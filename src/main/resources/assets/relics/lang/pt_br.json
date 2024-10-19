@@ -9,21 +9,35 @@
 
   "tooltip.relics.relic.tooltip.abilities": "Habilidades:",
 
-  "tooltip.relics.relic.ability.tooltip.level": "Nível: %1$s/%2$s",
-  "tooltip.relics.relic.ability.tooltip.rarity": "Raridade:",
   "tooltip.relics.relic.ability.tooltip.low_level": "Para usar, você precisa aumentar o nível da relíquia para %1$s %2$s.",
   "tooltip.relics.relic.ability.tooltip.no_stats": "Esta habilidade não possui estatísticas atualizáveis e não afeta a qualidade do relicário.",
+  "tooltip.relics.relic.ability.tooltip.ready_to_upgrade": "A habilidade está pronta para aprimorar %1$s.",
+
+  "tooltip.relics.relic.leveling_points.title": "Pontos de aprimoramento",
+
+  "tooltip.relics.relic.vanilla_experience.title": "Experiência do Minecraft vanilla",
+  "tooltip.relics.relic.vanilla_experience.current_amount": "Quantia atual: %1$s/%2$s [%3$s%%]",
+  "tooltip.relics.relic.vanilla_experience.total_amount": "Quantia total: %1$s",
+
+  "tooltip.relics.relic.relic_experience.title": "Experiência de relíquia",
+  "tooltip.relics.relic.relic_experience.current_amount": "Quantia atual: %1$s/%2$s [%3$s%%]",
+
+  "tooltip.relics.relic.max_level": "MÁX",
 
   "tooltip.relics.relic.ability.level": " [%1$s/%2$s]",
 
   "tooltip.relics.relic.status.positive": "§2§l[§2§l✔§2§l]",
   "tooltip.relics.relic.status.negative": "§4§l[§4§l✘§4§l]",
 
+  "tooltip.relics.relic.exchange.description": "Troca de experiência",
+  "tooltip.relics.relic.exchange.cost": "Converta %1$s de experiência do Minecraft Vanilla para 1%% da experiência máxima do nível atual da relíquia. O custo de troca aumenta após cada uso %2$s.",
+  "tooltip.relics.relic.exchange.locked": "A relíquia atingiu seu nível máximo.",
+
   "tooltip.relics.relic.upgrade.description": "Aprimorar Nível",
   "tooltip.relics.relic.upgrade.cost": "Custo: %1$s pontos de aprimoramento %2$s, %3$s pontos de experiência %4$s.",
   "tooltip.relics.relic.upgrade.locked": "A habilidade atingiu seu nível máximo.",
 
-  "tooltip.relics.relic.reroll.description": "Rerrolar estatísticas aleatórias",
+  "tooltip.relics.relic.reroll.description": "Reembaralhar estatísticas aleatórias",
   "tooltip.relics.relic.reroll.cost": "Custo: %1$s pontos de experiência %2$s.",
 
   "tooltip.relics.relic.reset.description": "Redefinir pontos de aprimoramento",
@@ -59,7 +73,7 @@
   "tooltip.relics.holy_locket.ability.steal.stat.amount.value": "%1$s%% da saúde regenerada.",
   "tooltip.relics.holy_locket.ability.steal.stat.radius.title": "Raio:",
   "tooltip.relics.holy_locket.ability.steal.stat.radius.value": "%1$s blocos.",
-  
+
   "item.relics.magic_mirror": "Espelho Mágico",
   "tooltip.relics.magic_mirror.description": "+1 ponto de experiência para cada uso da habilidade «Buraco de Minhoca» +1 ponto de experiência para cada 50 blocos até o ponto de teletransporte.",
   "tooltip.relics.magic_mirror.ability.teleport": "Buraco de Minhoca",
@@ -280,7 +294,7 @@
   "tooltip.relics.drowned_belt.ability.riptide.description": "Permite usar a habilidade «Riptide» do tridente sem chuva ou água, adicionando tempo de recarga a ela.",
   "tooltip.relics.drowned_belt.ability.riptide.stat.cooldown.title": "Tempo de Recarga:",
   "tooltip.relics.drowned_belt.ability.riptide.stat.cooldown.value": "%1$s segundos por nível de encantamento.",
-  
+
   "item.relics.hunter_belt": "Cinto do Caçador",
   "tooltip.relics.hunter_belt.description": "+1 ponto de experiência para cada ataque feito pelo animal de estimação do usuário.",
   "tooltip.relics.hunter_belt.ability.slots": "Capacidade de Carga",
@@ -291,7 +305,7 @@
   "tooltip.relics.hunter_belt.ability.training.description": "Aumenta o dano causado pelos animais de estimação do usuário.",
   "tooltip.relics.hunter_belt.ability.training.stat.damage.title": "Multiplicador de Dano:",
   "tooltip.relics.hunter_belt.ability.training.stat.damage.value": "+%1$s%%.",
-  
+
   "item.relics.leather_belt": "Cinto de Couro",
   "tooltip.relics.leather_belt.description": "+1 ponto de experiência para cada experiência adquirida pelos talismãs equipados.",
   "tooltip.relics.leather_belt.ability.slots": "Capacidade de Carga",
@@ -347,6 +361,16 @@
   "tooltip.relics.amphibian_boot.ability.swimming.stat.speed.value": "+%1$s%% para cada segundo.",
   "tooltip.relics.amphibian_boot.ability.swimming.stat.duration.title": "Duração máxima:",
   "tooltip.relics.amphibian_boot.ability.swimming.stat.duration.value": "%1$s segundos.",
+  "tooltip.relics.amphibian_boot.ability.slipping": "Deslizar",
+  "tooltip.relics.amphibian_boot.ability.slipping.description": "Aumenta a velocidade de movimento na chuva dependendo da sua duração.",
+  "tooltip.relics.amphibian_boot.ability.slipping.stat.speed.title": "Multiplicador de velocidade por segundo:",
+  "tooltip.relics.amphibian_boot.ability.slipping.stat.speed.value": "%1$s%%.",
+  "tooltip.relics.amphibian_boot.ability.slipping.stat.duration.title": "Duração Máxima:",
+  "tooltip.relics.amphibian_boot.ability.slipping.stat.duration.value": "%1$s segundos.",
+  "tooltip.relics.amphibian_boot.ability.gills": "Guelras",
+  "tooltip.relics.amphibian_boot.ability.gills.description": "Concede ao jogador a habilidade de não consumir ar enquanto estiver debaixo da água.",
+  "tooltip.relics.amphibian_boot.ability.gills.stat.chance.title": "Chance de ativação:",
+  "tooltip.relics.amphibian_boot.ability.gills.stat.chance.value": "%1$s%%.",
 
   "item.relics.spatial_sign": "Selo Espacial",
   "tooltip.relics.spatial_sign.description": "+1 ponto de experiência para cada segundo de retorno da habilidade «Fenda Temporal».",
@@ -396,6 +420,8 @@
   "tooltip.relics.space_dissector.ability.dissection.stat.time.title": "Tempo de Vida do Portal:",
   "tooltip.relics.space_dissector.ability.dissection.stat.time.value": "%1$s segundos.",
 
+  "item.relics.relic_experience_bottle": "Frasco de experiência de relíquia",
+
   "block.relics.researching_table": "Mesa de Pesquisa",
 
   "effect.relics.stun": "Atordoamento",
@@ -406,6 +432,6 @@
   "effect.relics.bleeding": "Sangramento",
 
   "command.relics.base.not_relic": "O item na mão deve ser uma relíquia!",
-
+  
   "key.relics.ability_list": "Mostrar a HUD de habilidades ativas"
 }
