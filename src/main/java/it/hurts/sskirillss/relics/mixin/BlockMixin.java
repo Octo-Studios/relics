@@ -58,13 +58,17 @@ public class BlockMixin {
         if (speed > -0.5D)
             return;
 
+        var level = player.getCommandSenderWorld();
+
+        if (!level.isClientSide())
+            relic.spreadRelicExperience(player, stack, 1);
+
         speed = Math.abs(speed);
 
         var power = relic.getStatValue(stack, "bounce", "power");
 
         player.setDeltaMovement(motion.multiply(1D, -power, 1D));
 
-        var level = player.getCommandSenderWorld();
         var random = level.getRandom();
 
         level.playSound(player, player.blockPosition(), SoundRegistry.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.min(2F, 0.25F + speed * 0.5F), (float) Math.max(0.1F, 2F - speed * 0.75F));

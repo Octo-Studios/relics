@@ -10,6 +10,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 public class DescriptionUtils {
+    public static final int TEXT_COLOR = 0x662F13;
     private static final ResourceLocation TOOLTIP = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tooltip.png");
 
     @OnlyIn(Dist.CLIENT)

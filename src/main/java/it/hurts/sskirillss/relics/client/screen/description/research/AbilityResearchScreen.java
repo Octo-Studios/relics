@@ -20,6 +20,7 @@ import it.hurts.sskirillss.relics.client.screen.description.research.widgets.Hin
 import it.hurts.sskirillss.relics.client.screen.description.research.widgets.StarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.research.widgets.TipWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
+import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
@@ -46,6 +47,8 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.FormattedCharSink;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
@@ -421,28 +424,28 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
             if (!relic.isAbilityResearched(stack, ability))
                 title.withStyle(ChatFormatting.OBFUSCATED);
 
-            guiGraphics.drawString(minecraft.font, title, 0, 0, 0x662f13, false);
+            guiGraphics.drawString(minecraft.font, title, 0, 0, DescriptionUtils.TEXT_COLOR, false);
 
             poseStack.popPose();
         }
 
-//        {
-//            poseStack.pushPose();
-//
-//            poseStack.translate(x + 184 + (102 / 2F), y + 100, 0F);
-//
-//            poseStack.scale(0.5F, 0.5F, 1F);
-//
-//            int yOff = 0;
-//
-//            for (FormattedCharSequence line : minecraft.font.split(ScreenUtils.obfuscate(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description"), 1D - relic.testAbilityResearchPercentage(stack, ability), minecraft.level.getGameTime() / 5), 180)) {
-//                guiGraphics.drawString(minecraft.font, line, -(minecraft.font.width(line) / 2F), yOff, 0x662f13, false);
-//
-//                yOff += 9;
-//            }
-//
-//            poseStack.popPose();
-//        }
+        {
+            poseStack.pushPose();
+
+            poseStack.translate(x + 184 + (102 / 2F), y + 100, 0F);
+
+            poseStack.scale(0.5F, 0.5F, 1F);
+
+            int yOff = 0;
+
+            for (FormattedCharSequence line : minecraft.font.split(ScreenUtils.obfuscate(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description"), 1D - relic.testAbilityResearchPercentage(stack, ability), 0), 180)) {
+                guiGraphics.drawString(minecraft.font, line, -(minecraft.font.width(line) / 2F), yOff, DescriptionUtils.TEXT_COLOR, false);
+
+                yOff += 9;
+            }
+
+            poseStack.popPose();
+        }
     }
 
     public Vec2 getScaledPos(Vec2 pos) {

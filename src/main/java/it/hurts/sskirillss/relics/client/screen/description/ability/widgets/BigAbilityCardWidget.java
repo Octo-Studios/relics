@@ -2,33 +2,119 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
+import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractBigCardWidget;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
+import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public class BigAbilityCardWidget extends AbstractBigCardWidget {
-    private final String ability;
+public class BigAbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget {
+    private AbilityDescriptionScreen screen;
 
-    public BigAbilityCardWidget(int x, int y, IRelicScreenProvider provider, String ability) {
-        super(x, y, provider);
+    public BigAbilityCardWidget(int x, int y, AbilityDescriptionScreen screen) {
+        super(x, y, 48, 74);
 
-        this.ability = ability;
+        this.screen = screen;
+    }
+
+    @Override
+    public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        var stack = screen.getStack();
+
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var player = minecraft.player;
+        var poseStack = guiGraphics.pose();
+        var ability = screen.getSelectedAbility();
+
+        var isUnlocked = relic.isAbilityUnlocked(stack, ability);
+
+        poseStack.pushPose();
+
+        float color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
+
+        GUIRenderer.begin(DescriptionTextures.getAbilityCardTexture(stack, ability), poseStack)
+                .anchor(SpriteAnchor.TOP_LEFT)
+                .color(color, color, color, 1F)
+                .pos(getX() + 7, getY() + 10)
+                .texSize(34, 49)
+                .end();
+
+        GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME, poseStack)
+                .anchor(SpriteAnchor.TOP_LEFT)
+                .pos(getX(), getY())
+                .end();
+
+        int xOff = 0;
+
+        for (int i = 0; i < 5; i++) {
+            GUIRenderer.begin(DescriptionTextures.BIG_STAR_HOLE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() + xOff + 4, getY() + 63)
+                    .end();
+
+            xOff += 8;
+        }
+
+        xOff = 0;
+
+        var quality = relic.getAbilityQuality(stack, ability);
+        var isAliquot = quality % 2 == 1;
+
+        for (int i = 0; i < Math.floor(quality / 2D); i++) {
+            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() + xOff + 4, getY() + 63)
+                    .end();
+
+            xOff += 8;
+        }
+
+        if (isAliquot)
+            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() + xOff + 4, getY() + 63)
+                    .patternSize(4, 7)
+                    .texSize(8, 7)
+                    .end();
+
+        poseStack.pushPose();
+
+        MutableComponent pointsComponent = Component.literal(String.valueOf(relic.getAbilityLevel(stack, ability))).withStyle(ChatFormatting.BOLD);
+
+        poseStack.scale(0.75F, 0.75F, 1F);
+
+        guiGraphics.drawString(minecraft.font, pointsComponent, (int) (((getX() + 25.5F) * 1.33F) - (minecraft.font.width(pointsComponent) / 2F)), (int) ((getY() + 4) * 1.33F), 0xFFE278, true);
+
+        poseStack.popPose();
+
+        if (isHovered())
+            GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() - 1, getY() - 1)
+                    .end();
+
+        poseStack.popPose();
     }
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        ItemStack stack = getProvider().getStack();
+        var stack = screen.getStack();
+        var ability = screen.getSelectedAbility();
+
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
@@ -71,7 +157,7 @@ public class BigAbilityCardWidget extends AbstractBigCardWidget {
         int yOff = 0;
 
         for (FormattedCharSequence entry : tooltip) {
-            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), 0x662f13, false);
+            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
 
             yOff += 5;
         }

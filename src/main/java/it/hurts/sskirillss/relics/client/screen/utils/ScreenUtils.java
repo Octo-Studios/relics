@@ -91,7 +91,7 @@ public class ScreenUtils {
                     MutableComponent component = Component.literal(String.valueOf(text.charAt(index))).setStyle(input.getStyle());
 
                     if (indices.contains(index))
-                        component.setStyle(style.applyTo(component.getStyle()));
+                        component.setStyle(style.withColor(0x7704b5).applyTo(component.getStyle()));
 
                     return component;
                 })
