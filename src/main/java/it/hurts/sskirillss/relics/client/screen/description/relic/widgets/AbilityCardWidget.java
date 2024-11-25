@@ -6,11 +6,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ChainParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.SparkParticleData;
@@ -47,7 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
-    private final RelicDescriptionScreen screen;
+    private final AbilityDescriptionScreen screen;
     private final String ability;
 
     private float scale = 1F;
@@ -56,7 +55,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
     private int shakeDelta = 0;
     private int colorDelta = 0;
 
-    public AbilityCardWidget(int x, int y, RelicDescriptionScreen screen, String ability) {
+    public AbilityCardWidget(int x, int y, AbilityDescriptionScreen screen, String ability) {
         super(x, y, 32, 47);
 
         this.screen = screen;
@@ -79,7 +78,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (isEnoughLevel) {
             if (isLockUnlocked) {
                 if (isAbilityResearched)
-                    minecraft.setScreen(new AbilityDescriptionScreen(minecraft.player, screen.container, screen.slot, screen.screen, ability));
+                    screen.setSelectedAbility(ability);
                 else
                     minecraft.setScreen(new AbilityResearchScreen(minecraft.player, screen.container, screen.slot, screen.screen, ability));
             } else {
@@ -309,7 +308,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (!(screen.stack.getItem() instanceof IRelicItem relic))
             return;
 
-        float maxScale = 1.1F;
+        float maxScale = 1.15F;
         float minScale = 1F;
 
         RandomSource random = minecraft.player.getRandom();
@@ -346,6 +345,11 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         if (colorDelta > 0)
             colorDelta--;
+    }
+
+    @Override
+    public boolean isLocked() {
+        return screen.getSelectedAbility().equals(ability);
     }
 
     @Override
@@ -435,7 +439,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             poseStack.scale(0.5F, 0.5F, 0.5F);
 
-            guiGraphics.drawString(minecraft.font, entry, -(minecraft.font.width(entry) / 2), ((y + yOff + 9) * 2), 0x662f13, false);
+            guiGraphics.drawString(minecraft.font, entry, -(minecraft.font.width(entry) / 2), ((y + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
 
             yOff += 5;
 
@@ -445,7 +449,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
     @Override
     public void playDownSound(SoundManager handler) {
-        if (screen.getStack().getItem() instanceof IRelicItem relic && relic.isAbilityUnlocked(screen.stack, ability))
+        if (!isLocked() && screen.getStack().getItem() instanceof IRelicItem relic && relic.isAbilityUnlocked(screen.stack, ability))
             super.playDownSound(handler);
     }
 }

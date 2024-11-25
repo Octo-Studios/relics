@@ -21,7 +21,13 @@ public class DescriptionTextures {
     public static final ResourceLocation ACTION_BUTTON_OUTLINE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/action_button_outline.png");
     public static final ResourceLocation STAT_DELIMITER = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/stat_delimiter.png");
 
+    public static final ResourceLocation TAB_ACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tab_active.png");
+    public static final ResourceLocation TAB_INACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tab_inactive.png");
+    public static final ResourceLocation TAB_INACTIVE_OUTLINE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tab_inactive_outline.png");
+
+    public static final ResourceLocation BIG_STAR_HOLE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/big_star_hole.png");
     public static final ResourceLocation BIG_STAR_ACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/big_star_active.png");
+    public static final ResourceLocation BIG_STAR_INACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/big_star_inactive.png");
 
     public static final ResourceLocation SMALL_CARD_LOCK_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/small_card_lock_background.png");
     public static final ResourceLocation SMALL_CARD_RESEARCH_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/small_card_research_background.png");
@@ -32,7 +38,8 @@ public class DescriptionTextures {
     public static final ResourceLocation RESEARCH_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/research/research_background.png");
     public static final ResourceLocation RESEARCH_FOG = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/research/research_fog.png");
 
-    public static final ResourceLocation BIG_CARD_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/big_card_background.png");
+    public static final ResourceLocation BIG_CARD_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/big_card_background.png");
+    public static final ResourceLocation BIG_CARD_FRAME = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/big_card_frame.png");
     public static final ResourceLocation BIG_CARD_FRAME_OUTLINE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/big_card_frame_outline.png");
 
     public static final ResourceLocation CHAINS_INACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/chains_inactive.png");

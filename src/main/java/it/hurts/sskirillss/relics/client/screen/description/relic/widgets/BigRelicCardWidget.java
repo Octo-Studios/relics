@@ -2,11 +2,17 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractBigCardWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
+import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -17,14 +23,104 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
 
-public class BigRelicCardWidget extends AbstractBigCardWidget {
-    public BigRelicCardWidget(int x, int y, IRelicScreenProvider provider) {
-        super(x, y, provider);
+public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHoverableWidget {
+    private RelicDescriptionScreen screen;
+
+    public BigRelicCardWidget(int x, int y, RelicDescriptionScreen screen) {
+        super(x, y, 48, 74);
+
+        this.screen = screen;
+    }
+
+    @Override
+    public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        var stack = screen.getStack();
+
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var player = minecraft.player;
+        var poseStack = guiGraphics.pose();
+
+        poseStack.pushPose();
+
+        GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME, poseStack)
+                .anchor(SpriteAnchor.TOP_LEFT)
+                .pos(getX(), getY())
+                .end();
+
+        int xOff = 0;
+
+        for (int i = 0; i < 5; i++) {
+            GUIRenderer.begin(DescriptionTextures.BIG_STAR_HOLE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() + xOff + 4, getY() + 63)
+                    .end();
+
+            xOff += 8;
+        }
+
+        xOff = 0;
+
+        var quality = relic.getRelicQuality(stack);
+        var isAliquot = quality % 2 == 1;
+
+        for (int i = 0; i < Math.floor(quality / 2D); i++) {
+            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() + xOff + 4, getY() + 63)
+                    .end();
+
+            xOff += 8;
+        }
+
+        if (isAliquot)
+            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() + xOff + 4, getY() + 63)
+                    .patternSize(4, 7)
+                    .texSize(8, 7)
+                    .end();
+
+        poseStack.pushPose();
+
+        float scale = 1.75F;
+
+        poseStack.translate(getX() + 10 + 8 * scale, getY() + 23 + Math.sin((player.tickCount + pPartialTick) * 0.1F) * 2F + 8 * scale, 0);
+
+        poseStack.mulPose(Axis.ZP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.05F) * 5F));
+        poseStack.mulPose(Axis.YP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.075F) * 25F));
+
+        poseStack.translate(-8 * scale, -8 * scale, -150 * scale);
+
+        poseStack.scale(scale, scale, scale);
+
+        guiGraphics.renderItem(stack, 0, 0);
+
+        poseStack.popPose();
+
+        poseStack.pushPose();
+
+        poseStack.scale(0.75F, 0.75F, 1F);
+
+        MutableComponent levelComponent = Component.literal(String.valueOf(relic.getRelicLevel(stack))).withStyle(ChatFormatting.BOLD);
+
+        guiGraphics.drawString(minecraft.font, levelComponent, (int) (((getX() + 25.5F) * 1.33F) - (minecraft.font.width(levelComponent) / 2F)), (int) ((getY() + 4) * 1.33F), 0xFFE278, true);
+
+        poseStack.popPose();
+
+        if (isHovered())
+            GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() - 1, getY() - 1)
+                    .end();
+
+        poseStack.popPose();
     }
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        ItemStack stack = getProvider().getStack();
+        ItemStack stack = screen.getStack();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
@@ -67,7 +163,7 @@ public class BigRelicCardWidget extends AbstractBigCardWidget {
         int yOff = 0;
 
         for (FormattedCharSequence entry : tooltip) {
-            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), 0x662f13, false);
+            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
 
             yOff += 5;
         }

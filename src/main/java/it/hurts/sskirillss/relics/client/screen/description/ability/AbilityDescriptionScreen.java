@@ -7,20 +7,29 @@ import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.BigAbilityCardWidget;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.RerollActionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.ResetActionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.UpgradeActionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.relic.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.AbilityCardWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
@@ -29,17 +38,22 @@ import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.network.chat.Style;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider {
+public class AbilityDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, ITabbedDescriptionScreen {
     public final Screen screen;
 
     @Getter
@@ -49,25 +63,29 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     @Getter
     public ItemStack stack;
 
-    public final String ability;
-
-    public int backgroundHeight = 256;
-    public int backgroundWidth = 418;
+    private final int backgroundHeight = 256;
+    private final int backgroundWidth = 418;
 
     public UpgradeActionWidget upgradeButton;
     public RerollActionWidget rerollButton;
     public ResetActionWidget resetButton;
 
-    public AbilityDescriptionScreen(Player player, int container, int slot, Screen screen, String ability) {
+    public AbilityDescriptionScreen(Player player, int container, int slot, Screen screen) {
         super(Component.empty());
 
         this.container = container;
         this.slot = slot;
         this.screen = screen;
 
-        this.ability = ability;
-
         stack = DescriptionUtils.gatherRelicStack(player, slot);
+    }
+
+    public String getSelectedAbility() {
+        return DescriptionCache.getSelectedAbility((IRelicItem) stack.getItem());
+    }
+
+    public void setSelectedAbility(String ability) {
+        DescriptionCache.setSelectedAbility((IRelicItem) stack.getItem(), ability);
     }
 
     @Override
@@ -75,10 +93,16 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
+        var ability = getSelectedAbility();
+
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
-        this.addRenderableWidget(new BigAbilityCardWidget(x + 60, y + 47, this, ability));
+        this.addRenderableWidget(new PageWidget(x + 81, y + 123, this, DescriptionPage.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+        this.addRenderableWidget(new PageWidget(x + 100, y + 123, this, DescriptionPage.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+        this.addRenderableWidget(new PageWidget(x + 119, y + 123, this, DescriptionPage.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+
+        this.addRenderableWidget(new BigAbilityCardWidget(x + 60, y + 47, this));
 
         this.addRenderableWidget(new LogoWidget(x + 313, y + 57, this));
 
@@ -91,26 +115,39 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         int xOff = 0;
 
-        for (AbilityBadge badge : BadgeRegistry.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof AbilityBadge).map(entry -> (AbilityBadge) entry).toList()) {
-            if (!badge.isVisible(stack, ability))
-                continue;
+        if (relic.isAbilityUnlocked(stack, ability)) {
+            for (AbilityBadge badge : BadgeRegistry.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof AbilityBadge).map(entry -> (AbilityBadge) entry).toList()) {
+                if (!badge.isVisible(stack, ability))
+                    continue;
 
-            this.addRenderableWidget(new AbilityBadgeWidget(x + 270 - xOff, y + 63, this, badge, ability));
+                this.addRenderableWidget(new AbilityBadgeWidget(x + 270 - xOff, y + 63, this, badge, ability));
 
-            xOff += 15;
+                xOff += 15;
+            }
         }
 
-        int yOff = 0;
+        Set<String> abilities = relic.getRelicData().getAbilities().getAbilities().keySet();
 
-        for (Map.Entry<String, StatData> entry : relic.getAbilityData(ability).getStats().entrySet()) {
-            this.addRenderableWidget(new StatWidget(x + 77, y + yOff + 148, this, entry.getKey()));
+        int cardWidth = 32;
+        int containerWidth = 209;
 
-            yOff += 14;
+        int count = Math.min(5, abilities.size());
+
+        int spacing = cardWidth + 8 + (3 * (5 - count));
+
+        xOff = (containerWidth / 2) - (((cardWidth * count) + ((spacing - cardWidth) * Math.max(count - 1, 0))) / 2);
+
+        for (String entry : abilities) {
+            this.addRenderableWidget(new AbilityCardWidget(x + 77 + xOff, y + 153, this, entry));
+
+            xOff += spacing;
         }
 
-        this.upgradeButton = this.addRenderableWidget(new UpgradeActionWidget(x + 288, y + 152, this, ability));
-        this.rerollButton = this.addRenderableWidget(new RerollActionWidget(x + 288, y + 170, this, ability));
-        this.resetButton = this.addRenderableWidget(new ResetActionWidget(x + 288, y + 188, this, ability));
+        this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 121, this));
+
+        this.upgradeButton = this.addRenderableWidget(new UpgradeActionWidget(x + 288, y + 63, this, ability));
+        this.rerollButton = this.addRenderableWidget(new RerollActionWidget(x + 288, y + 80, this, ability));
+        this.resetButton = this.addRenderableWidget(new ResetActionWidget(x + 288, y + 97, this, ability));
     }
 
     @Override
@@ -118,6 +155,16 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         super.tick();
 
         stack = DescriptionUtils.gatherRelicStack(minecraft.player, slot);
+
+        LocalPlayer player = minecraft.player;
+
+        if (player == null || stack == null || !(stack.getItem() instanceof IRelicItem))
+            return;
+
+        RandomSource random = player.getRandom();
+
+        int x = (this.width - backgroundWidth) / 2;
+        int y = (this.height - backgroundHeight) / 2;
     }
 
     @Override
@@ -128,6 +175,8 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
             return;
+
+        var ability = getSelectedAbility();
 
         RelicData relicData = relic.getRelicData();
 
@@ -160,18 +209,9 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
                         .frame(15, 2))
                 .end();
 
-        float color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
-
-        GUIRenderer.begin(DescriptionTextures.getAbilityCardTexture(stack, ability), poseStack)
-                .anchor(SpriteAnchor.TOP_LEFT)
-                .color(color, color, color, 1F)
-                .pos(x + 67, y + 57)
-                .texSize(34, 49)
-                .end();
-
         GUIRenderer.begin(DescriptionTextures.TOP_BACKGROUND, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(x + 60, y + 47)
+                .pos(x + 107, y + 47)
                 .end();
 
         GUIRenderer.begin(DescriptionTextures.BOTTOM_BACKGROUND, poseStack)
@@ -201,27 +241,112 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         poseStack.pushPose();
 
-        MutableComponent pointsComponent = Component.literal(String.valueOf(level)).withStyle(ChatFormatting.BOLD);
-
         poseStack.scale(0.75F, 0.75F, 1F);
 
-        guiGraphics.drawString(minecraft.font, pointsComponent, (int) (((x + 85.5F) * 1.33F) - (minecraft.font.width(pointsComponent) / 2F)), (int) ((y + 51) * 1.33F), 0xFFE278, true);
-
         guiGraphics.drawString(minecraft.font, Component.translatableWithFallback("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability)
-                .withStyle(ChatFormatting.BOLD), (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), 0x662f13, false);
-
-        yOff = 9;
+                .withStyle(ChatFormatting.BOLD), (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
 
         poseStack.popPose();
 
         poseStack.pushPose();
 
-        poseStack.scale(0.5F, 0.5F, 0.5F);
+        poseStack.scale(0.5F, 0.5F, 1F);
 
-        for (FormattedCharSequence line : minecraft.font.split(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description"), 340)) {
-            guiGraphics.drawString(minecraft.font, line, (x + 112) * 2, (y + 74) * 2 + yOff, 0x662f13, false);
+        yOff = 9;
 
-            yOff += 9;
+        List<MutableComponent> components = new ArrayList<>();
+
+        var wantsUpgrade = upgradeButton.isHovered() && relic.mayUpgrade(stack, ability);
+        var wantsReroll = rerollButton.isHovered() && relic.mayReroll(stack, ability);
+        var wantsReset = resetButton.isHovered() && relic.mayReset(stack, ability);
+
+        int color = DescriptionUtils.TEXT_COLOR;
+
+        for (var stat : relic.getAbilityData(ability).getStats().values()) {
+            var component = Component.literal(String.valueOf(stat.getFormatValue().apply(relic.getStatValue(stack, ability, stat.getId(), wantsUpgrade ? level + 1 : wantsReset ? 0 : level)))).withStyle(ChatFormatting.BOLD);
+
+            if (wantsUpgrade)
+                color = 0x228B22;
+
+            if (wantsReroll)
+                color = 0xFF8C00;
+
+            if (wantsReset)
+                color = 0xB22222;
+
+            components.add(component.withColor(color));
+        }
+
+        var pattern = Pattern.compile("%(\\d+)\\$s");
+
+        for (var line : font.getSplitter().splitLines(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description"), 340, Style.EMPTY)) {
+            String unformattedLine = line.getString().replace("%%", "%");
+
+            int currentX = (x + 112) * 2;
+            int currentY = (y + 74) * 2 + yOff;
+
+            var matcher = pattern.matcher(unformattedLine);
+
+            int lastEnd = 0;
+
+            while (matcher.find()) {
+                int index = Integer.parseInt(matcher.group(1)) - 1;
+
+                String staticText = unformattedLine.substring(lastEnd, matcher.start());
+
+                if (!staticText.isEmpty()) {
+                    guiGraphics.drawString(font, staticText, currentX, currentY, DescriptionUtils.TEXT_COLOR, false);
+
+                    currentX += font.width(staticText);
+                }
+
+                if (index >= 0 && index < components.size()) {
+                    int attachedStart = matcher.end();
+                    int attachedEnd = attachedStart;
+
+                    while (attachedEnd < unformattedLine.length()) {
+                        char c = unformattedLine.charAt(attachedEnd);
+
+                        if (Character.isWhitespace(c) || ".,!?;:".indexOf(c) != -1)
+                            break;
+
+                        attachedEnd++;
+                    }
+
+                    String attachedText = "";
+
+                    if (attachedEnd > attachedStart)
+                        attachedText = unformattedLine.substring(attachedStart, attachedEnd);
+
+                    MutableComponent dynamicComponent = components.get(index);
+
+                    var dynamicValue = dynamicComponent.append(attachedText);
+
+                    guiGraphics.drawString(font, dynamicValue, currentX + 2, currentY + 1, color, false);
+
+                    int frameStartX = currentX - 1;
+                    int frameStartY = currentY - 1;
+                    int frameEndX = currentX + font.width(dynamicValue) + 4;
+                    int frameEndY = currentY + font.lineHeight + 1;
+
+                    guiGraphics.fill(frameStartX, frameStartY, frameEndX, frameStartY + 1, 0xFF000000 + color);
+                    guiGraphics.fill(frameStartX, frameEndY - 1, frameEndX, frameEndY, 0xFF000000 + color);
+                    guiGraphics.fill(frameStartX, frameStartY, frameStartX + 1, frameEndY, 0xFF000000 + color);
+                    guiGraphics.fill(frameEndX - 1, frameStartY, frameEndX, frameEndY, 0xFF000000 + color);
+
+                    currentX += font.width(dynamicValue) + 3;
+
+                    lastEnd = attachedEnd;
+                }
+            }
+
+            if (lastEnd < unformattedLine.length()) {
+                String remainingText = unformattedLine.substring(lastEnd);
+
+                guiGraphics.drawString(font, remainingText, currentX, currentY, DescriptionUtils.TEXT_COLOR, false);
+            }
+
+            yOff += 10;
         }
 
         poseStack.popPose();
@@ -253,8 +378,13 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     }
 
     @Override
+    public void rebuildWidgets() {
+        super.rebuildWidgets();
+    }
+
+    @Override
     public void onClose() {
-        minecraft.setScreen(new RelicDescriptionScreen(minecraft.player, container, slot, screen));
+        Minecraft.getInstance().setScreen(screen);
     }
 
     @Override
@@ -265,5 +395,10 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     @Override
     public int getAutoScale() {
         return 0;
+    }
+
+    @Override
+    public DescriptionPage getPage() {
+        return DescriptionPage.ABILITY;
     }
 }
