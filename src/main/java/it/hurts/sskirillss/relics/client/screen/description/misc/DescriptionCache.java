@@ -53,6 +53,40 @@ public class DescriptionCache {
                 .build());
     }
 
+    public static String getSelectedExperienceSource(IRelicItem relic) {
+        var cache = getEntry(relic);
+        var index = cache.getSelectionIndex(DescriptionPage.EXPERIENCE);
+        var sources = relic.getLevelingData().getSources().getSources().keySet().stream().toList();
+        var source = sources.get(index);
+
+        if (source == null) {
+            index = 0;
+
+            source = sources.get(index);
+
+            setEntry(relic, cache.toBuilder()
+                    .selectionIndex(DescriptionPage.EXPERIENCE, index)
+                    .build());
+        }
+
+        return source;
+    }
+
+    public static void setSelectedExperienceSource(IRelicItem relic, String source) {
+        var cache = getEntry(relic);
+
+        var sources = relic.getLevelingData().getSources().getSources();
+
+        if (!sources.containsKey(source))
+            return;
+
+        var index = new ArrayList<>(sources.keySet()).indexOf(source);
+
+        setEntry(relic, cache.toBuilder()
+                .selectionIndex(DescriptionPage.ABILITY, index)
+                .build());
+    }
+
     @NoArgsConstructor
     @AllArgsConstructor
     @Builder(toBuilder = true)

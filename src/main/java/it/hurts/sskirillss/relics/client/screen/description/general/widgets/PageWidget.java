@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
-import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
@@ -90,7 +90,7 @@ public class PageWidget extends AbstractDescriptionWidget implements IHoverableW
 
     @Override
     public boolean isLocked() {
-        return minecraft.screen instanceof ITabbedDescriptionScreen screen && screen.getPage() == page;
+        return minecraft.screen instanceof IPagedDescriptionScreen screen && screen.getPage() == page;
     }
 
     @Override

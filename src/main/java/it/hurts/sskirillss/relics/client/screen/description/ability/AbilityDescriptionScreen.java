@@ -6,24 +6,22 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
+import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
-import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.BigAbilityCardWidget;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.RerollActionWidget;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.ResetActionWidget;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.UpgradeActionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.AbilityCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
+import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
+import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -39,21 +37,22 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.RandomSource;
+import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, ITabbedDescriptionScreen {
+public class AbilityDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, IPagedDescriptionScreen {
     public final Screen screen;
 
     @Getter
@@ -92,6 +91,8 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     protected void init() {
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
+
+        updateCache(relic);
 
         var ability = getSelectedAbility();
 
@@ -145,9 +146,11 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 121, this));
 
-        this.upgradeButton = this.addRenderableWidget(new UpgradeActionWidget(x + 288, y + 63, this, ability));
-        this.rerollButton = this.addRenderableWidget(new RerollActionWidget(x + 288, y + 80, this, ability));
-        this.resetButton = this.addRenderableWidget(new ResetActionWidget(x + 288, y + 97, this, ability));
+        if (relic.isAbilityUnlocked(stack, ability)) {
+            this.upgradeButton = this.addRenderableWidget(new UpgradeActionWidget(x + 288, y + 63, this, ability));
+            this.rerollButton = this.addRenderableWidget(new RerollActionWidget(x + 288, y + 80, this, ability));
+            this.resetButton = this.addRenderableWidget(new ResetActionWidget(x + 288, y + 97, this, ability));
+        }
     }
 
     @Override
@@ -156,12 +159,14 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         stack = DescriptionUtils.gatherRelicStack(minecraft.player, slot);
 
-        LocalPlayer player = minecraft.player;
+        var ability = getSelectedAbility();
 
-        if (player == null || stack == null || !(stack.getItem() instanceof IRelicItem))
+        var player = minecraft.player;
+
+        if (player == null || stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        RandomSource random = player.getRandom();
+        var random = player.getRandom();
 
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
@@ -219,32 +224,25 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
                 .pos(x + 60, y + 133)
                 .end();
 
-        int quality = relic.getAbilityQuality(stack, ability);
-        boolean isAliquot = quality % 2 == 1;
-
-        for (int i = 0; i < Math.floor(quality / 2D); i++) {
-            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(x + xOff + 64, y + 110)
-                    .end();
-
-            xOff += 8;
-        }
-
-        if (isAliquot)
-            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(x + xOff + 64, y + 110)
-                    .patternSize(4, 7)
-                    .texSize(8, 7)
-                    .end();
-
         poseStack.pushPose();
 
         poseStack.scale(0.75F, 0.75F, 1F);
 
-        guiGraphics.drawString(minecraft.font, Component.translatableWithFallback("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability)
-                .withStyle(ChatFormatting.BOLD), (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
+        var title = Component.translatableWithFallback("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability);
+
+        if (!relic.isAbilityUnlocked(stack, ability)) {
+            title = ScreenUtils.stylizeWidthReplacement(title, 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(0x9E00B0), ability.length());
+
+            var random = player.getRandom();
+
+            var shakeX = MathUtils.randomFloat(random) * 0.5F;
+            var shakeY = MathUtils.randomFloat(random) * 0.5F;
+
+            poseStack.translate(shakeX, shakeY, 0F);
+        } else
+            title.withStyle(ChatFormatting.BOLD);
+
+        guiGraphics.drawString(minecraft.font, title, (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
 
         poseStack.popPose();
 
@@ -254,99 +252,106 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         yOff = 9;
 
-        List<MutableComponent> components = new ArrayList<>();
+        if (relic.isAbilityUnlocked(stack, ability)) {
+            List<MutableComponent> components = new ArrayList<>();
 
-        var wantsUpgrade = upgradeButton.isHovered() && relic.mayUpgrade(stack, ability);
-        var wantsReroll = rerollButton.isHovered() && relic.mayReroll(stack, ability);
-        var wantsReset = resetButton.isHovered() && relic.mayReset(stack, ability);
+            var wantsUpgrade = upgradeButton != null && upgradeButton.isHovered() && relic.mayUpgrade(stack, ability);
+            var wantsReroll = rerollButton != null && rerollButton.isHovered() && relic.mayReroll(stack, ability);
+            var wantsReset = resetButton != null && resetButton.isHovered() && relic.mayReset(stack, ability);
 
-        int color = DescriptionUtils.TEXT_COLOR;
+            int color = DescriptionUtils.TEXT_COLOR;
 
-        for (var stat : relic.getAbilityData(ability).getStats().values()) {
-            var component = Component.literal(String.valueOf(stat.getFormatValue().apply(relic.getStatValue(stack, ability, stat.getId(), wantsUpgrade ? level + 1 : wantsReset ? 0 : level)))).withStyle(ChatFormatting.BOLD);
+            for (var stat : relic.getAbilityData(ability).getStats().values()) {
+                var component = Component.literal(String.valueOf(stat.getFormatValue().apply(relic.getStatValue(stack, ability, stat.getId(), wantsUpgrade ? level + 1 : wantsReset ? 0 : level)))).withStyle(ChatFormatting.BOLD);
 
-            if (wantsUpgrade)
-                color = 0x228B22;
+                if (wantsUpgrade)
+                    color = 0x228B22;
 
-            if (wantsReroll)
-                color = 0xFF8C00;
+                if (wantsReroll)
+                    color = 0xFF8C00;
 
-            if (wantsReset)
-                color = 0xB22222;
+                if (wantsReset)
+                    color = 0xB22222;
 
-            components.add(component.withColor(color));
-        }
+                if (color != DescriptionUtils.TEXT_COLOR) {
+                    var brightness = (float) (0.75F + 0.1F * Math.sin(2 * Math.PI * 0.75F * player.tickCount / 20F));
 
-        var pattern = Pattern.compile("%(\\d+)\\$s");
+                    var hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
 
-        for (var line : font.getSplitter().splitLines(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description"), 340, Style.EMPTY)) {
-            String unformattedLine = line.getString().replace("%%", "%");
+                    hsb[2] = Mth.clamp(brightness, 0F, 1F);
 
-            int currentX = (x + 112) * 2;
-            int currentY = (y + 74) * 2 + yOff;
-
-            var matcher = pattern.matcher(unformattedLine);
-
-            int lastEnd = 0;
-
-            while (matcher.find()) {
-                int index = Integer.parseInt(matcher.group(1)) - 1;
-
-                String staticText = unformattedLine.substring(lastEnd, matcher.start());
-
-                if (!staticText.isEmpty()) {
-                    guiGraphics.drawString(font, staticText, currentX, currentY, DescriptionUtils.TEXT_COLOR, false);
-
-                    currentX += font.width(staticText);
+                    color = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
                 }
 
-                if (index >= 0 && index < components.size()) {
-                    int attachedStart = matcher.end();
-                    int attachedEnd = attachedStart;
+                components.add(component.withColor(color));
+            }
 
-                    while (attachedEnd < unformattedLine.length()) {
-                        char c = unformattedLine.charAt(attachedEnd);
+            var pattern = Pattern.compile("([^ .,!?;:]*%(\\d+)\\$s[^ .,!?;:]*)");
 
-                        if (Character.isWhitespace(c) || ".,!?;:".indexOf(c) != -1)
-                            break;
+            for (var line : font.getSplitter().splitLines(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description"), 340, Style.EMPTY)) {
+                String unformattedLine = line.getString().replace("%%", "%");
 
-                        attachedEnd++;
+                int currentX = (x + 112) * 2;
+                int currentY = (y + 74) * 2 + yOff;
+
+                var matcher = pattern.matcher(unformattedLine);
+
+                int lastEnd = 0;
+
+                while (matcher.find()) {
+                    String dynamicSegment = matcher.group(1);
+
+                    int index = Integer.parseInt(matcher.group(2)) - 1;
+
+                    String staticText = unformattedLine.substring(lastEnd, matcher.start());
+
+                    if (!staticText.isEmpty()) {
+                        guiGraphics.drawString(font, staticText, currentX, currentY, DescriptionUtils.TEXT_COLOR, false);
+
+                        currentX += font.width(staticText);
                     }
 
-                    String attachedText = "";
+                    if (index >= 0 && index < components.size()) {
+                        MutableComponent dynamicComponent = components.get(index);
 
-                    if (attachedEnd > attachedStart)
-                        attachedText = unformattedLine.substring(attachedStart, attachedEnd);
+                        var dynamicValue = Component.literal(dynamicSegment.substring(0, dynamicSegment.indexOf('%')) + dynamicComponent.getString() + dynamicSegment.substring(dynamicSegment.lastIndexOf('s') + 1)).withStyle(dynamicComponent.getStyle());
 
-                    MutableComponent dynamicComponent = components.get(index);
+                        guiGraphics.drawString(font, dynamicValue, currentX + 2, currentY + 1, color, false);
 
-                    var dynamicValue = dynamicComponent.append(attachedText);
+                        int frameStartX = currentX - 1;
+                        int frameStartY = currentY - 1;
+                        int frameEndX = currentX + font.width(dynamicValue) + 4;
+                        int frameEndY = currentY + font.lineHeight + 1;
 
-                    guiGraphics.drawString(font, dynamicValue, currentX + 2, currentY + 1, color, false);
+                        guiGraphics.fill(frameStartX, frameStartY, frameEndX, frameStartY + 1, 0xFF000000 + color);
+                        guiGraphics.fill(frameStartX, frameEndY - 1, frameEndX, frameEndY, 0xFF000000 + color);
+                        guiGraphics.fill(frameStartX, frameStartY, frameStartX + 1, frameEndY, 0xFF000000 + color);
+                        guiGraphics.fill(frameEndX - 1, frameStartY, frameEndX, frameEndY, 0xFF000000 + color);
 
-                    int frameStartX = currentX - 1;
-                    int frameStartY = currentY - 1;
-                    int frameEndX = currentX + font.width(dynamicValue) + 4;
-                    int frameEndY = currentY + font.lineHeight + 1;
+                        currentX += font.width(dynamicValue) + 3;
 
-                    guiGraphics.fill(frameStartX, frameStartY, frameEndX, frameStartY + 1, 0xFF000000 + color);
-                    guiGraphics.fill(frameStartX, frameEndY - 1, frameEndX, frameEndY, 0xFF000000 + color);
-                    guiGraphics.fill(frameStartX, frameStartY, frameStartX + 1, frameEndY, 0xFF000000 + color);
-                    guiGraphics.fill(frameEndX - 1, frameStartY, frameEndX, frameEndY, 0xFF000000 + color);
-
-                    currentX += font.width(dynamicValue) + 3;
-
-                    lastEnd = attachedEnd;
+                        lastEnd = matcher.end();
+                    }
                 }
+
+                if (lastEnd < unformattedLine.length())
+                    guiGraphics.drawString(font, unformattedLine.substring(lastEnd), currentX, currentY, DescriptionUtils.TEXT_COLOR, false);
+
+                yOff += 10;
             }
+        } else {
+            List<Number> placeholders = new ArrayList<>();
 
-            if (lastEnd < unformattedLine.length()) {
-                String remainingText = unformattedLine.substring(lastEnd);
+            for (var stat : relic.getAbilityData(ability).getStats().values())
+                placeholders.add(stat.getFormatValue().apply(relic.getStatValue(stack, ability, stat.getId(), level)));
 
-                guiGraphics.drawString(font, remainingText, currentX, currentY, DescriptionUtils.TEXT_COLOR, false);
+            var component = ScreenUtils.stylizeWidthReplacement(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description", placeholders.toArray()), 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT), ability.length());
+
+            for (FormattedCharSequence line : font.split(component, 340)) {
+                guiGraphics.drawString(font, line, (x + 112) * 2, (y + 74) * 2 + yOff, 0x662f13, false);
+
+                yOff += 10;
             }
-
-            yOff += 10;
         }
 
         poseStack.popPose();

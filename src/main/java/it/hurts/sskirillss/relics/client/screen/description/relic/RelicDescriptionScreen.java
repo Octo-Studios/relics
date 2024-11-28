@@ -7,8 +7,9 @@ import it.hurts.sskirillss.relics.badges.base.RelicBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
-import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.PageWidget;
@@ -45,7 +46,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import java.awt.*;
 
 @OnlyIn(Dist.CLIENT)
-public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, ITabbedDescriptionScreen {
+public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, IPagedDescriptionScreen {
     public final Screen screen;
 
     @Getter
@@ -72,6 +73,8 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
     protected void init() {
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
+
+        updateCache(relic);
 
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;

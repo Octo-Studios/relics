@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.client.screen.description.relic;
+package it.hurts.sskirillss.relics.client.screen.description.experience;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -8,13 +8,16 @@ import it.hurts.sskirillss.relics.badges.base.RelicBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
-import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ExperienceGemWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.PageWidget;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
@@ -44,9 +47,10 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.awt.*;
+import java.util.Set;
 
 @OnlyIn(Dist.CLIENT)
-public class ExperienceDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, ITabbedDescriptionScreen {
+public class ExperienceDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, IPagedDescriptionScreen {
     public final Screen screen;
 
     @Getter
@@ -69,10 +73,20 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         stack = DescriptionUtils.gatherRelicStack(player, slot);
     }
 
+    public String getSelectedSource() {
+        return DescriptionCache.getSelectedExperienceSource((IRelicItem) stack.getItem());
+    }
+
+    public void setSelectedSource(String source) {
+        DescriptionCache.setSelectedExperienceSource((IRelicItem) stack.getItem(), source);
+    }
+
     @Override
     protected void init() {
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
+
+        updateCache(relic);
 
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
@@ -101,6 +115,23 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
             this.addRenderableWidget(new RelicBadgeWidget(x + 270 - xOff, y + 63, this, badge));
 
             xOff += 15;
+        }
+
+        Set<String> sources = relic.getLevelingData().getSources().getSources().keySet();
+
+        int cardWidth = 30;
+        int containerWidth = 209;
+
+        int count = Math.min(5, sources.size());
+
+        int spacing = cardWidth + 8 + (3 * (5 - count));
+
+        xOff = (containerWidth / 2) - (((cardWidth * count) + ((spacing - cardWidth) * Math.max(count - 1, 0))) / 2);
+
+        for (String entry : sources) {
+            this.addRenderableWidget(new ExperienceGemWidget(x + 77 + xOff, y + 153, this, entry));
+
+            xOff += spacing;
         }
 
         this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 121, this));

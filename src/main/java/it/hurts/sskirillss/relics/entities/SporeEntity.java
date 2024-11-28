@@ -91,8 +91,57 @@ public class SporeEntity extends ThrowableProjectile {
             if (isStuck())
                 setLifetime(getLifetime() + 1);
 
-            if (getLifetime() > relic.getStatValue(stack, "spore", "duration") * 20)
+            if (getLifetime() > relic.getStatValue(stack, "spore", "duration") * 20) {
+                level.playSound(null, this.blockPosition(), SoundEvents.PUFFER_FISH_BLOW_UP, SoundSource.MASTER, 1F, 1F + random.nextFloat());
+
+                double inlinedSize = Math.pow(Math.log10(1 + getSize()), 1D / 3D);
+
+                ParticleUtils.createBall(ParticleUtils.constructSimpleSpark(new Color(100 + level.getRandom().nextInt(50), 255, 0),
+                                (float) (inlinedSize * 0.35F), 40, 0.9F),
+                        this.position().add(0, inlinedSize / 3, 0), level, (int) Math.ceil(1 + inlinedSize), (float) (inlinedSize / 2D));
+
+                if (this.getOwner() instanceof Player player) {
+                    RandomSource random = player.getRandom();
+
+                    for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1F + (Math.pow(Math.log10(1 + getSize()), 1D / 3D) / 2F)))) {
+                        if (entity.getStringUUID().equals(player.getStringUUID()))
+                            continue;
+
+                        if (EntityUtils.hurt(entity, level.damageSources().thrown(this, player), (float) (getSize() * relic.getStatValue(stack, "spore", "damage")))) {
+                            entity.addEffect(new MobEffectInstance(MobEffects.POISON, 100));
+                            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100));
+                            entity.addEffect(new MobEffectInstance(EffectRegistry.ANTI_HEAL, 100));
+                        }
+                    }
+
+                    if (getSize() >= 1) {
+                        int count = (int) Math.ceil(Math.pow(getSize(), relic.getStatValue(stack, "multiplying", "amount")));
+
+                        for (int i = 0; i < count; i++) {
+                            if (random.nextFloat() > relic.getStatValue(stack, "multiplying", "chance"))
+                                break;
+
+                            float mul = this.getBbHeight() / 1.5F;
+                            float speed = 0.1F + random.nextFloat() * 0.2F;
+                            Vec3 motion = new Vec3(MathUtils.randomFloat(random) * speed, speed, MathUtils.randomFloat(random) * speed);
+
+                            SporeEntity spore = new SporeEntity(EntityRegistry.SPORE.get(), level);
+
+                            spore.setOwner(player);
+                            spore.setStack(stack);
+                            spore.setDeltaMovement(motion);
+                            spore.setPos(this.position().add(0, mul, 0).add(motion.normalize().scale(mul)));
+                            spore.setSize((float) (this.getSize() * relic.getStatValue(stack, "multiplying", "size")));
+
+                            level.addFreshEntity(spore);
+
+                            relic.spreadRelicExperience(player, stack, 1);
+                        }
+                    }
+                }
+
                 this.discard();
+            }
         }
 
         RandomSource random = level.getRandom();
@@ -128,64 +177,6 @@ public class SporeEntity extends ThrowableProjectile {
         this.setDeltaMovement(0, 0, 0);
 
         this.setStuck(true);
-    }
-
-    @Override
-    public void onRemovedFromLevel() {
-        ItemStack stack = getStack();
-
-        if (!(stack.getItem() instanceof IRelicItem relic))
-            return;
-
-        level().playSound(null, this.blockPosition(), SoundEvents.PUFFER_FISH_BLOW_UP, SoundSource.MASTER, 1F, 1F + random.nextFloat());
-
-        double inlinedSize = Math.pow(Math.log10(1 + getSize()), 1D / 3D);
-
-        ParticleUtils.createBall(ParticleUtils.constructSimpleSpark(new Color(100 + level().getRandom().nextInt(50), 255, 0),
-                        (float) (inlinedSize * 0.35F), 40, 0.9F),
-                this.position().add(0, inlinedSize / 3, 0), level(), (int) Math.ceil(1 + inlinedSize), (float) (inlinedSize / 2D));
-
-        if (this.getOwner() instanceof Player player) {
-            RandomSource random = player.getRandom();
-
-            for (LivingEntity entity : level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(1F + (Math.pow(Math.log10(1 + getSize()), 1D / 3D) / 2F)))) {
-                if (entity.getStringUUID().equals(player.getStringUUID()))
-                    continue;
-
-                if (EntityUtils.hurt(entity, level().damageSources().thrown(this, player), (float) (getSize() * relic.getStatValue(stack, "spore", "damage")))) {
-                    entity.addEffect(new MobEffectInstance(MobEffects.POISON, 100));
-                    entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 100));
-                    entity.addEffect(new MobEffectInstance(EffectRegistry.ANTI_HEAL, 100));
-                }
-            }
-
-            if (getSize() >= 1) {
-                int count = (int) Math.ceil(Math.pow(getSize(), relic.getStatValue(stack, "multiplying", "amount")));
-
-                for (int i = 0; i < count; i++) {
-                    if (random.nextFloat() > relic.getStatValue(stack, "multiplying", "chance"))
-                        break;
-
-                    float mul = this.getBbHeight() / 1.5F;
-                    float speed = 0.1F + random.nextFloat() * 0.2F;
-                    Vec3 motion = new Vec3(MathUtils.randomFloat(random) * speed, speed, MathUtils.randomFloat(random) * speed);
-
-                    SporeEntity spore = new SporeEntity(EntityRegistry.SPORE.get(), level());
-
-                    spore.setOwner(player);
-                    spore.setStack(stack);
-                    spore.setDeltaMovement(motion);
-                    spore.setPos(this.position().add(0, mul, 0).add(motion.normalize().scale(mul)));
-                    spore.setSize((float) (this.getSize() * relic.getStatValue(stack, "multiplying", "size")));
-
-                    level().addFreshEntity(spore);
-
-                    relic.spreadRelicExperience(player, stack, 1);
-                }
-            }
-        }
-
-        super.onRemovedFromLevel();
     }
 
     @Override

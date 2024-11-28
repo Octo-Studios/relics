@@ -7,10 +7,12 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.RandomSource;
 
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -63,15 +65,40 @@ public class ScreenUtils {
     public static final ResourceLocation ILLAGER_ALT_FONT = ResourceLocation.withDefaultNamespace("illageralt");
 
     public static MutableComponent illageriate(MutableComponent input, double percentage, long seed) {
-        return stylize(input, percentage, Style.EMPTY.withFont(ILLAGER_ALT_FONT), seed);
+        return stylizeWidthReplacement(input, percentage, Style.EMPTY.withFont(ILLAGER_ALT_FONT), seed);
     }
 
     public static MutableComponent galactizate(MutableComponent input, double percentage, long seed) {
-        return stylize(input, percentage, Style.EMPTY.withFont(ALT_FONT), seed);
+        return stylizeWidthReplacement(input, percentage, Style.EMPTY.withFont(ALT_FONT), seed);
     }
 
     public static MutableComponent obfuscate(MutableComponent input, double percentage, long seed) {
         return stylize(input, percentage, Style.EMPTY.withObfuscated(true), seed);
+    }
+
+    public static MutableComponent stylizeWidthReplacement(MutableComponent input, double percentage, Style style, long seed) {
+        RandomSource random = RandomSource.create(seed);
+
+        String text = input.getString();
+
+        List<Integer> letterIndices = IntStream.range(0, text.length())
+                .filter(i -> !Character.isSpaceChar(text.charAt(i)))
+                .boxed().collect(Collectors.toList());
+
+        Collections.shuffle(letterIndices, new Random(seed));
+
+        Set<Integer> indicesToReplace = new HashSet<>(letterIndices.subList(0, Math.min((int) Math.round(letterIndices.size() * percentage), letterIndices.size())));
+
+        List<Character> englishLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".chars()
+                .mapToObj(c -> (char) c)
+                .toList();
+
+        return IntStream.range(0, text.length()).mapToObj(i -> {
+            if (indicesToReplace.contains(i))
+                return Component.literal(String.valueOf(englishLetters.get(random.nextInt(englishLetters.size())))).setStyle(style);
+
+            return Component.literal(String.valueOf(text.charAt(i))).setStyle(input.getStyle());
+        }).collect(Component::empty, MutableComponent::append, MutableComponent::append);
     }
 
     public static MutableComponent stylize(MutableComponent input, double percentage, Style style, long seed) {
@@ -91,7 +118,7 @@ public class ScreenUtils {
                     MutableComponent component = Component.literal(String.valueOf(text.charAt(index))).setStyle(input.getStyle());
 
                     if (indices.contains(index))
-                        component.setStyle(style.withColor(0x7704b5).applyTo(component.getStyle()));
+                        component.setStyle(style.applyTo(component.getStyle()));
 
                     return component;
                 })

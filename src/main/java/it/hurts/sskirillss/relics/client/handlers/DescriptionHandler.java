@@ -1,8 +1,11 @@
 package it.hurts.sskirillss.relics.client.handlers;
 
 import com.mojang.blaze3d.platform.Window;
+import it.hurts.sskirillss.relics.api.events.common.TooltipDisplayEvent;
+import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -24,9 +27,11 @@ import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 
 @EventBusSubscriber(value = Dist.CLIENT)
 public class DescriptionHandler {
-    private static final int REQUIRED_TIME = 20;
+    private static final int REQUIRED_TIME = 10;
 
     private static int ticksCount;
+
+    private static int width;
 
     @SubscribeEvent
     public static void onPlayerTick(PlayerTickEvent.Post event) {
@@ -71,16 +76,20 @@ public class DescriptionHandler {
 
         ItemStack stack = slot.getItem();
 
-        if (!(stack.getItem() instanceof IRelicItem))
+        if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
         if (hasShiftDown) {
             ticksCount++;
 
             if (ticksCount >= REQUIRED_TIME) {
-                RelicDescriptionScreen descriptionScreen = new RelicDescriptionScreen(player, player.containerMenu.containerId, id, Minecraft.getInstance().screen);
+                Screen descriptionScreen;
 
-                descriptionScreen.stack = DescriptionUtils.gatherRelicStack(player, id);
+                switch (DescriptionCache.getEntry(relic).getSelectedPage()) {
+                    case ABILITY -> descriptionScreen = new AbilityDescriptionScreen(player, player.containerMenu.containerId, id, screen);
+                    case EXPERIENCE -> descriptionScreen = new ExperienceDescriptionScreen(player, player.containerMenu.containerId, id, screen);
+                    default -> descriptionScreen = new RelicDescriptionScreen(player, player.containerMenu.containerId, id, screen);
+                }
 
                 Minecraft.getInstance().setScreen(descriptionScreen);
 
@@ -101,7 +110,9 @@ public class DescriptionHandler {
         if (!(event.getItemStack().getItem() instanceof IRelicItem))
             return;
 
-        event.getToolTip().add(drawProgressBar("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||"));
+        var filler = "|";
+
+        event.getToolTip().add(drawProgressBar(filler.repeat(width / Minecraft.getInstance().font.width(filler))));
     }
 
     public static MutableComponent drawProgressBar(String style) {
@@ -130,5 +141,13 @@ public class DescriptionHandler {
         component.append(Component.literal(string.substring(offset)).setStyle(Style.EMPTY.withColor(ChatFormatting.DARK_GRAY)));
 
         return component;
+    }
+
+    @SubscribeEvent
+    public static void onTooltipDisplay(TooltipDisplayEvent event) {
+        if (!(event.getStack().getItem() instanceof IRelicItem))
+            return;
+
+        width = event.getWidth();
     }
 }
