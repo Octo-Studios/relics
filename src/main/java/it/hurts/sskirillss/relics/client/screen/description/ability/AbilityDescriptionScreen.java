@@ -146,7 +146,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 121, this));
 
-        if (relic.isAbilityUnlocked(stack, ability)) {
+        if (relic.isAbilityUnlocked(stack, ability) && !relic.getAbilityData(ability).getStats().isEmpty()) {
             this.upgradeButton = this.addRenderableWidget(new UpgradeActionWidget(x + 288, y + 63, this, ability));
             this.rerollButton = this.addRenderableWidget(new RerollActionWidget(x + 288, y + 80, this, ability));
             this.resetButton = this.addRenderableWidget(new ResetActionWidget(x + 288, y + 97, this, ability));

@@ -416,7 +416,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
             } else
                 title.withStyle(ChatFormatting.BOLD);
 
-            poseStack.translate((int) (x + 184 + (102 / 2F) - (minecraft.font.width(title) / 2F / 1.3F)), y + 68, 0F);
+            poseStack.translate((int) (x + 184 + (102 / 2F) - (minecraft.font.width(title) / 2F / 1.3F)), y + 67, 0F);
 
             poseStack.scale(0.75F, 0.75F, 1F);
 

@@ -885,10 +885,14 @@ public interface IRelicItem {
         return (getAbilityLevel(stack, ability) * 2) + 5;
     }
 
+    default boolean canBeUpgraded(String ability) {
+        return getAbilityData(ability).getMaxLevel() > 0 && !getAbilityData(ability).getStats().isEmpty();
+    }
+
     default boolean mayUpgrade(ItemStack stack, String ability) {
         AbilityData entry = getAbilityData(ability);
 
-        return !entry.getStats().isEmpty() && !isAbilityMaxLevel(stack, ability) && getRelicLevelingPoints(stack) >= entry.getRequiredPoints() && isAbilityUnlocked(stack, ability);
+        return canBeUpgraded(ability) && !isAbilityMaxLevel(stack, ability) && getRelicLevelingPoints(stack) >= entry.getRequiredPoints() && isAbilityUnlocked(stack, ability);
     }
 
     default boolean mayPlayerUpgrade(Player player, ItemStack stack, String ability) {

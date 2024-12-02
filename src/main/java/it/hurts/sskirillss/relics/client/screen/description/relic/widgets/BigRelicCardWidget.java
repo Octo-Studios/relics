@@ -4,7 +4,6 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -16,6 +15,7 @@ import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
@@ -44,7 +44,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.pushPose();
 
-        GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME, poseStack)
+        GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_ACTIVE, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(getX(), getY())
                 .end();
@@ -86,7 +86,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         float scale = 1.75F;
 
-        poseStack.translate(getX() + 10 + 8 * scale, getY() + 23 + Math.sin((player.tickCount + pPartialTick) * 0.1F) * 2F + 8 * scale, 0);
+        poseStack.translate(getX() + 10 + 8 * scale, getY() + 21 + Math.sin((player.tickCount + pPartialTick) * 0.1F) * 2F + 8 * scale, 0);
 
         poseStack.mulPose(Axis.ZP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.05F) * 5F));
         poseStack.mulPose(Axis.YP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.075F) * 25F));
@@ -169,5 +169,10 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
         }
 
         poseStack.popPose();
+    }
+
+    @Override
+    public void playDownSound(SoundManager handler) {
+
     }
 }

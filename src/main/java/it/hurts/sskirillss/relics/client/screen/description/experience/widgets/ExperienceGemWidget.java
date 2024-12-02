@@ -63,9 +63,13 @@ public class ExperienceGemWidget extends AbstractDescriptionWidget implements IT
         poseStack.translate((getX() + (width / 2F)) / lerpedScale, (getY() + (height / 2F)) / lerpedScale, 0);
 
         GUIRenderer.begin(sourceData.getIcon(), poseStack)
+                .pos(0, -1)
                 .end();
 
         GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/experience/gems/gem.png"), poseStack)
+                .end();
+
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/experience/gems/frame.png"), poseStack)
                 .end();
 
         RenderSystem.disableBlend();

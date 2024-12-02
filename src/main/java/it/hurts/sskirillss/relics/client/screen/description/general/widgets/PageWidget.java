@@ -8,6 +8,7 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
+import it.hurts.sskirillss.relics.utils.data.GUIScissors;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
@@ -48,27 +49,16 @@ public class PageWidget extends AbstractDescriptionWidget implements IHoverableW
         poseStack.pushPose();
 
         if (isLocked()) {
-            GUIRenderer.begin(DescriptionTextures.TAB_ACTIVE, poseStack)
+            GUIScissors.begin(getX(), getY(), width, 19);
+
+            GUIRenderer.begin(DescriptionTextures.TAB, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(getX() - 1, getY() + 15)
+                    .pos(getX(), getY() + 11)
                     .end();
 
-            poseStack.pushPose();
-
-            poseStack.translate(getX() + 2F, getY() + 31F, 0F);
-
-            poseStack.scale(1, -1, 1);
-
-            float color = (float) (1.1F + (Math.sin(player.tickCount * 0.25F) * 0.2F));
-
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tabs/" + page.name().toLowerCase(Locale.ROOT) + ".png"), poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .color(color, color, color, 1F)
-                    .end();
-
-            poseStack.popPose();
+            GUIScissors.end();
         } else {
-            GUIRenderer.begin(DescriptionTextures.TAB_INACTIVE, poseStack)
+            GUIRenderer.begin(DescriptionTextures.TAB, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX(), getY())
                     .end();
@@ -79,7 +69,7 @@ public class PageWidget extends AbstractDescriptionWidget implements IHoverableW
                     .end();
 
             if (isHovered())
-                GUIRenderer.begin(DescriptionTextures.TAB_INACTIVE_OUTLINE, poseStack)
+                GUIRenderer.begin(DescriptionTextures.TAB_OUTLINE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
                         .pos(getX() - 1, getY() - 1)
                         .end();

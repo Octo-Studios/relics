@@ -6,10 +6,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
+import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ChainParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.SparkParticleData;
@@ -156,6 +156,8 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var canUpgrade = relic.mayPlayerUpgrade(minecraft.player, stack, ability);
         var canResearch = relic.mayResearch(stack, ability);
 
+        var canBeUpgraded = relic.canBeUpgraded(ability);
+
         var hasAction = canUpgrade || canResearch;
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
@@ -186,7 +188,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     .scale(1.01F)
                     .end();
 
-        GUIRenderer.begin(canUse ? DescriptionTextures.SMALL_CARD_FRAME_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_INACTIVE, poseStack).end();
+        GUIRenderer.begin(canBeUpgraded ? canUse ? DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_INACTIVE : canUse ? DescriptionTextures.SMALL_CARD_FRAME_LOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_ACTIVE, poseStack).end();
 
         if (isHovered())
             GUIRenderer.begin(DescriptionTextures.SMALL_CARD_FRAME_OUTLINE, poseStack)
@@ -264,7 +266,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         }
 
         {
-            if (canUse) {
+            if (canBeUpgraded && canUse) {
                 int xOff = 0;
 
                 for (int i = 0; i < 5; i++) {
@@ -290,13 +292,15 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         }
 
         {
-            MutableComponent title = Component.literal(canUse ? String.valueOf(relic.getAbilityLevel(screen.stack, ability)) : "?").withStyle(ChatFormatting.BOLD);
+            if (canBeUpgraded) {
+                MutableComponent title = Component.literal(canUse ? String.valueOf(relic.getAbilityLevel(screen.stack, ability)) : "?").withStyle(ChatFormatting.BOLD);
 
-            float textScale = 0.5F;
+                float textScale = 0.5F;
 
-            poseStack.scale(textScale, textScale, textScale);
+                poseStack.scale(textScale, textScale, textScale);
 
-            guiGraphics.drawString(minecraft.font, title, -((width + 1) / 2) - (minecraft.font.width(title) / 2) + 16, (-(height / 2) - 19), canUse ? 0xFFE278 : 0xB7AED9, true);
+                guiGraphics.drawString(minecraft.font, title, -((width + 1) / 2) - (minecraft.font.width(title) / 2) + 16, (-(height / 2) - 19), canUse ? 0xFFE278 : 0xB7AED9, true);
+            }
         }
 
         RenderSystem.disableBlend();
@@ -395,16 +399,10 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     entries.add(Component.literal(" "));
 
                     entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.card.unresearched")));
-                } else {
-                    if (data.getMaxLevel() == 0) {
-                        entries.add(Component.literal(" "));
+                } else if (relic.mayPlayerUpgrade(minecraft.player, screen.stack, ability)) {
+                    entries.add(Component.literal(" "));
 
-                        entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.card.no_stats")));
-                    } else if (relic.mayPlayerUpgrade(minecraft.player, screen.stack, ability)) {
-                        entries.add(Component.literal(" "));
-
-                        entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.card.ready_to_upgrade")));
-                    }
+                    entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.card.ready_to_upgrade")));
                 }
             }
         }

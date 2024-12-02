@@ -10,6 +10,8 @@ import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.BigAbilityCardWidget;
+import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.BigExperienceCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ExperienceGemWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
@@ -95,7 +97,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         this.addRenderableWidget(new PageWidget(x + 100, y + 123, this, DescriptionPage.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
         this.addRenderableWidget(new PageWidget(x + 119, y + 123, this, DescriptionPage.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
-        //this.addRenderableWidget(new BigRelicCardWidget(x + 60, y + 47, this));
+        this.addRenderableWidget(new BigExperienceCardWidget(x + 60, y + 47, this));
 
         this.addRenderableWidget(new LogoWidget(x + 313, y + 57, this));
 
@@ -152,13 +154,6 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
-
-        if (player.tickCount % 3 == 0) {
-            ParticleStorage.addParticle(this, new ExperienceParticleData(
-                    new Color(140, random.nextInt(50), 255),
-                    x + 73 + random.nextInt(20), y + 73 + random.nextInt(20),
-                    1.5F + (random.nextFloat() * 0.5F), 100 + random.nextInt(50)));
-        }
     }
 
     @Override
@@ -215,71 +210,30 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(x + 60, y + 133)
                 .end();
-
-        int quality = relic.getRelicQuality(stack);
-        boolean isAliquot = quality % 2 == 1;
-
-        for (int i = 0; i < Math.floor(quality / 2D); i++) {
-            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(x + xOff + 64, y + 110)
-                    .end();
-
-            xOff += 8;
-        }
-
-        if (isAliquot)
-            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(x + xOff + 64, y + 110)
-                    .patternSize(4, 7)
-                    .texSize(8, 7)
-                    .end();
-
-        poseStack.pushPose();
-
-        float scale = 1.75F;
-
-        poseStack.translate(x + 70 + 8 * scale, y + 69 + Math.sin((player.tickCount + pPartialTick) * 0.1F) * 2F + 8 * scale, 0);
-
-        poseStack.mulPose(Axis.ZP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.05F) * 5F));
-        poseStack.mulPose(Axis.YP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.075F) * 25F));
-
-        poseStack.translate(-8 * scale, -8 * scale, -150 * scale);
-
-        poseStack.scale(scale, scale, scale);
-
-        guiGraphics.renderItem(stack, 0, 0);
-
-        poseStack.popPose();
-
-        poseStack.pushPose();
-
-        MutableComponent levelComponent = Component.literal(String.valueOf(level)).withStyle(ChatFormatting.BOLD);
-
-        poseStack.scale(0.75F, 0.75F, 1F);
-
-        guiGraphics.drawString(minecraft.font, levelComponent, (int) (((x + 85.5F) * 1.33F) - (minecraft.font.width(levelComponent) / 2F)), (int) ((y + 51) * 1.33F), 0xFFE278, true);
-
-        guiGraphics.drawString(minecraft.font, Component.literal(stack.getDisplayName().getString()
-                        .replace("[", "").replace("]", ""))
-                .withStyle(ChatFormatting.BOLD), (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
-
-        poseStack.popPose();
-
-        poseStack.pushPose();
-
-        poseStack.scale(0.5F, 0.5F, 0.5F);
-
-        yOff = 9;
-
-        for (FormattedCharSequence line : minecraft.font.split(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".description"), 340)) {
-            guiGraphics.drawString(minecraft.font, line, (x + 112) * 2, (y + 74) * 2 + yOff, DescriptionUtils.TEXT_COLOR, false);
-
-            yOff += 9;
-        }
-
-        poseStack.popPose();
+//
+//        poseStack.pushPose();
+//
+//        poseStack.scale(0.75F, 0.75F, 1F);
+//
+//        guiGraphics.drawString(minecraft.font, Component.literal(stack.getDisplayName().getString()
+//                        .replace("[", "").replace("]", ""))
+//                .withStyle(ChatFormatting.BOLD), (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
+//
+//        poseStack.popPose();
+//
+//        poseStack.pushPose();
+//
+//        poseStack.scale(0.5F, 0.5F, 0.5F);
+//
+//        yOff = 9;
+//
+//        for (FormattedCharSequence line : minecraft.font.split(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".description"), 340)) {
+//            guiGraphics.drawString(minecraft.font, line, (x + 112) * 2, (y + 74) * 2 + yOff, DescriptionUtils.TEXT_COLOR, false);
+//
+//            yOff += 9;
+//        }
+//
+//        poseStack.popPose();
     }
 
     @Override

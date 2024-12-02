@@ -48,8 +48,7 @@
   "tooltip.relics.researching.general.luck.extra_info": "Получается при каждом неудачном сбросе случайных характеристик реликвии и повышает вероятность получения лучших значений при их следующем сбросе. Увеличивает стоимость сброса на 1 уровень опыта за каждые 25% удачи.",
 
   "tooltip.relics.researching.relic.card.low_level": "Для разблокировки необходимо повысить уровень реликвии до %1$s!",
-  "tooltip.relics.researching.relic.card.no_stats": "Способность не имеет улучшаемых характеристик и не влияет на качество реликвии!",
-  "tooltip.relics.researching.relic.card.unresearched": "Для использования необходимо провести исследование!",
+  "tooltip.relics.researching.relic.card.unresearched": "Для использования способности необходимо завершить исследование!",
   "tooltip.relics.researching.relic.card.ready_to_unlock": "Способность готова к разблокировке! Кликов осталось: %1$s",
   "tooltip.relics.researching.relic.card.ready_to_upgrade": "Способность готова к улучшению!",
 
