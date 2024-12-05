@@ -16,9 +16,9 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import org.lwjgl.opengl.GL11;
 
 import java.awt.*;
+import java.util.Locale;
 
 public class ExperienceGemWidget extends AbstractDescriptionWidget implements ITickingWidget {
     private final ExperienceDescriptionScreen screen;
@@ -48,7 +48,9 @@ public class ExperienceGemWidget extends AbstractDescriptionWidget implements IT
 
         var stack = screen.getStack();
         var poseStack = guiGraphics.pose();
-        var sourceData = relic.getLevelingData().getSources().getSources().get(source);
+        var sourceData = relic.getLevelingSourcesData().getSources().get(source);
+
+        var isUnlocked = relic.isLevelingSourceUnlocked(stack, source);
 
         poseStack.pushPose();
 
@@ -62,14 +64,16 @@ public class ExperienceGemWidget extends AbstractDescriptionWidget implements IT
 
         poseStack.translate((getX() + (width / 2F)) / lerpedScale, (getY() + (height / 2F)) / lerpedScale, 0);
 
-        GUIRenderer.begin(sourceData.getIcon(), poseStack)
+        var shape = sourceData.getShape().name().toLowerCase(Locale.ROOT);
+
+        GUIRenderer.begin(isUnlocked ? sourceData.getIcon().apply(stack) : DescriptionTextures.SMALL_CARD_LOCK_BACKGROUND, poseStack)
                 .pos(0, -1)
                 .end();
 
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/experience/gems/gem.png"), poseStack)
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/experience/gems/" + shape + "/" + sourceData.getColor().name().toLowerCase(Locale.ROOT) + ".png"), poseStack)
                 .end();
 
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/experience/gems/frame.png"), poseStack)
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/experience/gems/" + shape + "/frame.png"), poseStack)
                 .end();
 
         RenderSystem.disableBlend();

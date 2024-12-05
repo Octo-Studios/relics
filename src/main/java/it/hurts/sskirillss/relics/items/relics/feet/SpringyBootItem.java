@@ -13,6 +13,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootCollections;
@@ -21,7 +23,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.PartPose;
@@ -32,7 +33,6 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -72,11 +72,9 @@ public class SpringyBootItem extends RelicItem implements IRenderableCurio {
                         .maxLevel(10)
                         .step(100)
                         .sources(LevelingSourcesData.builder()
-                                .source(LevelingSourceData.builder("test1")
-                                        .build())
-                                .source(LevelingSourceData.builder("test2")
-                                        .build())
-                                .source(LevelingSourceData.builder("test3")
+                                .source(LevelingSourceData.abilityBuilder("bounce")
+                                        .initialValue(1)
+                                        .gem(GemShape.SQUARE, GemColor.YELLOW)
                                         .build())
                                 .build())
                         .build())

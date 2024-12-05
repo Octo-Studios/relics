@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractActionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
@@ -24,32 +24,32 @@ import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
 
-public class UpgradeActionWidget extends AbstractActionWidget {
-    public UpgradeActionWidget(int x, int y, AbilityDescriptionScreen screen, String ability) {
+public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
+    public UpgradeAbilityActionWidget(int x, int y, AbilityDescriptionScreen screen, String ability) {
         super(x, y, PacketRelicTweak.Operation.UPGRADE, screen, ability);
     }
 
     @Override
     public boolean isLocked() {
-        return !(getProvider().getStack().getItem() instanceof IRelicItem relic) || !relic.mayPlayerUpgrade(minecraft.player, getProvider().getStack(), getAbility());
+        return !(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility());
     }
 
     @Override
     public void playDownSound(SoundManager handler) {
-        if (getProvider().getStack().getItem() instanceof IRelicItem relic && !isLocked()) {
-            int level = relic.getAbilityLevel(getProvider().getStack(), getAbility());
+        if (getScreen().getStack().getItem() instanceof IRelicItem relic && !isLocked()) {
+            int level = relic.getAbilityLevel(getScreen().getStack(), getAbility());
             int maxLevel = relic.getAbilityData(getAbility()).getMaxLevel();
 
-            handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_UPGRADE.get(), Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getProvider().getStack(), getAbility()) ? 2F : 1F + ((float) level / maxLevel)));
+            handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_UPGRADE.get(), Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility()) ? 2F : 1F + ((float) level / maxLevel)));
         }
     }
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        if (!(getProvider().getStack().getItem() instanceof IRelicItem relic))
+        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
             return;
 
-        boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getProvider().getStack(), getAbility());
+        boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility());
 
         float color = isQuick ? (float) (1.05F + (Math.sin((minecraft.player.tickCount + (getAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;
 
@@ -65,7 +65,7 @@ public class UpgradeActionWidget extends AbstractActionWidget {
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (!(getProvider().getStack().getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(getProvider().getStack(), getAbility()))
+        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(getScreen().getStack(), getAbility()))
             return;
 
         AbilityData data = relic.getAbilityData(getAbility());
@@ -81,9 +81,9 @@ public class UpgradeActionWidget extends AbstractActionWidget {
         int renderWidth = 0;
 
         int requiredPoints = data.getRequiredPoints();
-        int requiredLevel = relic.getUpgradeRequiredLevel(getProvider().getStack(), getAbility());
+        int requiredLevel = relic.getUpgradeRequiredLevel(getScreen().getStack(), getAbility());
 
-        int points = relic.getRelicLevelingPoints(getProvider().getStack());
+        int points = relic.getRelicLevelingPoints(getScreen().getStack());
         int level = minecraft.player.experienceLevel;
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
@@ -91,8 +91,8 @@ public class UpgradeActionWidget extends AbstractActionWidget {
 
         List<MutableComponent> entries = Lists.newArrayList(Component.translatable("tooltip.relics.relic.upgrade.description").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE));
 
-        boolean isMaxLevel = relic.isAbilityMaxLevel(getProvider().getStack(), getAbility());
-        boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getProvider().getStack(), getAbility());
+        boolean isMaxLevel = relic.isAbilityMaxLevel(getScreen().getStack(), getAbility());
+        boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility());
 
         if (!isMaxLevel) {
             entries.add(Component.literal(" "));

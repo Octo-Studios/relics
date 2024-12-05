@@ -34,6 +34,7 @@ public class StatData {
     private Function<Double, ? extends Number> formatValue = Double::doubleValue;
 
     @Builder.Default
+    @Deprecated(forRemoval = true)
     private StatIcon icon = StatIcons.UNKNOWN;
 
     public StatConfigData toConfigData() {

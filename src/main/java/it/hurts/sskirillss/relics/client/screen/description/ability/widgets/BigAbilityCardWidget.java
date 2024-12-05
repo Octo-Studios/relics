@@ -52,19 +52,18 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         float color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
 
-        if (isUnlocked) {
+        if (isUnlocked)
             GUIRenderer.begin(DescriptionTextures.getAbilityCardTexture(stack, ability), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .color(color, color, color, 1F)
                     .pos(getX() + 7, getY() + 10)
                     .texSize(34, 49)
                     .end();
-        } else {
+        else
             GUIRenderer.begin(DescriptionTextures.BIG_CARD_BACKGROUND, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() + 7, getY() + 10)
                     .end();
-        }
 
         GUIRenderer.begin(canBeUpgraded ? isUnlocked ? DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_INACTIVE : isUnlocked ? DescriptionTextures.BIG_CARD_FRAME_LOCKED_ACTIVE : DescriptionTextures.BIG_CARD_FRAME_LOCKED_INACTIVE, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)

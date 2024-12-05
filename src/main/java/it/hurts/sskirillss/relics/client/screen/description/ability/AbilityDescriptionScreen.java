@@ -48,7 +48,6 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
@@ -65,9 +64,9 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     private final int backgroundHeight = 256;
     private final int backgroundWidth = 418;
 
-    public UpgradeActionWidget upgradeButton;
-    public RerollActionWidget rerollButton;
-    public ResetActionWidget resetButton;
+    public UpgradeAbilityActionWidget upgradeButton;
+    public RerollAbilityActionWidget rerollButton;
+    public ResetAbilityActionWidget resetButton;
 
     public AbilityDescriptionScreen(Player player, int container, int slot, Screen screen) {
         super(Component.empty());
@@ -99,9 +98,21 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
+        var sources = relic.getLevelingSourcesData().getSources();
+        var abilities = relic.getAbilitiesData().getAbilities();
+
         this.addRenderableWidget(new PageWidget(x + 81, y + 123, this, DescriptionPage.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
-        this.addRenderableWidget(new PageWidget(x + 100, y + 123, this, DescriptionPage.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
-        this.addRenderableWidget(new PageWidget(x + 119, y + 123, this, DescriptionPage.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+
+        int xOff = 19;
+
+        if (!abilities.isEmpty()) {
+            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+
+            xOff += 19;
+        }
+
+        if (!sources.isEmpty())
+            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
         this.addRenderableWidget(new BigAbilityCardWidget(x + 60, y + 47, this));
 
@@ -114,7 +125,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 102, this));
         this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 127, this));
 
-        int xOff = 0;
+        xOff = 0;
 
         if (relic.isAbilityUnlocked(stack, ability)) {
             for (AbilityBadge badge : BadgeRegistry.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof AbilityBadge).map(entry -> (AbilityBadge) entry).toList()) {
@@ -127,29 +138,29 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
             }
         }
 
-        Set<String> abilities = relic.getRelicData().getAbilities().getAbilities().keySet();
+        if (!abilities.isEmpty()) {
+            int cardWidth = 32;
+            int containerWidth = 209;
 
-        int cardWidth = 32;
-        int containerWidth = 209;
+            int count = Math.min(5, abilities.size());
 
-        int count = Math.min(5, abilities.size());
+            int spacing = cardWidth + 8 + (3 * (5 - count));
 
-        int spacing = cardWidth + 8 + (3 * (5 - count));
+            xOff = (containerWidth / 2) - (((cardWidth * count) + ((spacing - cardWidth) * Math.max(count - 1, 0))) / 2);
 
-        xOff = (containerWidth / 2) - (((cardWidth * count) + ((spacing - cardWidth) * Math.max(count - 1, 0))) / 2);
+            for (String entry : abilities.keySet()) {
+                this.addRenderableWidget(new AbilityCardWidget(x + 77 + xOff, y + 153, this, entry));
 
-        for (String entry : abilities) {
-            this.addRenderableWidget(new AbilityCardWidget(x + 77 + xOff, y + 153, this, entry));
-
-            xOff += spacing;
+                xOff += spacing;
+            }
         }
 
         this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 121, this));
 
         if (relic.isAbilityUnlocked(stack, ability) && !relic.getAbilityData(ability).getStats().isEmpty()) {
-            this.upgradeButton = this.addRenderableWidget(new UpgradeActionWidget(x + 288, y + 63, this, ability));
-            this.rerollButton = this.addRenderableWidget(new RerollActionWidget(x + 288, y + 80, this, ability));
-            this.resetButton = this.addRenderableWidget(new ResetActionWidget(x + 288, y + 97, this, ability));
+            this.upgradeButton = this.addRenderableWidget(new UpgradeAbilityActionWidget(x + 288, y + 63, this, ability));
+            this.rerollButton = this.addRenderableWidget(new RerollAbilityActionWidget(x + 288, y + 80, this, ability));
+            this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 288, y + 97, this, ability));
         }
     }
 
@@ -288,7 +299,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
             var pattern = Pattern.compile("([^ .,!?;:]*%(\\d+)\\$s[^ .,!?;:]*)");
 
-            for (var line : font.getSplitter().splitLines(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description"), 340, Style.EMPTY)) {
+            for (var line : font.getSplitter().splitLines(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description"), 350, Style.EMPTY)) {
                 String unformattedLine = line.getString().replace("%%", "%");
 
                 int currentX = (x + 112) * 2;
@@ -347,7 +358,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
             var component = ScreenUtils.stylizeWidthReplacement(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description", placeholders.toArray()), 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT), ability.length());
 
-            for (FormattedCharSequence line : font.split(component, 340)) {
+            for (FormattedCharSequence line : font.split(component, 350)) {
                 guiGraphics.drawString(font, line, (x + 112) * 2, (y + 74) * 2 + yOff, 0x662f13, false);
 
                 yOff += 10;

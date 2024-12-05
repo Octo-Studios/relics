@@ -79,9 +79,21 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
+        var sources = relic.getLevelingSourcesData().getSources();
+        var abilities = relic.getAbilitiesData().getAbilities();
+
         this.addRenderableWidget(new PageWidget(x + 81, y + 123, this, DescriptionPage.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
-        this.addRenderableWidget(new PageWidget(x + 100, y + 123, this, DescriptionPage.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
-        this.addRenderableWidget(new PageWidget(x + 119, y + 123, this, DescriptionPage.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+
+        int xOff = 19;
+
+        if (!abilities.isEmpty()) {
+            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+
+            xOff += 19;
+        }
+
+        if (!sources.isEmpty())
+            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
         this.addRenderableWidget(new BigRelicCardWidget(x + 60, y + 47, this));
 
@@ -94,7 +106,7 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
         this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 102, this));
         this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 127, this));
 
-        int xOff = 0;
+        xOff = 0;
 
         for (RelicBadge badge : BadgeRegistry.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof RelicBadge).map(entry -> (RelicBadge) entry).toList()) {
             if (!badge.isVisible(stack))
@@ -203,7 +215,7 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
 
         yOff = 9;
 
-        for (FormattedCharSequence line : minecraft.font.split(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".description"), 340)) {
+        for (FormattedCharSequence line : minecraft.font.split(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".description"), 350)) {
             guiGraphics.drawString(minecraft.font, line, (x + 112) * 2, (y + 74) * 2 + yOff, DescriptionUtils.TEXT_COLOR, false);
 
             yOff += 9;

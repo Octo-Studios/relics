@@ -12,10 +12,9 @@ import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootCollections;
@@ -71,7 +70,17 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingData(100, 10, 200))
+                .leveling(LevelingData.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(100)
+                        .sources(LevelingSourcesData.builder()
+                                .source(LevelingSourceData.abilityBuilder("bridge")
+                                        .initialValue(1)
+                                        .gem(GemShape.SQUARE, GemColor.PURPLE)
+                                        .build())
+                                .build())
+                        .build())
                 .style(StyleData.builder()
                         .tooltip(TooltipData.builder()
                                 .borderTop(0xff5b0591)
@@ -117,7 +126,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
                             continue;
 
                         if (level.setBlockAndUpdate(relativePos, BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState())
-                                && level.getRandom().nextInt(9) == 0)
+                                && level.getRandom().nextInt(10) == 0)
                             spreadRelicExperience(player, stack, 1);
                     }
                 }

@@ -1,18 +1,19 @@
 package it.hurts.sskirillss.relics.client.screen.description.experience.widgets;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
+import it.hurts.sskirillss.relics.client.screen.description.research.particles.SmokeParticleData;
+import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.sounds.SoundManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.RandomSource;
 
 public class BigExperienceCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     private ExperienceDescriptionScreen screen;
@@ -32,20 +33,29 @@ public class BigExperienceCardWidget extends AbstractDescriptionWidget implement
 
         var player = minecraft.player;
         var poseStack = guiGraphics.pose();
-        var source = relic.getLevelingData().getSources().getSources().get(screen.getSelectedSource());
+        var source = screen.getSelectedSource();
+        var sourceData = relic.getLevelingSourcesData().getSources().get(source);
 
-        float color = (float) (1.05F + (Math.sin((player.tickCount + (source.getId().length() * 10)) * 0.2F) * 0.1F));
+        var isUnlocked = relic.isLevelingSourceUnlocked(stack, source);
+
+        float color = (float) (1.05F + (Math.sin((player.tickCount + (sourceData.getId().length() * 10)) * 0.2F) * 0.1F));
 
         poseStack.pushPose();
 
-        GUIRenderer.begin(source.getIcon(), poseStack)
-                .anchor(SpriteAnchor.TOP_LEFT)
-                .color(color, color, color, 1F)
-                .pos(getX() + 7, getY() + 10)
-                .texSize(34, 49)
-                .end();
+        if (isUnlocked)
+            GUIRenderer.begin(sourceData.getIcon().apply(stack), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .color(color, color, color, 1F)
+                    .pos(getX() + 7, getY() + 10)
+                    .texSize(34, 49)
+                    .end();
+        else
+            GUIRenderer.begin(DescriptionTextures.BIG_CARD_BACKGROUND, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() + 7, getY() + 10)
+                    .end();
 
-        GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_LOCKED_ACTIVE, poseStack)
+        GUIRenderer.begin(isUnlocked ? DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_INACTIVE, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(getX(), getY())
                 .end();
@@ -115,20 +125,20 @@ public class BigExperienceCardWidget extends AbstractDescriptionWidget implement
 
     @Override
     public void onTick() {
-//        var stack = screen.getStack();
-//        var ability = screen.getSelectedAbility();
-//
-//        if (!(stack.getItem() instanceof IRelicItem relic))
-//            return;
-//
-//        var isUnlocked = relic.isAbilityUnlocked(stack, ability);
-//
-//        if (!isUnlocked) {
-//            RandomSource random = minecraft.player.getRandom();
-//
-//            ParticleStorage.addParticle(screen, new SmokeParticleData(getX() + 11 + random.nextInt(27), getY() + 15 + random.nextInt(43), 0.75F + (random.nextFloat() * 0.25F), 20 + random.nextInt(40), 0.5F)
-//                    .setDeltaX(MathUtils.randomFloat(random) * 0.1F).setDeltaY(MathUtils.randomFloat(random) * 0.1F));
-//        }
+        var stack = screen.getStack();
+        var source = screen.getSelectedSource();
+
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var isUnlocked = relic.isLevelingSourceUnlocked(stack, source);
+
+        if (!isUnlocked) {
+            RandomSource random = minecraft.player.getRandom();
+
+            ParticleStorage.addParticle(screen, new SmokeParticleData(getX() + 11 + random.nextInt(27), getY() + 15 + random.nextInt(43), 0.75F + (random.nextFloat() * 0.25F), 20 + random.nextInt(40), 0.5F)
+                    .setDeltaX(MathUtils.randomFloat(random) * 0.1F).setDeltaY(MathUtils.randomFloat(random) * 0.1F));
+        }
     }
 
     @Override

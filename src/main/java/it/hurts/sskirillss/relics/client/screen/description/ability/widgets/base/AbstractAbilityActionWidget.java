@@ -2,7 +2,6 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets.bas
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
@@ -21,19 +20,19 @@ import net.minecraft.util.RandomSource;
 import java.awt.*;
 import java.util.Locale;
 
-public abstract class AbstractActionWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
+public abstract class AbstractAbilityActionWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     @Getter
     private final PacketRelicTweak.Operation operation;
     @Getter
-    private final IRelicScreenProvider provider;
+    private final AbilityDescriptionScreen screen;
     @Getter
     private final String ability;
 
-    public AbstractActionWidget(int x, int y, PacketRelicTweak.Operation operation, AbilityDescriptionScreen screen, String ability) {
+    public AbstractAbilityActionWidget(int x, int y, PacketRelicTweak.Operation operation, AbilityDescriptionScreen screen, String ability) {
         super(x, y, 14, 13);
 
         this.operation = operation;
-        this.provider = screen;
+        this.screen = screen;
         this.ability = ability;
     }
 
@@ -43,7 +42,7 @@ public abstract class AbstractActionWidget extends AbstractDescriptionWidget imp
     @Override
     public void onPress() {
         if (!isLocked())
-            NetworkHandler.sendToServer(new PacketRelicTweak(getProvider().getContainer(), getProvider().getSlot(), getAbility(), operation, Screen.hasShiftDown()));
+            NetworkHandler.sendToServer(new PacketRelicTweak(getScreen().getContainer(), getScreen().getSlot(), getAbility(), operation, Screen.hasShiftDown()));
     }
 
     @Override
@@ -68,7 +67,7 @@ public abstract class AbstractActionWidget extends AbstractDescriptionWidget imp
         if (!isHovered() || minecraft.player.tickCount % 5 != 0)
             return;
 
-        ParticleStorage.addParticle((Screen) provider, new ExperienceParticleData(
+        ParticleStorage.addParticle((Screen) screen, new ExperienceParticleData(
                 new Color(200 + random.nextInt(50), 150 + random.nextInt(100), 0),
                 getX() + random.nextInt(width), getY() + random.nextInt(height / 4),
                 1F + (random.nextFloat() * 0.25F), 50 + random.nextInt(50)));

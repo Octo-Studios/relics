@@ -56,7 +56,7 @@ public class DescriptionCache {
     public static String getSelectedExperienceSource(IRelicItem relic) {
         var cache = getEntry(relic);
         var index = cache.getSelectionIndex(DescriptionPage.EXPERIENCE);
-        var sources = relic.getLevelingData().getSources().getSources().keySet().stream().toList();
+        var sources = relic.getLevelingSourcesData().getSources().keySet().stream().toList();
         var source = sources.get(index);
 
         if (source == null) {
@@ -75,7 +75,7 @@ public class DescriptionCache {
     public static void setSelectedExperienceSource(IRelicItem relic, String source) {
         var cache = getEntry(relic);
 
-        var sources = relic.getLevelingData().getSources().getSources();
+        var sources = relic.getLevelingSourcesData().getSources();
 
         if (!sources.containsKey(source))
             return;

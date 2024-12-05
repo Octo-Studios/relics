@@ -26,6 +26,8 @@ public class LevelingData {
         this.initialCost = initialCost;
         this.maxLevel = maxLevel;
         this.step = step;
+
+        this.sources = LevelingSourcesData.builder().build();
     }
 
     public LevelingConfigData toConfigData() {

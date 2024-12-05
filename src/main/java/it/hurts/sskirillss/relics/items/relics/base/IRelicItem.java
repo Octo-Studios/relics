@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.base;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
+import io.netty.util.internal.UnstableApi;
 import it.hurts.sskirillss.relics.api.events.leveling.ExperienceAddEvent;
 import it.hurts.sskirillss.relics.components.*;
 import it.hurts.sskirillss.relics.entities.RelicExperienceOrbEntity;
@@ -18,10 +19,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.Re
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
@@ -99,6 +97,21 @@ public interface IRelicItem {
 
     default LevelingData getLevelingData() {
         return getRelicData().getLeveling();
+    }
+
+    default LevelingSourcesData getLevelingSourcesData() {
+        return getLevelingData().getSources();
+    }
+
+    default LevelingSourceData getLevelingSourceData(String source) {
+        return getLevelingSourcesData().getSources().get(source);
+    }
+
+    @UnstableApi
+    default boolean isLevelingSourceUnlocked(ItemStack stack, String source) {
+        var data = getLevelingSourceData(source);
+
+        return data.getRequiredLevel() >= getRelicLevel(stack) && (data.getRequiredAbility().isEmpty() || isAbilityUnlocked(stack, data.getRequiredAbility()));
     }
 
     default LootData getLootData() {

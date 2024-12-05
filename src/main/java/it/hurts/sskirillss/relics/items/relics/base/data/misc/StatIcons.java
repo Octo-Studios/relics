@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.misc;
 
+@Deprecated(forRemoval = true)
 public class StatIcons {
     public static final StatIcon UNKNOWN = new StatIcon("unknown", 0x838383);
 

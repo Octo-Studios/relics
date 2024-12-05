@@ -1,48 +1,49 @@
-package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
+package it.hurts.sskirillss.relics.client.screen.description.experience.widgets;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractActionWidget;
-import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.base.AbstractExperienceActionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
 
-public class ResetActionWidget extends AbstractActionWidget {
-    public ResetActionWidget(int x, int y, AbilityDescriptionScreen screen, String ability) {
-        super(x, y, PacketRelicTweak.Operation.RESET, screen, ability);
+public class UpgradeExperienceActionWidget extends AbstractExperienceActionWidget {
+    public UpgradeExperienceActionWidget(int x, int y, ExperienceDescriptionScreen screen, String source) {
+        super(x, y, PacketRelicTweak.Operation.UPGRADE, screen, source);
     }
 
     @Override
     public boolean isLocked() {
-        return !(getProvider().getStack().getItem() instanceof IRelicItem relic) || !relic.mayPlayerReset(minecraft.player, getProvider().getStack(), getAbility());
+        return true;
     }
 
     @Override
     public void playDownSound(SoundManager handler) {
-        if (!isLocked())
-            handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_RESET.get(), 1F));
+
     }
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (!(getProvider().getStack().getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(getProvider().getStack(), getAbility()))
-            return;
-
-        AbilityData data = relic.getAbilityData(getAbility());
-
-        if (data.getStats().isEmpty())
+        if (!(getScreen().getStack().getItem() instanceof IRelicItem))
             return;
 
         PoseStack poseStack = guiGraphics.pose();
@@ -52,22 +53,9 @@ public class ResetActionWidget extends AbstractActionWidget {
         int maxWidth = 100;
         int renderWidth = 0;
 
-        int requiredLevel = relic.getResetRequiredLevel(getProvider().getStack(), getAbility());
-
-        int level = minecraft.player.experienceLevel;
-
-        MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
-        MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
-
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.translatable("tooltip.relics.relic.reset.description").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
-                Component.literal(" "));
-
-        if (relic.getAbilityLevel(getProvider().getStack(), getAbility()) > 0)
-            entries.add(Component.translatable("tooltip.relics.relic.reset.cost", requiredLevel,
-                    (requiredLevel > level ? negativeStatus : positiveStatus)));
-        else
-            entries.add(Component.translatable("tooltip.relics.relic.reset.locked"));
+                Component.literal("To avoid issues with existing worlds, this feature will be added with the update to Minecraft 1.22.")
+        );
 
         for (MutableComponent entry : entries) {
             int entryWidth = (minecraft.font.width(entry) + 4) / 2;

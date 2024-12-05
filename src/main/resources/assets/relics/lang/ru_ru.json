@@ -477,12 +477,16 @@
   "item.relics.phantom_boot": "Фантомный ботинок",
   "tooltip.relics.phantom_boot.description": "Сгущает материю под ногами владельца реликвии, прокладывая ему путь через любые пространства, даже там, где нет твёрдой земли под ногами.",
   "tooltip.relics.phantom_boot.ability.bridge": "Фантомный мост",
-  "tooltip.relics.phantom_boot.ability.bridge.description": "Создаёт под ногами игрока временный фантомный мост, по которому может перемещаться любой владелец такой же реликвии. Мост обладает свойствами скользких и упругих блоков, полностью поглощая урон от падения. Если игрок будет стоять на мосту неподвижно более %1$s секунд, он провалится сквозь него и не сможет подняться обратно, пока не окажется на твёрдой поверхности.",
+  "tooltip.relics.phantom_boot.ability.bridge.description": "Создаёт под ногами игрока временный фантомный мост, по которому может перемещаться любой владелец реликвии. Если игрок будет стоять на мосту неподвижно более %1$s секунд, он провалится сквозь него и не сможет подняться обратно, пока не окажется на твёрдой поверхности.",
+  "tooltip.relics.phantom_boot.leveling_source.bridge.title": "Фантомный мост",
+  "tooltip.relics.phantom_boot.leveling_source.bridge.description": "+%1$s единиц опыта с вероятностью 10% при каждом создании моста от способности %2$s.",
 
   "item.relics.springy_boot": "Пружинный ботинок",
   "tooltip.relics.springy_boot.description": "Наделяет владельца реликвии особой упругостью, позволяющей ему отпрыгивать от любых твёрдых поверхностей.",
   "tooltip.relics.springy_boot.ability.bounce": "Упругость",
   "tooltip.relics.springy_boot.ability.bounce.description": "Повышает упругость всех блоков на %1$s%% относительно блока слизи, позволяя игроку отпрыгивать от них при падении. При активации на земле подбрасывает игрока в воздух.",
+  "tooltip.relics.springy_boot.leveling_source.bounce.title": "Упругость",
+  "tooltip.relics.springy_boot.leveling_source.bounce.description": "+%1$s единиц опыта за каждый совершённый отскок от поверхности при помощи способности %2$s.",
 
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
 
