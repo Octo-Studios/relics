@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.experience.widgets;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
@@ -9,13 +10,20 @@ import it.hurts.sskirillss.relics.client.screen.description.research.particles.S
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
-public class BigExperienceCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
+import java.util.Locale;
+
+public class BigExperienceCardWidget extends AbstractDescriptionWidget implements ITickingWidget {
     private ExperienceDescriptionScreen screen;
 
     public BigExperienceCardWidget(int x, int y, ExperienceDescriptionScreen screen) {
@@ -42,14 +50,24 @@ public class BigExperienceCardWidget extends AbstractDescriptionWidget implement
 
         poseStack.pushPose();
 
-        if (isUnlocked)
+        if (isUnlocked) {
             GUIRenderer.begin(sourceData.getIcon().apply(stack), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .color(color, color, color, 1F)
                     .pos(getX() + 7, getY() + 10)
                     .texSize(34, 49)
                     .end();
-        else
+
+            RenderSystem.enableBlend();
+
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/experience/filters/" + sourceData.getColor().name().toLowerCase(Locale.ROOT) + ".png"), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() + 7, getY() + 10)
+                    .texSize(34, 49)
+                    .end();
+
+            RenderSystem.disableBlend();
+        } else
             GUIRenderer.begin(DescriptionTextures.BIG_CARD_BACKGROUND, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() + 7, getY() + 10)
@@ -60,67 +78,19 @@ public class BigExperienceCardWidget extends AbstractDescriptionWidget implement
                 .pos(getX(), getY())
                 .end();
 
-        if (isHovered())
-            GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(getX() - 1, getY() - 1)
-                    .end();
+        {
+            poseStack.pushPose();
+
+            MutableComponent pointsComponent = Component.literal(isUnlocked ? String.valueOf(relic.getLevelingSourceLevel(stack, source)) : "?").withStyle(ChatFormatting.BOLD);
+
+            poseStack.scale(0.75F, 0.75F, 1F);
+
+            guiGraphics.drawString(minecraft.font, pointsComponent, (int) (((getX() + 25.5F) * 1.33F) - (minecraft.font.width(pointsComponent) / 2F)), (int) ((getY() + 4) * 1.33F), isUnlocked ? 0xFFE278 : 0xB7AED9, true);
+
+            poseStack.popPose();
+        }
 
         poseStack.popPose();
-    }
-
-    @Override
-    public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-//        var stack = screen.getStack();
-//        var ability = screen.getSelectedAbility();
-//
-//        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(stack, ability))
-//            return;
-//
-//        PoseStack poseStack = guiGraphics.pose();
-//
-//        List<FormattedCharSequence> tooltip = Lists.newArrayList();
-//
-//        int maxWidth = 150;
-//        int renderWidth = 0;
-//
-//        List<MutableComponent> entries = Lists.newArrayList(
-//                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getAbilityLevel(stack, ability) + "/" + relic.getAbilityData(ability).getMaxLevel()),
-//                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getAbilityQuality(stack, ability) / 2F, 1) + "/" + relic.getMaxQuality() / 2),
-//                Component.literal(" ")
-//        );
-//
-//        if (Screen.hasShiftDown())
-//            entries.add(Component.translatable("tooltip.relics.researching.ability.info.extra_info").withStyle(ChatFormatting.ITALIC));
-//        else
-//            entries.add(Component.translatable("tooltip.relics.researching.general.extra_info"));
-//
-//        for (MutableComponent entry : entries) {
-//            int entryWidth = (minecraft.font.width(entry) / 2);
-//
-//            if (entryWidth > renderWidth)
-//                renderWidth = Math.min(entryWidth + 2, maxWidth);
-//
-//            tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
-//        }
-//
-//        poseStack.pushPose();
-//
-//        poseStack.translate(0F, 0F, 400);
-//
-//        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, mouseX - 9 - (renderWidth / 2), mouseY);
-//
-//        poseStack.scale(0.5F, 0.5F, 0.5F);
-//
-//        int yOff = 0;
-//
-//        for (FormattedCharSequence entry : tooltip) {
-//            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
-//
-//            yOff += 5;
-//        }
-//
-//        poseStack.popPose();
     }
 
     @Override

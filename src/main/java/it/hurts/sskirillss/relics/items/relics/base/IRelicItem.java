@@ -110,8 +110,23 @@ public interface IRelicItem {
     @UnstableApi
     default boolean isLevelingSourceUnlocked(ItemStack stack, String source) {
         var data = getLevelingSourceData(source);
+        var ability = data.getRequiredAbility();
 
-        return data.getRequiredLevel() >= getRelicLevel(stack) && (data.getRequiredAbility().isEmpty() || isAbilityUnlocked(stack, data.getRequiredAbility()));
+        return getRelicLevel(stack) >= data.getRequiredLevel() && (ability.isEmpty() || isAbilityUnlocked(stack, ability));
+    }
+
+    @UnstableApi
+    default int getLevelingSourceValue(ItemStack stack, String source) {
+        var data = getLevelingSourceData(source);
+
+        // TODO: Use component value instead
+        return data.getInitialValue();
+    }
+
+    @UnstableApi
+    default int getLevelingSourceLevel(ItemStack stack, String source) {
+        // TODO: Use component value instead
+        return 1;
     }
 
     default LootData getLootData() {
@@ -192,7 +207,7 @@ public interface IRelicItem {
     }
 
     default int getRelicQuality(ItemStack stack) {
-        Map<String, AbilityData> abilities = getRelicData().getAbilities().getAbilities();
+        Map<String, AbilityData> abilities = getAbilitiesData().getAbilities();
 
         if (abilities.isEmpty())
             return 0;
@@ -201,7 +216,9 @@ public interface IRelicItem {
         double sum = 0;
 
         for (Map.Entry<String, AbilityData> entry : abilities.entrySet()) {
-            if (entry.getValue().getMaxLevel() == 0) {
+            var ability = entry.getKey();
+
+            if (!canBeUpgraded(ability) || !isAbilityUnlocked(stack, ability)) {
                 --size;
 
                 continue;
@@ -880,6 +897,10 @@ public interface IRelicItem {
 
     default boolean isAbilityUnlocked(ItemStack stack, String ability) {
         return isEnoughLevel(stack, ability) && isLockUnlocked(stack, ability) && isAbilityResearched(stack, ability);
+    }
+
+    default boolean hasUnlockedAbility(ItemStack stack) {
+        return getAbilitiesData().getAbilities().keySet().stream().anyMatch(ability -> isAbilityUnlocked(stack, ability));
     }
 
     default boolean canPlayerUseAbility(Player player, ItemStack stack, String ability) {

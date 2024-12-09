@@ -83,7 +83,7 @@ public class DescriptionCache {
         var index = new ArrayList<>(sources.keySet()).indexOf(source);
 
         setEntry(relic, cache.toBuilder()
-                .selectionIndex(DescriptionPage.ABILITY, index)
+                .selectionIndex(DescriptionPage.EXPERIENCE, index)
                 .build());
     }
 

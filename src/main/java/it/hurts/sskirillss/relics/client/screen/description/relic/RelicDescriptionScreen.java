@@ -215,10 +215,10 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
 
         yOff = 9;
 
-        for (FormattedCharSequence line : minecraft.font.split(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".description"), 350)) {
+        for (FormattedCharSequence line : minecraft.font.split(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".description"), 340)) {
             guiGraphics.drawString(minecraft.font, line, (x + 112) * 2, (y + 74) * 2 + yOff, DescriptionUtils.TEXT_COLOR, false);
 
-            yOff += 9;
+            yOff += 10;
         }
 
         poseStack.popPose();
@@ -256,6 +256,8 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
 
     @Override
     public void onClose() {
+        screen.rebuildWidgets();
+
         Minecraft.getInstance().setScreen(screen);
     }
 

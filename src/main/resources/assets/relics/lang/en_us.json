@@ -53,6 +53,13 @@
   "tooltip.relics.researching.relic.card.ready_to_unlock": "Ability is ready to be unlocked! Clicks remaining: %1$s",
   "tooltip.relics.researching.relic.card.ready_to_upgrade": "Ability is ready to be upgraded!",
 
+  "tooltip.relics.researching.relic.gem.low_level": "To unlock the experience source, you need to level up the relic to %1$s!",
+  "tooltip.relics.researching.relic.gem.locked_ability": "To unlock the experience source, you need to unlock and research the associated ability!",
+
+  "tooltip.relics.researching.tab.relic": "Relic",
+  "tooltip.relics.researching.tab.ability": "Abilities",
+  "tooltip.relics.researching.tab.experience": "Experience Sources",
+
   "tooltip.relics.researching.general.extra_info": "Hold [Shift] for more info",
 
   "tooltip.relics.researching.relic.info.level": "Relic Level:",
@@ -476,18 +483,18 @@
   "tooltip.relics.space_dissector.ability.dissection.stat.time.value": "%1$s seconds",
 
   "item.relics.phantom_boot": "Phantom Boot",
-  "tooltip.relics.phantom_boot.description": "Condenses matter beneath the feet of the relic's owner, forging a path through any space, even where there is no solid ground.",
+  "tooltip.relics.phantom_boot.description": "Condenses matter beneath the relic owner's feet, creating a path through any terrain, even where no solid ground exists.",
   "tooltip.relics.phantom_boot.ability.bridge": "Phantom Bridge",
-  "tooltip.relics.phantom_boot.ability.bridge.description": "When the ability is active, a temporary phantom bridge forms beneath the player's feet, allowing the relic's owner to traverse it. The bridge possesses the properties of slippery and bouncy blocks, fully absorbing fall damage. If the player stands still on the bridge for too long, they will fall through and will be unable to climb back up until they stand on solid ground.",
-  "tooltip.relics.phantom_boot.ability.bridge.stat.duration.title": "Maximum standing duration:",
-  "tooltip.relics.phantom_boot.ability.bridge.stat.duration.value": "%1$s seconds.",
+  "tooltip.relics.phantom_boot.ability.bridge.description": "Creates a temporary phantom bridge beneath the player's feet that any relic owner can walk on. If the player stands still on the bridge for more than %1$s seconds, they will fall through and cannot get back up until they reach solid ground.",
+  "tooltip.relics.phantom_boot.leveling_source.bridge.title": "Phantom Bridge",
+  "tooltip.relics.phantom_boot.leveling_source.bridge.description": "+%1$s experience points with a 10% chance each time a bridge is created using the %2$s ability.",
 
   "item.relics.springy_boot": "Springy Boot",
-  "tooltip.relics.springy_boot.description": "Grants the relic owner a special bounciness, allowing them to bounce off any solid surface.",
-  "tooltip.relics.springy_boot.ability.bounce": "Bounciness",
-  "tooltip.relics.springy_boot.ability.bounce.description": "When the ability is active, all solid blocks gain bounciness, allowing the player to bounce off them when falling. Upon activation, the player is launched into the air with a force based on the current bounciness.",
-  "tooltip.relics.springy_boot.ability.bounce.stat.power.title": "Additional Bounciness:",
-  "tooltip.relics.springy_boot.ability.bounce.stat.power.value": "+%1$s%%",
+  "tooltip.relics.springy_boot.description": "Grants the relic owner special elasticity, allowing them to bounce off any solid surface.",
+  "tooltip.relics.springy_boot.ability.bounce": "Elasticity",
+  "tooltip.relics.springy_boot.ability.bounce.description": "Increases the elasticity of all blocks by %1$s%% compared to slime blocks, enabling the player to bounce off them upon landing. When activated on the ground, it launches the player into the air.",
+  "tooltip.relics.springy_boot.leveling_source.bounce.title": "Elasticity",
+  "tooltip.relics.springy_boot.leveling_source.bounce.description": "+%1$s experience points for each bounce off a surface using the %2$s ability.",
 
   "item.relics.leafy_ring": "Leafy Ring [WIP]",
   "tooltip.relics.leafy_ring.description": "[WIP]",

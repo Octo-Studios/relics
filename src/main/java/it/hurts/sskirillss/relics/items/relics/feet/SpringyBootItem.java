@@ -18,7 +18,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootCollections;
-import it.hurts.sskirillss.relics.items.relics.base.data.misc.StatIcons;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
@@ -54,7 +53,6 @@ public class SpringyBootItem extends RelicItem implements IRenderableCurio {
                                         .type(CastType.TOGGLEABLE)
                                         .build())
                                 .stat(StatData.builder("power")
-                                        .icon(StatIcons.REFLECT)
                                         .initialValue(0.25D, 0.5D)
                                         .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 1))

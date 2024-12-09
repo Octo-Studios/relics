@@ -47,10 +47,17 @@
   "tooltip.relics.researching.general.luck.title": "Удача:",
   "tooltip.relics.researching.general.luck.extra_info": "Получается при каждом неудачном сбросе случайных характеристик реликвии и повышает вероятность получения лучших значений при их следующем сбросе. Увеличивает стоимость сброса на 1 уровень опыта за каждые 25% удачи.",
 
-  "tooltip.relics.researching.relic.card.low_level": "Для разблокировки необходимо повысить уровень реликвии до %1$s!",
+  "tooltip.relics.researching.relic.card.low_level": "Для разблокировки способности необходимо повысить уровень реликвии до %1$s!",
   "tooltip.relics.researching.relic.card.unresearched": "Для использования способности необходимо завершить исследование!",
   "tooltip.relics.researching.relic.card.ready_to_unlock": "Способность готова к разблокировке! Кликов осталось: %1$s",
   "tooltip.relics.researching.relic.card.ready_to_upgrade": "Способность готова к улучшению!",
+
+  "tooltip.relics.researching.relic.gem.low_level": "Для разблокировки источника получения опыта необходимо повысить уровень реликвии до %1$s!",
+  "tooltip.relics.researching.relic.gem.locked_ability": "Для разблокировки источника получения опыта необходимо разблокировать и исследовать связанную способность!",
+
+  "tooltip.relics.researching.tab.relic": "Реликвия",
+  "tooltip.relics.researching.tab.ability": "Способности",
+  "tooltip.relics.researching.tab.experience": "Источники получения опыта",
 
   "tooltip.relics.researching.general.extra_info": "Удерживай [Шифт] для подробной информации",
 
@@ -479,7 +486,7 @@
   "tooltip.relics.phantom_boot.ability.bridge": "Фантомный мост",
   "tooltip.relics.phantom_boot.ability.bridge.description": "Создаёт под ногами игрока временный фантомный мост, по которому может перемещаться любой владелец реликвии. Если игрок будет стоять на мосту неподвижно более %1$s секунд, он провалится сквозь него и не сможет подняться обратно, пока не окажется на твёрдой поверхности.",
   "tooltip.relics.phantom_boot.leveling_source.bridge.title": "Фантомный мост",
-  "tooltip.relics.phantom_boot.leveling_source.bridge.description": "+%1$s единиц опыта с вероятностью 10% при каждом создании моста от способности %2$s.",
+  "tooltip.relics.phantom_boot.leveling_source.bridge.description": "+%1$s единиц опыта с вероятностью 10%% при каждом создании моста от способности %2$s.",
 
   "item.relics.springy_boot": "Пружинный ботинок",
   "tooltip.relics.springy_boot.description": "Наделяет владельца реликвии особой упругостью, позволяющей ему отпрыгивать от любых твёрдых поверхностей.",

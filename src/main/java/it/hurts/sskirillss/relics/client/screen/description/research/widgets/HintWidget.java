@@ -77,11 +77,6 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
                     .end();
         } else {
             if (isHovered()) {
-                GUIRenderer.begin(DescriptionTextures.HINT_OUTLINE, poseStack)
-                        .anchor(SpriteAnchor.TOP_LEFT)
-                        .pos(getX() - 1, getY() - 6)
-                        .end();
-
                 float color = (float) (1.025F + (Math.sin(player.tickCount + pPartialTick) * 0.05F));
 
                 if (Screen.hasShiftDown())
@@ -107,6 +102,12 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
                         .pos(getX() + 34, getY() - 3)
                         .end();
         }
+
+        if (isHovered())
+            GUIRenderer.begin(DescriptionTextures.HINT_OUTLINE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() - 1, getY() - 6)
+                    .end();
 
         poseStack.popPose();
     }

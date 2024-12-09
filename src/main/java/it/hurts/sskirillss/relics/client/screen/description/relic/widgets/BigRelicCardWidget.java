@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
@@ -51,36 +50,38 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         int xOff = 0;
 
-        for (int i = 0; i < 5; i++) {
-            GUIRenderer.begin(DescriptionTextures.BIG_STAR_HOLE, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(getX() + xOff + 4, getY() + 63)
-                    .end();
+        if (relic.hasUnlockedAbility(stack)) {
+            for (int i = 0; i < 5; i++) {
+                GUIRenderer.begin(DescriptionTextures.BIG_STAR_HOLE, poseStack)
+                        .anchor(SpriteAnchor.TOP_LEFT)
+                        .pos(getX() + xOff + 4, getY() + 63)
+                        .end();
 
-            xOff += 8;
+                xOff += 8;
+            }
+
+            xOff = 0;
+
+            var quality = relic.getRelicQuality(stack);
+            var isAliquot = quality % 2 == 1;
+
+            for (int i = 0; i < Math.floor(quality / 2D); i++) {
+                GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
+                        .anchor(SpriteAnchor.TOP_LEFT)
+                        .pos(getX() + xOff + 4, getY() + 63)
+                        .end();
+
+                xOff += 8;
+            }
+
+            if (isAliquot)
+                GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
+                        .anchor(SpriteAnchor.TOP_LEFT)
+                        .pos(getX() + xOff + 4, getY() + 63)
+                        .patternSize(4, 7)
+                        .texSize(8, 7)
+                        .end();
         }
-
-        xOff = 0;
-
-        var quality = relic.getRelicQuality(stack);
-        var isAliquot = quality % 2 == 1;
-
-        for (int i = 0; i < Math.floor(quality / 2D); i++) {
-            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(getX() + xOff + 4, getY() + 63)
-                    .end();
-
-            xOff += 8;
-        }
-
-        if (isAliquot)
-            GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(getX() + xOff + 4, getY() + 63)
-                    .patternSize(4, 7)
-                    .texSize(8, 7)
-                    .end();
 
         poseStack.pushPose();
 
@@ -109,7 +110,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.popPose();
 
-        if (isHovered())
+        if (isHovered() && relic.hasUnlockedAbility(stack))
             GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() - 1, getY() - 1)
@@ -122,10 +123,10 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         ItemStack stack = screen.getStack();
 
-        if (!(stack.getItem() instanceof IRelicItem relic))
+        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.hasUnlockedAbility(stack))
             return;
 
-        PoseStack poseStack = guiGraphics.pose();
+        var poseStack = guiGraphics.pose();
 
         List<FormattedCharSequence> tooltip = Lists.newArrayList();
 

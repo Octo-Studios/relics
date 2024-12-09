@@ -468,7 +468,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
             for (FormattedCharSequence line : minecraft.font.split(component, 180)) {
                 guiGraphics.drawString(minecraft.font, line, -(minecraft.font.width(line) / 2F), yOff, DescriptionUtils.TEXT_COLOR, false);
 
-                yOff += 9;
+                yOff += 10;
             }
 
             poseStack.popPose();
@@ -679,6 +679,8 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
     @Override
     public void onClose() {
+        screen.rebuildWidgets();
+
         minecraft.setScreen(screen);
     }
 

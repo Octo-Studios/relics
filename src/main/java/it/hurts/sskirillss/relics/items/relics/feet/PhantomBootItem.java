@@ -18,7 +18,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootCollections;
-import it.hurts.sskirillss.relics.items.relics.base.data.misc.StatIcons;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
@@ -58,7 +57,6 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
                                         .type(CastType.TOGGLEABLE)
                                         .build())
                                 .stat(StatData.builder("duration")
-                                        .icon(StatIcons.DURATION)
                                         .initialValue(0.25D, 1D)
                                         .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
