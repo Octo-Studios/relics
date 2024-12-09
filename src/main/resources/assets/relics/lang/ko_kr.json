@@ -53,6 +53,13 @@
   "tooltip.relics.researching.relic.card.ready_to_unlock": "능력을 잠금 해제할 수 있습니다! 남은 클릭 횟수: %1$s",
   "tooltip.relics.researching.relic.card.ready_to_upgrade": "이 능력은 업그레이드할 준비가 되었습니다!",
 
+  "tooltip.relics.researching.relic.gem.low_level": "유물 경험치를 활성화하려면 최소 %1$s 레벨까지 올려야 합니다!",
+  "tooltip.relics.researching.relic.gem.locked_ability": "유물 경험치를 활성화하려면 관련된 능력을 잠금 해제하고 연구해야 합니다!",
+
+  "tooltip.relics.researching.tab.relic": "유물",
+  "tooltip.relics.researching.tab.ability": "능력",
+  "tooltip.relics.researching.tab.experience": "유물 경험치",
+
   "tooltip.relics.researching.general.extra_info": "[Shift] 키를 누르면 추가 정보를 볼 수 있습니다.",
 
   "tooltip.relics.researching.relic.info.level": "유물 레벨:",
@@ -73,12 +80,12 @@
   "tooltip.relics.relic.upgrade.description": "레벨업",
   "tooltip.relics.relic.upgrade.cost": "비용: %1$s 레벨링 포인트 %2$s, %3$s 경험치 포인트 %4$s.",
   "tooltip.relics.relic.upgrade.locked": "능력이 최대 레벨에 도달했습니다.",
-  "tooltip.relics.relic.upgrade.quick":"[Shift] 키를 누른 상태로 클릭 시 자동으로 가능한 최고 레벨까지 업그레이드됩니다.",
+  "tooltip.relics.relic.upgrade.quick": "[Shift] 키를 누른 상태로 클릭 시 자동으로 가능한 최고 레벨까지 업그레이드됩니다.",
 
   "tooltip.relics.relic.reroll.description": "스텟 재분배",
   "tooltip.relics.relic.reroll.cost": "비용: %1$s 경험치 포인트 %2$s.",
-  "tooltip.relics.relic.reroll.quick":"[Shift] 키를 누른 상태로 클릭 시 자동으로 완벽한 수치까지 랜덤 스탯을 재분배합니다.",
-  "tooltip.relics.relic.reroll.warning":"[Shift] 키를 누른 상태로 클릭 시 지금의 완벽한 수치가 랜덤 수치로 스탯이 재분배 됩니다.",
+  "tooltip.relics.relic.reroll.quick": "[Shift] 키를 누른 상태로 클릭 시 자동으로 완벽한 수치까지 랜덤 스탯을 재분배합니다.",
+  "tooltip.relics.relic.reroll.warning": "[Shift] 키를 누른 상태로 클릭 시 지금의 완벽한 수치가 랜덤 수치로 스탯이 재분배 됩니다.",
 
   "tooltip.relics.relic.reset.description": "레벨링 포인트 초기화",
   "tooltip.relics.relic.reset.cost": "비용: %1$s 경험치 포인트 %2$s.",
@@ -479,17 +486,17 @@
   "tooltip.relics.phantom_boot.description": "유물의 소유자 발 아래에서 물질이 응축되어, 고체 바닥이 없는 공간에서도 길을 만들어냅니다.",
   "tooltip.relics.phantom_boot.ability.bridge": "팬텀 구름다리",
   "tooltip.relics.phantom_boot.ability.bridge.description": "이 능력이 활성화되면, 플레이어의 발 아래에 일시적인 팬텀 구름다리가 형성되어 유물의 소유자가 그 위를 건널 수 있습니다. 이 구름다리는 미끄럽고 뛰어오를 수 있는 블록의 특성을 가지고 있어서 낙하 데미지를 완전히 흡수합니다. 플레이어가 다리 위에서 너무 오랫동안 가만히 서 있으면 다리 밑으로 떨어지게 되고, 단단한 땅 위에 서기 전에는 다시 올라갈 수 없습니다.",
-  "tooltip.relics.phantom_boot.ability.bridge.stat.duration.title": "서있을 수 있는 최대 시간:",
-  "tooltip.relics.phantom_boot.ability.bridge.stat.duration.value": "%1$s초",
+  "tooltip.relics.phantom_boot.leveling_source.bridge.title": "팬텀 구름다리",
+  "tooltip.relics.phantom_boot.leveling_source.bridge.description": "%2$s 능력으로 구름다리를 생성할 때마다 10%의 확률로 +%1$s 경험치를 얻습니다.",
 
   "item.relics.springy_boot": "스프링 부츠",
   "tooltip.relics.springy_boot.description": "유물 소유자에게 특수한 탄력을 부여하여,모든 단단한 표면에서 튕겨 나갈 수 있게 합니다.",
   "tooltip.relics.springy_boot.ability.bounce": "콩콩이",
   "tooltip.relics.springy_boot.ability.bounce.description": "능력이 활성화되면 모든 단단한 블록에 떨어졌을 때 탄력을 얻어 튕겨 나오게 됩니다. 튕겨 나올 때 플레이어는 떨어진 높이에 기반한 힘으로 공중으로 발사됩니다",
-  "tooltip.relics.springy_boot.ability.bounce.stat.power.title": "추가로 튕겨지는 높이:",
-  "tooltip.relics.springy_boot.ability.bounce.stat.power.value": "+%1$s%%",
+  "tooltip.relics.springy_boot.leveling_source.bounce.title": "탄성",
+  "tooltip.relics.springy_boot.leveling_source.bounce.description": "%2$s 능력으로 표면에 튕길 때마다 +%1$s 경험치를 얻습니다.",
 
-  "item.relics.leafy_ring": "Leafy Ring [WIP]",
+  "item.relics.leafy_ring": "잎사귀 반지 [WIP]",
   "tooltip.relics.leafy_ring.description": "[WIP]",
 
   "item.relics.relic_experience_bottle": "유물 경험치 병",
