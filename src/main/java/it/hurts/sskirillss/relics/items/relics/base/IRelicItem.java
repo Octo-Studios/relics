@@ -43,6 +43,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation.*;
+
+
 public interface IRelicItem {
     @Nullable
     default Item getItem() {
@@ -886,13 +889,7 @@ public interface IRelicItem {
         if (data == null)
             return result;
 
-        var step = data.getUpgradeModifier().getValue();
-
-        switch (data.getUpgradeModifier().getKey()) {
-            case ADD -> result = value + (points * step);
-            case MULTIPLY_BASE -> result = value + ((value * step) * points);
-            case MULTIPLY_TOTAL -> result = value * Math.pow(step + 1, points);
-        }
+        result = data.getNewUpgradeModifier().apply(value, points);
 
         var threshold = data.getThresholdValue();
 

@@ -39,7 +39,8 @@ public class LeatherBeltItem extends RelicItem implements IRenderableCurio {
                                 .requiredPoints(2)
                                 .stat(StatData.builder("charm")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(UpgradeOperation.ADD, 1D)
+                                        //.upgradeModifier(UpgradeOperation.ADD, 1D) // Deprecated
+                                        .upgradeModifier(Double::sum)
                                         .formatValue(value -> (int) (MathUtils.round(value, 1)))
                                         .build())
                                 .build())

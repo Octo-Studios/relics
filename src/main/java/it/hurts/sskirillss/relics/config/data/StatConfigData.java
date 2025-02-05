@@ -28,6 +28,7 @@ public class StatConfigData {
             MULTIPLY_BASE: x + ((x * y) * z),
             MULTIPLY_TOTAL: x * (y + 1)^z,
             ADD: x + (y * z).
+            CUSTOM: logic is overwritten in code, can't be changed via configs
             
             ...where x - Base stat value, y - Value of [upgradeModifier], z - Current relic level
             """)
