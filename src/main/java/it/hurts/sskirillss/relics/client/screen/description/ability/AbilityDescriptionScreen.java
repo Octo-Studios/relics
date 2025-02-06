@@ -79,17 +79,11 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     }
 
     public String getSelectedAbility() {
-        if (!(stack.getItem() instanceof IRelicItem relic))
-            return "";
-
-        return DescriptionCache.getSelectedAbility(relic);
+        return DescriptionCache.getSelectedAbility(stack);
     }
 
     public void setSelectedAbility(String ability) {
-        if (!(stack.getItem() instanceof IRelicItem relic))
-            return;
-
-        DescriptionCache.setSelectedAbility(relic, ability);
+        DescriptionCache.setSelectedAbility(stack, ability);
     }
 
     @Override
@@ -108,7 +102,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         int y = (this.height - backgroundHeight) / 2;
 
         var sources = relic.getLevelingSourcesData().getSources();
-        var abilities = relic.getAbilitiesData().getAbilities();
+        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
 
         this.addRenderableWidget(new PageWidget(x + 81, y + 123, this, DescriptionPage.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
@@ -157,7 +151,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
             xOff = (containerWidth / 2) - (((objectWidth * count) + ((spacing - objectWidth) * Math.max(count - 1, 0))) / 2);
 
-            for (String entry : abilities.keySet()) {
+            for (String entry : abilities) {
                 this.addRenderableWidget(new AbilityCardWidget(x + 77 + xOff, y + 153, this, entry));
 
                 xOff += spacing;

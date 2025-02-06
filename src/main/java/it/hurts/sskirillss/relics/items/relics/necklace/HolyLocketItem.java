@@ -175,6 +175,11 @@ public class HolyLocketItem extends RelicItem {
             cycleMode(stack, 1);
     }
 
+    @Override
+    public boolean isAbilityEnabled(ItemStack stack, String ability) {
+        return !ability.equals("faith") && super.isAbilityEnabled(stack, ability);
+    }
+
     @Getter
     @AllArgsConstructor
     public enum Mode {

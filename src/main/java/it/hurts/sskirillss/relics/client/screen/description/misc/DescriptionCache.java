@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.misc;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import lombok.*;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -19,10 +20,13 @@ public class DescriptionCache {
         CACHE.put(relic, cache);
     }
 
-    public static String getSelectedAbility(IRelicItem relic) {
+    public static String getSelectedAbility(ItemStack stack) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return "";
+
         var cache = getEntry(relic);
         var index = cache.getSelectionIndex(DescriptionPage.ABILITY);
-        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().toList();
+        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
         var ability = abilities.get(index);
 
         if (ability == null) {
@@ -38,25 +42,31 @@ public class DescriptionCache {
         return ability;
     }
 
-    public static void setSelectedAbility(IRelicItem relic, String ability) {
-        var cache = getEntry(relic);
-
-        var abilities = relic.getAbilitiesData().getAbilities();
-
-        if (!abilities.containsKey(ability))
+    public static void setSelectedAbility(ItemStack stack, String ability) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var index = new ArrayList<>(abilities.keySet()).indexOf(ability);
+        var cache = getEntry(relic);
+
+        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
+
+        if (!abilities.contains(ability))
+            return;
+
+        var index = abilities.indexOf(ability);
 
         setEntry(relic, cache.toBuilder()
                 .selectionIndex(DescriptionPage.ABILITY, index)
                 .build());
     }
 
-    public static String getSelectedExperienceSource(IRelicItem relic) {
+    public static String getSelectedExperienceSource(ItemStack stack) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return "";
+
         var cache = getEntry(relic);
         var index = cache.getSelectionIndex(DescriptionPage.EXPERIENCE);
-        var sources = relic.getLevelingSourcesData().getSources().keySet().stream().toList();
+        var sources = relic.getLevelingSourcesData().getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(stack, entry)).toList();
         var source = sources.get(index);
 
         if (source == null) {
@@ -72,15 +82,18 @@ public class DescriptionCache {
         return source;
     }
 
-    public static void setSelectedExperienceSource(IRelicItem relic, String source) {
-        var cache = getEntry(relic);
-
-        var sources = relic.getLevelingSourcesData().getSources();
-
-        if (!sources.containsKey(source))
+    public static void setSelectedExperienceSource(ItemStack stack, String source) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var index = new ArrayList<>(sources.keySet()).indexOf(source);
+        var cache = getEntry(relic);
+
+        var sources = relic.getLevelingSourcesData().getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(stack, entry)).toList();
+
+        if (!sources.contains(source))
+            return;
+
+        var index = sources.indexOf(source);
 
         setEntry(relic, cache.toBuilder()
                 .selectionIndex(DescriptionPage.EXPERIENCE, index)

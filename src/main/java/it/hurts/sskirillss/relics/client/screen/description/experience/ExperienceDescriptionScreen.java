@@ -77,17 +77,11 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
     }
 
     public String getSelectedSource() {
-        if (!(stack.getItem() instanceof IRelicItem relic))
-            return "";
-
-        return DescriptionCache.getSelectedExperienceSource(relic);
+        return DescriptionCache.getSelectedExperienceSource(stack);
     }
 
     public void setSelectedSource(String source) {
-        if (!(stack.getItem() instanceof IRelicItem relic))
-            return;
-
-        DescriptionCache.setSelectedExperienceSource(relic, source);
+        DescriptionCache.setSelectedExperienceSource(stack, source);
     }
 
     @Override
@@ -105,8 +99,8 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
-        var sources = relic.getLevelingSourcesData().getSources();
-        var abilities = relic.getAbilitiesData().getAbilities();
+        var sources = relic.getLevelingSourcesData().getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(stack, entry)).toList();
+        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
 
         this.addRenderableWidget(new PageWidget(x + 81, y + 123, this, DescriptionPage.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
@@ -142,7 +136,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
             xOff = (containerWidth / 2) - (((objectWidth * count) + ((spacing - objectWidth) * Math.max(count - 1, 0))) / 2);
 
-            for (String entry : sources.keySet()) {
+            for (String entry : sources) {
                 this.addRenderableWidget(new ExperienceGemWidget(x + 77 + xOff, y + 153, this, entry));
 
                 xOff += spacing;

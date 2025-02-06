@@ -120,7 +120,15 @@ public interface IRelicItem {
         var data = getLevelingSourceData(source);
         var ability = data.getRequiredAbility();
 
-        return getRelicLevel(stack) >= data.getRequiredLevel() && (ability.isEmpty() || isAbilityUnlocked(stack, ability));
+        return isLevelingSourceEnabled(stack, source) && getRelicLevel(stack) >= data.getRequiredLevel() && (ability.isEmpty() || isAbilityUnlocked(stack, ability));
+    }
+
+    @UnstableApi
+    default boolean isLevelingSourceEnabled(ItemStack stack, String source) {
+        var data = getLevelingSourceData(source);
+        var ability = data.getRequiredAbility();
+
+        return data.getRequiredAbility().isEmpty() || isAbilityEnabled(stack, ability);
     }
 
     @UnstableApi
@@ -476,7 +484,7 @@ public interface IRelicItem {
     }
 
     default boolean isRelicFlawless(ItemStack stack) {
-        return isRelicMaxLevel(stack) && getAbilitiesData().getAbilities().keySet().stream().allMatch(ability -> isAbilityFlawless(stack, ability));
+        return isRelicMaxLevel(stack) && getAbilitiesData().getAbilities().keySet().stream().filter(ability -> isAbilityEnabled(stack, ability)).allMatch(ability -> isAbilityFlawless(stack, ability));
     }
 
     default boolean isAbilityMaxLevel(ItemStack stack, String ability) {
@@ -911,8 +919,13 @@ public interface IRelicItem {
         return getRelicLevel(stack) >= getAbilityData(ability).getRequiredLevel();
     }
 
+    @UnstableApi
+    default boolean isAbilityEnabled(ItemStack stack, String ability) {
+        return true;
+    }
+
     default boolean isAbilityUnlocked(ItemStack stack, String ability) {
-        return isEnoughLevel(stack, ability) && isLockUnlocked(stack, ability) && isAbilityResearched(stack, ability);
+        return isAbilityEnabled(stack, ability) && isEnoughLevel(stack, ability) && isLockUnlocked(stack, ability) && isAbilityResearched(stack, ability);
     }
 
     default boolean hasUnlockedUpgradeableAbility(ItemStack stack) {
