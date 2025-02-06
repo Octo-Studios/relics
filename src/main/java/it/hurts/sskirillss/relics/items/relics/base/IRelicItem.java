@@ -1072,4 +1072,16 @@ public interface IRelicItem {
     default boolean isAbilityOnCooldown(ItemStack stack, String ability) {
         return getAbilityCooldown(stack, ability) > 0;
     }
+
+    default boolean isAbilityUpgradeEnabled(ItemStack stack, String ability) {
+        return isAbilityUnlocked(stack, ability) && !getAbilityData(ability).getStats().isEmpty();
+    }
+
+    default boolean isAbilityRerollEnabled(ItemStack stack, String ability) {
+        return isAbilityUnlocked(stack, ability) && !getAbilityData(ability).getStats().isEmpty();
+    }
+
+    default boolean isAbilityResetEnabled(ItemStack stack, String ability) {
+        return isAbilityUnlocked(stack, ability) && !getAbilityData(ability).getStats().isEmpty();
+    }
 }
