@@ -228,6 +228,11 @@ public class HolyLocketItem extends RelicItem {
 
         @SubscribeEvent
         public static void onLivingHeal(LivingHealEvent event) {
+            var amount = event.getAmount();
+
+            if (amount <= 0.5F)
+                return;
+
             var item = ItemRegistry.HOLY_LOCKET.get();
 
             var maxDistance = item.getRelativeStatValue("faith", "radius", item.getStatData("faith", "radius").getInitialValue().getValue(), item.getLevelingData().getMaxLevel());
@@ -245,7 +250,6 @@ public class HolyLocketItem extends RelicItem {
                             || entity.position().distanceTo(player.position()) > relic.getStatValue(stack, "faith", "radius"))
                         continue;
 
-                    var amount = event.getAmount();
                     var heal = (float) (amount * relic.getStatValue(stack, "faith", "health"));
 
                     var essence = new LifeEssenceEntity(EntityRegistry.LIFE_ESSENCE.get(), level);
