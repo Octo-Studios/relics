@@ -40,6 +40,8 @@ import java.util.Locale;
 import static it.hurts.sskirillss.relics.init.DataComponentRegistry.MODE;
 
 public class HolyLocketItem extends RelicItem {
+    private static final int MAX_TARGETS = 10;
+
     @Override
     public RelicData constructDefaultRelicData() {
         return RelicData.builder()
@@ -241,9 +243,13 @@ public class HolyLocketItem extends RelicItem {
             var level = entity.getCommandSenderWorld();
             var random = level.getRandom();
 
+            var targets = 0;
+
             for (var player : EntityUtils.gatherPotentialTargets(entity, Player.class, maxDistance).toList()) {
                 if (player.getStringUUID().equals(entity.getStringUUID()))
                     continue;
+
+                targets++;
 
                 for (var stack : EntityUtils.findEquippedCurios(player, ItemRegistry.HOLY_LOCKET.get())) {
                     if (!(stack.getItem() instanceof HolyLocketItem relic) || relic.getMode(stack) != Mode.HOLINESS || !relic.canPlayerUseAbility(player, stack, "faith")
@@ -266,6 +272,9 @@ public class HolyLocketItem extends RelicItem {
 
                     relic.spreadRelicExperience(player, stack, 1);
                 }
+
+                if (targets >= MAX_TARGETS)
+                    break;
             }
 
             if (entity instanceof Player player && player.getHealth() < player.getMaxHealth()) {
@@ -273,9 +282,13 @@ public class HolyLocketItem extends RelicItem {
                     if (!(stack.getItem() instanceof HolyLocketItem relic) || relic.getMode(stack) != Mode.WICKEDNESS || !relic.canPlayerUseAbility(player, stack, "faith"))
                         continue;
 
+                    targets = 0;
+
                     for (var target : EntityUtils.gatherPotentialTargets(player, LivingEntity.class, relic.getStatValue(stack, "faith", "radius")).toList()) {
                         if (player.getStringUUID().equals(target.getStringUUID()))
                             continue;
+
+                        targets++;
 
                         var essence = new DeathEssenceEntity(EntityRegistry.DEATH_ESSENCE.get(), level);
 
@@ -288,6 +301,9 @@ public class HolyLocketItem extends RelicItem {
                         level.addFreshEntity(essence);
 
                         relic.spreadRelicExperience(player, stack, 1);
+
+                        if (targets >= MAX_TARGETS)
+                            break;
                     }
                 }
             }
