@@ -38,7 +38,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
     public void playDownSound(SoundManager handler) {
         if (getScreen().getStack().getItem() instanceof IRelicItem relic && !isLocked()) {
             int level = relic.getAbilityLevel(getScreen().getStack(), getAbility());
-            int maxLevel = relic.getAbilityData(getAbility()).getMaxLevel();
+            int maxLevel = relic.getAbilityMaxLevel(getScreen().getStack(), getAbility());
 
             handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_UPGRADE.get(), Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility()) ? 2F : 1F + ((float) level / maxLevel)));
         }

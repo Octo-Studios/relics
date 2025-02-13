@@ -46,7 +46,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         var ability = screen.getSelectedAbility();
 
         var isUnlocked = relic.isAbilityUnlocked(stack, ability);
-        var canBeUpgraded = relic.canBeUpgraded(ability);
+        var canBeUpgraded = relic.canBeUpgraded(stack, ability);
 
         poseStack.pushPose();
 
@@ -131,7 +131,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         var stack = screen.getStack();
         var ability = screen.getSelectedAbility();
 
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(stack, ability) || !relic.canBeUpgraded(ability))
+        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(stack, ability) || !relic.canBeUpgraded(stack, ability))
             return;
 
         PoseStack poseStack = guiGraphics.pose();
@@ -142,7 +142,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getAbilityLevel(stack, ability) + "/" + relic.getAbilityData(ability).getMaxLevel()),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getAbilityLevel(stack, ability) + "/" + relic.getAbilityMaxLevel(stack, ability)),
                 Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getAbilityQuality(stack, ability) / 2F, 1) + "/" + relic.getMaxQuality() / 2),
                 Component.literal(" ")
         );

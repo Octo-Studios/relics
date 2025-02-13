@@ -234,7 +234,7 @@ public interface IRelicItem {
         for (Map.Entry<String, AbilityData> entry : abilities.entrySet()) {
             var ability = entry.getKey();
 
-            if (!canBeUpgraded(ability) || !isAbilityUnlocked(stack, ability)) {
+            if (!canBeUpgraded(stack, ability) || !isAbilityUnlocked(stack, ability)) {
                 --size;
 
                 continue;
@@ -488,7 +488,7 @@ public interface IRelicItem {
     }
 
     default boolean isAbilityMaxLevel(ItemStack stack, String ability) {
-        return getAbilityLevel(stack, ability) >= getAbilityData(ability).getMaxLevel();
+        return getAbilityLevel(stack, ability) >= getAbilityMaxLevel(stack, ability);
     }
 
     default boolean isAbilityMaxQuality(ItemStack stack, String ability) {
@@ -787,6 +787,11 @@ public interface IRelicItem {
         return getAbilityComponent(stack, ability).points();
     }
 
+    @UnstableApi
+    default int getAbilityMaxLevel(ItemStack stack, String ability) {
+        return getAbilityData(ability).getMaxLevel();
+    }
+
     default void setAbilityLevel(ItemStack stack, String ability, int points) {
         setAbilityComponent(stack, ability, getAbilityComponent(stack, ability).toBuilder()
                 .points(points)
@@ -929,7 +934,7 @@ public interface IRelicItem {
     }
 
     default boolean hasUnlockedUpgradeableAbility(ItemStack stack) {
-        return getAbilitiesData().getAbilities().keySet().stream().anyMatch(ability -> canBeUpgraded(ability) && isAbilityUnlocked(stack, ability));
+        return getAbilitiesData().getAbilities().keySet().stream().anyMatch(ability -> canBeUpgraded(stack, ability) && isAbilityUnlocked(stack, ability));
     }
 
     default boolean hasUnlockedAbility(ItemStack stack) {
@@ -952,14 +957,14 @@ public interface IRelicItem {
         return (getAbilityLevel(stack, ability) * 2) + 5;
     }
 
-    default boolean canBeUpgraded(String ability) {
-        return getAbilityData(ability).getMaxLevel() > 0 && !getAbilityData(ability).getStats().isEmpty();
+    default boolean canBeUpgraded(ItemStack stack, String ability) {
+        return getAbilityMaxLevel(stack, ability) > 0 && !getAbilityData(ability).getStats().isEmpty();
     }
 
     default boolean mayUpgrade(ItemStack stack, String ability) {
         AbilityData entry = getAbilityData(ability);
 
-        return canBeUpgraded(ability) && !isAbilityMaxLevel(stack, ability) && getRelicLevelingPoints(stack) >= entry.getRequiredPoints() && isAbilityUnlocked(stack, ability);
+        return canBeUpgraded(stack, ability) && !isAbilityMaxLevel(stack, ability) && getRelicLevelingPoints(stack) >= entry.getRequiredPoints() && isAbilityUnlocked(stack, ability);
     }
 
     default boolean mayPlayerUpgrade(Player player, ItemStack stack, String ability) {

@@ -171,7 +171,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var canUpgrade = relic.mayPlayerUpgrade(minecraft.player, stack, ability);
         var canResearch = relic.mayResearch(stack, ability);
 
-        var canBeUpgraded = relic.canBeUpgraded(ability);
+        var canBeUpgraded = relic.canBeUpgraded(stack, ability);
 
         var hasAction = canUpgrade || canResearch;
 
