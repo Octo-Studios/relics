@@ -109,7 +109,8 @@ public class ShadowGlaiveItem extends RelicItem {
                 return;
 
             for (var stack : EntityUtils.findEquippedCurios(player, ItemRegistry.SHADOW_GLAIVE.get())) {
-                if (!(stack.getItem() instanceof IRelicItem relic) || source.getRandom().nextDouble() > relic.getStatValue(stack, "mayhem", "chance"))
+                if (!(stack.getItem() instanceof IRelicItem relic) || !relic.canPlayerUseAbility(player, stack, "mayhem")
+                        || source.getRandom().nextDouble() > relic.getStatValue(stack, "mayhem", "chance"))
                     continue;
 
                 var level = target.getCommandSenderWorld();
