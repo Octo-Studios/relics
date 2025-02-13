@@ -69,6 +69,13 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
                 level.addParticle(ParticleUtils.constructSimpleSpark(new Color(50 + random.nextInt(100), 150 + random.nextInt(100), 0), 0.01F + random.nextFloat() * Math.min(tickCount * 0.01F, 0.1F), 5 + random.nextInt(3), 0.9F),
                         particleCenter.x() + MathUtils.randomFloat(random) * 0.05F, particleCenter.y() + MathUtils.randomFloat(random) * 0.05F, particleCenter.z() + MathUtils.randomFloat(random) * 0.05F, 0F, 0F, 0F);
 
+        if (this.tickCount >= 250) {
+            if (!level.isClientSide())
+                this.discard();
+
+            return;
+        }
+
         if (target == null || target.isDeadOrDying()) {
             if (level.isClientSide())
                 return;

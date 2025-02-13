@@ -46,7 +46,7 @@ public class DeathEssenceEntity extends ThrowableProjectile implements ITargetab
         level.addParticle((ParticleUtils.constructSimpleSpark(new Color(random.nextInt(150), 150 + random.nextInt(50), 200 + random.nextInt(50)), 0.05F, 10, 0.9F)), this.xOld, this.yOld, this.zOld,
                 -this.getDeltaMovement().x * 0.1F * random.nextFloat(), -this.getDeltaMovement().y * 0.1F * random.nextFloat(), -this.getDeltaMovement().z * 0.1F * random.nextFloat());
 
-        if (target == null || target.isDeadOrDying()) {
+        if (target == null || target.isDeadOrDying() || this.tickCount >= 250) {
             if (!level.isClientSide())
                 this.discard();
 
