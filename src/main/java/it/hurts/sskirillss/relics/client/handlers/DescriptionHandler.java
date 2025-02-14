@@ -20,6 +20,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
+import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(value = Dist.CLIENT)
 public class DescriptionHandler {
@@ -40,8 +41,12 @@ public class DescriptionHandler {
         ticksCountOld = ticksCount;
 
         var MC = Minecraft.getInstance();
+        var key = HotkeyRegistry.RESEARCH_RELIC.getKey().getValue();
 
-        var isResearching = InputConstants.isKeyDown(MC.getWindow().getWindow(), HotkeyRegistry.RESEARCH_RELIC.getKey().getValue());
+        if (key == GLFW.GLFW_KEY_UNKNOWN)
+            return;
+
+        var isResearching = InputConstants.isKeyDown(MC.getWindow().getWindow(), key);
 
         if (ticksCount > 0 && !isResearching)
             ticksCount--;
