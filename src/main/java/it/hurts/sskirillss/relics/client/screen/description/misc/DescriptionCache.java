@@ -27,6 +27,14 @@ public class DescriptionCache {
         var cache = getEntry(relic);
         var index = cache.getSelectionIndex(DescriptionPage.ABILITY);
         var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
+        var size = abilities.size();
+
+        if (size == 0)
+            return "";
+
+        if (index >= size)
+            index = size - 1;
+
         var ability = abilities.get(index);
 
         if (ability == null) {
@@ -67,6 +75,14 @@ public class DescriptionCache {
         var cache = getEntry(relic);
         var index = cache.getSelectionIndex(DescriptionPage.EXPERIENCE);
         var sources = relic.getLevelingSourcesData().getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(stack, entry)).toList();
+        var size = sources.size();
+
+        if (size == 0)
+            return "";
+
+        if (index >= size)
+            index = size - 1;
+
         var source = sources.get(index);
 
         if (source == null) {

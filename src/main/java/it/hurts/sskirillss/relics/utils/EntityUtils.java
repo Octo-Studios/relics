@@ -258,10 +258,10 @@ public class EntityUtils {
 
     public static <T extends LivingEntity> Stream<T> gatherPotentialTargets(Entity seeker, Class<T> type, double radius) {
         return seeker.getCommandSenderWorld().getEntitiesOfClass(type, seeker.getBoundingBox().inflate(radius)).stream()
-                .sorted(Comparator.comparing(entry -> entry.position().distanceTo(entry.position())))
+                .sorted(Comparator.comparing(entry -> seeker.position().distanceTo(entry.position())))
                 .filter(entry -> !(entry instanceof ArmorStand)
                         && !entry.isDeadOrDying()
                         && entry.hasLineOfSight(seeker)
-                        && EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(seeker));
+                        && EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(entry));
     }
 }
