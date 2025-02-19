@@ -5,14 +5,14 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.BigExperienceCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ExperienceGemWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ResetExperienceActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.UpgradeExperienceActionWidget;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
+import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
@@ -50,7 +50,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
-public class ExperienceDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, IPagedDescriptionScreen {
+public class ExperienceDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, ITabbedDescriptionScreen {
     public final Screen screen;
 
     @Getter
@@ -102,18 +102,18 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         var sources = relic.getLevelingSourcesData().getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(stack, entry)).toList();
         var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
 
-        this.addRenderableWidget(new PageWidget(x + 81, y + 123, this, DescriptionPage.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+        this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
         int xOff = 19;
 
         if (!abilities.isEmpty()) {
-            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
             xOff += 19;
         }
 
         if (!sources.isEmpty())
-            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
         this.addRenderableWidget(new BigExperienceCardWidget(x + 60, y + 47, this));
 
@@ -393,7 +393,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
     }
 
     @Override
-    public DescriptionPage getPage() {
-        return DescriptionPage.EXPERIENCE;
+    public DescriptionTab getTab() {
+        return DescriptionTab.EXPERIENCE;
     }
 }

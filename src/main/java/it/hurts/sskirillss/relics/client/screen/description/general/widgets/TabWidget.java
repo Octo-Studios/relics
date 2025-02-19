@@ -3,9 +3,9 @@ package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
+import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -26,7 +26,7 @@ import net.minecraft.util.FormattedCharSequence;
 import java.util.List;
 import java.util.Locale;
 
-public class PageWidget extends AbstractDescriptionWidget implements IHoverableWidget {
+public class TabWidget extends AbstractDescriptionWidget implements IHoverableWidget {
     @Getter
     private IRelicScreenProvider source;
 
@@ -34,14 +34,14 @@ public class PageWidget extends AbstractDescriptionWidget implements IHoverableW
     private IRelicScreenProvider target;
 
     @Getter
-    private DescriptionPage page;
+    private DescriptionTab tab;
 
-    public PageWidget(int x, int y, IRelicScreenProvider source, DescriptionPage page, IRelicScreenProvider target) {
+    public TabWidget(int x, int y, IRelicScreenProvider source, DescriptionTab tab, IRelicScreenProvider target) {
         super(x, y, 17, 19);
 
         this.source = source;
         this.target = target;
-        this.page = page;
+        this.tab = tab;
     }
 
     @Override
@@ -74,7 +74,7 @@ public class PageWidget extends AbstractDescriptionWidget implements IHoverableW
                     .pos(getX(), getY())
                     .end();
 
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tabs/" + page.name().toLowerCase(Locale.ROOT) + ".png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tabs/" + tab.name().toLowerCase(Locale.ROOT) + ".png"), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() + 2, getY() + 5)
                     .end();
@@ -91,7 +91,7 @@ public class PageWidget extends AbstractDescriptionWidget implements IHoverableW
 
     @Override
     public boolean isLocked() {
-        return minecraft.screen instanceof IPagedDescriptionScreen screen && screen.getPage() == page;
+        return minecraft.screen instanceof ITabbedDescriptionScreen screen && screen.getTab() == tab;
     }
 
     @Override
@@ -110,7 +110,7 @@ public class PageWidget extends AbstractDescriptionWidget implements IHoverableW
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.translatable("tooltip.relics.researching.tab." + page.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.BOLD)
+                Component.translatable("tooltip.relics.researching.tab." + tab.name().toLowerCase(Locale.ROOT)).withStyle(ChatFormatting.BOLD)
         );
 
         for (MutableComponent entry : entries) {

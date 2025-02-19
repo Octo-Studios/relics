@@ -6,11 +6,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.badges.base.RelicBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
+import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -45,7 +45,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import java.awt.*;
 
 @OnlyIn(Dist.CLIENT)
-public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, IPagedDescriptionScreen {
+public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, ITabbedDescriptionScreen {
     public final Screen screen;
 
     @Getter
@@ -81,18 +81,18 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
         var sources = relic.getLevelingSourcesData().getSources();
         var abilities = relic.getAbilitiesData().getAbilities();
 
-        this.addRenderableWidget(new PageWidget(x + 81, y + 123, this, DescriptionPage.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+        this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
         int xOff = 19;
 
         if (!abilities.isEmpty()) {
-            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
             xOff += 19;
         }
 
         if (!sources.isEmpty())
-            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
         this.addRenderableWidget(new BigRelicCardWidget(x + 60, y + 47, this));
 
@@ -273,7 +273,7 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
     }
 
     @Override
-    public DescriptionPage getPage() {
-        return DescriptionPage.RELIC;
+    public DescriptionTab getTab() {
+        return DescriptionTab.RELIC;
     }
 }

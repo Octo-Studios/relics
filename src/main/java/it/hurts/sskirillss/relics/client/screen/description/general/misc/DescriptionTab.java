@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.general.misc;
 
-public enum DescriptionPage {
+public enum DescriptionTab {
     RELIC,
     ABILITY,
     EXPERIENCE

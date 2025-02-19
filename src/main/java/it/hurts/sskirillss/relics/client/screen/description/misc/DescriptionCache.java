@@ -1,11 +1,10 @@
 package it.hurts.sskirillss.relics.client.screen.description.misc;
 
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
+import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import lombok.*;
 import net.minecraft.world.item.ItemStack;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,7 +24,7 @@ public class DescriptionCache {
             return "";
 
         var cache = getEntry(relic);
-        var index = cache.getSelectionIndex(DescriptionPage.ABILITY);
+        var index = cache.getSelectionIndex(DescriptionTab.ABILITY);
         var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
         var size = abilities.size();
 
@@ -43,7 +42,7 @@ public class DescriptionCache {
             ability = abilities.get(index);
 
             setEntry(relic, cache.toBuilder()
-                    .selectionIndex(DescriptionPage.ABILITY, index)
+                    .selectionIndex(DescriptionTab.ABILITY, index)
                     .build());
         }
 
@@ -64,7 +63,7 @@ public class DescriptionCache {
         var index = abilities.indexOf(ability);
 
         setEntry(relic, cache.toBuilder()
-                .selectionIndex(DescriptionPage.ABILITY, index)
+                .selectionIndex(DescriptionTab.ABILITY, index)
                 .build());
     }
 
@@ -73,7 +72,7 @@ public class DescriptionCache {
             return "";
 
         var cache = getEntry(relic);
-        var index = cache.getSelectionIndex(DescriptionPage.EXPERIENCE);
+        var index = cache.getSelectionIndex(DescriptionTab.EXPERIENCE);
         var sources = relic.getLevelingSourcesData().getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(stack, entry)).toList();
         var size = sources.size();
 
@@ -91,7 +90,7 @@ public class DescriptionCache {
             source = sources.get(index);
 
             setEntry(relic, cache.toBuilder()
-                    .selectionIndex(DescriptionPage.EXPERIENCE, index)
+                    .selectionIndex(DescriptionTab.EXPERIENCE, index)
                     .build());
         }
 
@@ -112,7 +111,7 @@ public class DescriptionCache {
         var index = sources.indexOf(source);
 
         setEntry(relic, cache.toBuilder()
-                .selectionIndex(DescriptionPage.EXPERIENCE, index)
+                .selectionIndex(DescriptionTab.EXPERIENCE, index)
                 .build());
     }
 
@@ -121,19 +120,19 @@ public class DescriptionCache {
     @Builder(toBuilder = true)
     public static class CacheEntry {
         @Getter
-        private DescriptionPage selectedPage = DescriptionPage.RELIC;
+        private DescriptionTab selectedPage = DescriptionTab.RELIC;
 
-        private Map<DescriptionPage, Integer> selectionIndices = new HashMap<>() {{
-            for (var page : DescriptionPage.values())
+        private Map<DescriptionTab, Integer> selectionIndices = new HashMap<>() {{
+            for (var page : DescriptionTab.values())
                 put(page, 0);
         }};
 
-        public int getSelectionIndex(DescriptionPage page) {
+        public int getSelectionIndex(DescriptionTab page) {
             return selectionIndices.computeIfAbsent(page, entry -> 0);
         }
 
         public static class CacheEntryBuilder {
-            public CacheEntryBuilder selectionIndex(DescriptionPage page, int index) {
+            public CacheEntryBuilder selectionIndex(DescriptionTab page, int index) {
                 selectionIndices.put(page, index);
 
                 return this;

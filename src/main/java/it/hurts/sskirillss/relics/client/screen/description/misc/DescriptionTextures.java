@@ -52,6 +52,10 @@ public class DescriptionTextures {
     public static final ResourceLocation SMALL_STAR_ACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/small_star_active.png");
     public static final ResourceLocation SMALL_STAR_INACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/small_star_inactive.png");
 
+    public static final ResourceLocation PAGE_ARROW_UP = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/page_arrow_up.png");
+    public static final ResourceLocation PAGE_ARROW_DOWN = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/page_arrow_down.png");
+    public static final ResourceLocation PAGE_COUNTER = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/page_counter.png");
+
     public static final ResourceLocation LOCK_INACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/icons/lock_inactive.png");
     public static final ResourceLocation UPGRADE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/icons/upgrade.png");
     public static final ResourceLocation RESEARCH = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/icons/research.png");

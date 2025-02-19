@@ -6,11 +6,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
+import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
@@ -26,6 +26,7 @@ import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -51,7 +52,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, IPagedDescriptionScreen {
+public class AbilityDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, ITabbedDescriptionScreen {
     public final Screen screen;
 
     @Getter
@@ -60,6 +61,10 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     public final int slot;
     @Getter
     public ItemStack stack;
+
+    @Getter
+    @Setter
+    private int page;
 
     private final int backgroundHeight = 256;
     private final int backgroundWidth = 418;
@@ -76,6 +81,14 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         this.screen = screen;
 
         stack = DescriptionUtils.gatherRelicStack(player, slot);
+
+        if (stack.getItem() instanceof IRelicItem relic) {
+            var abilities = relic.getAbilitiesData().getAbilities().keySet().stream()
+                    .filter(entry -> relic.isAbilityEnabled(stack, entry))
+                    .toList();
+
+            setPage(abilities.indexOf(getSelectedAbility()) / 5);
+        }
     }
 
     public String getSelectedAbility() {
@@ -102,20 +115,34 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         int y = (this.height - backgroundHeight) / 2;
 
         var sources = relic.getLevelingSourcesData().getSources();
-        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
+        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream()
+                .filter(entry -> relic.isAbilityEnabled(stack, entry))
+                .toList();
 
-        this.addRenderableWidget(new PageWidget(x + 81, y + 123, this, DescriptionPage.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+        var maxEntries = 5;
+
+        if (abilities.size() > maxEntries) {
+            this.addRenderableWidget(new PageWidget(x + 289, y + 151, this, 1));
+            this.addRenderableWidget(new PageWidget(x + 289, y + 186, this, -1));
+        }
+
+        int startIndex = page * maxEntries;
+        int endIndex = Math.min(startIndex + maxEntries, abilities.size());
+
+        var paginatedAbilities = (startIndex < abilities.size() && startIndex >= 0) ? abilities.subList(startIndex, endIndex) : new ArrayList<String>();
+
+        this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
         int xOff = 19;
 
-        if (!abilities.isEmpty()) {
-            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+        if (!paginatedAbilities.isEmpty()) {
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
             xOff += 19;
         }
 
         if (!sources.isEmpty())
-            this.addRenderableWidget(new PageWidget(x + 81 + xOff, y + 123, this, DescriptionPage.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
         this.addRenderableWidget(new BigAbilityCardWidget(x + 60, y + 47, this));
 
@@ -141,17 +168,17 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
             }
         }
 
-        if (!abilities.isEmpty()) {
+        if (!paginatedAbilities.isEmpty()) {
             int objectWidth = 32;
             int containerWidth = 209;
 
-            int count = Math.min(5, abilities.size());
+            int count = paginatedAbilities.size();
 
-            int spacing = objectWidth + 8 + (3 * (5 - count));
+            int spacing = objectWidth + 8 + (3 * (maxEntries - count));
 
             xOff = (containerWidth / 2) - (((objectWidth * count) + ((spacing - objectWidth) * Math.max(count - 1, 0))) / 2);
 
-            for (String entry : abilities) {
+            for (String entry : paginatedAbilities) {
                 this.addRenderableWidget(new AbilityCardWidget(x + 77 + xOff, y + 153, this, entry));
 
                 xOff += spacing;
@@ -236,6 +263,24 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(x + 60, y + 133)
                 .end();
+
+        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream()
+                .filter(entry -> relic.isAbilityEnabled(stack, entry))
+                .toList();
+
+        if (abilities.size() > 5) {
+            poseStack.pushPose();
+
+            GUIRenderer.begin(DescriptionTextures.PAGE_COUNTER, poseStack)
+                    .pos(x + 295, y + 177)
+                    .end();
+
+            var page = Component.literal(String.valueOf(this.page + 1)).withStyle(ChatFormatting.BOLD);
+
+            guiGraphics.drawString(minecraft.font, page, (int) (x + 296 - font.width(page) / 2F), y + 174, 0xFFFFFF, false);
+
+            poseStack.popPose();
+        }
 
         poseStack.pushPose();
 
@@ -420,7 +465,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     }
 
     @Override
-    public DescriptionPage getPage() {
-        return DescriptionPage.ABILITY;
+    public DescriptionTab getTab() {
+        return DescriptionTab.ABILITY;
     }
 }
