@@ -277,7 +277,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
             var page = Component.literal(String.valueOf(this.page + 1)).withStyle(ChatFormatting.BOLD);
 
-            guiGraphics.drawString(minecraft.font, page, (int) (x + 296 - font.width(page) / 2F), y + 174, 0xffe278, false);
+            guiGraphics.drawString(minecraft.font, page, (int) (x + 296 - font.width(page) / 2F), y + 173, 0xffe278, true);
 
             poseStack.popPose();
         }
