@@ -7,9 +7,9 @@
 
   "tooltip.relics.relic.tooltip.abilities": "アビリティ:",
 
-  "tooltip.relics.researching.badge.ability.oblivion.title": "忘却への耐性",
+  "tooltip.relics.researching.badge.ability.oblivion.title": "忘却の影響",
   "tooltip.relics.researching.badge.ability.oblivion.description": "忘却効果が付与されている間はアビリティが効果を発揮しない",
-  "tooltip.relics.researching.badge.ability.silence.title": "沈黙への耐性",
+  "tooltip.relics.researching.badge.ability.silence.title": "沈黙の影響",
   "tooltip.relics.researching.badge.ability.silence.description": "沈黙効果が付与されている間はアビリティが効果を発揮しない",
   "tooltip.relics.researching.badge.ability.flawless_ability.title": "完璧なアビリティ",
   "tooltip.relics.researching.badge.ability.flawless_ability.description": "アビリティの特性値が完璧な状態になった！すごい！",
@@ -94,7 +94,7 @@
   "item.relics.infinity_ham": "無限のハム",
   "tooltip.relics.infinity_ham.description": "どれだけかじられても、元の大きさに自動的に復元されていく不思議な肉の切れはし",
   "tooltip.relics.infinity_ham.ability.regeneration": "肉再生",
-  "tooltip.relics.infinity_ham.ability.regeneration.description": "%1$s秒ごとに、6口分を上限として再生する。1口食べると空腹ゲージを%2$sだけ回復する。使用すると、プレイヤーの空腹ゲージを満タンにするのに必要な分を自動的に消費する",
+  "tooltip.relics.infinity_ham.ability.regeneration.description": "6口分を上限として%1$s秒ごとに少しずつ再生する。1口食べると空腹度を%2$sだけ回復する。使用すると、プレイヤーの空腹ゲージを充填するのに必要な分を自動的に消費する",
   "tooltip.relics.infinity_ham.ability.marinade": "マリネ",
   "tooltip.relics.infinity_ham.ability.marinade.description": "インベントリ内のレリックにポーションをマウス左クリックで使用すると、そのポーションの効果を記憶する。レリックを食べるたびに、回復した空腹ゲージ1つあたり%1$s秒だけ記憶したポーション効果をプレイヤーに与える。水入り瓶を使うとポーション効果を消すことができる。",
   "tooltip.relics.infinity_ham.ability.meat_bat": "肉棍棒",
@@ -109,7 +109,7 @@
   "item.relics.enders_hand": "エンダーの手",
   "tooltip.relics.enders_hand.description": "アビリティ《転移》を使うとレリック経験値+1ポイント、さらに転移先の距離が10ブロック離れるごとにレリック経験値+1ポイントを加算",
   "tooltip.relics.enders_hand.ability.neutrality": "中立",
-  "tooltip.relics.enders_hand.ability.neutrality.description": "持っているとエンダーマンが着用者に対して中立になる",
+  "tooltip.relics.enders_hand.ability.neutrality.description": "身につけているとエンダーマンが着用者に対して中立になる",
   "tooltip.relics.enders_hand.ability.swap": "転移",
   "tooltip.relics.enders_hand.ability.swap.description": "使用者とターゲットの場所を視線方向に沿って入れ替える",
   "tooltip.relics.enders_hand.ability.swap.stat.distance.title": "距離:",
@@ -242,7 +242,7 @@
   "item.relics.spore_sack": "胞子袋",
   "tooltip.relics.spore_sack.description": "質素な麻袋に、命を蝕む瘴気が充満している",
   "tooltip.relics.spore_sack.ability.spore_mist": "胞子の霧",
-  "tooltip.relics.spore_sack.ability.spore_mist.description": "プレイヤーの体力が50%以下になると、最大%1$個の追尾する胞子を周囲にばら撒く。この胞子はプレイヤーが失っている体力の%2$s%%に等しいダメージを与え、影響を受けた対象は5秒間回復できなくなる。再使用するには、プレイヤーの体力が一度50%以上まで回復する必要がある。",
+  "tooltip.relics.spore_sack.ability.spore_mist.description": "プレイヤーの体力が50%以下になると、最大%1$s個の追尾する胞子を周囲にばら撒く。この胞子はプレイヤーが失っている体力の%2$s%%に等しいダメージを与え、影響を受けた対象は5秒間回復できなくなる。再使用するには、プレイヤーの体力が一度50%以上まで回復する必要がある。",
   "tooltip.relics.spore_sack.leveling_source.spore_mist.title": "胞子の霧",
   "tooltip.relics.spore_sack.leveling_source.spore_mist.description": "アビリティ%2$sによる胞子でダメージを1回与えるたびにレリック経験値+%1$sポイント",
 
@@ -444,9 +444,9 @@
 
   "item.relics.phantom_boot": "ファントムの靴",
   "tooltip.relics.phantom_boot.description": "たとえ地面がない場所であっても、着用者の足下に物質を凝縮させてどんな地形でも進んでいける道を作る",
-  "tooltip.relics.phantom_boot.ability.bridge": "亡霊橋",
+  "tooltip.relics.phantom_boot.ability.bridge": "幽霊橋",
   "tooltip.relics.phantom_boot.ability.bridge.description": "プレイヤーの足下に一時的な幻の橋を生成し、レリックを着用している者であれば誰でもその上を歩くことができる。その橋の上で%1$s秒以上立ち止まっていると落下してしまい、地面に落ちるまで橋を再び作ることはできない",
-  "tooltip.relics.phantom_boot.leveling_source.bridge.title": "亡霊橋",
+  "tooltip.relics.phantom_boot.leveling_source.bridge.title": "幽霊橋",
   "tooltip.relics.phantom_boot.leveling_source.bridge.description": "アビリティ%2$sによって橋を生成したときに10%%の確率でレリック経験値+%1$sポイント",
 
   "item.relics.springy_boot": "バウンドブーツ",
@@ -456,7 +456,7 @@
   "tooltip.relics.springy_boot.leveling_source.bounce.title": "弾性",
   "tooltip.relics.springy_boot.leveling_source.bounce.description": "アビリティ%2$sによって地表でバウンドするたびにレリック経験値+%1$sポイント",
 
-  "tooltip.relics.leveling_source.generic.spreading.title": "知識の敷物",
+  "tooltip.relics.leveling_source.generic.spreading.title": "知識の伝搬",
   "tooltip.relics.leveling_source.generic.spreading.description": "インベントリ内にあるレリックであれば何でも、取得するレリック経験値が%1$s%%分だけ増える",
 
   "item.relics.leafy_ring": "繁茂の指輪 [WIP]",
