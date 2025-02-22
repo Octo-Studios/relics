@@ -140,7 +140,7 @@
   "tooltip.relics.magic_mirror.ability.teleport.stat.cooldown.title": "チャージ時間:",
   "tooltip.relics.magic_mirror.ability.teleport.stat.cooldown.value": "%1$s秒",
 
-  "item.relics.shadow_glaive": "影の円刃",
+  "item.relics.shadow_glaive": "影の凶刃",
   "tooltip.relics.shadow_glaive.description": "熟練の技に鍛えられた気まぐれな武器。その気になれば、千本の刃が大兵団をも打ち滅ぼすだろう",
   "tooltip.relics.shadow_glaive.ability.mayhem": "恐慌",
   "tooltip.relics.shadow_glaive.ability.mayhem.description": "ダメージを与えたときに%1$s%%の確率で、半径16ブロック内の近くのターゲット間で無秩序にバウンドする飛翔体を発動する。飛翔体は最大%2$s回までバウンドし、発動時に与えたダメージの%3$s%%を与える",
