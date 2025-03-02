@@ -94,40 +94,15 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
 
     @Override
     public void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
-        var level = player.level();
+        if (ability.equals("bridge") && stage == CastStage.START && isToggled(stack)) {
+            var motion = player.getDeltaMovement();
 
-        if (ability.equals("bridge") && isToggled(stack)) {
-            if (stage == CastStage.START) {
-                var motion = player.getDeltaMovement();
+            if (motion.y <= -0.5D) {
+                player.setDeltaMovement(motion.x, -motion.y, motion.z);
 
-                if (motion.y <= -0.5D) {
-                    player.setDeltaMovement(motion.x, -motion.y, motion.z);
+                var state = BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState();
 
-                    var state = BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState();
-
-                    state.getBlock().fallOn(level, state, player.blockPosition(), player, player.fallDistance);
-                }
-            }
-
-            if (!level.isClientSide() && stage == CastStage.TICK) {
-                var motion = player.getKnownMovement().multiply(1F, 0F, 1F);
-                var pos = player.position().add(motion);
-                var blockPos = new BlockPos((int) Math.floor(pos.x()), (int) Math.floor(pos.y()), (int) Math.floor(pos.z()));
-
-                var radius = (int) Mth.clamp(Math.round(motion.length()), 1, 3);
-
-                for (int x = -radius; x <= radius; x++) {
-                    for (int z = -radius; z <= radius; z++) {
-                        var relativePos = blockPos.offset(x, -1, z);
-
-                        if (!level.isEmptyBlock(relativePos))
-                            continue;
-
-                        if (level.setBlockAndUpdate(relativePos, BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState())
-                                && level.getRandom().nextInt(10) == 0)
-                            spreadRelicExperience(player, stack, 1);
-                    }
-                }
+                state.getBlock().fallOn(player.level(), state, player.blockPosition(), player, player.fallDistance);
             }
         }
     }
@@ -161,6 +136,27 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
                 }
             } else if (time > 0)
                 addTime(stack, -1);
+
+            if (isAbilityTicking(stack, "bridge")) {
+                var motion = player.getKnownMovement().multiply(1F, 0F, 1F);
+                var pos = player.position().add(motion);
+                var blockPos = new BlockPos((int) Math.floor(pos.x()), (int) Math.floor(pos.y()), (int) Math.floor(pos.z()));
+
+                var radius = (int) Mth.clamp(Math.round(motion.length()), 1, 3);
+
+                for (int x = -radius; x <= radius; x++) {
+                    for (int z = -radius; z <= radius; z++) {
+                        var relativePos = blockPos.offset(x, -1, z);
+
+                        if (!level.isEmptyBlock(relativePos))
+                            continue;
+
+                        if (level.setBlockAndUpdate(relativePos, BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState())
+                                && level.getRandom().nextInt(10) == 0)
+                            spreadRelicExperience(player, stack, 1);
+                    }
+                }
+            }
         } else {
             if (player.onGround() && !onBridge)
                 setToggled(stack, true);
