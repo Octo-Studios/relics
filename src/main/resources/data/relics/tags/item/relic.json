@@ -1,0 +1,31 @@
+{
+  "replace": false,
+  "values": [
+    "relics:midnight_robe",
+    "relics:elytra_booster",
+    "relics:drowned_belt",
+    "relics:hunter_belt",
+    "relics:leather_belt",
+    "relics:spore_sack",
+    "relics:shadow_glaive",
+    "relics:magma_walker",
+    "relics:aqua_walker",
+    "relics:ice_skates",
+    "relics:ice_breaker",
+    "relics:roller_skates",
+    "relics:amphibian_boot",
+    "relics:phantom_boot",
+    "relics:springy_boot",
+    "relics:rage_glove",
+    "relics:enders_hand",
+    "relics:wool_mitten",
+    "relics:reflection_necklace",
+    "relics:jellyfish_necklace",
+    "relics:holy_locket",
+    "relics:chorus_inhibitor",
+    "relics:bastion_ring",
+    "relics:infinity_ham",
+    "relics:magic_mirror",
+    "relics:space_dissector"
+  ]
+}
