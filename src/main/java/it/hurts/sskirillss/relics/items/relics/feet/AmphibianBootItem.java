@@ -97,14 +97,18 @@ public class AmphibianBootItem extends RelicItem implements IRenderableCurio {
 
         int charge = stack.getOrDefault(CHARGE, 0);
 
+        boolean isSwimming = false;
+        boolean isSlipping = false;
+
         if (player.isSwimming()) {
+            isSwimming = true;
+
             if (player.tickCount % 20 == 0)
                 spreadRelicExperience(player, stack, 1);
 
             if (charge < getStatValue(stack, "swimming", "duration"))
                 stack.set(CHARGE, charge + 1);
-        } else if (charge > 0)
-            stack.set(CHARGE, --charge);
+        }
 
         EntityUtils.removeAttribute(player, stack, NeoForgeMod.SWIM_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
@@ -112,12 +116,16 @@ public class AmphibianBootItem extends RelicItem implements IRenderableCurio {
             EntityUtils.applyAttribute(player, stack, NeoForgeMod.SWIM_SPEED, (float) (charge * getStatValue(stack, "swimming", "speed")), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
         if (player.isSprinting() && player.level().isRainingAt(player.blockPosition()) && !player.isShiftKeyDown() && !player.isInWater() && !player.isInLava()) {
+            isSlipping = true;
+
             if (player.tickCount % 20 == 0)
                 spreadRelicExperience(player, stack, 1);
 
             if (charge < getStatValue(stack, "slipping", "duration") && player.tickCount % 4 == 0)
                 stack.set(CHARGE, charge + 1);
-        } else if (charge > 0)
+        }
+
+        if ((!isSwimming && !isSlipping) && charge > 0)
             stack.set(CHARGE, --charge);
 
         EntityUtils.removeAttribute(player, stack, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
