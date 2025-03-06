@@ -111,6 +111,12 @@ public class DissectionEntity extends Entity {
         if (level().isClientSide())
             return;
 
+        if (this.tickCount > 1200) {
+            this.discard();
+
+            return;
+        }
+
         locked = false;
 
         ServerLevel serverLevel = (ServerLevel) level();
