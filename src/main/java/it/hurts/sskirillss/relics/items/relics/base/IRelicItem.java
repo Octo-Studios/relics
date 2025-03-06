@@ -949,6 +949,10 @@ public interface IRelicItem {
         return testAbilityPredicates(player, stack, ability, PredicateType.VISIBILITY);
     }
 
+    default boolean mayUnlock(ItemStack stack, String ability) {
+        return isEnoughLevel(stack, ability) && !isLockUnlocked(stack, ability);
+    }
+
     default boolean mayResearch(ItemStack stack, String ability) {
         return isEnoughLevel(stack, ability) && isLockUnlocked(stack, ability) && !isAbilityResearched(stack, ability);
     }
