@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.utils.Reference;
@@ -42,8 +43,8 @@ public class GuiGraphicsMixin {
             NeoForge.EVENT_BUS.post(new TooltipDisplayEvent(event.getItemStack(), (GuiGraphics) (Object) this, postWidth, postHeight, postPos.x(), postPos.y()));
     }
 
-    @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;IIII)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V", shift = At.Shift.AFTER))
-    public void renderItem(LivingEntity entity, Level level, ItemStack stack, int x, int y, int seed, int guiOffset, CallbackInfo ci) {
+    @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z", shift = At.Shift.AFTER))
+    public void renderItemDecorations(Font font, ItemStack stack, int x, int y, String text, CallbackInfo ci) {
         var player = Minecraft.getInstance().player;
 
         if (player == null || !(stack.getItem() instanceof IRelicItem relic))
@@ -54,7 +55,8 @@ public class GuiGraphicsMixin {
 
         var partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
 
-        var time = seed + player.tickCount + partialTicks;
+        var time = (stack.hashCode() / 1000F) + player.tickCount + partialTicks;
+        var color = (float) (1F + Math.sin(time * 0.45F) * 0.1F);
 
         var renderedUpgradeIcon = false;
         var renderedResearchIcon = false;
@@ -63,16 +65,11 @@ public class GuiGraphicsMixin {
             if (!renderedUpgradeIcon && relic.mayUpgrade(stack, ability.getId())) {
                 poseStack.pushPose();
 
-                var scale = 0.0625F;
-                var color = (float) (1F + Math.sin(time * 0.45F) * 0.15F);
-
-                poseStack.scale(scale, -scale, scale);
-
-                poseStack.translate(1, -8, 1);
+                poseStack.translate(x + 9, y, 200);
 
                 poseStack.translate(3.5F, 3.5F, 0);
 
-                poseStack.mulPose(Axis.ZP.rotation((float) (Math.sin(time * 0.35F) * 0.25F)));
+                poseStack.mulPose(Axis.ZP.rotation((float) (Math.sin(time * 0.35F) * 0.15F)));
 
                 poseStack.translate(-3.5F, -3.5F, 0);
 
@@ -89,14 +86,9 @@ public class GuiGraphicsMixin {
             if (!renderedResearchIcon && (relic.mayResearch(stack, ability.getId()) || relic.mayUnlock(stack, ability.getId()))) {
                 poseStack.pushPose();
 
-                var scale = 0.0625F;
-                var color = (float) (1F + Math.sin(time * 0.45F) * 0.15F);
+                poseStack.translate(x + 9, y + 9, 200);
 
-                poseStack.scale(scale, -scale, scale);
-
-                poseStack.translate(1, 1, 1);
-
-                poseStack.translate(Math.sin(time * 0.25F), Math.cos(time * 0.25F), 0F);
+                poseStack.translate(Math.sin(time * 0.25F) * 0.75F, Math.cos(time * 0.25F) * 0.75F, 0F);
 
                 RenderSystem.enableBlend();
 
@@ -112,6 +104,21 @@ public class GuiGraphicsMixin {
                 renderedResearchIcon = true;
             }
         }
+    }
+
+    @Inject(method = "renderItem(Lnet/minecraft/world/entity/LivingEntity;Lnet/minecraft/world/level/Level;Lnet/minecraft/world/item/ItemStack;IIII)V", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;scale(FFF)V", shift = At.Shift.AFTER))
+    public void renderItem(LivingEntity entity, Level level, ItemStack stack, int x, int y, int seed, int guiOffset, CallbackInfo ci) {
+        var player = Minecraft.getInstance().player;
+
+        if (player == null || !(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var guiGraphics = (GuiGraphics) (Object) this;
+        var poseStack = guiGraphics.pose();
+
+        var partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+
+        var time = seed + player.tickCount + partialTicks;
 
         if (relic.isRelicFlawless(stack)) {
             var data = relic.getStyleData().getBeams().apply(player, stack);
