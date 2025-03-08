@@ -7,6 +7,7 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.ChatFormatting;
@@ -45,7 +46,7 @@ public class PlayerExperiencePlateWidget extends AbstractPlateWidget {
                 .pos(1, height - 3)
                 .texSize(barWidth, barHeight)
                 .anchor(SpriteAnchor.TOP_LEFT)
-                .patternSize((int) (barWidth * ((player.totalExperience / ((player.totalExperience / player.experienceProgress) / 100F)) / 100F)), barHeight)
+                .patternSize((int) (barWidth * minecraft.player.experienceProgress), barHeight)
                 .end();
 
         poseStack.popPose();
@@ -65,8 +66,11 @@ public class PlayerExperiencePlateWidget extends AbstractPlateWidget {
         int maxWidth = 150;
         int renderWidth = 0;
 
+        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
+
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.general.player_experience.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + minecraft.player.experienceLevel),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.general.player_experience.title").withStyle(ChatFormatting.BOLD)
+                        .withStyle(ChatFormatting.UNDERLINE)).append(" " + experience + " (" +  EntityUtils.getLevelFromTotalExperience(experience) + ")"),
                 Component.literal(" ")
         );
 

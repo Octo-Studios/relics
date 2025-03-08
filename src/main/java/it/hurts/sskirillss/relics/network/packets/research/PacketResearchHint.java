@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -71,12 +72,12 @@ public class PacketResearchHint implements CustomPacketPayload {
 
             RandomSource random = player.getRandom();
 
-            int cost = relic.getResearchHintCost(ability) * amount;
+            int cost = relic.getResearchHintPlayerExperienceCost(ability) * amount;
 
-            if (player.experienceLevel < cost)
+            if (EntityUtils.getPlayerTotalExperience(player) < cost)
                 return;
 
-            player.giveExperienceLevels(-cost);
+            player.giveExperiencePoints(-cost);
 
             research(stack, amount);
 

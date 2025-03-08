@@ -32,7 +32,7 @@
   "tooltip.relics.researching.research.tip": "Чтобы разблокировать способность, необходимо соединить звезды, скрытые под туманом, так, чтобы образованное созвездие совпало с изображением на фоне. Когда созвездие будет подобрано правильно, способность будет исследована автоматически.",
 
   "tooltip.relics.researching.research.hint.description": "Подсказка",
-  "tooltip.relics.researching.research.hint.cost": "Стоимость: %1$s уровней опыта %2$s.",
+  "tooltip.relics.researching.research.hint.cost": "Стоимость: %1$s очков опыта игрока (%2$s относительных уровней) %3$s.",
   "tooltip.relics.researching.research.hint.quick": "Удерживай [Шифт] для полного автоматического исследования способности.",
   "tooltip.relics.researching.research.hint.locked": "Способность уже исследована!",
 
@@ -41,11 +41,11 @@
   "tooltip.relics.researching.general.leveling_point.title": "Очки улучшения:",
   "tooltip.relics.researching.general.leveling_point.extra_info": "Получается при повышении уровня реликвии и используется для повышения уровня способностей.",
 
-  "tooltip.relics.researching.general.player_experience.title": "Уровень опыта:",
-  "tooltip.relics.researching.general.player_experience.extra_info": "Стандартный опыт игрока из оригинальной игры. Получается при убийстве мобов, добыче руды, плавке предметов и т.п.",
+  "tooltip.relics.researching.general.player_experience.title": "Очки опыта:",
+  "tooltip.relics.researching.general.player_experience.extra_info": "Опыт игрока из \"ванильного\" Minecraft. Получается при убийстве мобов, добыче руды, плавке предметов и т.п.",
 
   "tooltip.relics.researching.general.luck.title": "Удача:",
-  "tooltip.relics.researching.general.luck.extra_info": "Получается при каждом неудачном сбросе случайных характеристик реликвии и повышает вероятность получения лучших значений при их следующем сбросе. Увеличивает стоимость сброса на 1 уровень опыта за каждые 25% удачи.",
+  "tooltip.relics.researching.general.luck.extra_info": "Получается при каждом неудачном сбросе случайных характеристик реликвии и повышает вероятность получения лучших значений при их следующем сбросе. Увеличивает стоимость сброса на 5 единиц опыта игрока за каждый процент удачи.",
 
   "tooltip.relics.researching.relic.card.low_level": "Для разблокировки способности необходимо повысить уровень реликвии до %1$s!",
   "tooltip.relics.researching.relic.card.unresearched": "Для использования способности необходимо завершить исследование!",
@@ -77,17 +77,17 @@
   "tooltip.relics.relic.status.unknown": "§6§l[§6§l?§6§l]",
 
   "tooltip.relics.relic.upgrade.description": "Повышение уровня",
-  "tooltip.relics.relic.upgrade.cost": "Стоимость: %1$s очков улучшения %2$s, %3$s уровней опыта %4$s.",
+  "tooltip.relics.relic.upgrade.cost": "Стоимость: %1$s очков улучшения %2$s, %3$s очков опыта игрока (%4$s относительных уровней) %5$s.",
   "tooltip.relics.relic.upgrade.locked": "Способность достигла максимального уровня.",
   "tooltip.relics.relic.upgrade.quick": "Удерживай [Шифт] для автоматического повышения до максимально возможного уровня.",
 
   "tooltip.relics.relic.reroll.description": "Сброс случайных характеристик",
-  "tooltip.relics.relic.reroll.cost": "Стоимость: %1$s уровней опыта %2$s.",
+  "tooltip.relics.relic.reroll.cost": "Стоимость: %1$s очков опыта игрока (%2$s относительных уровней) %3$s.",
   "tooltip.relics.relic.reroll.quick": "Удерживай [Шифт] для автоматического сброса случайных характеристик до идеальных значений.",
   "tooltip.relics.relic.reroll.warning": "Удерживай [Шифт] для подтверждения сброса характеристик с идеальных значений на другие случайные.",
 
   "tooltip.relics.relic.reset.description": "Сброс очков улучшения",
-  "tooltip.relics.relic.reset.cost": "Стоимость: %1$s уровней опыта %2$s.",
+  "tooltip.relics.relic.reset.cost": "Стоимость: %1$s очков опыта игрока (%2$s относительных уровней) %3$s.",
   "tooltip.relics.relic.reset.locked": "Для использования необходимо улучшить способность хотя бы 1 раз.",
 
   "item.relics.infinity_ham": "Бесконечный окорок",

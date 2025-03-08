@@ -11,6 +11,7 @@ import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -77,14 +78,14 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
 
         PoseStack poseStack = guiGraphics.pose();
 
-        int maxWidth = 100;
+        int maxWidth = 120;
         int renderWidth = 0;
 
         int requiredPoints = data.getRequiredPoints();
-        int requiredLevel = relic.getUpgradeRequiredLevel(getScreen().getStack(), getAbility());
+        int requiredExperience = relic.getUpgradePlayerExperienceCost(getScreen().getStack(), getAbility());
 
         int points = relic.getRelicLevelingPoints(getScreen().getStack());
-        int level = minecraft.player.experienceLevel;
+        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
         MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
@@ -93,12 +94,14 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
 
         boolean isMaxLevel = relic.isAbilityMaxLevel(getScreen().getStack(), getAbility());
         boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility());
+        boolean hasExperience = requiredExperience <= experience;
 
         if (!isMaxLevel) {
             entries.add(Component.literal(" "));
             entries.add(Component.translatable("tooltip.relics.relic.upgrade.cost", isQuick ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : requiredPoints,
-                    (requiredPoints > points ? negativeStatus : positiveStatus), isQuick ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : requiredLevel,
-                    (requiredLevel > level ? negativeStatus : positiveStatus)));
+                    (requiredPoints > points ? negativeStatus : positiveStatus), isQuick ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : requiredExperience,
+                    hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
+                    (hasExperience ? positiveStatus: negativeStatus)));
         }
 
         if (!isLocked()) {

@@ -3,15 +3,16 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -91,23 +92,25 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
         List<FormattedCharSequence> tooltip = Lists.newArrayList();
 
-        int maxWidth = 100;
+        int maxWidth = 120;
         int renderWidth = 0;
 
-        int requiredLevel = relic.getRerollRequiredLevel(getScreen().getStack(), getAbility());
-
-        int level = minecraft.player.experienceLevel;
+        int requiredExperience = relic.getRerollPlayerExperienceCost(getScreen().getStack(), getAbility());
+        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
         MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
         MutableComponent unknownStatus = Component.translatable("tooltip.relics.relic.status.unknown");
 
         boolean isQuick = relic.mayPlayerReroll(minecraft.player, getScreen().getStack(), getAbility()) && relic.getAbilityQuality(getScreen().getStack(), getAbility()) != relic.getMaxQuality();
+        boolean hasExperience = requiredExperience <= experience;
 
         List<MutableComponent> entries = Lists.newArrayList(
                 Component.translatable("tooltip.relics.relic.reroll.description").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
                 Component.literal(" "),
-                Component.translatable("tooltip.relics.relic.reroll.cost", isQuick && Screen.hasShiftDown() ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : requiredLevel, (requiredLevel > level ? negativeStatus : isQuick && Screen.hasShiftDown() ? unknownStatus : positiveStatus))
+                Component.translatable("tooltip.relics.relic.reroll.cost", isQuick && Screen.hasShiftDown() ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : requiredExperience,
+                        isQuick && Screen.hasShiftDown() ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
+                        hasExperience ? isQuick && Screen.hasShiftDown() ? unknownStatus : positiveStatus : negativeStatus)
         );
 
         if (relic.getAbilityQuality(getScreen().getStack(), getAbility()) == relic.getMaxQuality()) {

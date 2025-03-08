@@ -23,6 +23,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -289,7 +290,7 @@ public interface IRelicItem {
     }
 
     default double getLuckModifier() {
-        return 1.25D;
+        return 1.15D;
     }
 
     default int getRelicLuck(ItemStack stack) {
@@ -736,8 +737,8 @@ public interface IRelicItem {
         return testAbilityResearchPercentage(stack, ability) >= 1D;
     }
 
-    default int getResearchHintCost(String ability) {
-        return 3;
+    default int getResearchHintPlayerExperienceCost(String ability) {
+        return 50;
     }
 
     default StatComponent getStatComponent(ItemStack stack, String ability, String stat) {
@@ -957,8 +958,8 @@ public interface IRelicItem {
         return isEnoughLevel(stack, ability) && isLockUnlocked(stack, ability) && !isAbilityResearched(stack, ability);
     }
 
-    default int getUpgradeRequiredLevel(ItemStack stack, String ability) {
-        return (getAbilityLevel(stack, ability) * 2) + 5;
+    default int getUpgradePlayerExperienceCost(ItemStack stack, String ability) {
+        return (getAbilityLevel(stack, ability) + 1) * 50;
     }
 
     default boolean canBeUpgraded(ItemStack stack, String ability) {
@@ -972,14 +973,14 @@ public interface IRelicItem {
     }
 
     default boolean mayPlayerUpgrade(Player player, ItemStack stack, String ability) {
-        return mayUpgrade(stack, ability) && player.experienceLevel >= getUpgradeRequiredLevel(stack, ability);
+        return mayUpgrade(stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getUpgradePlayerExperienceCost(stack, ability);
     }
 
     default boolean upgrade(Player player, ItemStack stack, String ability) {
         if (!mayPlayerUpgrade(player, stack, ability))
             return false;
 
-        player.giveExperienceLevels(-getUpgradeRequiredLevel(stack, ability));
+        player.giveExperiencePoints(-getUpgradePlayerExperienceCost(stack, ability));
 
         setAbilityLevel(stack, ability, getAbilityLevel(stack, ability) + 1);
         addRelicLevelingPoints(stack, -getAbilityData(ability).getRequiredPoints());
@@ -987,8 +988,8 @@ public interface IRelicItem {
         return true;
     }
 
-    default int getRerollRequiredLevel(ItemStack stack, String ability) {
-        return (int) Math.floor(getRelicLuck(stack) / 25D) + 1;
+    default int getRerollPlayerExperienceCost(ItemStack stack, String ability) {
+        return (getRelicLuck(stack) * 5) + 50;
     }
 
     default boolean mayReroll(ItemStack stack, String ability) {
@@ -996,14 +997,14 @@ public interface IRelicItem {
     }
 
     default boolean mayPlayerReroll(Player player, ItemStack stack, String ability) {
-        return mayReroll(stack, ability) && player.experienceLevel >= getRerollRequiredLevel(stack, ability);
+        return mayReroll(stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getRerollPlayerExperienceCost(stack, ability);
     }
 
     default boolean reroll(Player player, ItemStack stack, String ability) {
         if (!mayPlayerReroll(player, stack, ability))
             return false;
 
-        player.giveExperienceLevels(-getRerollRequiredLevel(stack, ability));
+        player.giveExperiencePoints(-getRerollPlayerExperienceCost(stack, ability));
 
         int prevQuality = getAbilityQuality(stack, ability);
 
@@ -1017,8 +1018,8 @@ public interface IRelicItem {
         return true;
     }
 
-    default int getResetRequiredLevel(ItemStack stack, String ability) {
-        return getAbilityLevel(stack, ability) * 5;
+    default int getResetPlayerExperienceCost(ItemStack stack, String ability) {
+        return getAbilityLevel(stack, ability) * 250;
     }
 
     default boolean mayReset(ItemStack stack, String ability) {
@@ -1026,14 +1027,14 @@ public interface IRelicItem {
     }
 
     default boolean mayPlayerReset(Player player, ItemStack stack, String ability) {
-        return !getAbilityData(ability).getStats().isEmpty() && mayReset(stack, ability) && player.experienceLevel >= getResetRequiredLevel(stack, ability);
+        return !getAbilityData(ability).getStats().isEmpty() && mayReset(stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getResetPlayerExperienceCost(stack, ability);
     }
 
     default boolean reset(Player player, ItemStack stack, String ability) {
         if (!mayPlayerReset(player, stack, ability))
             return false;
 
-        player.giveExperienceLevels(-getResetRequiredLevel(stack, ability));
+        player.giveExperiencePoints(-getResetPlayerExperienceCost(stack, ability));
 
         addRelicLevelingPoints(stack, getAbilityLevel(stack, ability) * getAbilityData(ability).getRequiredPoints());
         setAbilityLevel(stack, ability, 0);

@@ -13,6 +13,7 @@ import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.research.PacketResearchHint;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -46,11 +47,10 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
 
         int links = relic.getResearchData(screen.ability).getLinks().size();
 
-        int requiredLevel = relic.getResearchHintCost(screen.ability) * (Screen.hasShiftDown() ? (links + 1) : 1);
+        int requiredExperience = relic.getResearchHintPlayerExperienceCost(screen.ability) * (Screen.hasShiftDown() ? (links + 1) : 1);
+        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
-        int level = minecraft.player.experienceLevel;
-
-        if (level >= requiredLevel)
+        if (experience >= requiredExperience)
             NetworkHandler.sendToServer(new PacketResearchHint(screen.container, screen.slot, screen.ability, Screen.hasShiftDown() ? links : 1));
     }
 
@@ -137,9 +137,8 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
         int maxWidth = 150;
         int renderWidth = 0;
 
-        int requiredLevel = relic.getResearchHintCost(screen.ability) * (Screen.hasShiftDown() ? relic.getResearchData(screen.ability).getLinks().size() : 1);
-
-        int level = minecraft.player.experienceLevel;
+        int requiredExperience = relic.getResearchHintPlayerExperienceCost(screen.ability) * (Screen.hasShiftDown() ? (relic.getResearchData(screen.ability).getLinks().size() + 1) : 1);
+        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
         MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
@@ -149,10 +148,14 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
                 Component.literal(" ")
         );
 
+        boolean hasExperience = requiredExperience <= experience;
+
         if (relic.isAbilityResearched(screen.stack, screen.ability))
             entries.add(Component.translatable("tooltip.relics.researching.research.hint.locked"));
         else {
-            entries.add(Component.translatable("tooltip.relics.relic.reset.cost", requiredLevel, (requiredLevel > level ? negativeStatus : positiveStatus)));
+            entries.add(Component.translatable("tooltip.relics.researching.research.hint.cost", requiredExperience,
+                    hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
+                    hasExperience ? positiveStatus : negativeStatus));
             entries.add(Component.literal(" "));
             entries.add(Component.literal("▶ ").append(Component.translatable("tooltip.relics.researching.research.hint.quick")));
         }

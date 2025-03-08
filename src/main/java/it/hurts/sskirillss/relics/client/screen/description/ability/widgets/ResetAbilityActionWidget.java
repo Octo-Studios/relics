@@ -2,13 +2,14 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -49,12 +50,13 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
 
         List<FormattedCharSequence> tooltip = Lists.newArrayList();
 
-        int maxWidth = 100;
+        int maxWidth = 120;
         int renderWidth = 0;
 
-        int requiredLevel = relic.getResetRequiredLevel(getScreen().getStack(), getAbility());
+        int requiredExperience = relic.getResetPlayerExperienceCost(getScreen().getStack(), getAbility());
+        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
-        int level = minecraft.player.experienceLevel;
+        boolean hasExperience = requiredExperience <= experience;
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
         MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
@@ -64,8 +66,9 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
                 Component.literal(" "));
 
         if (relic.getAbilityLevel(getScreen().getStack(), getAbility()) > 0)
-            entries.add(Component.translatable("tooltip.relics.relic.reset.cost", requiredLevel,
-                    (requiredLevel > level ? negativeStatus : positiveStatus)));
+            entries.add(Component.translatable("tooltip.relics.relic.reset.cost", requiredExperience,
+                    hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
+                    hasExperience ? positiveStatus : negativeStatus));
         else
             entries.add(Component.translatable("tooltip.relics.relic.reset.locked"));
 

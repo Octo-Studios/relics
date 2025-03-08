@@ -197,21 +197,76 @@ public class EntityUtils {
     public static int getTotalExperienceForLevel(int level) {
         int result = 0;
 
-        for (int i = 0; i < level; i++) {
+        for (int i = 0; i < level; i++)
             result += getExperienceForLevel(i);
-        }
 
         return result;
     }
 
     public static int getPlayerTotalExperience(Player player) {
-        int result = player.totalExperience;
+        int totalExperience = 0;
 
-        for (int level = 0; level < player.experienceLevel; level++) {
-            result += getExperienceForLevel(level);
+        for (int level = 0; level < player.experienceLevel; level++)
+            totalExperience += getExperienceForLevel(level);
+
+        totalExperience += Math.round(player.experienceProgress * getExperienceForLevel(player.experienceLevel));
+
+        return totalExperience;
+    }
+
+    // Blame Mojang, not me!!!
+    public static double getLevelFromTotalExperience(int totalXP) {
+        if (totalXP <= 0)
+            return 0D;
+
+        if (totalXP < 315) {
+            double calculatedLevel = (-6 + Math.sqrt(36 + 4 * totalXP)) / 2.0;
+
+            int floorLevel = (int) Math.floor(calculatedLevel);
+
+            double xpAtLevel = floorLevel * floorLevel + 6 * floorLevel;
+            double xpNeededForNextLevel = 7 + 2 * floorLevel;
+            double progressWithinLevel = (totalXP - xpAtLevel) / xpNeededForNextLevel;
+
+            return MathUtils.round(floorLevel + progressWithinLevel, 1);
+        } else if (totalXP < 1395) {
+            double xpOffset = totalXP - 315;
+            double discriminant = 34.5 * 34.5 + 4 * 2.5 * xpOffset;
+            double levelOffset = (-34.5 + Math.sqrt(discriminant)) / (2 * 2.5);
+            double calculatedLevel = 15 + levelOffset;
+
+            int floorLevel = (int) Math.floor(calculatedLevel);
+            int offsetInt = floorLevel - 15;
+            int xpAtLevel = 315 + 37 * offsetInt + (int) (2.5 * offsetInt * (offsetInt - 1));
+            int xpNeededForNextLevel = 37 + 5 * offsetInt;
+
+            double progressWithinLevel = (totalXP - xpAtLevel) / (double) xpNeededForNextLevel;
+
+            return MathUtils.round(floorLevel + progressWithinLevel, 1);
+        } else {
+            double xpOffset = totalXP - 1395;
+            double levelOffset = (-107.5 + Math.sqrt(107.5 * 107.5 + 18 * xpOffset)) / 9.0;
+            double calculatedLevel = 30 + levelOffset;
+
+            int floorLevel = (int) Math.floor(calculatedLevel);
+            int offsetInt = floorLevel - 30;
+            int xpAtLevel = 1395 + 112 * offsetInt + (int) (4.5 * offsetInt * (offsetInt - 1));
+            int xpNeededForNextLevel = 112 + 9 * offsetInt;
+
+            double progressWithinLevel = (totalXP - xpAtLevel) / (double) xpNeededForNextLevel;
+
+            return MathUtils.round(floorLevel + progressWithinLevel, 1);
         }
+    }
 
-        return result;
+    public static double calculateExperienceLevelLoss(Player player, int experience) {
+        int totalExperience = getPlayerTotalExperience(player);
+        int targetTotalExperience = Math.max(0, totalExperience - experience);
+
+        double currentLevel = getLevelFromTotalExperience(totalExperience);
+        double newLevel = getLevelFromTotalExperience(targetTotalExperience);
+
+        return MathUtils.round(currentLevel - newLevel, 1);
     }
 
     public static boolean isAlliedTo(@Nullable Entity source, @Nullable Entity target) {

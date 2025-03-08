@@ -32,7 +32,7 @@
   "tooltip.relics.researching.research.tip": "To unlock the ability, it is necessary to connect the stars hidden beneath the fog in such a way that the resulting constellation matches the image in the background. When the constellation is correctly aligned, the ability will be automatically researched.",
 
   "tooltip.relics.researching.research.hint.description": "Hint",
-  "tooltip.relics.researching.research.hint.cost": "Cost: %1$s experience levels %2$s.",
+  "tooltip.relics.researching.research.hint.cost": "Cost: %1$s player experience points (%2$s relative levels) %3$s.",
   "tooltip.relics.researching.research.hint.quick": "Hold [Shift] for fully automatic ability research.",
   "tooltip.relics.researching.research.hint.locked": "The ability has already been researched!",
 
@@ -41,11 +41,11 @@
   "tooltip.relics.researching.general.leveling_point.title": "Leveling Points:",
   "tooltip.relics.researching.general.leveling_point.extra_info": "Earned when leveling up the relic and used to upgrade abilities.",
 
-  "tooltip.relics.researching.general.player_experience.title": "Experience Level:",
-  "tooltip.relics.researching.general.player_experience.extra_info": "Standard player experience from the vanilla game. Obtained by killing mobs, mining ore, smelting items, etc.",
+  "tooltip.relics.researching.general.player_experience.title": "Experience Points:",
+  "tooltip.relics.researching.general.player_experience.extra_info": "Player experience from 'vanilla' Minecraft. Gained by killing mobs, mining ore, smelting items, etc.",
 
   "tooltip.relics.researching.general.luck.title": "Luck:",
-  "tooltip.relics.researching.general.luck.extra_info": "Gained with each unsuccessful reroll of random relic stats, increasing the chances of getting better stats in the next reroll. Increases the reroll cost by 1 experience level for every 25% of luck.",
+  "tooltip.relics.researching.general.luck.extra_info": "Gained with each unsuccessful reroll of a relic's random attributes and increases the chance of getting better values on the next reroll. Increases the reroll cost by 5 player experience points for each percent of luck.",
 
   "tooltip.relics.researching.relic.card.low_level": "To unlock, you need to level up the relic to %1$s!",
   "tooltip.relics.researching.relic.card.no_stats": "Ability has no upgradeable stats and does not affect the quality of the relic!",
@@ -78,17 +78,17 @@
   "tooltip.relics.relic.status.unknown": "§6§l[§6§l?§6§l]",
 
   "tooltip.relics.relic.upgrade.description": "Level-up",
-  "tooltip.relics.relic.upgrade.cost": "Cost: %1$s leveling points %2$s, %3$s experience levels %4$s.",
+  "tooltip.relics.relic.upgrade.cost": "Cost: %1$s upgrade points %2$s, %3$s player experience points (%4$s relative levels) %5$s.",
   "tooltip.relics.relic.upgrade.locked": "The ability has reached its max level.",
   "tooltip.relics.relic.upgrade.quick":"Hold [Shift] to automatically upgrade to the highest possible level.",
 
   "tooltip.relics.relic.reroll.description": "Reroll random stats",
-  "tooltip.relics.relic.reroll.cost": "Cost: %1$s experience levels %2$s.",
+  "tooltip.relics.relic.reroll.cost": "Cost: %1$s player experience points (%2$s relative levels) %3$s.",
   "tooltip.relics.relic.reroll.quick":"Hold [Shift] to automatically reroll random stats to perfect values.",
   "tooltip.relics.relic.reroll.warning":"Hold [Shift] to confirm rerolling stats from perfect values to other random ones.",
 
   "tooltip.relics.relic.reset.description": "Reset leveling points",
-  "tooltip.relics.relic.reset.cost": "Cost: %1$s experience levels %2$s.",
+  "tooltip.relics.relic.reset.cost": "Cost: %1$s player experience points (%2$s relative levels) %3$s.",
   "tooltip.relics.relic.reset.locked": "To use you need to level-up this ability at least 1 time.",
 
   "item.relics.infinity_ham": "Infinite Ham",
