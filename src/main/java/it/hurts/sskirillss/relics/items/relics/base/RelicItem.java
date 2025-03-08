@@ -58,7 +58,7 @@ public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicIt
     }
 
     @Override
-    public List<Component> getAttributesTooltip(List<Component> tooltips, ItemStack stack) {
+    public List<Component> getAttributesTooltip(List<Component> tooltips, TooltipContext context, ItemStack stack) {
         return new ArrayList<>();
     }
 
