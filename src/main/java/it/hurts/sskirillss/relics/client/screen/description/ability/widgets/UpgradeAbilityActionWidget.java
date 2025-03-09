@@ -3,10 +3,10 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
@@ -96,12 +96,14 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
         boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility());
         boolean hasExperience = requiredExperience <= experience;
 
+        Component obfuscated = Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED);
+
         if (!isMaxLevel) {
             entries.add(Component.literal(" "));
-            entries.add(Component.translatable("tooltip.relics.relic.upgrade.cost", isQuick ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : requiredPoints,
-                    (requiredPoints > points ? negativeStatus : positiveStatus), isQuick ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : requiredExperience,
-                    hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
-                    (hasExperience ? positiveStatus: negativeStatus)));
+            entries.add(Component.translatable("tooltip.relics.relic.upgrade.cost", isQuick ? obfuscated : requiredPoints,
+                    (requiredPoints > points ? negativeStatus : positiveStatus), isQuick ? obfuscated : requiredExperience,
+                    isQuick ? obfuscated : hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
+                    (hasExperience ? positiveStatus : negativeStatus)));
         }
 
         if (!isLocked()) {
