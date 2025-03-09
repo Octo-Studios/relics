@@ -55,7 +55,7 @@ public class GuiGraphicsMixin {
 
         var partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
 
-        var time = (stack.hashCode() / 1000F) + player.tickCount + partialTicks;
+        var time = (stack.getItem().hashCode() / 1000F) + player.tickCount + partialTicks;
         var color = (float) (1F + Math.sin(time * 0.45F) * 0.1F);
 
         var renderedUpgradeIcon = false;
