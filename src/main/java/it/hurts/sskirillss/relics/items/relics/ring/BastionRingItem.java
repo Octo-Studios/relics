@@ -78,9 +78,6 @@ public class BastionRingItem extends RelicItem {
         if (world.isClientSide() || world.dimension() != Level.NETHER)
             return;
 
-        if(!this.isAbilityUnlocked(stack, "compass"))
-            return;
-        
         Piglin piglin = world.getNearestEntity(Piglin.class, TargetingConditions.DEFAULT, player,
                 player.getX(), player.getY(), player.getZ(), player.getBoundingBox().inflate(5));
 
@@ -106,8 +103,7 @@ public class BastionRingItem extends RelicItem {
 
         BlockPos bastionPos = bastion.getFirst();
 
-        //Dont see the point, also mostly cus i dont feel like debugging why high levels of slowness are making mobs super fast, is a bug ive noticed in modded for a while now.
-        //piglin.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 255, false, false));
+        piglin.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 20, 255, false, false));
 
         Vec3 currentVec = piglin.position();
         Vec3 finalVec = currentVec.add(new Vec3(bastionPos.getX(), piglin.getY(),
