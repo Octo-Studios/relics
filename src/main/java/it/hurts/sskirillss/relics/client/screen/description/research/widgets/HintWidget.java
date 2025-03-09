@@ -47,7 +47,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
 
         int links = relic.getResearchData(screen.ability).getLinks().size();
 
-        int requiredExperience = relic.getResearchHintPlayerExperienceCost(screen.ability) * (Screen.hasShiftDown() ? (links + 1) : 1);
+        int requiredExperience = relic.getResearchHintPlayerExperienceCost(screen.ability) * (Screen.hasShiftDown() ? links : 1);
         int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         if (experience >= requiredExperience)
@@ -137,7 +137,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
         int maxWidth = 150;
         int renderWidth = 0;
 
-        int requiredExperience = relic.getResearchHintPlayerExperienceCost(screen.ability) * (Screen.hasShiftDown() ? (relic.getResearchData(screen.ability).getLinks().size() + 1) : 1);
+        int requiredExperience = relic.getResearchHintPlayerExperienceCost(screen.ability) * (Screen.hasShiftDown() ? relic.getResearchData(screen.ability).getLinks().size() : 1);
         int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
