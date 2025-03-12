@@ -1,10 +1,7 @@
 package it.hurts.sskirillss.relics.client.particles;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -14,9 +11,9 @@ import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
+import net.minecraft.client.Camera;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureManager;
@@ -77,28 +74,30 @@ public class BasicColoredParticle extends TextureSheetParticle {
     @Nonnull
     @Override
     public ParticleRenderType getRenderType() {
-        return RENDERER;
+        return constructor.isVisibleThroughWalls() ? RENDERER_NO_DEPTH : ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
     }
 
-    private static final ParticleRenderType RENDERER = new ParticleRenderType() {
+    @Override
+    public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
+        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+        super.render(buffer, renderInfo, partialTicks);
+    }
+
+    private static final ParticleRenderType RENDERER_NO_DEPTH = new ParticleRenderType() {
         @Override
         public BufferBuilder begin(Tesselator tesselator, TextureManager manager) {
-            RenderSystem.setShader(GameRenderer::getParticleShader);
-            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
             RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
-
             RenderSystem.enableBlend();
-
-            RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-
             RenderSystem.depthMask(false);
+            RenderSystem.disableDepthTest();
 
             return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
         }
 
         @Override
         public String toString() {
-            return Reference.MODID + ":" + "basic_colored";
+            return Reference.MODID + ":" + "basic_colored_no_depth";
         }
     };
 
@@ -116,6 +115,9 @@ public class BasicColoredParticle extends TextureSheetParticle {
 
         @Builder.Default
         private boolean physical = true;
+
+        @Builder.Default
+        private boolean visibleThroughWalls = false;
 
         @Builder.Default
         private int lifetime = 20;
@@ -154,13 +156,14 @@ public class BasicColoredParticle extends TextureSheetParticle {
         @Getter
         private final Constructor data;
 
-        private Options(int color, float diameter, int lifetime, float roll, float scaleModifier) {
+        private Options(int color, float diameter, int lifetime, float roll, float scaleModifier, boolean visibleThroughWalls) {
             this.data = Constructor.builder()
                     .color(color)
                     .diameter(diameter)
                     .lifetime(lifetime)
                     .roll(roll)
                     .scaleModifier(scaleModifier)
+                    .visibleThroughWalls(visibleThroughWalls)
                     .build();
         }
 
@@ -180,7 +183,8 @@ public class BasicColoredParticle extends TextureSheetParticle {
                         Codec.FLOAT.fieldOf("diameter").forGetter(options -> options.getData().getDiameter()),
                         Codec.INT.fieldOf("lifetime").forGetter(options -> options.getData().getLifetime()),
                         Codec.FLOAT.fieldOf("roll").forGetter(options -> options.getData().getRoll()),
-                        Codec.FLOAT.fieldOf("scaleModifier").forGetter(options -> options.getData().getScaleModifier())
+                        Codec.FLOAT.fieldOf("scaleModifier").forGetter(options -> options.getData().getScaleModifier()),
+                        Codec.BOOL.fieldOf("visibleThroughWalls").forGetter(options -> options.getData().isVisibleThroughWalls())
                 ).apply(instance, Options::new));
 
         public static final StreamCodec<ByteBuf, Options> STREAM_CODEC = StreamCodec.composite(
@@ -189,6 +193,7 @@ public class BasicColoredParticle extends TextureSheetParticle {
                 ByteBufCodecs.INT, options -> options.getData().getLifetime(),
                 ByteBufCodecs.FLOAT, options -> options.getData().getRoll(),
                 ByteBufCodecs.FLOAT, options -> options.getData().getScaleModifier(),
+                ByteBufCodecs.BOOL, options -> options.getData().isVisibleThroughWalls(),
                 Options::new
         );
     }
