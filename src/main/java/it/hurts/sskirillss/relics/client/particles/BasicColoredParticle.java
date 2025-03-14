@@ -22,6 +22,7 @@ import net.minecraft.core.particles.ParticleType;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.opengl.GL11;
 
@@ -30,6 +31,9 @@ import java.awt.*;
 
 public class BasicColoredParticle extends TextureSheetParticle {
     private final Constructor constructor;
+
+    private float oldQuadSize;
+    private float currentQuadSize;
 
     public BasicColoredParticle(ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, Constructor constructor) {
         super(world, x, y, z, velocityX, velocityY, velocityZ);
@@ -44,6 +48,9 @@ public class BasicColoredParticle extends TextureSheetParticle {
         this.quadSize = constructor.getDiameter();
         this.hasPhysics = constructor.isPhysical();
 
+        this.oldQuadSize = quadSize;
+        this.currentQuadSize = quadSize;
+
         this.xd = velocityX;
         this.yd = velocityY;
         this.zd = velocityZ;
@@ -51,7 +58,8 @@ public class BasicColoredParticle extends TextureSheetParticle {
 
     @Override
     public void tick() {
-        this.quadSize *= constructor.getScaleModifier();
+        this.oldQuadSize = quadSize;
+        this.currentQuadSize *= constructor.getScaleModifier();
 
         xo = x;
         yo = y;
@@ -79,12 +87,14 @@ public class BasicColoredParticle extends TextureSheetParticle {
 
     @Override
     public void render(VertexConsumer buffer, Camera renderInfo, float partialTicks) {
+        this.quadSize = Mth.lerp(partialTicks, oldQuadSize, currentQuadSize);
+
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 
         super.render(buffer, renderInfo, partialTicks);
     }
 
-    private static final ParticleRenderType RENDERER_NO_DEPTH = new ParticleRenderType() {
+    public static final ParticleRenderType RENDERER_NO_DEPTH = new ParticleRenderType() {
         @Override
         public BufferBuilder begin(Tesselator tesselator, TextureManager manager) {
             RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
