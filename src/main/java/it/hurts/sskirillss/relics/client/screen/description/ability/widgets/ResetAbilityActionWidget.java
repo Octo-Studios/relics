@@ -54,7 +54,7 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
         int renderWidth = 0;
 
         int requiredExperience = relic.getResetPlayerExperienceCost(getScreen().getStack(), getAbility());
-        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
+        long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         boolean hasExperience = requiredExperience <= experience;
 

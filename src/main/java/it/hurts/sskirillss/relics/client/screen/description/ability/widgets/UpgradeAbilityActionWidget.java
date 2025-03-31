@@ -85,7 +85,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
         int requiredExperience = relic.getUpgradePlayerExperienceCost(getScreen().getStack(), getAbility());
 
         int points = relic.getRelicLevelingPoints(getScreen().getStack());
-        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
+        long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
         MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");

@@ -96,7 +96,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         int renderWidth = 0;
 
         int requiredExperience = relic.getRerollPlayerExperienceCost(getScreen().getStack(), getAbility());
-        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
+        long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
         MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");

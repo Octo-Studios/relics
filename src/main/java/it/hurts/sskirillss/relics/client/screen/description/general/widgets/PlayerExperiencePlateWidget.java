@@ -66,7 +66,7 @@ public class PlayerExperiencePlateWidget extends AbstractPlateWidget {
         int maxWidth = 150;
         int renderWidth = 0;
 
-        int experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
+        long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         List<MutableComponent> entries = Lists.newArrayList(
                 Component.literal("").append(Component.translatable("tooltip.relics.researching.general.player_experience.title").withStyle(ChatFormatting.BOLD)
