@@ -276,6 +276,9 @@ public class HolyLocketItem extends RelicItem implements IRenderableCurio {
 
         @SubscribeEvent
         public static void onLivingHeal(LivingHealEvent event) {
+            if (event.getAmount() <= 0.5F)
+                return;
+
             if (event.getEntity() instanceof Player player) {
                 ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.HOLY_LOCKET.get());
                 Level level = player.getCommandSenderWorld();

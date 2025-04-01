@@ -241,7 +241,8 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
         if (canUseAbility(stack, "phlebotomy")) {
             float percentage = 100F - (player.getHealth() / player.getMaxHealth() * 100F);
 
-            player.heal((float) getAbilityValue(stack, "phlebotomy", "heal") * percentage);
+            if (player.getHealth() < player.getMaxHealth())
+                player.heal((float) getAbilityValue(stack, "phlebotomy", "heal") * percentage);
 
             EntityUtils.resetAttribute(player, stack, Attributes.ATTACK_SPEED, (float) (getAbilityValue(stack, "phlebotomy", "attack_speed") * percentage), AttributeModifier.Operation.MULTIPLY_TOTAL);
             EntityUtils.resetAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) (getAbilityValue(stack, "phlebotomy", "movement_speed") * percentage), AttributeModifier.Operation.MULTIPLY_TOTAL);
