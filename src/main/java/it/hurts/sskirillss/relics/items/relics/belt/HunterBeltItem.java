@@ -102,7 +102,7 @@ public class HunterBeltItem extends RelicItem implements IRenderableCurio {
             if (!(stack.getItem() instanceof IRelicItem relic))
                 return;
 
-            relic.dropAllocableExperience(player.level, player.getEyePosition(), stack, 1);
+            relic.addExperience(player, stack, 1);
 
             event.setAmount((float) (event.getAmount() * relic.getAbilityValue(stack, "training", "damage")));
         }

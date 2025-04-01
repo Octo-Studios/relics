@@ -157,7 +157,7 @@ public class ShadowGlaiveEntity extends ThrowableProjectile {
 
                 if (this.getOwner() instanceof Player player) {
                     EntityUtils.hurt(entity, DamageSource.thrown(this, player), damage);
-                    relic.dropAllocableExperience(getLevel(), entity.getEyePosition(), stack, 1);
+                    relic.addExperience(entity, stack, 1);
                 } else
                     entity.hurt(DamageSource.MAGIC, damage);
 

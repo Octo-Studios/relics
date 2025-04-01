@@ -650,7 +650,7 @@ public class ArrowQuiverItem extends RelicItem implements IRenderableCurio {
                 int amount = (int) Math.min(10, Math.round(player.position().distanceTo(new Vec3(arrow.getX(), player.getY(), arrow.getZ())) * 0.1));
 
                 if (amount > 0)
-                    relic.dropAllocableExperience(player.level, player.getEyePosition(), stack, amount);
+                    relic.addExperience(player, stack, 1);
             }
 
             if (relic.canUseAbility(stack, "leap")) {
