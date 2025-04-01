@@ -20,6 +20,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.utils.WorldUtils;
 import it.hurts.sskirillss.relics.utils.data.WorldPosition;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -52,7 +53,7 @@ public class IceBreakerItem extends RelicItem {
                                 .maxLevel(10)
                                 .active(CastData.builder()
                                         .type(CastType.INSTANTANEOUS)
-                                        .predicate("falling", PredicateType.CAST, (player, stack) -> !(player.onGround() || player.isSpectator()))
+                                        .predicate("falling", PredicateType.CAST, (player, stack) -> !(player.onGround() || player.isSpectator()) && WorldUtils.getGroundHeight(player, player.position(), 3) <= 3)
                                         .build())
                                 .stat(StatData.builder("size")
                                         .initialValue(2.5D, 5D)
@@ -123,11 +124,14 @@ public class IceBreakerItem extends RelicItem {
             if (distance <= 0)
                 return;
 
+            var radius = (int) Math.round(Math.min(getStatValue(stack, "impact", "size"), distance * 0.25D));
+
+            if (radius <= 0)
+                return;
+
             spreadRelicExperience(player, stack, (int) Math.min(10, Math.round(distance / 3F)));
 
-            ShockwaveEntity shockwave = new ShockwaveEntity(level,
-                    (int) Math.round(Math.min(getStatValue(stack, "impact", "size"), distance * 0.25D)),
-                    (float) getStatValue(stack, "impact", "damage"));
+            ShockwaveEntity shockwave = new ShockwaveEntity(level, radius, (float) getStatValue(stack, "impact", "damage"));
 
             BlockPos blockPos = player.getOnPos();
 

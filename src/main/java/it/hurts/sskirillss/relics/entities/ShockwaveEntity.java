@@ -76,10 +76,7 @@ public class ShockwaveEntity extends ThrowableProjectile {
 
             for (BlockPos p : closest) {
                 if (!level.isClientSide()) {
-                    float damage = radius * this.damage / step;
-
-                    if (Float.isNaN(damage))
-                        damage = 1F;
+                    float damage = Mth.clamp(this.radius * this.damage / (this.step + 1), 0, 1000);
 
                     for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, new AABB(Vec3.atCenterOf(p), Vec3.atCenterOf(p.above(3))).inflate(0.5F))) {
                         if (owner != null && entity.getStringUUID().equals(owner.getStringUUID()))
