@@ -25,7 +25,7 @@ public class CurioSlotReference extends SlotReference {
 
             int index = getIndex();
 
-            return index > stackHandler.getSlots() - 1 ? null : stackHandler.getStackInSlot(index);
+            return index > stackHandler.getSlots() - 1 ? ItemStack.EMPTY : stackHandler.getStackInSlot(index);
         }).orElse(ItemStack.EMPTY);
     }
 
