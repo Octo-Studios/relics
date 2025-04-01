@@ -257,7 +257,7 @@ public class HolyLocketItem extends RelicItem implements IRenderableCurio {
                         int charges = relic.getCharges(stack);
 
                         if (charges > 0)
-                            event.setAmount(event.getAmount() * (charges / 100F));
+                            event.setAmount(event.getAmount() * (1F - (charges * 0.01F)));
                     }
                 }
             } else if (event.getSource().getEntity() instanceof Player player) {
