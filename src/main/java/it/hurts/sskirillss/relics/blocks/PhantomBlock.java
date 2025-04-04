@@ -19,7 +19,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -88,7 +87,7 @@ public class PhantomBlock extends Block {
 
     @Override
     public void updateEntityAfterFallOn(BlockGetter level, Entity entity) {
-        Vec3 motion = entity.getDeltaMovement();
+        var motion = entity.getDeltaMovement();
 
         if (motion.y > -0.5D) {
             super.updateEntityAfterFallOn(level, entity);
@@ -96,22 +95,26 @@ public class PhantomBlock extends Block {
             return;
         }
 
-        entity.setDeltaMovement(motion.x, -motion.y, motion.z);
+        entity.setDeltaMovement(motion.x, -(motion.y / 1.5D), motion.z);
     }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        if (context instanceof EntityCollisionContext entityContext) {
-            var entity = entityContext.getEntity();
+        if (!(context instanceof EntityCollisionContext entityContext))
+            return Shapes.empty();
 
-            var stack = EntityUtils.findEquippedCurio(entity, ItemRegistry.PHANTOM_BOOT.get());
+        var entity = entityContext.getEntity();
 
-            if (!stack.isEmpty() && stack.getItem() instanceof PhantomBootItem relic && relic.isToggled(stack)) {
-                var shape = Shapes.block();
+        if (entity == null)
+            return Shapes.empty();
 
-                if (entityContext.isAbove(shape, pos, true))
-                    return shape;
-            }
+        var stack = EntityUtils.findEquippedCurio(entity, ItemRegistry.PHANTOM_BOOT.get());
+
+        if (!entity.isShiftKeyDown() && !stack.isEmpty() && stack.getItem() instanceof PhantomBootItem relic && relic.isToggled(stack)) {
+            var shape = Shapes.block();
+
+            if (entityContext.isAbove(shape, pos, true))
+                return shape;
         }
 
         return Shapes.empty();
