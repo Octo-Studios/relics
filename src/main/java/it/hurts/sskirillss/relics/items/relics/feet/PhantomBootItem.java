@@ -98,7 +98,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
             var motion = player.getDeltaMovement();
 
             if (motion.y <= -0.5D) {
-                player.setDeltaMovement(motion.x, -motion.y, motion.z);
+                player.setDeltaMovement(motion.x, -(motion.y / 1.5D), motion.z);
 
                 var state = BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState();
 
