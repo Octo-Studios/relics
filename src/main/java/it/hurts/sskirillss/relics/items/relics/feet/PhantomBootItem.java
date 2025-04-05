@@ -139,7 +139,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
             } else if (time > 0)
                 addTime(stack, -1);
 
-            if (isAbilityTicking(stack, "bridge")) {
+            if (!player.isShiftKeyDown() && isAbilityTicking(stack, "bridge")) {
                 var horizontalMotion = player.getKnownMovement().multiply(1F, 0F, 1F);
 
                 var motionSpeed = (float) horizontalMotion.length();
