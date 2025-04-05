@@ -39,10 +39,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import org.joml.Vector2f;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static it.hurts.sskirillss.relics.init.DataComponentRegistry.TIME;
 import static it.hurts.sskirillss.relics.init.DataComponentRegistry.TOGGLED;
@@ -138,24 +140,37 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
                 addTime(stack, -1);
 
             if (isAbilityTicking(stack, "bridge")) {
-                var motion = player.getKnownMovement().multiply(1F, 0F, 1F);
-                var pos = player.position().add(motion);
-                var blockPos = new BlockPos((int) Math.floor(pos.x()), (int) Math.floor(pos.y()), (int) Math.floor(pos.z()));
+                var horizontalMotion = player.getKnownMovement().multiply(1F, 0F, 1F);
 
-                var radius = (int) Mth.clamp(Math.round(motion.length()), 1, 3);
+                var motionSpeed = (float) horizontalMotion.length();
 
-                for (int x = -radius; x <= radius; x++) {
-                    for (int z = -radius; z <= radius; z++) {
-                        var relativePos = blockPos.offset(x, -1, z);
+                var minorRadius = 1.5F;
+                var minSpeedThreshold = 0.1F;
+                var lengthFactor = 1.5F;
 
-                        if (!level.isEmptyBlock(relativePos))
-                            continue;
+                var majorRadius = motionSpeed < minSpeedThreshold ? minorRadius : minorRadius + motionSpeed * lengthFactor;
+                var direction = motionSpeed < minSpeedThreshold ? new Vector2f(1, 0) : new Vector2f((float) horizontalMotion.x, (float) horizontalMotion.z).normalize();
+                var center = motionSpeed < minSpeedThreshold ? player.position() : player.position().add(direction.x * majorRadius, 0, direction.y * majorRadius);
 
-                        if (level.setBlockAndUpdate(relativePos, BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState())
-                                && level.getRandom().nextInt(10) == 0)
-                            spreadRelicExperience(player, stack, 1);
-                    }
-                }
+                var perpendicularDirection = new Vector2f(-direction.y, direction.x);
+
+                var step = 0.25F;
+                var baseY = (int) Math.floor(player.getY()) - 1;
+                var stepsCount = (int) (2 / step) + 1;
+
+                IntStream.range(0, stepsCount).boxed().flatMap(i -> {
+                    var alpha = -1F + i * step;
+
+                    return IntStream.range(0, stepsCount).mapToObj(j -> new float[]{alpha, -1F + j * step});
+                }).filter(pair -> pair[0] * pair[0] + pair[1] * pair[1] <= 1F).forEach(pair -> {
+                    var worldX = center.x() + pair[0] * majorRadius * direction.x + pair[1] * minorRadius * perpendicularDirection.x;
+                    var worldZ = center.z() + pair[0] * majorRadius * direction.y + pair[1] * minorRadius * perpendicularDirection.y;
+
+                    var blockPos = new BlockPos((int) Math.floor(worldX), baseY, (int) Math.floor(worldZ));
+
+                    if (level.isEmptyBlock(blockPos) && level.setBlockAndUpdate(blockPos, BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState()) && level.getRandom().nextInt(10) == 0)
+                        spreadRelicExperience(player, stack, 1);
+                });
             }
         } else {
             if (player.onGround() && !onBridge)
