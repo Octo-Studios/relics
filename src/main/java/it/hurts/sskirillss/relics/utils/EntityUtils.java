@@ -7,15 +7,13 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntitySelector;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.OwnableEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -313,10 +311,11 @@ public class EntityUtils {
 
     public static <T extends LivingEntity> Stream<T> gatherPotentialTargets(Entity seeker, Class<T> type, double radius) {
         return seeker.getCommandSenderWorld().getEntitiesOfClass(type, seeker.getBoundingBox().inflate(radius)).stream()
-                .sorted(Comparator.comparing(entry -> seeker.position().distanceTo(entry.position())))
-                .filter(entry -> !(entry instanceof ArmorStand)
-                        && !entry.isDeadOrDying()
-                        && entry.hasLineOfSight(seeker)
-                        && EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(entry));
+                .filter(entity -> !(entity instanceof ArmorStand)
+                        && !entity.isDeadOrDying()
+                        && entity.hasLineOfSight(seeker)
+                        && EntitySelector.NO_CREATIVE_OR_SPECTATOR.test(entity))
+                .sorted(Comparator.comparingInt((T entity) -> (entity instanceof Player || entity instanceof Monster) ? 0 : (entity instanceof NeutralMob ? 1 : 2))
+                        .thenComparing(entity -> seeker.position().distanceTo(entity.position())));
     }
 }
