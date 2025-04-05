@@ -14,7 +14,6 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.EntitySelector;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -24,10 +23,11 @@ import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.awt.*;
-import java.util.Comparator;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetableEntity, TrailProvider {
     private static final EntityDataAccessor<Integer> MAX_BOUNCES = SynchedEntityData.defineId(ShadowGlaiveEntity.class, EntityDataSerializers.INT);
@@ -37,6 +37,8 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
 
     @Getter
     private Set<String> bouncedTargets = new HashSet<>();
+
+    private List<String> blacklistedTargets = new ArrayList<>();
 
     @Nullable
     private LivingEntity currentTarget = null;
@@ -84,10 +86,10 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
     }
 
     public List<LivingEntity> locateNearestTargets() {
-        return EntityUtils.gatherPotentialTargets(this, LivingEntity.class,16)
+        return EntityUtils.gatherPotentialTargets(this, LivingEntity.class, 16)
                 .filter(entity -> (lastTarget == null || !lastTarget.getStringUUID().equals(entity.getStringUUID()))
                         && (!(this.getOwner() instanceof Player player) || !EntityUtils.isAlliedTo(player, entity)))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -112,8 +114,14 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
 
             var candidateEntities = locateNearestTargets();
 
+            candidateEntities.removeIf(entity -> blacklistedTargets.contains(entity.getStringUUID()));
+
             var targetEntities = candidateEntities.stream()
-                    .filter(entity -> !bouncedTargets.contains(entity.getStringUUID()))
+                    .filter(entity -> {
+                        var uuid = entity.getStringUUID();
+
+                        return !bouncedTargets.contains(uuid) && !blacklistedTargets.contains(uuid);
+                    })
                     .toList();
 
             if (!targetEntities.isEmpty())
@@ -161,6 +169,10 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
 
                     level.addFreshEntity(entity);
                 }
+            } else {
+                blacklistedTargets.add(currentTarget.getStringUUID());
+
+                setTarget(null);
             }
         } else {
             this.setDeltaMovement(currentTarget.getEyePosition().subtract(this.getEyePosition()).normalize());
