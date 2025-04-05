@@ -154,7 +154,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
 
                 var perpendicularDirection = new Vector2f(-direction.y, direction.x);
 
-                var step = 0.25F;
+                var step = 0.15F;
                 var baseY = (int) Math.floor(player.getY()) - 1;
                 var stepsCount = (int) (2 / step) + 1;
 
