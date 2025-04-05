@@ -281,7 +281,7 @@
   "item.relics.phantom_boot": "Phantom Boot",
   "tooltip.relics.phantom_boot.description": "Condenses matter beneath the relic owner's feet, creating a path through any terrain, even where no solid ground exists.",
   "tooltip.relics.phantom_boot.ability.bridge": "Phantom Bridge",
-  "tooltip.relics.phantom_boot.ability.bridge.description": "Creates a temporary phantom bridge beneath the player's feet that any relic owner can walk on. If the player stands still on the bridge for more than %1$s seconds, they will fall through and cannot get back up until they reach solid ground.",
+  "tooltip.relics.phantom_boot.ability.bridge.description": "Creates a temporary phantom bridge beneath the player's feet that any relic owner can walk on. If the player stands still on the bridge for more than %1$s seconds, they will fall through and cannot get back up until they reach solid ground. While sneaking, the player is forced to fall through the phantom bridge blocks.",
   "tooltip.relics.phantom_boot.leveling_source.bridge.title": "Phantom Bridge",
   "tooltip.relics.phantom_boot.leveling_source.bridge.description": "+%1$s experience points with a 10%% chance each time a bridge is created using the %2$s ability.",
 
