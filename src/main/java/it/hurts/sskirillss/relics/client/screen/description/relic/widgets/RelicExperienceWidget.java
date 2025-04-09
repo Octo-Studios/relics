@@ -117,9 +117,11 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
 
         int level = relic.getRelicLevel(screen.getStack());
 
+        var experience = String.valueOf(MathUtils.round(relic.getRelicExperience(screen.getStack()), 1));
+
         List<MutableComponent> entries = Lists.newArrayList(
                 Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.experience.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE))
-                        .append(" " + (relic.isRelicMaxLevel(screen.getStack()) ? "MAX" : relic.getRelicExperience(screen.getStack()) + "/" + relic.getTotalRelicExperienceBetweenLevels(level, level + 1))),
+                        .append(" " + (relic.isRelicMaxLevel(screen.getStack()) ? "MAX" : (experience.endsWith(".0") ? experience.replace(".0", "") : experience) + "/" + relic.getTotalRelicExperienceBetweenLevels(level, level + 1))),
                 Component.literal(" ")
         );
 
@@ -164,7 +166,7 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
     private float calculateFillerPercentage(IRelicItem relic) {
         int level = relic.getRelicLevel(screen.getStack());
 
-        return relic.getRelicExperience(screen.getStack()) / (relic.getTotalRelicExperienceBetweenLevels(level, level + 1) / 100F);
+        return (float) (relic.getRelicExperience(screen.getStack()) / (relic.getTotalRelicExperienceBetweenLevels(level, level + 1) / 100D));
     }
 
     private int calculateFillerWidth(IRelicItem relic) {

@@ -12,9 +12,9 @@ import javax.annotation.Nullable;
 public class ExperienceAddEvent extends RelicEvent implements ICancellableEvent {
     @Getter
     @Setter
-    private int amount;
+    private double amount;
 
-    public ExperienceAddEvent(@Nullable LivingEntity entity, ItemStack stack, int amount) {
+    public ExperienceAddEvent(@Nullable LivingEntity entity, ItemStack stack, double amount) {
         super(entity, stack);
 
         this.amount = amount;

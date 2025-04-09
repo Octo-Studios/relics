@@ -317,21 +317,21 @@ public interface IRelicItem {
         setRelicLuck(stack, getRelicLuck(stack) + amount);
     }
 
-    default int getRelicExperience(ItemStack stack) {
+    default double getRelicExperience(ItemStack stack) {
         return getLevelingComponent(stack).experience();
     }
 
-    default void setRelicExperience(ItemStack stack, int experience) {
+    default void setRelicExperience(ItemStack stack, double experience) {
         setLevelingComponent(stack, getLevelingComponent(stack).toBuilder()
                 .experience(Math.clamp(experience, 0, getTotalRelicExperienceForLevel(getRelicLevel(stack) + 1)))
                 .build());
     }
 
-    default boolean addRelicExperience(ItemStack stack, int amount) {
+    default boolean addRelicExperience(ItemStack stack, double amount) {
         return addRelicExperience(null, stack, amount);
     }
 
-    default boolean addRelicExperience(@Nullable LivingEntity entity, ItemStack stack, int amount) {
+    default boolean addRelicExperience(@Nullable LivingEntity entity, ItemStack stack, double amount) {
         var event = new ExperienceAddEvent(entity instanceof LivingEntity ? entity : null, stack, amount);
 
         NeoForge.EVENT_BUS.post(event);
@@ -344,15 +344,15 @@ public interface IRelicItem {
 
         var toAdd = event.getAmount();
 
-        if (toAdd == 0)
+        if (toAdd == 0D)
             return false;
 
         var resultLevel = currentLevel;
-        var resultExperience = 0;
+        var resultExperience = 0D;
 
         var maxLevel = getLevelingData().getMaxLevel();
 
-        while (toAdd > 0) {
+        while (toAdd > 0D) {
             if (resultLevel >= maxLevel)
                 break;
 
@@ -365,7 +365,7 @@ public interface IRelicItem {
 
                 resultLevel++;
 
-                currentExperience = 0;
+                currentExperience = 0D;
             } else {
                 resultExperience = currentExperience + toAdd;
 
@@ -391,7 +391,7 @@ public interface IRelicItem {
     default void spreadRelicExperience(@Nullable LivingEntity entity, ItemStack stack, int experience, double percentage) {
         var isMaxLevel = isRelicMaxLevel(stack);
 
-        var toSpread = isMaxLevel ? 0 : (int) Math.ceil(experience * percentage);
+        var toSpread = isMaxLevel ? 0 : experience * percentage;
 
         if (!isMaxLevel)
             addRelicExperience(entity, stack, experience);
@@ -438,7 +438,7 @@ public interface IRelicItem {
         }
     }
 
-    default int getRelicExperienceLeftForLevelUp(ItemStack stack, int level) {
+    default double getRelicExperienceLeftForLevelUp(ItemStack stack, int level) {
         int currentLevel = getRelicLevel(stack);
 
         return getTotalRelicExperienceBetweenLevels(currentLevel, level) - getRelicExperience(stack);
