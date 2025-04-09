@@ -122,9 +122,10 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         if (relic.isSomethingWrongWithLevelingPoints(stack))
             this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
-        this.addRenderableWidget(new PointsPlateWidget(x + 313, y + 77, this));
-        this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 102, this));
-        this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 127, this));
+        this.addRenderableWidget(new RankPlateWidget(x + 313, y + 77, this));
+        this.addRenderableWidget(new PointsPlateWidget(x + 313, y + 102, this));
+        this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 127, this));
+        this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 152, this));
 
         if (!sources.isEmpty()) {
             int objectWidth = 32;

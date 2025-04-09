@@ -262,6 +262,18 @@ public interface IRelicItem {
         return getLevelingComponent(stack).points();
     }
 
+    default int getRelicRank(ItemStack stack) {
+        return getLevelingComponent(stack).rank();
+    }
+
+    default void setRelicRank(ItemStack stack, int rank) {
+        setLevelingComponent(stack, getLevelingComponent(stack).toBuilder().rank(Math.max(0, rank)).build());
+    }
+
+    default void addRelicRank(ItemStack stack, int rank) {
+        setRelicLevelingPoints(stack, getRelicLevelingPoints(stack) + rank);
+    }
+
     default void setRelicLevelingPoints(ItemStack stack, int amount) {
         setLevelingComponent(stack, getLevelingComponent(stack).toBuilder().points(Math.max(0, amount)).build());
     }
