@@ -12,13 +12,11 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
-import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.BeamsData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -45,11 +43,6 @@ public class ShadowGlaiveItem extends RelicItem {
                                         .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.15D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .research(ResearchData.builder()
-                                        .star(0, 11, 2).star(1, 3, 19).star(2, 11, 19)
-                                        .star(3, 19, 19).star(4, 11, 29)
-                                        .link(0, 2).link(2, 1).link(2, 3).link(2, 4)
-                                        .build())
                                 .build())
                         .ability(AbilityData.builder("cloning")
                                 .requiredLevel(5)
@@ -57,11 +50,6 @@ public class ShadowGlaiveItem extends RelicItem {
                                         .initialValue(0.05D, 0.1D)
                                         .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
-                                        .build())
-                                .research(ResearchData.builder()
-                                        .star(0, 12, 2).star(1, 7, 7).star(2, 17, 14)
-                                        .star(3, 6, 22).star(4, 11, 29)
-                                        .link(0, 1).link(1, 2).link(2, 3).link(3, 4)
                                         .build())
                                 .build())
                         .build())
