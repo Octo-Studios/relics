@@ -18,7 +18,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
-import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -56,12 +55,6 @@ public class SpringyBootItem extends RelicItem implements IRenderableCurio {
                                         .initialValue(0.25D, 0.5D)
                                         .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 1))
-                                        .build())
-                                .research(ResearchData.builder()
-                                        .star(0, 6, 8).star(1, 16, 10).star(2, 6, 12)
-                                        .star(3, 16, 14).star(4, 6, 16).star(5, 16, 18)
-                                        .star(6, 6, 20).star(7, 16, 22).star(8, 6, 24)
-                                        .link(0, 1).link(1, 2).link(2, 3).link(3, 4).link(4, 5).link(5, 6).link(6, 7).link(7, 8)
                                         .build())
                                 .build())
                         .build())
