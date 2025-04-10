@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedCurioModel;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
@@ -15,7 +16,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
@@ -53,7 +53,7 @@ public class SpringyBootItem extends RelicItem implements IRenderableCurio {
                                         .build())
                                 .stat(StatData.builder("power")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 1))
                                         .build())
                                 .build())

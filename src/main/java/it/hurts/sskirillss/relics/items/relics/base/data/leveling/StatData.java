@@ -1,7 +1,8 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
 
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.UpgradeOperation;
 import it.hurts.sskirillss.relics.config.data.StatConfigData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
+import it.hurts.sskirillss.relics.init.RegistryRegistry;
 import lombok.Builder;
 import lombok.Data;
 import org.apache.commons.lang3.tuple.Pair;
@@ -21,7 +22,6 @@ public class StatData {
         return builder;
     }
 
-    @Builder.Default
     private Pair<UpgradeOperation, Double> upgradeModifier;
     @Builder.Default
     private Pair<Double, Double> initialValue;
@@ -32,11 +32,10 @@ public class StatData {
     private Function<Double, ? extends Number> formatValue = Double::doubleValue;
 
     public StatConfigData toConfigData() {
-        return new StatConfigData(initialValue.getKey(), initialValue.getValue(), thresholdValue.getKey(), thresholdValue.getValue(), upgradeModifier.getKey(), upgradeModifier.getValue());
+        return new StatConfigData(initialValue.getKey(), initialValue.getValue(), thresholdValue.getKey(), thresholdValue.getValue(), RegistryRegistry.UPGRADE_OPERATION_REGISTRY.getKey(upgradeModifier.getKey()).toString(), upgradeModifier.getValue());
     }
 
     public static class StatDataBuilder {
-        private Pair<UpgradeOperation, Double> upgradeModifier = Pair.of(UpgradeOperation.ADD, 0D);
         private Pair<Double, Double> initialValue = Pair.of(0D, 0D);
         private Pair<Double, Double> thresholdValue = Pair.of(Double.MIN_VALUE, Double.MAX_VALUE);
 

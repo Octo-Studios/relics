@@ -6,6 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedCurioModel;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -14,7 +15,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -54,31 +54,31 @@ public class AmphibianBootItem extends RelicItem implements IRenderableCurio {
                         .ability(AbilityData.builder("swimming")
                                 .stat(StatData.builder("speed")
                                         .initialValue(0.005D, 0.01D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.25D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value * 100 * 4, 1))
                                         .build())
                                 .stat(StatData.builder("duration")
                                         .initialValue(15D, 35D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.2D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value / 5, 1))
                                         .build())
                                 .build())
                         .ability(AbilityData.builder("slipping")
                                 .stat(StatData.builder("speed")
                                         .initialValue(0.005D, 0.01D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.15D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value * 100 * 4, 1))
                                         .build())
                                 .stat(StatData.builder("duration")
                                         .initialValue(15D, 25D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.15D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value / 5, 1))
                                         .build())
                                 .build())
                         .ability(AbilityData.builder("gills")
                                 .stat(StatData.builder("chance")
                                         .initialValue(0.01D, 0.1D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.35D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.35D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .build())

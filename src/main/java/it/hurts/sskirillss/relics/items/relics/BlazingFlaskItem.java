@@ -1,12 +1,12 @@
 package it.hurts.sskirillss.relics.items.relics;
 
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -40,17 +40,17 @@ public class BlazingFlaskItem extends RelicItem {
                         .ability(AbilityData.builder("bonfire")
                                 .stat(StatData.builder("step")
                                         .initialValue(1D, 2.5D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatData.builder("speed")
                                         .initialValue(0.01D, 0.05D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 1.9D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 1.9D)
                                         .formatValue(value -> MathUtils.round(value * 8, 1))
                                         .build())
                                 .stat(StatData.builder("height")
                                         .initialValue(3D, 5D)
-                                        .upgradeModifier(UpgradeOperation.ADD, 1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

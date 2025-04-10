@@ -3,12 +3,12 @@ package it.hurts.sskirillss.relics.items.relics.charm;
 import it.hurts.sskirillss.relics.entities.SporeEntity;
 import it.hurts.sskirillss.relics.init.DataComponentRegistry;
 import it.hurts.sskirillss.relics.init.EntityRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.BeamsData;
@@ -29,12 +29,12 @@ public class SporeSackItem extends RelicItem {
                         .ability(AbilityData.builder("spore_mist")
                                 .stat(StatData.builder("amount")
                                         .initialValue(3, 8)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.15D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatData.builder("damage")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.2D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .build())

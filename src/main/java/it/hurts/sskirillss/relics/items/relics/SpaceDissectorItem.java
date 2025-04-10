@@ -1,13 +1,13 @@
 package it.hurts.sskirillss.relics.items.relics;
 
 import it.hurts.sskirillss.relics.entities.DissectionEntity;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -40,12 +40,12 @@ public class SpaceDissectorItem extends RelicItem {
                         .ability(AbilityData.builder("dissection")
                                 .stat(StatData.builder("distance")
                                         .initialValue(16D, 32D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.25D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatData.builder("time")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.5D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

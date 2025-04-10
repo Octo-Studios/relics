@@ -8,7 +8,7 @@
 //import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 //import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 //import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-//import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
+//
 //import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 //import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootCollections;
 //import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
@@ -51,7 +51,7 @@
 //                        .ability(AbilityData.builder("seal")
 //                                .stat(StatData.builder("time")
 //                                        .initialValue(2D, 4D)
-//                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.25D)
+//                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
 //                                        .formatValue(value -> MathUtils.round(value, 1))
 //                                        .build())
 //                                .build())

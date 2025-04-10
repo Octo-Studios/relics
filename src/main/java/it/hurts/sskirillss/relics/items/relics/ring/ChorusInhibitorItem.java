@@ -1,13 +1,13 @@
 package it.hurts.sskirillss.relics.items.relics.ring;
 
 import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -40,12 +40,12 @@ public class ChorusInhibitorItem extends RelicItem {
                         .ability(AbilityData.builder("blink")
                                 .stat(StatData.builder("distance")
                                         .initialValue(16D, 32D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.2D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 0)))
                                         .build())
                                 .stat(StatData.builder("cooldown")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(UpgradeOperation.ADD, -0.5D)
+                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

@@ -3,13 +3,13 @@ package it.hurts.sskirillss.relics.items.relics;
 import it.hurts.sskirillss.relics.entities.ShadowGlaiveEntity;
 import it.hurts.sskirillss.relics.init.EntityRegistry;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.BeamsData;
@@ -30,17 +30,17 @@ public class ShadowGlaiveItem extends RelicItem {
                         .ability(AbilityData.builder("mayhem")
                                 .stat(StatData.builder("chance")
                                         .initialValue(0.05D, 0.15D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.065D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.065D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatData.builder("bounces")
                                         .initialValue(2D, 4D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.15D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatData.builder("damage")
                                         .initialValue(0.1D, 0.2D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.15D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .build())
@@ -48,7 +48,7 @@ public class ShadowGlaiveItem extends RelicItem {
                                 .requiredLevel(5)
                                 .stat(StatData.builder("chance")
                                         .initialValue(0.05D, 0.1D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .build())

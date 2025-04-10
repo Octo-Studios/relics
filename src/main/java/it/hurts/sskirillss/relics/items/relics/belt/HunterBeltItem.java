@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.belt;
 
 import com.google.common.collect.Lists;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -11,7 +12,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -40,14 +40,14 @@ public class HunterBeltItem extends RelicItem implements IRenderableCurio {
                                 .requiredPoints(2)
                                 .stat(StatData.builder("charm")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(UpgradeOperation.ADD, 1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 0)))
                                         .build())
                                 .build())
                         .ability(AbilityData.builder("training")
                                 .stat(StatData.builder("damage")
                                         .initialValue(1.25D, 2D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.15D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 3) * 100))
                                         .build())
                                 .build())

@@ -1,12 +1,13 @@
 package it.hurts.sskirillss.relics.config.data;
 
 import it.hurts.octostudios.octolib.modules.config.annotations.Prop;
+import it.hurts.sskirillss.relics.init.RegistryRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.tuple.Pair;
 
 @Data
@@ -23,15 +24,8 @@ public class StatConfigData {
     @Prop(comment = "Maximum threshold value for the stat, representing hard limits that cannot be surpassed through ability level upgrades or other methods")
     private double maxThresholdValue;
 
-    @Prop(comment = """
-            Type of mathematical operation used to calculate the stat's value based on the ability level. Supported operations include:
-            MULTIPLY_BASE: x + ((x * y) * z),
-            MULTIPLY_TOTAL: x * (y + 1)^z,
-            ADD: x + (y * z).
-            
-            ...where x - Base stat value, y - Value of [upgradeModifier], z - Current relic level
-            """)
-    private UpgradeOperation upgradeOperation;
+    @Prop(comment = "Type of mathematical operation used to calculate the stat's value based on the ability level.")
+    private String upgradeOperation;
     @Prop(comment = "Modifier applied to the base value of the stat, depending on the [upgradeOperation] parameter.")
     private double upgradeModifier;
 
@@ -40,7 +34,7 @@ public class StatConfigData {
 
         data.setInitialValue(Pair.of(minInitialValue, maxInitialValue));
         data.setThresholdValue(Pair.of(minThresholdValue, maxThresholdValue));
-        data.setUpgradeModifier(Pair.of(upgradeOperation, upgradeModifier));
+        data.setUpgradeModifier(Pair.of(RegistryRegistry.UPGRADE_OPERATION_REGISTRY.get(ResourceLocation.parse(upgradeOperation)), upgradeModifier));
 
         return data;
     }

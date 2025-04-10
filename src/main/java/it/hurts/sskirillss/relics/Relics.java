@@ -30,6 +30,7 @@ public class Relics {
         CreativeTabRegistry.register(bus);
         DataComponentRegistry.register(bus);
         RelicContainerRegistry.register(bus);
+        UpgradeOperationRegistry.register(bus);
     }
 
     private void setupCommon(final FMLCommonSetupEvent event) {

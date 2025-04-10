@@ -1,9 +1,11 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
 
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.UpgradeOperation;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
+
 import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.Builder;
 import lombok.Data;
@@ -80,7 +82,7 @@ public class LevelingSourceData {
         private Function<ItemStack, ResourceLocation> icon = (stack) -> ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/abilities/missing.png");
         private Function<ItemStack, String> translationPath = (stack) -> "";
 
-        private Pair<UpgradeOperation, Integer> upgradeModifier = Pair.of(UpgradeOperation.ADD, 0);
+        private Pair<UpgradeOperation, Integer> upgradeModifier = Pair.of(UpgradeOperationRegistry.ADDITIVE.get(), 0);
 
         private LevelingSourceDataBuilder id(String id) {
             this.id = id;

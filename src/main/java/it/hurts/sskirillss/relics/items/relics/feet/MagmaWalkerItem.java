@@ -7,6 +7,7 @@ import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedCurioModel;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -15,7 +16,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -60,7 +60,7 @@ public class MagmaWalkerItem extends RelicItem implements IRenderableCurio {
                         .ability(AbilityData.builder("pace")
                                 .stat(StatData.builder("time")
                                         .initialValue(20D, 50D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 0)))
                                         .build())
                                 .build())

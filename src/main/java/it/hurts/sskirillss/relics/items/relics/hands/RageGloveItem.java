@@ -9,6 +9,7 @@ import it.hurts.sskirillss.relics.client.models.items.SidedFPRCurioModel;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -20,7 +21,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
@@ -81,17 +81,17 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
                                 .maxLevel(10)
                                 .stat(StatData.builder("incoming_damage")
                                         .initialValue(0.05D, 0.025D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.05D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.05D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 3) * 100, 3))
                                         .build())
                                 .stat(StatData.builder("dealt_damage")
                                         .initialValue(0.025D, 0.075D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 3) * 100, 3))
                                         .build())
                                 .stat(StatData.builder("duration")
                                         .initialValue(2D, 4D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
@@ -100,17 +100,17 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
                                 .maxLevel(10)
                                 .stat(StatData.builder("heal")
                                         .initialValue(0.0001D, 0.00025D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 5) * 20, 5))
                                         .build())
                                 .stat(StatData.builder("movement_speed")
                                         .initialValue(0.01D, 0.025D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 3) * 100, 3))
                                         .build())
                                 .stat(StatData.builder("attack_speed")
                                         .initialValue(0.005D, 0.01D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.05D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.05D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 3) * 100, 3))
                                         .build())
                                 .build())
@@ -122,17 +122,17 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
                                         .build())
                                 .stat(StatData.builder("damage")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 2))
                                         .build())
                                 .stat(StatData.builder("distance")
                                         .initialValue(3D, 8D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.3D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.3D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatData.builder("cooldown")
                                         .initialValue(20, 15)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_TOTAL, -0.075)
+                                        .upgradeModifier(UpgradeOperationRegistry.EXPONENTIAL.get(), -0.075)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

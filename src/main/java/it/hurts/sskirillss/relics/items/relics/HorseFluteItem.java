@@ -6,7 +6,7 @@
 //import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 //import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 //import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-//import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
+//
 //import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 //import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootCollections;
 //import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
@@ -51,7 +51,7 @@
 //                                .requiredLevel(5)
 //                                .stat(StatData.builder("amount")
 //                                        .initialValue(0.01D, 0.1D)
-//                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 1D)
+//                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 1D)
 //                                        .formatValue(value -> MathUtils.round(value, 2))
 //                                        .build())
 //                                .build())

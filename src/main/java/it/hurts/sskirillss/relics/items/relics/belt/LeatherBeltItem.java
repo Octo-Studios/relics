@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.belt;
 import com.google.common.collect.Lists;
 import it.hurts.sskirillss.relics.api.events.leveling.ExperienceAddEvent;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -12,7 +13,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -39,7 +39,7 @@ public class LeatherBeltItem extends RelicItem implements IRenderableCurio {
                                 .requiredPoints(2)
                                 .stat(StatData.builder("charm")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(UpgradeOperation.ADD, 1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 1)))
                                         .build())
                                 .build())

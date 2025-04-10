@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
@@ -14,7 +15,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -57,7 +57,7 @@ public class JellyfishNecklaceItem extends RelicItem implements IRenderableCurio
                                         .build())
                                 .stat(StatData.builder("damage")
                                         .initialValue(0.5D, 2.5D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.2D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
@@ -65,7 +65,7 @@ public class JellyfishNecklaceItem extends RelicItem implements IRenderableCurio
                                 .requiredLevel(5)
                                 .stat(StatData.builder("duration")
                                         .initialValue(0.5D, 1.5D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

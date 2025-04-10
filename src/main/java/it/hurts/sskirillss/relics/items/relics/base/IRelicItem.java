@@ -907,22 +907,12 @@ public interface IRelicItem {
     default double getRelativeStatValue(String ability, String stat, double value, int points) {
         var data = getStatData(ability, stat);
 
-        var result = 0D;
-
         if (data == null)
-            return result;
-
-        var step = data.getUpgradeModifier().getValue();
-
-        switch (data.getUpgradeModifier().getKey()) {
-            case ADD -> result = value + (points * step);
-            case MULTIPLY_BASE -> result = value + ((value * step) * points);
-            case MULTIPLY_TOTAL -> result = value * Math.pow(step + 1, points);
-        }
+            return 0D;
 
         var threshold = data.getThresholdValue();
 
-        return MathUtils.round(Mth.clamp(result, threshold.getKey(), threshold.getValue()), 5);
+        return MathUtils.round(Mth.clamp(data.getUpgradeModifier().getKey().apply(value, data.getUpgradeModifier().getValue(), points), threshold.getKey(), threshold.getValue()), 5);
     }
 
     default double getStatValue(ItemStack stack, String ability, String stat, int points) {

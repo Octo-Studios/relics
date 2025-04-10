@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
 import it.hurts.sskirillss.relics.entities.ShockwaveEntity;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
@@ -14,7 +15,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -45,7 +45,7 @@ public class IceBreakerItem extends RelicItem {
                         .ability(AbilityData.builder("sustainability")
                                 .stat(StatData.builder("modifier")
                                         .initialValue(0.75, 0.5D)
-                                        .upgradeModifier(UpgradeOperation.ADD, -0.05D)
+                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.05D)
                                         .formatValue(value -> (int) (MathUtils.round(1 - value, 1) * 100))
                                         .build())
                                 .build())
@@ -57,12 +57,12 @@ public class IceBreakerItem extends RelicItem {
                                         .build())
                                 .stat(StatData.builder("size")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.3D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.3D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatData.builder("damage")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.25D)
+                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
