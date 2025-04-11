@@ -7,15 +7,15 @@ import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedCurioModel;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
 import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -48,43 +48,43 @@ import static it.hurts.sskirillss.relics.init.DataComponentRegistry.CHARGE;
 
 public class AmphibianBootItem extends RelicItem implements IRenderableCurio {
     @Override
-    public RelicData constructDefaultRelicData() {
-        return RelicData.builder()
-                .abilities(AbilitiesData.builder()
-                        .ability(AbilityData.builder("swimming")
-                                .stat(StatData.builder("speed")
+    public RelicTemplate constructDefaultRelicTemplate() {
+        return RelicTemplate.builder()
+                .abilities(AbilitiesTemplate.builder()
+                        .ability(AbilityTemplate.builder("swimming")
+                                .stat(StatTemplate.builder("speed")
                                         .initialValue(0.005D, 0.01D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value * 100 * 4, 1))
                                         .build())
-                                .stat(StatData.builder("duration")
+                                .stat(StatTemplate.builder("duration")
                                         .initialValue(15D, 35D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value / 5, 1))
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("slipping")
-                                .stat(StatData.builder("speed")
+                        .ability(AbilityTemplate.builder("slipping")
+                                .stat(StatTemplate.builder("speed")
                                         .initialValue(0.005D, 0.01D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value * 100 * 4, 1))
                                         .build())
-                                .stat(StatData.builder("duration")
+                                .stat(StatTemplate.builder("duration")
                                         .initialValue(15D, 25D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value / 5, 1))
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("gills")
-                                .stat(StatData.builder("chance")
+                        .ability(AbilityTemplate.builder("gills")
+                                .stat(StatTemplate.builder("chance")
                                         .initialValue(0.01D, 0.1D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.35D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingData(100, 10, 100))
-                .loot(LootData.builder()
+                .leveling(new LevelingTemplate(100, 10, 100))
+                .loot(LootTemplate.builder()
                         .entry(LootEntries.AQUATIC)
                         .build())
                 .build();

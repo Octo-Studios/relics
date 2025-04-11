@@ -2,12 +2,12 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 
 import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -28,32 +28,32 @@ import static it.hurts.sskirillss.relics.init.DataComponentRegistry.CHARGE;
 
 public class IceSkatesItem extends RelicItem {
     @Override
-    public RelicData constructDefaultRelicData() {
-        return RelicData.builder()
-                .abilities(AbilitiesData.builder()
-                        .ability(AbilityData.builder("skating")
-                                .stat(StatData.builder("speed")
+    public RelicTemplate constructDefaultRelicTemplate() {
+        return RelicTemplate.builder()
+                .abilities(AbilitiesTemplate.builder()
+                        .ability(AbilityTemplate.builder("skating")
+                                .stat(StatTemplate.builder("speed")
                                         .initialValue(0.01D, 0.035D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 3) * 10 * 100))
                                         .build())
-                                .stat(StatData.builder("duration")
+                                .stat(StatTemplate.builder("duration")
                                         .initialValue(25D, 50D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value / 10, 1))
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("ram")
+                        .ability(AbilityTemplate.builder("ram")
                                 .requiredLevel(5)
-                                .stat(StatData.builder("damage")
+                                .stat(StatTemplate.builder("damage")
                                         .initialValue(0.05D, 0.25D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value * 10, 1))
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingData(100, 10, 200))
-                .loot(LootData.builder()
+                .leveling(new LevelingTemplate(100, 10, 200))
+                .loot(LootTemplate.builder()
                         .entry(LootEntries.FROST)
                         .build())
                 .build();

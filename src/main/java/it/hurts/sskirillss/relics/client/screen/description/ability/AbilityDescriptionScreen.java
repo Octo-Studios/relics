@@ -19,8 +19,8 @@ import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescripti
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -224,7 +224,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         if (relic.getAbilityData(ability) == null)
             return;
 
-        RelicData relicData = relic.getRelicData();
+        RelicTemplate relicData = relic.getRelicTemplate();
 
         if (relicData == null)
             return;

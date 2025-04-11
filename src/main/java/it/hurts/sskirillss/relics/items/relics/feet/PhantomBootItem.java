@@ -3,23 +3,26 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedCurioModel;
 import it.hurts.sskirillss.relics.init.BlockRegistry;
 import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
-import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
-import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.WorldUtils;
@@ -51,44 +54,44 @@ import static it.hurts.sskirillss.relics.init.DataComponentRegistry.TOGGLED;
 
 public class PhantomBootItem extends RelicItem implements IRenderableCurio {
     @Override
-    public RelicData constructDefaultRelicData() {
-        return RelicData.builder()
-                .abilities(AbilitiesData.builder()
-                        .ability(AbilityData.builder("bridge")
+    public RelicTemplate constructDefaultRelicTemplate() {
+        return RelicTemplate.builder()
+                .abilities(AbilitiesTemplate.builder()
+                        .ability(AbilityTemplate.builder("bridge")
                                 .active(CastData.builder()
                                         .type(CastType.TOGGLEABLE)
                                         .build())
-                                .stat(StatData.builder("duration")
+                                .stat(StatTemplate.builder("duration")
                                         .initialValue(0.25D, 1D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .research(ResearchData.builder()
+                                .research(ResearchTemplate.builder()
                                         .star(0, 11, 8).star(1, 7, 13).star(2, 15, 14)
                                         .star(3, 11, 21).star(4, 3, 29).star(5, 19, 29)
                                         .link(0, 1).link(0, 2).link(0, 3).link(3, 4).link(3, 5).link(4, 5)
                                         .build())
                                 .build())
                         .build())
-                .leveling(LevelingData.builder()
+                .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .maxLevel(10)
                         .step(100)
-                        .sources(LevelingSourcesData.builder()
-                                .source(LevelingSourceData.abilityBuilder("bridge")
+                        .sources(LevelingSourcesTemplate.builder()
+                                .source(LevelingSourceTemplate.abilityBuilder("bridge")
                                         .initialValue(1)
                                         .gem(GemShape.SQUARE, GemColor.PURPLE)
                                         .build())
                                 .build())
                         .build())
-                .style(StyleData.builder()
+                .style(StyleTemplate.builder()
                         .tooltip(TooltipData.builder()
                                 .borderTop(0xff5b0591)
                                 .borderBottom(0xff3d0068)
                                 .textured(true)
                                 .build())
                         .build())
-                .loot(LootData.builder()
+                .loot(LootTemplate.builder()
                         .entry(LootEntries.THE_END, LootEntries.END_LIKE)
                         .build())
                 .build();

@@ -1,9 +1,10 @@
-package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
+package it.hurts.sskirillss.relics.api.relics.abilities;
 
 import com.mojang.datafixers.util.Function3;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
-import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import lombok.Builder;
 import lombok.Data;
 import net.minecraft.world.entity.player.Player;
@@ -15,11 +16,11 @@ import java.util.stream.Collectors;
 
 @Data
 @Builder
-public class AbilityData {
+public class AbilityTemplate {
     private final String id;
 
-    public static AbilityDataBuilder builder(String id) {
-        AbilityDataBuilder builder = new AbilityDataBuilder();
+    public static AbilityTemplateBuilder builder(String id) {
+        AbilityTemplateBuilder builder = new AbilityTemplateBuilder();
 
         builder.id(id);
 
@@ -30,7 +31,7 @@ public class AbilityData {
     private Function3<Player, ItemStack, String, String> icon = (player, stack, ability) -> ability;
 
     @Builder.Default
-    private Map<String, StatData> stats;
+    private Map<String, StatTemplate> stats;
 
     @Builder.Default
     private int maxLevel = 10;
@@ -45,44 +46,44 @@ public class AbilityData {
     private CastData castData;
 
     @Builder.Default
-    private ResearchData researchData;
+    private ResearchTemplate researchTemplate;
 
     public AbilityConfigData toConfigData() {
         return new AbilityConfigData(requiredPoints, requiredLevel, maxLevel, stats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toConfigData(), (o1, o2) -> o1, LinkedHashMap::new)));
     }
 
-    public static class AbilityDataBuilder {
-        private Map<String, StatData> stats = new LinkedHashMap<>();
+    public static class AbilityTemplateBuilder {
+        private Map<String, StatTemplate> stats = new LinkedHashMap<>();
         private CastData castData = CastData.builder().build();
-        private ResearchData researchData = ResearchData.builder().build();
+        private ResearchTemplate researchData = ResearchTemplate.builder().build();
 
-        private AbilityDataBuilder castData(CastData data) {
+        private AbilityTemplateBuilder castData(CastData data) {
             return this;
         }
 
-        private AbilityDataBuilder researchData(ResearchData data) {
+        private AbilityTemplateBuilder researchData(ResearchTemplate data) {
             return this;
         }
 
-        public AbilityDataBuilder research(ResearchData data) {
+        public AbilityTemplateBuilder research(ResearchTemplate data) {
             this.researchData = data;
 
             return this;
         }
 
-        public AbilityDataBuilder active(CastData data) {
+        public AbilityTemplateBuilder active(CastData data) {
             this.castData = data;
 
             return this;
         }
 
-        public AbilityDataBuilder stat(StatData stat) {
+        public AbilityTemplateBuilder stat(StatTemplate stat) {
             this.stats.put(stat.getId(), stat);
 
             return this;
         }
 
-        private AbilityDataBuilder id(String id) {
+        private AbilityTemplateBuilder id(String id) {
             this.id = id;
 
             return this;

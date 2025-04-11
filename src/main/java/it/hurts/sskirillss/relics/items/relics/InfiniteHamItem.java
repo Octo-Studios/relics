@@ -1,19 +1,22 @@
 package it.hurts.sskirillss.relics.items.relics;
 
 import it.hurts.sskirillss.relics.api.events.common.ContainerSlotClickEvent;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.init.CreativeTabRegistry;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
 import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
-import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
-import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -62,54 +65,54 @@ public class InfiniteHamItem extends RelicItem {
     }
 
     @Override
-    public RelicData constructDefaultRelicData() {
-        return RelicData.builder()
-                .abilities(AbilitiesData.builder()
-                        .ability(AbilityData.builder("regeneration")
+    public RelicTemplate constructDefaultRelicTemplate() {
+        return RelicTemplate.builder()
+                .abilities(AbilitiesTemplate.builder()
+                        .ability(AbilityTemplate.builder("regeneration")
                                 .requiredPoints(2)
-                                .stat(StatData.builder("cooldown")
+                                .stat(StatTemplate.builder("cooldown")
                                         .initialValue(30D, 15D)
                                         .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatData.builder("feed")
+                                .stat(StatTemplate.builder("feed")
                                         .initialValue(1D, 3D)
                                         .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .research(ResearchData.builder()
+                                .research(ResearchTemplate.builder()
                                         .star(0, 8, 7).star(1, 19, 7).star(2, 5, 15)
                                         .star(3, 10, 16).star(4, 17, 20).star(5, 7, 24)
                                         .link(1, 3).link(3, 0).link(3, 2).link(3, 4).link(3, 5)
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("marinade")
+                        .ability(AbilityTemplate.builder("marinade")
                                 .requiredLevel(5)
-                                .stat(StatData.builder("duration")
+                                .stat(StatTemplate.builder("duration")
                                         .initialValue(1D, 3D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .research(ResearchData.builder()
+                                .research(ResearchTemplate.builder()
                                         .star(0, 18, 5).star(1, 8, 7).star(2, 4, 16)
                                         .star(3, 17, 16).star(4, 10, 21).star(5, 17, 23)
                                         .star(6, 5, 25).star(7, 10, 29)
                                         .link(0, 1).link(0, 3).link(1, 3).link(1, 2).link(3, 4).link(2, 4).link(3, 5).link(4, 7).link(2, 6)
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("meat_bat")
+                        .ability(AbilityTemplate.builder("meat_bat")
                                 .requiredLevel(10)
-                                .stat(StatData.builder("damage")
+                                .stat(StatTemplate.builder("damage")
                                         .initialValue(0.5D, 2D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatData.builder("stun")
+                                .stat(StatTemplate.builder("stun")
                                         .initialValue(0.05D, 0.25D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 2))
                                         .build())
-                                .research(ResearchData.builder()
+                                .research(ResearchTemplate.builder()
                                         .star(0, 10, 5).star(1, 18, 7).star(2, 3, 9)
                                         .star(3, 17, 14).star(4, 10, 17).star(5, 3, 19)
                                         .star(6, 9, 24).star(7, 18, 24)
@@ -118,33 +121,33 @@ public class InfiniteHamItem extends RelicItem {
                                         .build())
                                 .build())
                         .build())
-                .leveling(LevelingData.builder()
+                .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .maxLevel(20)
                         .step(100)
-                        .sources(LevelingSourcesData.builder()
-                                .source(LevelingSourceData.abilityBuilder("regeneration")
+                        .sources(LevelingSourcesTemplate.builder()
+                                .source(LevelingSourceTemplate.abilityBuilder("regeneration")
                                         .initialValue(1)
                                         .gem(GemShape.SQUARE, GemColor.ORANGE)
                                         .build())
-                                .source(LevelingSourceData.abilityBuilder("marinade")
+                                .source(LevelingSourceTemplate.abilityBuilder("marinade")
                                         .initialValue(1)
                                         .gem(GemShape.SQUARE, GemColor.ORANGE)
                                         .build())
-                                .source(LevelingSourceData.abilityBuilder("meat_bat")
+                                .source(LevelingSourceTemplate.abilityBuilder("meat_bat")
                                         .initialValue(1)
                                         .gem(GemShape.SQUARE, GemColor.ORANGE)
                                         .build())
                                 .build())
                         .build())
-                .style(StyleData.builder()
+                .style(StyleTemplate.builder()
                         .tooltip(TooltipData.builder()
                                 .borderTop(0xff644a41)
                                 .borderBottom(0xff592410)
                                 .textured(true)
                                 .build())
                         .build())
-                .loot(LootData.builder()
+                .loot(LootTemplate.builder()
                         .entry(LootEntries.VILLAGE)
                         .build())
                 .build();

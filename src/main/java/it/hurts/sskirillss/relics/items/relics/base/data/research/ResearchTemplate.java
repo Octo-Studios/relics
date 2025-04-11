@@ -12,7 +12,7 @@ import java.util.Map;
 
 @Data
 @Builder
-public class ResearchData {
+public class ResearchTemplate {
     @Builder.Default
     private Map<Integer, StarData> stars;
 
@@ -39,17 +39,17 @@ public class ResearchData {
         return connectedStars;
     }
 
-    public static class ResearchDataBuilder {
+    public static class ResearchTemplateBuilder {
         private Map<Integer, StarData> stars = new HashMap<>();
         private Multimap<Integer, Integer> links = LinkedHashMultimap.create();
 
-        public ResearchDataBuilder star(int index, int x, int y) {
+        public ResearchTemplateBuilder star(int index, int x, int y) {
             stars.put(index, new StarData(index, x, y));
 
             return this;
         }
 
-        public ResearchDataBuilder link(int first, int second) {
+        public ResearchTemplateBuilder link(int first, int second) {
             links.put(first > second ? first + second - (second = first) : first, second);
 
             return this;

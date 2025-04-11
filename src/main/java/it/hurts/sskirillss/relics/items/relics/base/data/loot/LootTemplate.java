@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class LootData {
+public class LootTemplate {
     @Builder.Default
     private List<LootEntry> entries;
 
@@ -19,10 +19,10 @@ public class LootData {
         return new LootConfigData(entries.stream().map(entry -> new LootEntryConfigData(entry.getDimensions(), entry.getBiomes(), entry.getTables(), entry.getWeight())).toList());
     }
 
-    public static class LootDataBuilder {
+    public static class LootTemplateBuilder {
         private List<LootEntry> entries = new ArrayList<>();
 
-        public LootDataBuilder entry(LootEntry... entries) {
+        public LootTemplateBuilder entry(LootEntry... entries) {
             this.entries.addAll(Arrays.asList(entries));
 
             return this;

@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.badges.ability;
 
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import net.minecraft.world.item.ItemStack;
 
 public class FlawlessAbilityBadge extends AbilityBadge {

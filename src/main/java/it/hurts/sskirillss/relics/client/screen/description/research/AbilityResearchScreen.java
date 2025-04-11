@@ -20,9 +20,9 @@ import it.hurts.sskirillss.relics.client.screen.description.research.widgets.Tip
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
-import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.StarData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.research.PacketManageLink;
@@ -107,7 +107,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0;
 
-        return relic.getAbilityData(ability).getResearchData().getConnectedStars(star).size();
+        return relic.getAbilityData(ability).getResearchTemplate().getConnectedStars(star).size();
     }
 
     public int getOccupiedConnectionsCount(StarData star) {
@@ -156,7 +156,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
         int starSize = 17;
 
-        for (var entry : relic.getAbilityData(ability).getResearchData().getStars().values())
+        for (var entry : relic.getAbilityData(ability).getResearchTemplate().getStars().values())
             stars.add(this.addWidget(new StarWidget((int) (x + 67 + (entry.getX() * 5F) - starSize / 2F), (int) (y + 54 + (entry.getY() * 5F) - starSize / 2F), this, entry)));
     }
 
@@ -183,7 +183,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
                 researchProgress++;
 
                 if (researchProgress % 3 == 0) {
-                    ResearchData researchData = relic.getResearchData(ability);
+                    ResearchTemplate researchData = relic.getResearchData(ability);
 
                     for (var link : relic.getResearchLinks(stack, ability).entries()) {
                         var start = researchData.getStars().get(link.getKey()).getPos();
@@ -315,7 +315,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
             return;
 
-        RelicData relicData = relic.getRelicData();
+        RelicTemplate relicData = relic.getRelicTemplate();
 
         if (relicData == null)
             return;
@@ -349,7 +349,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         }
 
         {
-            ResearchData researchData = relic.getAbilityData(ability).getResearchData();
+            ResearchTemplate researchData = relic.getAbilityData(ability).getResearchTemplate();
 
             for (var link : relic.getResearchLinks(stack, ability).entries()) {
                 var start = researchData.getStars().get(link.getKey()).getPos();
@@ -601,7 +601,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
         if (stack.getItem() instanceof IRelicItem relic && !relic.isAbilityResearched(stack, ability) && pButton == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            ResearchData researchData = relic.getResearchData(ability);
+            ResearchTemplate researchData = relic.getResearchData(ability);
 
             Pair<Integer, Integer> toRemove = null;
 

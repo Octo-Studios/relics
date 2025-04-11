@@ -7,8 +7,8 @@ import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import lombok.SneakyThrows;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -45,10 +45,10 @@ public class RelicAbilityStatArgument implements ArgumentType<String> {
         List<String> result = new ArrayList<>();
 
         if (ability.equals("all")) {
-            for (AbilityData abilityEntry : relic.getRelicData().getAbilities().getAbilities().values())
+            for (AbilityTemplate abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().values())
                 result.addAll(abilityEntry.getStats().keySet());
         } else {
-            AbilityData data = relic.getAbilityData(ability);
+            AbilityTemplate data = relic.getAbilityData(ability);
 
             if (data == null)
                 return Suggestions.empty();

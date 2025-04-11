@@ -10,18 +10,18 @@ import it.hurts.sskirillss.relics.init.EffectRegistry;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.PacketPlayerMotion;
@@ -74,71 +74,71 @@ import static it.hurts.sskirillss.relics.init.DataComponentRegistry.TIME;
 
 public class RageGloveItem extends RelicItem implements IRenderableCurio {
     @Override
-    public RelicData constructDefaultRelicData() {
-        return RelicData.builder()
-                .abilities(AbilitiesData.builder()
-                        .ability(AbilityData.builder("rage")
+    public RelicTemplate constructDefaultRelicTemplate() {
+        return RelicTemplate.builder()
+                .abilities(AbilitiesTemplate.builder()
+                        .ability(AbilityTemplate.builder("rage")
                                 .maxLevel(10)
-                                .stat(StatData.builder("incoming_damage")
+                                .stat(StatTemplate.builder("incoming_damage")
                                         .initialValue(0.05D, 0.025D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.05D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 3) * 100, 3))
                                         .build())
-                                .stat(StatData.builder("dealt_damage")
+                                .stat(StatTemplate.builder("dealt_damage")
                                         .initialValue(0.025D, 0.075D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 3) * 100, 3))
                                         .build())
-                                .stat(StatData.builder("duration")
+                                .stat(StatTemplate.builder("duration")
                                         .initialValue(2D, 4D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("phlebotomy")
+                        .ability(AbilityTemplate.builder("phlebotomy")
                                 .requiredLevel(5)
                                 .maxLevel(10)
-                                .stat(StatData.builder("heal")
+                                .stat(StatTemplate.builder("heal")
                                         .initialValue(0.0001D, 0.00025D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 5) * 20, 5))
                                         .build())
-                                .stat(StatData.builder("movement_speed")
+                                .stat(StatTemplate.builder("movement_speed")
                                         .initialValue(0.01D, 0.025D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 3) * 100, 3))
                                         .build())
-                                .stat(StatData.builder("attack_speed")
+                                .stat(StatTemplate.builder("attack_speed")
                                         .initialValue(0.005D, 0.01D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.05D)
                                         .formatValue(value -> MathUtils.round(MathUtils.round(value, 3) * 100, 3))
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("spurt")
+                        .ability(AbilityTemplate.builder("spurt")
                                 .requiredLevel(10)
                                 .maxLevel(10)
                                 .active(CastData.builder()
                                         .type(CastType.INSTANTANEOUS)
                                         .build())
-                                .stat(StatData.builder("damage")
+                                .stat(StatTemplate.builder("damage")
                                         .initialValue(0.1D, 0.25D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 2))
                                         .build())
-                                .stat(StatData.builder("distance")
+                                .stat(StatTemplate.builder("distance")
                                         .initialValue(3D, 8D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.3D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatData.builder("cooldown")
+                                .stat(StatTemplate.builder("cooldown")
                                         .initialValue(20, 15)
                                         .upgradeModifier(UpgradeOperationRegistry.EXPONENTIAL.get(), -0.075)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingData(100, 20, 100))
-                .loot(LootData.builder()
+                .leveling(new LevelingTemplate(100, 20, 100))
+                .loot(LootTemplate.builder()
                         .entry(LootEntries.NETHER_LIKE, LootEntries.THE_NETHER)
                         .build())
                 .build();

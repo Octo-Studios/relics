@@ -8,7 +8,7 @@ import lombok.Data;
 @Data
 @Builder
 @AllArgsConstructor
-public class LevelingData {
+public class LevelingTemplate {
     @Builder.Default
     private int initialCost = 100;
 
@@ -19,15 +19,15 @@ public class LevelingData {
     private int step = 100;
 
     @Builder.Default
-    private LevelingSourcesData sources = LevelingSourcesData.builder().build();
+    private LevelingSourcesTemplate sources = LevelingSourcesTemplate.builder().build();
 
     @Deprecated(forRemoval = true)
-    public LevelingData(int initialCost, int maxLevel, int step) {
+    public LevelingTemplate(int initialCost, int maxLevel, int step) {
         this.initialCost = initialCost;
         this.maxLevel = maxLevel;
         this.step = step;
 
-        this.sources = LevelingSourcesData.builder().build();
+        this.sources = LevelingSourcesTemplate.builder().build();
     }
 
     public LevelingConfigData toConfigData() {

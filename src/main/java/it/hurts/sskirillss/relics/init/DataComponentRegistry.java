@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.init;
 
 import com.mojang.serialization.Codec;
 import it.hurts.sskirillss.relics.components.DataComponent;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.WorldPosition;
 import net.minecraft.core.component.DataComponentType;

@@ -1,11 +1,11 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.cast.containers;
 
 import it.hurts.sskirillss.relics.init.RelicContainerRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityReference;
 import it.hurts.sskirillss.relics.system.casts.slots.CurioSlotReference;
 import net.minecraft.world.entity.LivingEntity;
@@ -60,7 +60,7 @@ public class CuriosRelicContainer extends RelicContainer {
                         if (!(stack.getItem() instanceof IRelicItem relic))
                             continue;
 
-                        for (AbilityData abilityData : relic.getRelicData().getAbilities().getAbilities().values()) {
+                        for (AbilityTemplate abilityData : relic.getRelicTemplate().getAbilities().getAbilities().values()) {
                             String id = abilityData.getId();
 
                             if (!relic.isAbilityUnlocked(stack, id) || !relic.canPlayerSeeAbility(player, stack, id))

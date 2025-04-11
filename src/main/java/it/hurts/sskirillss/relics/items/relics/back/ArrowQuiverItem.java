@@ -8,7 +8,7 @@
 //import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 //import it.hurts.sskirillss.relics.entities.ArrowRainEntity;
 //import it.hurts.sskirillss.relics.init.*;
-//import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+//import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 //import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 //import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 //import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;

@@ -12,16 +12,16 @@ import java.util.Map;
 @Data
 @Builder
 @AllArgsConstructor
-public class LevelingSourcesData {
+public class LevelingSourcesTemplate {
     @Builder.Default
-    private Map<String, LevelingSourceData> sources;
+    private Map<String, LevelingSourceTemplate> sources;
 
     public static class LevelingSourcesDataBuilder {
-        private Map<String, LevelingSourceData> sources = new LinkedHashMap<>();
+        private Map<String, LevelingSourceTemplate> sources = new LinkedHashMap<>();
 
         // TODO: Replace static init with registry entry
         {
-            var entry = LevelingSourceData.genericBuilder("spreading")
+            var entry = LevelingSourceTemplate.genericBuilder("spreading")
                     .initialValue(25)
                     .gem(GemShape.OVAL, GemColor.YELLOW)
                     .build();
@@ -29,7 +29,7 @@ public class LevelingSourcesData {
             sources.put(entry.getId(), entry);
         }
 
-        public LevelingSourcesDataBuilder source(LevelingSourceData source) {
+        public LevelingSourcesDataBuilder source(LevelingSourceTemplate source) {
             sources.put(source.getId(), source);
 
             return this;

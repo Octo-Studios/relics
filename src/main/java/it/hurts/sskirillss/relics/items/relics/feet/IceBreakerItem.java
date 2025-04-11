@@ -6,16 +6,16 @@ import it.hurts.sskirillss.relics.init.ItemRegistry;
 import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilitiesData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -39,36 +39,36 @@ import static it.hurts.sskirillss.relics.init.DataComponentRegistry.WORLD_POSITI
 
 public class IceBreakerItem extends RelicItem {
     @Override
-    public RelicData constructDefaultRelicData() {
-        return RelicData.builder()
-                .abilities(AbilitiesData.builder()
-                        .ability(AbilityData.builder("sustainability")
-                                .stat(StatData.builder("modifier")
+    public RelicTemplate constructDefaultRelicTemplate() {
+        return RelicTemplate.builder()
+                .abilities(AbilitiesTemplate.builder()
+                        .ability(AbilityTemplate.builder("sustainability")
+                                .stat(StatTemplate.builder("modifier")
                                         .initialValue(0.75, 0.5D)
                                         .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.05D)
                                         .formatValue(value -> (int) (MathUtils.round(1 - value, 1) * 100))
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("impact")
+                        .ability(AbilityTemplate.builder("impact")
                                 .maxLevel(10)
                                 .active(CastData.builder()
                                         .type(CastType.INSTANTANEOUS)
                                         .predicate("falling", PredicateType.CAST, (player, stack) -> !(player.onGround() || player.isSpectator()) && WorldUtils.getGroundHeight(player, player.position(), 3) <= 3)
                                         .build())
-                                .stat(StatData.builder("size")
+                                .stat(StatTemplate.builder("size")
                                         .initialValue(2.5D, 5D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.3D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatData.builder("damage")
+                                .stat(StatTemplate.builder("damage")
                                         .initialValue(2.5D, 5D)
                                         .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingData(100, 10, 200))
-                .loot(LootData.builder()
+                .leveling(new LevelingTemplate(100, 10, 200))
+                .loot(LootTemplate.builder()
                         .entry(LootEntries.TAIGA, LootEntries.FROST, LootEntries.MOUNTAIN)
                         .build())
                 .build();

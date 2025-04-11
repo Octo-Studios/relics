@@ -2,8 +2,8 @@ package it.hurts.sskirillss.relics.config.data;
 
 import it.hurts.octostudios.octolib.modules.config.annotations.Prop;
 import it.hurts.sskirillss.relics.init.RegistryRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -29,8 +29,8 @@ public class StatConfigData {
     @Prop(comment = "Modifier applied to the base value of the stat, depending on the [upgradeOperation] parameter.")
     private double upgradeModifier;
 
-    public StatData toData(IRelicItem relic, String ability, String stat) {
-        StatData data = relic.constructDefaultRelicData().getAbilities().getAbilities().get(ability).getStats().get(stat);
+    public StatTemplate toData(IRelicItem relic, String ability, String stat) {
+        StatTemplate data = relic.constructDefaultRelicTemplate().getAbilities().getAbilities().get(ability).getStats().get(stat);
 
         data.setInitialValue(Pair.of(minInitialValue, maxInitialValue));
         data.setThresholdValue(Pair.of(minThresholdValue, maxThresholdValue));

@@ -18,18 +18,18 @@ import java.util.function.Function;
 
 @Data
 @Builder
-public class LevelingSourceData {
+public class LevelingSourceTemplate {
     private final String id;
 
-    private static LevelingSourceDataBuilder builder(String id) {
-        var builder = new LevelingSourceDataBuilder();
+    private static LevelingSourceTemplateBuilder builder(String id) {
+        var builder = new LevelingSourceTemplateBuilder();
 
         builder.id(id);
 
         return builder;
     }
 
-    public static LevelingSourceDataBuilder genericBuilder(String id) {
+    public static LevelingSourceTemplateBuilder genericBuilder(String id) {
         var builder = builder(id);
 
         builder.translationPath((stack) -> "tooltip.relics.leveling_source.generic." + id);
@@ -38,7 +38,7 @@ public class LevelingSourceData {
         return builder;
     }
 
-    public static LevelingSourceDataBuilder abilityBuilder(String id, String ability) {
+    public static LevelingSourceTemplateBuilder abilityBuilder(String id, String ability) {
         var builder = builder(id);
 
         builder.requiredAbility(ability);
@@ -48,7 +48,7 @@ public class LevelingSourceData {
         return builder;
     }
 
-    public static LevelingSourceDataBuilder abilityBuilder(String ability) {
+    public static LevelingSourceTemplateBuilder abilityBuilder(String ability) {
         return abilityBuilder(ability, ability);
     }
 
@@ -78,43 +78,43 @@ public class LevelingSourceData {
     @Builder.Default
     private GemColor color = GemColor.RED;
 
-    public static class LevelingSourceDataBuilder {
+    public static class LevelingSourceTemplateBuilder {
         private Function<ItemStack, ResourceLocation> icon = (stack) -> ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/abilities/missing.png");
         private Function<ItemStack, String> translationPath = (stack) -> "";
 
         private Pair<UpgradeOperation, Integer> upgradeModifier = Pair.of(UpgradeOperationRegistry.ADDITIVE.get(), 0);
 
-        private LevelingSourceDataBuilder id(String id) {
+        private LevelingSourceTemplateBuilder id(String id) {
             this.id = id;
 
             return this;
         }
 
-        public LevelingSourceDataBuilder upgradeModifier(UpgradeOperation operation, int step) {
+        public LevelingSourceTemplateBuilder upgradeModifier(UpgradeOperation operation, int step) {
             upgradeModifier = Pair.of(operation, step);
 
             return this;
         }
 
-        private LevelingSourceDataBuilder icon(Function<ItemStack, ResourceLocation> icon) {
+        private LevelingSourceTemplateBuilder icon(Function<ItemStack, ResourceLocation> icon) {
             this.icon = icon;
 
             return this;
         }
 
-        public LevelingSourceDataBuilder manualIcon(Function<ItemStack, ResourceLocation> icon) {
+        public LevelingSourceTemplateBuilder manualIcon(Function<ItemStack, ResourceLocation> icon) {
             return icon(icon);
         }
 
-        public LevelingSourceDataBuilder genericIcon(String icon) {
+        public LevelingSourceTemplateBuilder genericIcon(String icon) {
             return manualIcon((stack) -> ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/leveling_source/generic/" + icon + ".png"));
         }
 
-        public LevelingSourceDataBuilder abilityIcon(String ability) {
+        public LevelingSourceTemplateBuilder abilityIcon(String ability) {
             return manualIcon((stack) -> DescriptionTextures.getAbilityCardTexture(stack, ability));
         }
 
-        public LevelingSourceDataBuilder gem(GemShape shape, GemColor color) {
+        public LevelingSourceTemplateBuilder gem(GemShape shape, GemColor color) {
             this.shape(shape);
             this.color(color);
 

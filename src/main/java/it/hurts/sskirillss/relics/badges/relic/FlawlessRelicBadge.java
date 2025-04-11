@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.badges.relic;
 
 import it.hurts.sskirillss.relics.badges.base.RelicBadge;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import net.minecraft.world.item.ItemStack;
 
 public class FlawlessRelicBadge extends RelicBadge {

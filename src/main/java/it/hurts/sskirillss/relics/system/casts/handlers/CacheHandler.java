@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.system.casts.handlers;
 
 import it.hurts.sskirillss.relics.init.RegistryRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityCache;
