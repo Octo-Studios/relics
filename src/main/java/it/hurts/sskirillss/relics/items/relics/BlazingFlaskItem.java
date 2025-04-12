@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics;
 
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
@@ -40,17 +40,17 @@ public class BlazingFlaskItem extends RelicItem {
                         .ability(AbilityTemplate.builder("bonfire")
                                 .stat(StatTemplate.builder("step")
                                         .initialValue(1D, 2.5D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("speed")
                                         .initialValue(0.01D, 0.05D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 1.9D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 1.9D)
                                         .formatValue(value -> MathUtils.round(value * 8, 1))
                                         .build())
                                 .stat(StatTemplate.builder("height")
                                         .initialValue(3D, 5D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
 import it.hurts.sskirillss.relics.entities.ShockwaveEntity;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -45,7 +45,7 @@ public class IceBreakerItem extends RelicItem {
                         .ability(AbilityTemplate.builder("sustainability")
                                 .stat(StatTemplate.builder("modifier")
                                         .initialValue(0.75, 0.5D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.05D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), -0.05D)
                                         .formatValue(value -> (int) (MathUtils.round(1 - value, 1) * 100))
                                         .build())
                                 .build())
@@ -57,12 +57,12 @@ public class IceBreakerItem extends RelicItem {
                                         .build())
                                 .stat(StatTemplate.builder("size")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.3D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.3D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

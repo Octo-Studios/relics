@@ -6,10 +6,10 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.ICancellableEvent;
 
 @Data
-public class RelicExperienceChangeEvent extends RelicEvent implements ICancellableEvent {
-    private double delta;
+public class RelicLevelingPointsChangeEvent extends RelicEvent  implements ICancellableEvent {
+    private int delta;
 
-    public RelicExperienceChangeEvent(LivingEntity bearer, ItemStack stack, double delta) {
+    public RelicLevelingPointsChangeEvent(LivingEntity bearer, ItemStack stack, int delta) {
         super(bearer, stack);
 
         this.delta = delta;

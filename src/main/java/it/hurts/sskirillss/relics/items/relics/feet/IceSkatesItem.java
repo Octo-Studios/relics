@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.feet;
 
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
@@ -34,12 +34,12 @@ public class IceSkatesItem extends RelicItem {
                         .ability(AbilityTemplate.builder("skating")
                                 .stat(StatTemplate.builder("speed")
                                         .initialValue(0.01D, 0.035D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 3) * 10 * 100))
                                         .build())
                                 .stat(StatTemplate.builder("duration")
                                         .initialValue(25D, 50D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value / 10, 1))
                                         .build())
                                 .build())
@@ -47,7 +47,7 @@ public class IceSkatesItem extends RelicItem {
                                 .requiredLevel(5)
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.05D, 0.25D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value * 10, 1))
                                         .build())
                                 .build())

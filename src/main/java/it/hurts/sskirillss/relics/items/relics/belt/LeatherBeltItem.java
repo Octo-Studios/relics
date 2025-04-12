@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.belt;
 import com.google.common.collect.Lists;
 import it.hurts.sskirillss.relics.api.events.leveling.ExperienceAddEvent;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -39,7 +39,7 @@ public class LeatherBeltItem extends RelicItem implements IRenderableCurio {
                                 .requiredPoints(2)
                                 .stat(StatTemplate.builder("charm")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 1)))
                                         .build())
                                 .build())

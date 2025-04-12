@@ -9,6 +9,7 @@ import java.util.function.BiFunction;
 
 @Data
 @Builder
+@Deprecated(forRemoval = true)
 public class StyleTemplate {
     @Builder.Default
     private BiFunction<Player, ItemStack, TooltipData> tooltip;

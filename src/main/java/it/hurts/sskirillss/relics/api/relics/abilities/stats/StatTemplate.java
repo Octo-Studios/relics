@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.api.relics.abilities.stats;
 
+import it.hurts.sskirillss.relics.api.relics.ScalingModel;
 import it.hurts.sskirillss.relics.config.data.StatConfigData;
 import it.hurts.sskirillss.relics.init.RegistryRegistry;
 import lombok.Builder;
@@ -21,7 +22,7 @@ public class StatTemplate {
         return builder;
     }
 
-    private Pair<UpgradeOperation, Double> upgradeModifier;
+    private Pair<ScalingModel, Double> upgradeModifier;
     @Builder.Default
     private Pair<Double, Double> initialValue;
     @Builder.Default
@@ -31,7 +32,7 @@ public class StatTemplate {
     private Function<Double, ? extends Number> formatValue = Double::doubleValue;
 
     public StatConfigData toConfigData() {
-        return new StatConfigData(initialValue.getKey(), initialValue.getValue(), thresholdValue.getKey(), thresholdValue.getValue(), RegistryRegistry.UPGRADE_OPERATION_REGISTRY.getKey(upgradeModifier.getKey()).toString(), upgradeModifier.getValue());
+        return new StatConfigData(initialValue.getKey(), initialValue.getValue(), thresholdValue.getKey(), thresholdValue.getValue(), RegistryRegistry.SCALING_MODEL_REGISTRY.getKey(upgradeModifier.getKey()).toString(), upgradeModifier.getValue());
     }
 
     public static class StatTemplateBuilder {
@@ -56,7 +57,7 @@ public class StatTemplate {
             return this;
         }
 
-        public StatTemplateBuilder upgradeModifier(UpgradeOperation operation, double step) {
+        public StatTemplateBuilder upgradeModifier(ScalingModel operation, double step) {
             upgradeModifier = Pair.of(operation, step);
 
             return this;

@@ -34,7 +34,7 @@ public class StatConfigData {
 
         data.setInitialValue(Pair.of(minInitialValue, maxInitialValue));
         data.setThresholdValue(Pair.of(minThresholdValue, maxThresholdValue));
-        data.setUpgradeModifier(Pair.of(RegistryRegistry.UPGRADE_OPERATION_REGISTRY.get(ResourceLocation.parse(upgradeOperation)), upgradeModifier));
+        data.setUpgradeModifier(Pair.of(RegistryRegistry.SCALING_MODEL_REGISTRY.get(ResourceLocation.parse(upgradeOperation)), upgradeModifier));
 
         return data;
     }

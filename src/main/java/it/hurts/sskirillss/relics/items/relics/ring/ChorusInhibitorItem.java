@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics.ring;
 
 import it.hurts.sskirillss.relics.init.ItemRegistry;
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
@@ -40,12 +40,12 @@ public class ChorusInhibitorItem extends RelicItem {
                         .ability(AbilityTemplate.builder("blink")
                                 .stat(StatTemplate.builder("distance")
                                         .initialValue(16D, 32D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 0)))
                                         .build())
                                 .stat(StatTemplate.builder("cooldown")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.5D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), -0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

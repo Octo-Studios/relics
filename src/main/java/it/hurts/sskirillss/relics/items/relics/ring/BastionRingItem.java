@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.ring;
 
 import com.mojang.datafixers.util.Pair;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -56,7 +56,7 @@ public class BastionRingItem extends RelicItem {
                                 .requiredPoints(2)
                                 .stat(StatTemplate.builder("rolls")
                                         .initialValue(0D, 1D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .build())

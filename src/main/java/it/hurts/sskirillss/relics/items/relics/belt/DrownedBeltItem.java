@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.belt;
 
 import com.google.common.collect.Lists;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -49,33 +49,33 @@ public class DrownedBeltItem extends RelicItem implements IRenderableCurio {
                                 .requiredPoints(2)
                                 .stat(StatTemplate.builder("charm")
                                         .initialValue(0D, 2D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 0)))
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("anchor")
                                 .stat(StatTemplate.builder("slowness")
                                         .initialValue(0.5D, 0.25D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.05D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), -0.05D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 2) * 100))
                                         .build())
                                 .stat(StatTemplate.builder("sinking")
                                         .initialValue(5D, 3D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.1D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), -0.1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 2) * 100))
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("pressure")
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(1.25D, 2D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 2) * 100))
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("riptide")
                                 .stat(StatTemplate.builder("cooldown")
                                         .initialValue(10D, 5D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.5D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), -0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

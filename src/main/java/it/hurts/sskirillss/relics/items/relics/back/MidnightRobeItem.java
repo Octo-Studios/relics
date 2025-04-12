@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.back;
 import com.google.common.collect.Lists;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -62,24 +62,24 @@ public class MidnightRobeItem extends RelicItem implements IRenderableCurio {
                                         .build())
                                 .stat(StatTemplate.builder("light")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("speed")
                                         .initialValue(0.1D, 0.35D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.35D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.35D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 3) * 100))
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("backstab")
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(1.25D, 1.75D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) (100 * MathUtils.round(value - 1, 1)))
                                         .build())
                                 .stat(StatTemplate.builder("distance")
                                         .initialValue(20D, 15D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.5D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), -0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

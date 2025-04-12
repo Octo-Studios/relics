@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
 
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.UpgradeOperation;
+import it.hurts.sskirillss.relics.api.relics.ScalingModel;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
 
@@ -56,7 +56,7 @@ public class LevelingSourceTemplate {
     private int initialValue = 1;
 
     @Builder.Default
-    private Pair<UpgradeOperation, Integer> upgradeModifier;
+    private Pair<ScalingModel, Integer> upgradeModifier;
 
     @Builder.Default
     private int maxLevel = 0;
@@ -82,7 +82,7 @@ public class LevelingSourceTemplate {
         private Function<ItemStack, ResourceLocation> icon = (stack) -> ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/abilities/missing.png");
         private Function<ItemStack, String> translationPath = (stack) -> "";
 
-        private Pair<UpgradeOperation, Integer> upgradeModifier = Pair.of(UpgradeOperationRegistry.ADDITIVE.get(), 0);
+        private Pair<ScalingModel, Integer> upgradeModifier = Pair.of(ScalingModelRegistry.ADDITIVE.get(), 0);
 
         private LevelingSourceTemplateBuilder id(String id) {
             this.id = id;
@@ -90,7 +90,7 @@ public class LevelingSourceTemplate {
             return this;
         }
 
-        public LevelingSourceTemplateBuilder upgradeModifier(UpgradeOperation operation, int step) {
+        public LevelingSourceTemplateBuilder upgradeModifier(ScalingModel operation, int step) {
             upgradeModifier = Pair.of(operation, step);
 
             return this;

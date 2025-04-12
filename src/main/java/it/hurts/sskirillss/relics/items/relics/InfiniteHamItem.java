@@ -6,7 +6,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.init.CreativeTabRegistry;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
-import it.hurts.sskirillss.relics.init.UpgradeOperationRegistry;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -72,12 +72,12 @@ public class InfiniteHamItem extends RelicItem {
                                 .requiredPoints(2)
                                 .stat(StatTemplate.builder("cooldown")
                                         .initialValue(30D, 15D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), -0.5D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), -0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("feed")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1D)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -90,7 +90,7 @@ public class InfiniteHamItem extends RelicItem {
                                 .requiredLevel(5)
                                 .stat(StatTemplate.builder("duration")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -104,12 +104,12 @@ public class InfiniteHamItem extends RelicItem {
                                 .requiredLevel(10)
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.5D, 2D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("stun")
                                         .initialValue(0.05D, 0.25D)
-                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 2))
                                         .build())
                                 .research(ResearchTemplate.builder()

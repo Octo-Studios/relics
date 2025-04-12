@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class RelicTemplate {
     @Builder.Default
     private AbilitiesTemplate abilities = AbilitiesTemplate.builder().build();

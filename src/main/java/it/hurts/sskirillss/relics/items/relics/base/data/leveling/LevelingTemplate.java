@@ -1,6 +1,8 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
 
+import it.hurts.sskirillss.relics.api.relics.ScalingModel;
 import it.hurts.sskirillss.relics.config.data.LevelingConfigData;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,19 +12,22 @@ import lombok.Data;
 @AllArgsConstructor
 public class LevelingTemplate {
     @Builder.Default
-    private int initialCost = 100;
+    private ScalingModel scalingModel = ScalingModelRegistry.ADDITIVE.get();
+
+    @Builder.Default
+    private double initialCost = 100D;
+
+    @Builder.Default
+    private double step = 100D;
 
     @Builder.Default
     private int maxLevel = 10;
 
     @Builder.Default
-    private int step = 100;
-
-    @Builder.Default
     private LevelingSourcesTemplate sources = LevelingSourcesTemplate.builder().build();
 
     @Deprecated(forRemoval = true)
-    public LevelingTemplate(int initialCost, int maxLevel, int step) {
+    public LevelingTemplate(double initialCost, int maxLevel, double step) {
         this.initialCost = initialCost;
         this.maxLevel = maxLevel;
         this.step = step;
