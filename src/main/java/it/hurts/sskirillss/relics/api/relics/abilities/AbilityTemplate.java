@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class AbilityTemplate {
     private final String id;
 

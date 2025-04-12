@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class LootTemplate {
     @Builder.Default
     private List<LootEntry> entries;

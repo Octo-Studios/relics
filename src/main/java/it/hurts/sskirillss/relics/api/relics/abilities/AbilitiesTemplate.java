@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class AbilitiesTemplate {
     @Builder.Default
     private Map<String, AbilityTemplate> abilities;

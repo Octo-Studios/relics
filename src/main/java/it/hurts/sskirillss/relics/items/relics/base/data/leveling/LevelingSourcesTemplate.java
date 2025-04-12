@@ -2,7 +2,6 @@ package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
 
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
@@ -10,8 +9,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
-@Builder
-@AllArgsConstructor
+@Builder(toBuilder = true)
 public class LevelingSourcesTemplate {
     @Builder.Default
     private Map<String, LevelingSourceTemplate> sources;

@@ -9,13 +9,10 @@ import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.api.relics.events.RelicExperienceChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelingPointsChangeEvent;
-import it.hurts.sskirillss.relics.api.relics.events.RelicMaxLevelEvent;
 import it.hurts.sskirillss.relics.components.AbilityComponent;
 import it.hurts.sskirillss.relics.components.ResearchComponent;
 import it.hurts.sskirillss.relics.components.StatComponent;
 import it.hurts.sskirillss.relics.config.data.RelicConfigData;
-import it.hurts.sskirillss.relics.entities.RelicExperienceOrbEntity;
-import it.hurts.sskirillss.relics.init.EntityRegistry;
 import it.hurts.sskirillss.relics.init.RegistryRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
@@ -23,19 +20,17 @@ import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RelicUtils;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.common.NeoForge;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.ApiStatus;
@@ -180,7 +175,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
      */
     default boolean addRelicLevel(LivingEntity entity, ItemStack stack, int level) {
         var currentLevel = getRelicLevel(entity, stack);
-        var maxLevel = getRelicMaxLevel(entity, stack);
+        var maxLevel = getLevelingTemplate(entity, stack).getMaxLevel();
 
         var allowedDelta = level > 0
                 ? Math.min(level, maxLevel - currentLevel)
@@ -242,7 +237,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
 
         var delta = event.getDelta();
         var currentPoints = getRelicLevelingPoints(entity, stack);
-        var max = getRelicMaxLevel(entity, stack);
+        var maxLevel = getLevelingTemplate(entity, stack).getMaxLevel();
         var newPoints = currentPoints + delta;
 
         if (newPoints < 0) {
@@ -252,7 +247,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
                     .filter(ability -> getAbilityLevel(entity, stack, ability) > 0)
                     .toList();
 
-            var comparator = Comparator.comparingInt((String ability) -> getLevelingPointsPerAbilityLevel(entity, stack, ability));
+            var comparator = Comparator.comparingInt((String ability) -> getAbilityTemplate(entity, stack, ability).getRequiredPoints());
 
             var sortedAbilities = deficit == 1
                     ? abilities.stream().sorted(comparator).toList()
@@ -260,7 +255,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
 
             for (var ability : sortedAbilities) {
                 while (deficit > 0 && getAbilityLevel(entity, stack, ability) > 0) {
-                    var cost = getLevelingPointsPerAbilityLevel(entity, stack, ability);
+                    var cost = getAbilityTemplate(entity, stack, ability).getRequiredPoints();
 
                     addAbilityLevel(entity, stack, ability, -1);
 
@@ -274,19 +269,53 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
             newPoints = deficit < 0 ? -deficit : 0;
         }
 
-        setRelicLevelingPoints(entity, stack, Math.clamp(newPoints, 0, max));
+        setRelicLevelingPoints(entity, stack, Math.clamp(newPoints, 0, maxLevel));
 
         return true;
     }
 
-    default int getRelicMaxLevel(LivingEntity entity, ItemStack stack) {
-        return NeoForge.EVENT_BUS.post(new RelicMaxLevelEvent.Get(entity, stack, getLevelingTemplate(entity, stack).getMaxLevel())).getMaxLevel();
+    /**
+     * Returns the rank of the relic.
+     *
+     * @param entity the entity holding the relic
+     * @param stack  the item stack representing the relic
+     * @return the current rank of the relic
+     */
+    default int getRelicRank(LivingEntity entity, ItemStack stack) {
+        return getLevelingData(stack).getRank();
     }
 
-    // TODO: Give it a way to live lol
-    @ApiStatus.Obsolete
-    default int getLevelingPointsPerAbilityLevel(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityTemplate(entity, stack, ability).getRequiredPoints();
+    /**
+     * Sets the rank of the relic.
+     *
+     * @param entity the entity holding the relic
+     * @param stack  the item stack representing the relic
+     * @param amount the rank value to set
+     */
+    default void setRelicRank(LivingEntity entity, ItemStack stack, int amount) {
+        setLevelingData(stack, getLevelingData(stack).toBuilder().rank(Math.max(0, amount)).build());
+    }
+
+    /**
+     * Adds to the current rank of the relic.
+     *
+     * @param entity the entity holding the relic
+     * @param stack  the item stack representing the relic
+     * @param amount the amount of rank to add (can be negative)
+     */
+    default void addRelicRank(LivingEntity entity, ItemStack stack, int amount) {
+        setRelicRank(entity, stack, getRelicRank(entity, stack) + amount);
+    }
+
+    // TODO: Huh?
+    @Override
+    @ApiStatus.Internal
+    default LevelingTemplate getLevelingTemplate(LivingEntity entity, ItemStack stack) {
+        var template = IRelicTemplateHolder.super.getLevelingTemplate(entity, stack);
+
+        return template.toBuilder()
+                .maxLevel(template.getMaxLevel() + getRelicLevel(entity, stack))
+                .build();
     }
 
     // TODO: Replace with relative integration
@@ -463,18 +492,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
         return (int) Mth.clamp(sum, min + 1, max - 1);
     }
 
-    default int getRelicRank(LivingEntity entity, ItemStack stack) {
-        return getLevelingData(stack).rank();
-    }
-
-    default void setRelicRank(LivingEntity entity, ItemStack stack, int rank) {
-        setLevelingData(stack, getLevelingData(stack).toBuilder().rank(Math.max(0, rank)).build());
-    }
-
-    default void addRelicRank(LivingEntity entity, ItemStack stack, int rank) {
-        setRelicLevelingPoints(entity, stack, getRelicLevelingPoints(entity, stack) + rank);
-    }
-
     default int getMaxLuck(LivingEntity entity, ItemStack stack) {
         return 100;
     }
@@ -523,30 +540,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
 
         if (relicStack.getItem() instanceof IRelicItem relic)
             relic.addRelicExperience(entity, relicStack, toSpread);
-    }
-
-    default void dropRelicExperience(Level level, Vec3 pos, int amount) {
-        if (amount <= 0)
-            return;
-
-        RandomSource random = level.getRandom();
-
-        int orbs = Math.max(amount / RelicExperienceOrbEntity.getMaxExperience(), random.nextInt(amount) + 1);
-
-        for (int i = 0; i < orbs; i++) {
-            RelicExperienceOrbEntity orb = new RelicExperienceOrbEntity(EntityRegistry.RELIC_EXPERIENCE_ORB.get(), level);
-
-            orb.setPos(pos);
-            orb.setExperience(amount / orbs);
-
-            orb.setDeltaMovement(
-                    (-1 + 2 * random.nextFloat()) * 0.15F,
-                    0.1F + random.nextFloat() * 0.2F,
-                    (-1 + 2 * random.nextFloat()) * 0.15F
-            );
-
-            level.addFreshEntity(orb);
-        }
     }
 
     @Deprecated(forRemoval = true)
@@ -762,11 +755,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
 
     default int getAbilityLevel(LivingEntity entity, ItemStack stack, String ability) {
         return getAbilityComponent(stack, ability).points();
-    }
-
-    @UnstableApi
-    default int getAbilityMaxLevel(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityData(ability).getMaxLevel();
     }
 
     default void setAbilityLevel(LivingEntity entity, ItemStack stack, String ability, int points) {

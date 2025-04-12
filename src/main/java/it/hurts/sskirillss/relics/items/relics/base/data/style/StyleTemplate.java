@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.function.BiFunction;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 @Deprecated(forRemoval = true)
 public class StyleTemplate {
     @Builder.Default

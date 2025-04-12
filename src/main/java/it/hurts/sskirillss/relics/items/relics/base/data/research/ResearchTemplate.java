@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class ResearchTemplate {
     @Builder.Default
     private Map<Integer, StarData> stars;

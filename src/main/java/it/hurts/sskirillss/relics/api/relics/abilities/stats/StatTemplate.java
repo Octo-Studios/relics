@@ -10,7 +10,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.function.Function;
 
 @Data
-@Builder
+@Builder(toBuilder = true)
 public class StatTemplate {
     private final String id;
 
