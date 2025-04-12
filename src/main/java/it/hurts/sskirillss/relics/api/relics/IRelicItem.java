@@ -7,6 +7,8 @@ import io.netty.util.internal.UnstableApi;
 import it.hurts.sskirillss.relics.api.events.leveling.ExperienceAddEvent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.events.RelicLevelEvent;
+import it.hurts.sskirillss.relics.api.relics.events.RelicMaxLevelEvent;
 import it.hurts.sskirillss.relics.components.*;
 import it.hurts.sskirillss.relics.config.data.RelicConfigData;
 import it.hurts.sskirillss.relics.entities.RelicExperienceOrbEntity;
@@ -44,7 +46,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
+public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRelicDataProcessor {
     /**
      * Returns the {@link Item} instance associated with this object.
      *
@@ -57,6 +59,89 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
 
         throw new IllegalStateException("Relic interface is not associated with an Item class");
     }
+
+    // TODO: Experimental. I don't rly think I need to post an event for each setter/getter :/
+
+    default int getRelicMaxLevel(LivingEntity entity, ItemStack stack) {
+        return NeoForge.EVENT_BUS.post(new RelicMaxLevelEvent.Get(entity, stack, getLevelingTemplate(entity, stack).getMaxLevel())).getMaxLevel();
+    }
+
+    default int getRelicLevel(LivingEntity entity, ItemStack stack) {
+        return NeoForge.EVENT_BUS.post(new RelicLevelEvent.Get(entity, stack, getLevelingComponent(stack).getLevel())).getLevel();
+    }
+
+    default void setRelicLevel(LivingEntity entity, ItemStack stack, int level) {
+        setLevelingComponent(stack, getLevelingComponent(stack).toBuilder().level(Math.max(0, NeoForge.EVENT_BUS.post(new RelicLevelEvent.Set(entity, stack, level)).getLevel())).build());
+    }
+
+    default void addRelicLevel(LivingEntity entity, ItemStack stack, int level) {
+        setRelicLevel(entity, stack, getRelicLevel(entity, stack) + NeoForge.EVENT_BUS.post(new RelicLevelEvent.Add(entity, stack, level)).getLevel());
+    }
+
+    default double getRelicExperience(LivingEntity entity, ItemStack stack) {
+        return getLevelingComponent(stack).getExperience();
+    }
+
+    default void setRelicExperience(LivingEntity entity, ItemStack stack, double experience) {
+        setLevelingComponent(stack, getLevelingComponent(stack).toBuilder()
+                .experience(Math.clamp(experience, 0D, getTotalRelicExperienceForLevel(entity, stack, getRelicLevel(entity, stack) + 1)))
+                .build());
+    }
+
+    default boolean addRelicExperience(@Nullable LivingEntity entity, ItemStack stack, double amount) {
+        var event = new ExperienceAddEvent(entity instanceof LivingEntity ? entity : null, stack, amount);
+
+        NeoForge.EVENT_BUS.post(event);
+
+        if (event.isCanceled())
+            return false;
+
+        var currentExperience = getRelicExperience(entity, stack);
+        var currentLevel = getRelicLevel(entity, stack);
+
+        var toAdd = event.getAmount();
+
+        if (toAdd == 0D)
+            return false;
+
+        var resultLevel = currentLevel;
+        var resultExperience = 0D;
+
+        var maxLevel = getLevelingTemplate(entity, stack).getMaxLevel();
+
+        while (toAdd > 0D) {
+            if (resultLevel >= maxLevel)
+                break;
+
+            var requiredExperience = getTotalRelicExperienceBetweenLevels(entity, stack, resultLevel, resultLevel + 1);
+
+            var diff = requiredExperience - currentExperience;
+
+            if (toAdd >= diff) {
+                toAdd -= diff;
+
+                resultLevel++;
+
+                currentExperience = 0D;
+            } else {
+                resultExperience = currentExperience + toAdd;
+
+                break;
+            }
+        }
+
+        setRelicExperience(entity, stack, resultExperience);
+
+        if (currentLevel != resultLevel) {
+            setRelicLevel(entity, stack, resultLevel);
+
+            addRelicLevelingPoints(entity, stack, resultLevel - currentLevel);
+        }
+
+        return true;
+    }
+
+
 
     // TODO: Replace with relative integration
     @Deprecated(forRemoval = true)
@@ -256,21 +341,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
         setRelicLevelingPoints(entity, stack, getRelicLevelingPoints(entity, stack) + amount);
     }
 
-    default int getRelicLevel(LivingEntity entity, ItemStack stack) {
-        return getLevelingComponent(stack).level();
-    }
-
-    default void setRelicLevel(LivingEntity entity, ItemStack stack, int level) {
-        setLevelingComponent(stack, getLevelingComponent(stack).toBuilder().level(Math.max(0, level)).build());
-    }
-
-    default void addRelicLevel(LivingEntity entity, ItemStack stack, int amount) {
-        if (amount > 0)
-            addRelicLevelingPoints(entity, stack, Mth.clamp(amount, 0, getLevelingTemplate(entity, stack).getMaxLevel() - getRelicLevel(entity, stack)));
-
-        setRelicLevel(entity, stack, getRelicLevel(entity, stack) + amount);
-    }
-
     default int getMaxLuck(LivingEntity entity, ItemStack stack) {
         return 100;
     }
@@ -289,69 +359,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
 
     default void addRelicLuck(LivingEntity entity, ItemStack stack, int amount) {
         setRelicLuck(entity, stack, getRelicLuck(entity, stack) + amount);
-    }
-
-    default double getRelicExperience(LivingEntity entity, ItemStack stack) {
-        return getLevelingComponent(stack).experience();
-    }
-
-    default void setRelicExperience(LivingEntity entity, ItemStack stack, double experience) {
-        setLevelingComponent(stack, getLevelingComponent(stack).toBuilder()
-                .experience(Math.clamp(experience, 0, getTotalRelicExperienceForLevel(entity, stack, getRelicLevel(entity, stack) + 1)))
-                .build());
-    }
-
-    default boolean addRelicExperience(@Nullable LivingEntity entity, ItemStack stack, double amount) {
-        var event = new ExperienceAddEvent(entity instanceof LivingEntity ? entity : null, stack, amount);
-
-        NeoForge.EVENT_BUS.post(event);
-
-        if (event.isCanceled())
-            return false;
-
-        var currentExperience = getRelicExperience(entity, stack);
-        var currentLevel = getRelicLevel(entity, stack);
-
-        var toAdd = event.getAmount();
-
-        if (toAdd == 0D)
-            return false;
-
-        var resultLevel = currentLevel;
-        var resultExperience = 0D;
-
-        var maxLevel = getLevelingTemplate(entity, stack).getMaxLevel();
-
-        while (toAdd > 0D) {
-            if (resultLevel >= maxLevel)
-                break;
-
-            var requiredExperience = getTotalRelicExperienceBetweenLevels(entity, stack, resultLevel, resultLevel + 1);
-
-            var diff = requiredExperience - currentExperience;
-
-            if (toAdd >= diff) {
-                toAdd -= diff;
-
-                resultLevel++;
-
-                currentExperience = 0D;
-            } else {
-                resultExperience = currentExperience + toAdd;
-
-                break;
-            }
-        }
-
-        setRelicExperience(entity, stack, resultExperience);
-
-        if (currentLevel != resultLevel) {
-            setRelicLevel(entity, stack, resultLevel);
-
-            addRelicLevelingPoints(entity, stack, resultLevel - currentLevel);
-        }
-
-        return true;
     }
 
     default void spreadRelicExperience(@Nullable LivingEntity entity, ItemStack stack, int experience) {

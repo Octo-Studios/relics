@@ -110,12 +110,12 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link AbilitiesTemplate} defined in this relic's raw template.
+     * Returns the {@link AbilitiesTemplate} defined in this relic's default template.
      * <p>
      * This method bypasses any runtime or context-specific overrides and accesses the base ability configuration associated with the default {@link RelicTemplate}.
      * </p>
      *
-     * @return the raw {@link AbilitiesTemplate} of this relic
+     * @return the default {@link AbilitiesTemplate} of this relic
      */
     @ApiStatus.NonExtendable
     default AbilitiesTemplate getDefaultAbilitiesTemplate() {
@@ -123,7 +123,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the raw {@link AbilityTemplate} by its ID from this relic's base template.
+     * Returns the default {@link AbilityTemplate} by its ID from this relic's base template.
      *
      * @param ability the ID of the ability
      * @return the corresponding {@link AbilityTemplate}, or {@code null} if not present
@@ -134,7 +134,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link ResearchTemplate} associated with a specific ability from the raw template.
+     * Returns the {@link ResearchTemplate} associated with a specific ability from the default template.
      *
      * @param ability the ID of the ability
      * @return the corresponding {@link ResearchTemplate}, or {@code null} if not present
@@ -145,7 +145,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link StatTemplate} for a specific stat of a specific ability from the raw template.
+     * Returns the {@link StatTemplate} for a specific stat of a specific ability from the default template.
      *
      * @param ability the ID of the ability
      * @param stat    the ID of the stat
@@ -157,12 +157,12 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingTemplate} associated with this relic's raw template.
+     * Returns the {@link LevelingTemplate} associated with this relic's default template.
      * <p>
      * Contains experience curves, thresholds, and leveling behaviors.
      * </p>
      *
-     * @return the raw {@link LevelingTemplate}
+     * @return the default {@link LevelingTemplate}
      */
     @ApiStatus.NonExtendable
     default LevelingTemplate getDefaultLevelingTemplate() {
@@ -170,12 +170,12 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingSourcesTemplate} from the raw leveling configuration.
+     * Returns the {@link LevelingSourcesTemplate} from the default leveling configuration.
      * <p>
      * Encapsulates all XP gain sources defined in the relic template.
      * </p>
      *
-     * @return the raw {@link LevelingSourcesTemplate}
+     * @return the default {@link LevelingSourcesTemplate}
      */
     @ApiStatus.NonExtendable
     default LevelingSourcesTemplate getDefaultLevelingSourcesTemplate() {
@@ -183,7 +183,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingSourceTemplate} for a specific experience source from the raw template.
+     * Returns the {@link LevelingSourceTemplate} for a specific experience source from the default template.
      *
      * @param source the ID of the experience source
      * @return the corresponding {@link LevelingSourceTemplate}, or {@code null} if not found
@@ -196,7 +196,7 @@ public interface IRelicTemplateHolder {
     /**
      * Returns the {@link RelicTemplate} associated with the given entity and item context.
      * <p>
-     * By default, this method returns the raw template. Implementations may override this to provide dynamic behavior based on the context (e.g., NBT, player status, etc.).
+     * By default, this method returns the default template. Implementations may override this to provide dynamic behavior based on the context (e.g., data components, player status, etc.).
      * </p>
      *
      * @param entity the holder of the item
