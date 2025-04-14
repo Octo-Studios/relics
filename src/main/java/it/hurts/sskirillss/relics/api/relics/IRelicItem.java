@@ -25,7 +25,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.RelicUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -43,7 +42,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
+public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRelicUtilities {
     /**
      * Returns the {@link Item} instance associated with this object.
      *
@@ -77,7 +76,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
      */
     default void setRelicExperience(LivingEntity entity, ItemStack stack, double experience) {
         setLevelingData(stack, getLevelingData(stack).toBuilder()
-                .experience(Math.clamp(experience, 0D, RelicUtils.getTotalRelicExperienceForLevel(entity, stack, getRelicLevel(entity, stack) + 1)))
+                .experience(Math.clamp(experience, 0D, getTotalRelicExperienceForLevel(entity, stack, getRelicLevel(entity, stack) + 1)))
                 .build());
     }
 
@@ -104,7 +103,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
 
         while ((delta > 0 && level < maxLevel) || (delta < 0 && level > 0)) {
             if (delta > 0) {
-                var requirement = RelicUtils.getTotalRelicExperienceBetweenLevels(entity, stack, level, level + 1) - xp;
+                var requirement = getTotalRelicExperienceBetweenLevels(entity, stack, level, level + 1) - xp;
 
                 if (delta >= requirement) {
                     delta -= requirement;
@@ -127,7 +126,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder {
 
                     level--;
 
-                    xp = RelicUtils.getTotalRelicExperienceBetweenLevels(entity, stack, level, level + 1);
+                    xp = getTotalRelicExperienceBetweenLevels(entity, stack, level, level + 1);
                 }
             }
         }

@@ -1,23 +1,25 @@
-package it.hurts.sskirillss.relics.utils;
+package it.hurts.sskirillss.relics.api.relics;
 
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
-public class RelicUtils {
-    public static double getRelicExperienceLeftForLevelUp(LivingEntity entity, ItemStack stack, int level) {
+@ApiStatus.Internal
+@ApiStatus.Experimental
+@ApiStatus.NonExtendable
+public interface IRelicUtilities {
+    default double getRelicExperienceLeftForLevelUp(LivingEntity entity, ItemStack stack, int level) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0D;
 
         return getTotalRelicExperienceBetweenLevels(entity, stack, relic.getRelicLevel(entity, stack), level) - relic.getRelicExperience(entity, stack);
     }
 
-    public static double getTotalRelicExperienceBetweenLevels(LivingEntity entity, ItemStack stack, int from, int to) {
+    default double getTotalRelicExperienceBetweenLevels(LivingEntity entity, ItemStack stack, int from, int to) {
         return getTotalRelicExperienceForLevel(entity, stack, to) - getTotalRelicExperienceForLevel(entity, stack, from);
     }
 
-    public static double getTotalRelicExperienceForLevel(LivingEntity entity, ItemStack stack, int level) {
+    default double getTotalRelicExperienceForLevel(LivingEntity entity, ItemStack stack, int level) {
         if (!(stack.getItem() instanceof IRelicItem relic) || level <= 0)
             return 0;
 
@@ -27,7 +29,7 @@ public class RelicUtils {
         var total = 0D;
 
         for (int i = 1; i < level; i++) {
-            double value = operation.evaluate(template.getInitialCost(), template.getStep(), i - 1);
+            double value = operation.evaluate(entity, stack, template.getInitialCost(), template.getStep(), i - 1);
 
             total += value;
         }
@@ -35,7 +37,7 @@ public class RelicUtils {
         return (int) Math.floor(total);
     }
 
-    public static int getRelicLevelFromExperience(LivingEntity entity, ItemStack stack, int experience) {
+    default int getRelicLevelFromExperience(LivingEntity entity, ItemStack stack, int experience) {
         int result = 0;
         var amount = 0D;
 

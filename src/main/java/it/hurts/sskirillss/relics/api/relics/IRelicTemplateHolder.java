@@ -55,6 +55,7 @@ public interface IRelicTemplateHolder {
      * As part of decomposition or orchestration, it is encouraged to reuse specialized methods like {@link #constructDefaultAbilitiesTemplate()}, {@link #constructDefaultLevelingTemplate()}, and {@link #constructDefaultLootTemplate()} to encapsulate and isolate logic related to each specific aspect of the relic template.
      * </p>
      */
+    @ApiStatus.OverrideOnly
     default RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(constructDefaultAbilitiesTemplate())
@@ -68,6 +69,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the default {@link AbilitiesTemplate} associated with this relic
      */
+    @ApiStatus.OverrideOnly
     default AbilitiesTemplate constructDefaultAbilitiesTemplate() {
         return AbilitiesTemplate.builder().build();
     }
@@ -77,6 +79,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the default {@link LevelingTemplate} used for this relic
      */
+    @ApiStatus.OverrideOnly
     default LevelingTemplate constructDefaultLevelingTemplate() {
         return LevelingTemplate.builder().build();
     }
@@ -86,6 +89,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the default {@link LootTemplate} for this relic
      */
+    @ApiStatus.OverrideOnly
     default LootTemplate constructDefaultLootTemplate() {
         return LootTemplate.builder().build();
     }
