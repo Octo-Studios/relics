@@ -30,7 +30,7 @@ import org.jetbrains.annotations.ApiStatus;
  * </p>
  *
  * <p>
- * Template construction can be decomposed and customized through helper methods such as {@link #constructDefaultAbilitiesTemplate()}, {@link #constructDefaultLevelingTemplate()}, and {@link #constructDefaultLootTemplate()} for modular setup.
+ * Template construction of {@link #constructDefaultRelicTemplate()} can be decomposed and customized through helper methods such as {@link #constructDefaultAbilitiesTemplate()}, {@link #constructDefaultLevelingTemplate()}, and {@link #constructDefaultLootTemplate()} for modular setup.
  * </p>
  *
  * <p>
@@ -41,7 +41,6 @@ import org.jetbrains.annotations.ApiStatus;
  * @see RelicTemplate
  * @see IRelicItem
  */
-@ApiStatus.Internal
 public interface IRelicTemplateHolder {
     /**
      * Returns the {@link RelicTemplate} that defines the default behavior of this relic item.
@@ -108,7 +107,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the {@link RelicTemplate} linked to this instance.
      */
-    @ApiStatus.NonExtendable
+    @ApiStatus.Internal
     default RelicTemplate getDefaultRelicTemplate() {
         return RelicStorage.RELIC_TEMPLATES.computeIfAbsent(this, data -> constructDefaultRelicTemplate());
     }
@@ -121,7 +120,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the default {@link AbilitiesTemplate} of this relic
      */
-    @ApiStatus.NonExtendable
+    @ApiStatus.Internal
     default AbilitiesTemplate getDefaultAbilitiesTemplate() {
         return getDefaultRelicTemplate().getAbilities();
     }
@@ -132,7 +131,7 @@ public interface IRelicTemplateHolder {
      * @param ability the ID of the ability
      * @return the corresponding {@link AbilityTemplate}, or {@code null} if not present
      */
-    @ApiStatus.NonExtendable
+    @ApiStatus.Internal
     default AbilityTemplate getDefaultAbilityTemplate(String ability) {
         return getDefaultAbilitiesTemplate().getAbilities().get(ability);
     }
@@ -143,7 +142,7 @@ public interface IRelicTemplateHolder {
      * @param ability the ID of the ability
      * @return the corresponding {@link ResearchTemplate}, or {@code null} if not present
      */
-    @ApiStatus.NonExtendable
+    @ApiStatus.Internal
     default ResearchTemplate getDefaultResearchTemplate(String ability) {
         return getDefaultAbilityTemplate(ability).getResearchTemplate();
     }
@@ -155,7 +154,7 @@ public interface IRelicTemplateHolder {
      * @param stat    the ID of the stat
      * @return the matching {@link StatTemplate}, or {@code null} if not found
      */
-    @ApiStatus.NonExtendable
+    @ApiStatus.Internal
     default StatTemplate getDefaultStatTemplate(String ability, String stat) {
         return getDefaultAbilityTemplate(ability).getStats().get(stat);
     }
@@ -168,7 +167,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the default {@link LevelingTemplate}
      */
-    @ApiStatus.NonExtendable
+    @ApiStatus.Internal
     default LevelingTemplate getDefaultLevelingTemplate() {
         return getDefaultRelicTemplate().getLeveling();
     }
@@ -181,7 +180,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the default {@link LevelingSourcesTemplate}
      */
-    @ApiStatus.NonExtendable
+    @ApiStatus.Internal
     default LevelingSourcesTemplate getDefaultLevelingSourcesTemplate() {
         return getDefaultLevelingTemplate().getSources();
     }
@@ -192,7 +191,7 @@ public interface IRelicTemplateHolder {
      * @param source the ID of the experience source
      * @return the corresponding {@link LevelingSourceTemplate}, or {@code null} if not found
      */
-    @ApiStatus.NonExtendable
+    @ApiStatus.Internal
     default LevelingSourceTemplate getDefaultLevelingSourceTemplate(String source) {
         return getDefaultLevelingSourcesTemplate().getSources().get(source);
     }
@@ -231,7 +230,7 @@ public interface IRelicTemplateHolder {
      * @return the corresponding {@link AbilityTemplate}, or {@code null} if not present
      */
     default AbilityTemplate getAbilityTemplate(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilitiesTemplate(entity, stack).getAbilities().get(ability);
+        return getRelicTemplate(entity, stack).getAbilities().getAbilities().get(ability);
     }
 
     /**
@@ -243,7 +242,7 @@ public interface IRelicTemplateHolder {
      * @return the contextual {@link ResearchTemplate}, or {@code null} if not found
      */
     default ResearchTemplate getResearchTemplate(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityTemplate(entity, stack, ability).getResearchTemplate();
+        return getRelicTemplate(entity, stack).getAbilities().getAbilities().get(ability).getResearchTemplate();
     }
 
     /**
@@ -256,7 +255,7 @@ public interface IRelicTemplateHolder {
      * @return the contextual {@link StatTemplate}, or {@code null} if not found
      */
     default StatTemplate getStatTemplate(LivingEntity entity, ItemStack stack, String ability, String stat) {
-        return getAbilityTemplate(entity, stack, ability).getStats().get(stat);
+        return getRelicTemplate(entity, stack).getAbilities().getAbilities().get(ability).getStats().get(stat);
     }
 
     /**
@@ -278,7 +277,7 @@ public interface IRelicTemplateHolder {
      * @return the contextual {@link LevelingSourcesTemplate}
      */
     default LevelingSourcesTemplate getLevelingSourcesTemplate(LivingEntity entity, ItemStack stack) {
-        return getLevelingTemplate(entity, stack).getSources();
+        return getRelicTemplate(entity, stack).getLeveling().getSources();
     }
 
     /**
@@ -290,6 +289,6 @@ public interface IRelicTemplateHolder {
      * @return the contextual {@link LevelingSourceTemplate}, or {@code null} if not found
      */
     default LevelingSourceTemplate getLevelingSourceTemplate(LivingEntity entity, ItemStack stack, String source) {
-        return getLevelingSourcesTemplate(entity, stack).getSources().get(source);
+        return getRelicTemplate(entity, stack).getLeveling().getSources().getSources().get(source);
     }
 }
