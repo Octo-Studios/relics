@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
@@ -9,14 +9,14 @@ import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
 
-public class PageWidget extends AbstractDescriptionWidget {
+public class ExperienceSourcePageWidget extends AbstractDescriptionWidget {
     @Getter
-    private AbilityDescriptionScreen screen;
+    private ExperienceDescriptionScreen screen;
 
     @Getter
     private int step;
 
-    public PageWidget(int x, int y, AbilityDescriptionScreen screen, int step) {
+    public ExperienceSourcePageWidget(int x, int y, ExperienceDescriptionScreen screen, int step) {
         super(x, y, 12, 17);
 
         this.screen = screen;
@@ -30,12 +30,12 @@ public class PageWidget extends AbstractDescriptionWidget {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream()
-                .filter(entry -> relic.isAbilityEnabled(stack, entry))
+        var sources = relic.getLevelingSourcesData().getSources().keySet().stream()
+                .filter(entry -> relic.isLevelingSourceEnabled(stack, entry))
                 .toList();
 
         var maxEntries = 5;
-        var size = abilities.size();
+        var size = sources.size();
 
         var totalPages = (int) Math.ceil(size / (double) maxEntries);
 

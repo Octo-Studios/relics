@@ -8,6 +8,8 @@ import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.AbilityPageWidget;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.ExperienceSourcePageWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.BigExperienceCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ExperienceGemWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ResetExperienceActionWidget;
@@ -26,6 +28,7 @@ import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -60,6 +63,10 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
     @Getter
     public ItemStack stack;
 
+    @Getter
+    @Setter
+    private int page;
+
     private final int backgroundHeight = 256;
     private final int backgroundWidth = 418;
 
@@ -74,6 +81,14 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         this.screen = screen;
 
         stack = DescriptionUtils.gatherRelicStack(player, slot);
+
+        if (stack.getItem() instanceof IRelicItem relic) {
+            var sources = relic.getLevelingSourcesData().getSources().keySet().stream()
+                    .filter(entry -> relic.isLevelingSourceEnabled(stack, entry))
+                    .toList();
+
+            setPage(sources.indexOf(getSelectedSource()) / 5);
+        }
     }
 
     public String getSelectedSource() {
@@ -99,8 +114,24 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
-        var sources = relic.getLevelingSourcesData().getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(stack, entry)).toList();
-        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
+        var sources = relic.getLevelingSourcesData().getSources().keySet().stream()
+                .filter(entry -> relic.isLevelingSourceEnabled(stack, entry))
+                .toList();
+        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream()
+                .filter(entry -> relic.isAbilityEnabled(stack, entry))
+                .toList();
+
+        var maxEntries = 5;
+
+        if (sources.size() > maxEntries) {
+            this.addRenderableWidget(new ExperienceSourcePageWidget(x + 289, y + 151, this, 1));
+            this.addRenderableWidget(new ExperienceSourcePageWidget(x + 289, y + 186, this, -1));
+        }
+
+        int startIndex = page * maxEntries;
+        int endIndex = Math.min(startIndex + maxEntries, sources.size());
+
+        var paginatedSources = (startIndex < sources.size() && startIndex >= 0) ? sources.subList(startIndex, endIndex) : new ArrayList<String>();
 
         this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
@@ -126,17 +157,17 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 102, this));
         this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 127, this));
 
-        if (!sources.isEmpty()) {
+        if (!paginatedSources.isEmpty()) {
             int objectWidth = 32;
             int containerWidth = 209;
 
-            int count = Math.min(5, sources.size());
+            int count = paginatedSources.size();
 
-            int spacing = objectWidth + 8 + (3 * (5 - count));
+            int spacing = objectWidth + 8 + (3 * (maxEntries - count));
 
             xOff = (containerWidth / 2) - (((objectWidth * count) + ((spacing - objectWidth) * Math.max(count - 1, 0))) / 2);
 
-            for (String entry : sources) {
+            for (String entry : paginatedSources) {
                 this.addRenderableWidget(new ExperienceGemWidget(x + 77 + xOff, y + 153, this, entry));
 
                 xOff += spacing;
@@ -218,6 +249,24 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(x + 60, y + 133)
                 .end();
+
+        var sources = relic.getLevelingSourcesData().getSources().keySet().stream()
+                .filter(entry -> relic.isLevelingSourceEnabled(stack, entry))
+                .toList();
+
+        if (sources.size() > 5) {
+            poseStack.pushPose();
+
+            GUIRenderer.begin(DescriptionTextures.PAGE_COUNTER, poseStack)
+                    .pos(x + 295, y + 177)
+                    .end();
+
+            var page = Component.literal(String.valueOf(this.page + 1)).withStyle(ChatFormatting.BOLD);
+
+            guiGraphics.drawString(minecraft.font, page, (int) (x + 296 - font.width(page) / 2F), y + 173, 0xffe278, true);
+
+            poseStack.popPose();
+        }
 
         poseStack.pushPose();
 

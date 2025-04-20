@@ -114,7 +114,9 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
-        var sources = relic.getLevelingSourcesData().getSources();
+        var sources = relic.getLevelingSourcesData().getSources().keySet().stream()
+                .filter(entry -> relic.isLevelingSourceEnabled(stack, entry))
+                .toList();
         var abilities = relic.getAbilitiesData().getAbilities().keySet().stream()
                 .filter(entry -> relic.isAbilityEnabled(stack, entry))
                 .toList();
@@ -122,8 +124,8 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         var maxEntries = 5;
 
         if (abilities.size() > maxEntries) {
-            this.addRenderableWidget(new PageWidget(x + 289, y + 151, this, 1));
-            this.addRenderableWidget(new PageWidget(x + 289, y + 186, this, -1));
+            this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 151, this, 1));
+            this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 186, this, -1));
         }
 
         int startIndex = page * maxEntries;
