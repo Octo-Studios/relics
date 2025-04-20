@@ -7,10 +7,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.abilities.SpellCastPacket;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityCache;
@@ -541,7 +541,7 @@ public class HUDRenderHandler {
             boolean isTicking = relic.isAbilityTicking(stack, ability.getId());
             boolean isCasting = Minecraft.getInstance().mouseHandler.isLeftPressed();
 
-            AbilityData entry = relic.getAbilityData(ability.getId());
+            AbilityTemplate entry = relic.getAbilityData(ability.getId());
 
             if (entry == null)
                 return;

@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.misc;
 
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import lombok.*;
 import net.minecraft.world.item.ItemStack;
 

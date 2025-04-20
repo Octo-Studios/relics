@@ -8,33 +8,34 @@ import net.minecraft.world.item.ItemStack;
 import java.util.function.BiFunction;
 
 @Data
-@Builder
-public class StyleData {
+@Builder(toBuilder = true)
+@Deprecated(forRemoval = true)
+public class StyleTemplate {
     @Builder.Default
     private BiFunction<Player, ItemStack, TooltipData> tooltip;
 
     @Builder.Default
     private BiFunction<Player, ItemStack, BeamsData> beams;
 
-    public static class StyleDataBuilder {
+    public static class StyleTemplateBuilder {
         private BiFunction<Player, ItemStack, TooltipData> tooltip = (player, stack) -> TooltipData.builder().build();
         private BiFunction<Player, ItemStack, BeamsData> beams = (player, stack) -> BeamsData.builder().build();
 
-        public StyleDataBuilder tooltip(TooltipData tooltip) {
+        public StyleTemplateBuilder tooltip(TooltipData tooltip) {
             return tooltip((player, stack) -> tooltip);
         }
 
-        public StyleDataBuilder tooltip(BiFunction<Player, ItemStack, TooltipData> tooltip) {
+        public StyleTemplateBuilder tooltip(BiFunction<Player, ItemStack, TooltipData> tooltip) {
             this.tooltip = tooltip;
 
             return this;
         }
 
-        public StyleDataBuilder beams(BeamsData beams) {
+        public StyleTemplateBuilder beams(BeamsData beams) {
             return beams((player, stack) -> beams);
         }
 
-        public StyleDataBuilder beams(BiFunction<Player, ItemStack, BeamsData> beams) {
+        public StyleTemplateBuilder beams(BiFunction<Player, ItemStack, BeamsData> beams) {
             this.beams = beams;
 
             return this;

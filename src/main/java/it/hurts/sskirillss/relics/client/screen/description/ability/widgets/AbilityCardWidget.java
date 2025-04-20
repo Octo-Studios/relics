@@ -16,8 +16,8 @@ import it.hurts.sskirillss.relics.client.screen.description.relic.particles.Spar
 import it.hurts.sskirillss.relics.client.screen.description.research.AbilityResearchScreen;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.lock.PacketAbilityUnlock;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -379,7 +379,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        AbilityData data = relic.getAbilityData(ability);
+        AbilityTemplate data = relic.getAbilityData(ability);
 
         if (data == null)
             return;

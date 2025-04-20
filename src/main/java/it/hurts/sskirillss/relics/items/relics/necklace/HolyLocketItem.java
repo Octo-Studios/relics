@@ -1,25 +1,28 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.DeathEssenceEntity;
 import it.hurts.sskirillss.relics.entities.LifeEssenceEntity;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
 import it.hurts.sskirillss.relics.init.EntityRegistry;
 import it.hurts.sskirillss.relics.init.ItemRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
-import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
-import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchData;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.BeamsData;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
+import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -43,30 +46,30 @@ public class HolyLocketItem extends RelicItem {
     private static final int MAX_TARGETS = 10;
 
     @Override
-    public RelicData constructDefaultRelicData() {
-        return RelicData.builder()
-                .abilities(AbilitiesData.builder()
-                        .ability(AbilityData.builder("faith")
+    public RelicTemplate constructDefaultRelicTemplate() {
+        return RelicTemplate.builder()
+                .abilities(AbilitiesTemplate.builder()
+                        .ability(AbilityTemplate.builder("faith")
                                 .active(CastData.builder()
                                         .type(CastType.INSTANTANEOUS)
                                         .build())
                                 .icon((player, stack, ability) -> ability + "_" + getMode(stack).name().toLowerCase(Locale.ROOT))
-                                .stat(StatData.builder("health")
+                                .stat(StatTemplate.builder("health")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .stat(StatData.builder("damage")
+                                .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.75D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.5D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.5D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .stat(StatData.builder("radius")
+                                .stat(StatTemplate.builder("radius")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.25D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .research(ResearchData.builder()
+                                .research(ResearchTemplate.builder()
                                         .star(0, 13, 5).star(1, 6, 8).star(2, 10, 12)
                                         .star(3, 4, 13).star(4, 18, 13).star(5, 8, 16)
                                         .star(6, 14, 16).star(7, 5, 20).star(8, 17, 20)
@@ -75,34 +78,34 @@ public class HolyLocketItem extends RelicItem {
                                         .link(4, 8).link(7, 9).link(8, 9).link(9, 10).link(9, 11).link(10, 11)
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("penitence")
+                        .ability(AbilityTemplate.builder("penitence")
                                 .requiredLevel(5)
-                                .stat(StatData.builder("amount")
+                                .stat(StatTemplate.builder("amount")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.3D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.3D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .research(ResearchData.builder()
+                                .research(ResearchTemplate.builder()
                                         .star(0, 7, 12).star(1, 15, 12).star(2, 6, 19)
                                         .star(3, 16, 19).star(4, 9, 26).star(5, 13, 26)
                                         .link(0, 1).link(0, 2).link(1, 3).link(2, 4).link(3, 5).link(4, 5)
                                         .build())
                                 .build())
-                        .ability(AbilityData.builder("ascension")
+                        .ability(AbilityTemplate.builder("ascension")
                                 .requiredLevel(10)
                                 .requiredPoints(3)
                                 .maxLevel(5)
-                                .stat(StatData.builder("max_duration")
+                                .stat(StatTemplate.builder("max_duration")
                                         .initialValue(7.5D, 15D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_TOTAL, 0.3195D)
+                                        .upgradeModifier(ScalingModelRegistry.EXPONENTIAL.get(), 0.3195D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatData.builder("duration")
+                                .stat(StatTemplate.builder("duration")
                                         .initialValue(0.5D, 1D)
-                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.2D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .research(ResearchData.builder()
+                                .research(ResearchTemplate.builder()
                                         .star(0, 11, 27).star(1, 3, 19).star(2, 3, 4)
                                         .star(3, 11, 17).star(4, 6, 13).star(5, 11, 13)
                                         .star(6, 16, 13).star(7, 19, 19).star(8, 19, 4)
@@ -110,26 +113,26 @@ public class HolyLocketItem extends RelicItem {
                                         .build())
                                 .build())
                         .build())
-                .leveling(LevelingData.builder()
+                .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .maxLevel(20)
                         .step(100)
-                        .sources(LevelingSourcesData.builder()
-                                .source(LevelingSourceData.abilityBuilder("faith")
+                        .sources(LevelingSourcesTemplate.builder()
+                                .source(LevelingSourceTemplate.abilityBuilder("faith")
                                         .initialValue(1)
                                         .gem(GemShape.SQUARE, GemColor.ORANGE)
                                         .build())
-                                .source(LevelingSourceData.abilityBuilder("penitence")
+                                .source(LevelingSourceTemplate.abilityBuilder("penitence")
                                         .initialValue(1)
                                         .gem(GemShape.SQUARE, GemColor.ORANGE)
                                         .build())
-                                .source(LevelingSourceData.abilityBuilder("ascension")
+                                .source(LevelingSourceTemplate.abilityBuilder("ascension")
                                         .initialValue(1)
                                         .gem(GemShape.SQUARE, GemColor.ORANGE)
                                         .build())
                                 .build())
                         .build())
-                .style(StyleData.builder()
+                .style(StyleTemplate.builder()
                         .tooltip((player, stack) -> getMode(stack) == Mode.HOLINESS
                                 ? TooltipData.builder()
                                 .borderTop(0xFFcb4a0c)
@@ -153,7 +156,7 @@ public class HolyLocketItem extends RelicItem {
                                 .endColor(0x000000FF)
                                 .build())
                         .build())
-                .loot(LootData.builder()
+                .loot(LootTemplate.builder()
                         .entry(LootEntries.DESERT)
                         .build())
                 .build();

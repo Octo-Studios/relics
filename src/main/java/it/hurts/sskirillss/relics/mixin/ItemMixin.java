@@ -1,10 +1,10 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -33,7 +33,7 @@ public class ItemMixin {
         Item item = (Item) (Object) this;
 
         if (item instanceof IRelicItem relic)
-            RelicStorage.RELICS.put(relic, relic.getRelicData());
+            RelicStorage.RELIC_TEMPLATES.put(relic, relic.getRelicTemplate());
     }
 
     @Inject(method = "inventoryTick", at = @At("HEAD"))
@@ -41,7 +41,7 @@ public class ItemMixin {
         if (level.isClientSide() || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        for (Map.Entry<String, AbilityData> entry : relic.getRelicData().getAbilities().getAbilities().entrySet()) {
+        for (Map.Entry<String, AbilityTemplate> entry : relic.getRelicTemplate().getAbilities().getAbilities().entrySet()) {
             String ability = entry.getKey();
 
             if (relic.getAbilityCooldown(stack, ability) > 0)
@@ -75,13 +75,13 @@ public class ItemMixin {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        for (AbilityData abilityData : relic.getAbilitiesData().getAbilities().values()) {
+        for (AbilityTemplate abilityData : relic.getAbilitiesData().getAbilities().values()) {
             String abilityId = abilityData.getId();
 
             if (relic.getAbilityComponent(stack, abilityId) == null)
                 relic.randomizeAbilityStats(stack, abilityId, 0);
             else {
-                for (StatData statData : relic.getAbilityData(abilityId).getStats().values()) {
+                for (StatTemplate statData : relic.getAbilityData(abilityId).getStats().values()) {
                     String statId = statData.getId();
 
                     if (relic.getStatComponent(stack, abilityId, statId) == null)

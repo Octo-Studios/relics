@@ -19,8 +19,8 @@ import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRel
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -101,9 +101,10 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
         if (relic.isSomethingWrongWithLevelingPoints(stack))
             this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
-        this.addRenderableWidget(new PointsPlateWidget(x + 313, y + 77, this));
-        this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 102, this));
-        this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 127, this));
+        this.addRenderableWidget(new RankPlateWidget(x + 313, y + 77, this));
+        this.addRenderableWidget(new PointsPlateWidget(x + 313, y + 102, this));
+        this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 127, this));
+        this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 152, this));
 
         xOff = 0;
 
@@ -159,7 +160,7 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
             return;
 
-        RelicData relicData = relic.getRelicData();
+        RelicTemplate relicData = relic.getRelicTemplate();
 
         if (relicData == null)
             return;

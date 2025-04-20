@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.config.data;
 
 import it.hurts.octostudios.octolib.modules.config.annotations.Prop;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,8 +24,8 @@ public class AbilityConfigData {
 
     private Map<String, StatConfigData> stats = new LinkedHashMap<>();
 
-    public AbilityData toData(IRelicItem relic, String ability) {
-        AbilityData data = relic.constructDefaultRelicData().getAbilities().getAbilities().get(ability);
+    public AbilityTemplate toData(IRelicItem relic, String ability) {
+        AbilityTemplate data = relic.constructDefaultRelicTemplate().getAbilities().getAbilities().get(ability);
 
         data.setRequiredPoints(requiredPoints);
         data.setRequiredLevel(requiredLevel);

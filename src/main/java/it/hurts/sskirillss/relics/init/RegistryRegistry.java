@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.init;
 
+import it.hurts.sskirillss.relics.api.relics.ScalingModel;
 import it.hurts.sskirillss.relics.badges.base.AbstractBadge;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
 import it.hurts.sskirillss.relics.utils.Reference;
@@ -19,8 +20,12 @@ public class RegistryRegistry {
     public static final ResourceKey<Registry<AbstractBadge>> BADGE_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "badges"));
     public static final Registry<AbstractBadge> BADGE_REGISTRY = new RegistryBuilder<>(BADGE_REGISTRY_KEY).create();
 
+    public static final ResourceKey<Registry<ScalingModel>> SCALING_MODEL_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "scaling_models"));
+    public static final Registry<ScalingModel> SCALING_MODEL_REGISTRY = new RegistryBuilder<>(SCALING_MODEL_REGISTRY_KEY).create();
+
     @SubscribeEvent
     public static void registerRegistries(NewRegistryEvent event) {
+        event.register(SCALING_MODEL_REGISTRY);
         event.register(RELIC_CONTAINER_REGISTRY);
         event.register(BADGE_REGISTRY);
     }

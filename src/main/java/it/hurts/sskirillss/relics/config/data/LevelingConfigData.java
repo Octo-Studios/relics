@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.config.data;
 
 import it.hurts.octostudios.octolib.modules.config.annotations.Prop;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,8 +18,8 @@ public class LevelingConfigData {
     @Prop(comment = "Increment in experience required for each subsequent level of the relic")
     private int step;
 
-    public LevelingData toData(IRelicItem relic) {
-        LevelingData data = relic.getLevelingData();
+    public LevelingTemplate toData(IRelicItem relic) {
+        LevelingTemplate data = relic.getLevelingData();
 
         data.setInitialCost(initialCost);
         data.setMaxLevel(maxLevel);

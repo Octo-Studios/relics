@@ -4,7 +4,7 @@ import it.hurts.octostudios.octolib.modules.config.ConfigManager;
 import it.hurts.sskirillss.relics.config.LootConfigData;
 import it.hurts.sskirillss.relics.config.RelicsConfigData;
 import it.hurts.sskirillss.relics.config.data.RelicConfigData;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;

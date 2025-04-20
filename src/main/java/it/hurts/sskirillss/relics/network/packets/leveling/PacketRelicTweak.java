@@ -2,8 +2,8 @@ package it.hurts.sskirillss.relics.network.packets.leveling;
 
 import io.netty.buffer.ByteBuf;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -68,7 +68,7 @@ public class PacketRelicTweak implements CustomPacketPayload {
                 return;
             }
 
-            AbilityData entry = relic.getAbilityData(ability);
+            AbilityTemplate entry = relic.getAbilityData(ability);
 
             if (entry == null)
                 return;

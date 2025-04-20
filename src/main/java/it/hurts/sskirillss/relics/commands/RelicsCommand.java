@@ -6,7 +6,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import it.hurts.sskirillss.relics.commands.arguments.RelicAbilityArgument;
 import it.hurts.sskirillss.relics.commands.arguments.RelicAbilityStatArgument;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -27,7 +27,7 @@ public class RelicsCommand {
                                 return 0;
                             }
 
-                            var relicData = relic.getRelicData();
+                            var relicData = relic.getRelicTemplate();
 
                             relic.setRelicLevel(stack, relicData.getLeveling().getMaxLevel());
 
@@ -57,7 +57,7 @@ public class RelicsCommand {
                                 return 0;
                             }
 
-                            var relicData = relic.getRelicData();
+                            var relicData = relic.getRelicTemplate();
 
                             relic.setRelicLevel(stack, relicData.getLeveling().getMaxLevel());
                             relic.setRelicExperience(stack, 0);
@@ -117,9 +117,9 @@ public class RelicsCommand {
                                             var experience = IntegerArgumentType.getInteger(context, "experience");
 
                                             switch (context.getArgument("action", CommandAction.class)) {
-                                                case SET -> relic.setRelicExperience(stack, experience);
-                                                case ADD -> relic.addRelicExperience(stack, experience);
-                                                case TAKE -> relic.addRelicExperience(stack, -experience);
+                                                case SET -> relic.setRelicExperience(null, stack, experience);
+                                                case ADD -> relic.addRelicExperience(null, stack, experience);
+                                                case TAKE -> relic.addRelicExperience(null, stack, -experience);
                                             }
 
                                             return Command.SINGLE_SUCCESS;
@@ -168,7 +168,7 @@ public class RelicsCommand {
                                                             var points = IntegerArgumentType.getInteger(context, "points");
 
                                                             if (ability.equals("all")) {
-                                                                for (var entry : relic.getRelicData().getAbilities().getAbilities().keySet()) {
+                                                                for (var entry : relic.getRelicTemplate().getAbilities().getAbilities().keySet()) {
                                                                     switch (action) {
                                                                         case SET -> relic.setAbilityLevel(stack, entry, points);
                                                                         case ADD -> relic.addAbilityLevel(stack, entry, points);
@@ -207,7 +207,7 @@ public class RelicsCommand {
                                                                     var value = DoubleArgumentType.getDouble(context, "value");
 
                                                                     if (ability.equals("all")) {
-                                                                        for (var abilityEntry : relic.getRelicData().getAbilities().getAbilities().keySet()) {
+                                                                        for (var abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().keySet()) {
                                                                             if (stat.equals("all")) {
                                                                                 for (var statEntry : relic.getAbilityData(abilityEntry).getStats().keySet()) {
                                                                                     switch (action) {
@@ -266,7 +266,7 @@ public class RelicsCommand {
                                                                     var quality = IntegerArgumentType.getInteger(context, "quality");
 
                                                                     if (ability.equals("all")) {
-                                                                        for (String abilityEntry : relic.getRelicData().getAbilities().getAbilities().keySet()) {
+                                                                        for (String abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().keySet()) {
                                                                             if (stat.equals("all")) {
                                                                                 for (String statEntry : relic.getAbilityData(abilityEntry).getStats().keySet()) {
                                                                                     double value = relic.getStatValueByQuality(abilityEntry, statEntry, quality);
@@ -328,7 +328,7 @@ public class RelicsCommand {
                                                     var stat = RelicAbilityStatArgument.getAbilityStat(context, "stat");
 
                                                     if (ability.equals("all")) {
-                                                        for (var abilityEntry : relic.getRelicData().getAbilities().getAbilities().keySet()) {
+                                                        for (var abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().keySet()) {
                                                             if (stat.equals("all")) {
                                                                 for (var statEntry : relic.getAbilityData(abilityEntry).getStats().keySet())
                                                                     relic.randomizeStat(stack, abilityEntry, statEntry);

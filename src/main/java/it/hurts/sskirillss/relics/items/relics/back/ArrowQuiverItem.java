@@ -8,7 +8,7 @@
 //import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 //import it.hurts.sskirillss.relics.entities.ArrowRainEntity;
 //import it.hurts.sskirillss.relics.init.*;
-//import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+//import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 //import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 //import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 //import it.hurts.sskirillss.relics.items.relics.base.data.RelicData;
@@ -19,7 +19,7 @@
 //import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
 //import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingData;
 //import it.hurts.sskirillss.relics.items.relics.base.data.leveling.StatData;
-//import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.UpgradeOperation;
+//
 //import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootData;
 //import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootCollections;
 //import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleData;
@@ -97,7 +97,7 @@
 //                                .maxLevel(10)
 //                                .stat(StatData.builder("slots")
 //                                        .initialValue(2, 5)
-//                                        .upgradeModifier(UpgradeOperation.ADD, 1)
+//                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1)
 //                                        .formatValue(value -> (int) Math.round(value))
 //                                        .build())
 //                                .build())
@@ -123,17 +123,17 @@
 //                                )
 //                                .stat(StatData.builder("multiplier")
 //                                        .initialValue(0.1, 0.5)
-//                                        .upgradeModifier(UpgradeOperation.MULTIPLY_TOTAL, 0.15)
+//                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_TOTAL.get(), 0.15)
 //                                        .formatValue(value -> (int) (MathUtils.round(value, 2) * 100))
 //                                        .build())
 //                                .stat(StatData.builder("duration")
 //                                        .initialValue(4, 6)
-//                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.1)
+//                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.1)
 //                                        .formatValue(value -> MathUtils.round(value, 1))
 //                                        .build())
 //                                .stat(StatData.builder("cooldown")
 //                                        .initialValue(15, 12)
-//                                        .upgradeModifier(UpgradeOperation.MULTIPLY_TOTAL, -0.1)
+//                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_TOTAL.get(), -0.1)
 //                                        .formatValue(value -> MathUtils.round(value, 1))
 //                                        .build())
 //                                .build())
@@ -143,7 +143,7 @@
 //                                .maxLevel(5)
 //                                .stat(StatData.builder("modifier")
 //                                        .initialValue(1, 1)
-//                                        .upgradeModifier(UpgradeOperation.ADD, 1)
+//                                        .upgradeModifier(UpgradeOperationRegistry.ADDITIVE.get(), 1)
 //                                        .formatValue(value -> (int) ((1 + MathUtils.round(value, 0))) * 100)
 //                                        .build())
 //                                .build())
@@ -165,17 +165,17 @@
 //                                )
 //                                .stat(StatData.builder("radius")
 //                                        .initialValue(3, 5)
-//                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.15)
+//                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.15)
 //                                        .formatValue(value -> MathUtils.round(value, 1))
 //                                        .build())
 //                                .stat(StatData.builder("duration")
 //                                        .initialValue(10, 15)
-//                                        .upgradeModifier(UpgradeOperation.MULTIPLY_BASE, 0.25)
+//                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_BASE.get(), 0.25)
 //                                        .formatValue(value -> MathUtils.round(value, 1))
 //                                        .build())
 //                                .stat(StatData.builder("delay")
 //                                        .initialValue(1, 0.75)
-//                                        .upgradeModifier(UpgradeOperation.MULTIPLY_TOTAL, -0.15)
+//                                        .upgradeModifier(UpgradeOperationRegistry.MULTIPLICATIVE_TOTAL.get(), -0.15)
 //                                        .formatValue(value -> MathUtils.round(value, 2))
 //                                        .build())
 //                                .build())

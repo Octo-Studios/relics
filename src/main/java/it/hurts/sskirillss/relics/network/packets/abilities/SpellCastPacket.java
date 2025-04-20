@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.network.packets.abilities;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityReference;
