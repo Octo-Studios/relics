@@ -60,7 +60,7 @@ public class AbilityPageWidget extends AbstractDescriptionWidget {
 
         poseStack.pushPose();
 
-        GUIRenderer.begin(step > 0 ? DescriptionTextures.PAGE_ARROW_UP : DescriptionTextures.PAGE_ARROW_DOWN, poseStack)
+        GUIRenderer.begin(step > 0 ? DescriptionTextures.PAGE_ARROW_DOWN : DescriptionTextures.PAGE_ARROW_UP, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(getX(), getY())
                 .end();

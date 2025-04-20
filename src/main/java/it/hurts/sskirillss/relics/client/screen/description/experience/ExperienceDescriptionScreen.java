@@ -124,8 +124,8 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         var maxEntries = 5;
 
         if (sources.size() > maxEntries) {
-            this.addRenderableWidget(new ExperienceSourcePageWidget(x + 289, y + 151, this, 1));
-            this.addRenderableWidget(new ExperienceSourcePageWidget(x + 289, y + 186, this, -1));
+            this.addRenderableWidget(new ExperienceSourcePageWidget(x + 289, y + 151, this, -1));
+            this.addRenderableWidget(new ExperienceSourcePageWidget(x + 289, y + 186, this, 1));
         }
 
         int startIndex = page * maxEntries;

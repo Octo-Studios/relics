@@ -124,8 +124,8 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         var maxEntries = 5;
 
         if (abilities.size() > maxEntries) {
-            this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 151, this, 1));
-            this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 186, this, -1));
+            this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 151, this, -1));
+            this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 186, this, 1));
         }
 
         int startIndex = page * maxEntries;
