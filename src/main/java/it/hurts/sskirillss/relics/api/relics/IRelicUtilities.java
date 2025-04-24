@@ -53,6 +53,13 @@ public interface IRelicUtilities {
         return result - 1;
     }
 
+    default double getOrCalculateStatValue(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return 0D;
+
+        return relic.getStatOverrideValue(entity, stack, ability, stat).orElse(getStatValueFromQuality(entity, stack, ability, stat, relic.getStatQuality(entity, stack, ability, stat)));
+    }
+
     default double getRelativeStatValue(LivingEntity entity, ItemStack stack, String ability, String stat, double value, int points) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0D;
@@ -67,7 +74,7 @@ public interface IRelicUtilities {
         return MathUtils.round(Mth.clamp(template.getUpgradeModifier().getKey().evaluate(entity, stack, value, template.getUpgradeModifier().getValue(), points), threshold.getKey(), threshold.getValue()), 5);
     }
 
-    default double getStatValueByQuality(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
+    default double getStatValueFromQuality(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0D;
 
@@ -89,6 +96,6 @@ public interface IRelicUtilities {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0D;
 
-        return getRelativeStatValue(entity, stack, ability, stat, relic.getStatOverrideValue(entity, stack, ability, stat).orElse(getStatValueByQuality(entity, stack, ability, stat, relic.getStatQuality(entity, stack, ability, stat))), level);
+        return getRelativeStatValue(entity, stack, ability, stat, getOrCalculateStatValue(entity, stack, ability, stat), level);
     }
 }

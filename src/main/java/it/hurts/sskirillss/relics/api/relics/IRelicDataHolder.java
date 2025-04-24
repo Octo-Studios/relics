@@ -94,10 +94,6 @@ public interface IRelicDataHolder {
                 .build());
     }
 
-    default int getStatMaxQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
-        return 10;
-    }
-
     default int getStatInitialQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
         return getStatComponent(entity, stack, ability, stat).getInitialQuality();
     }

@@ -37,7 +37,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -330,6 +329,95 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return getStatValueForLevel(entity, stack, ability, stat, getAbilityLevel(entity, stack, ability));
     }
 
+    default int getStatMaxQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        return 10;
+    }
+
+    default int getStatQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        var statData = getStatTemplate(entity, stack, ability, stat);
+
+        if (statData == null)
+            return 0;
+
+        var format = statData.getFormatValue();
+
+        var initial = format.apply(getOrCalculateStatValue(entity, stack, ability, stat)).doubleValue();
+
+        var min = format.apply(statData.getInitialValue().getKey()).doubleValue();
+        var max = format.apply(statData.getInitialValue().getValue()).doubleValue();
+
+        if (min == max)
+            return getStatMaxQuality(entity, stack, ability, stat);
+
+        if (initial == min)
+            return 0;
+
+        if (initial == max)
+            return getStatMaxQuality(entity, stack, ability, stat);
+
+        return Mth.clamp((int) Math.round((initial - min) / ((max - min) / getStatMaxQuality(entity, stack, ability, stat))), 1, getStatMaxQuality(entity, stack, ability, stat) - 1);
+    }
+
+    default int getAbilityMaxQuality(LivingEntity entity, ItemStack stack, String ability) {
+        return 10;
+    }
+
+    default int getAbilityQuality(LivingEntity entity, ItemStack stack, String ability) {
+        var stats = getAbilityTemplate(entity, stack, ability).getStats();
+
+        if (stats.isEmpty())
+            return getAbilityMaxQuality(entity, stack, ability);
+
+        var avg = stats.keySet().stream()
+                .mapToInt(stat -> getStatQuality(entity, stack, ability, stat))
+                .average()
+                .orElse(0);
+
+        var min = 0;
+        var max = getAbilityMaxQuality(entity, stack, ability);
+
+        if (avg == min)
+            return min;
+
+        if (avg == max)
+            return max;
+
+        return (int) Mth.clamp(Math.floor(avg), min + 1, max - 1);
+    }
+
+    default int getRelicMaxQuality(LivingEntity entity, ItemStack stack) {
+        return 10;
+    }
+
+    default int getRelicQuality(LivingEntity entity, ItemStack stack) {
+        var abilities = getAbilitiesTemplate(entity, stack).getAbilities();
+
+        if (abilities.isEmpty())
+            return 0;
+
+        var filtered = abilities.keySet().stream()
+                .filter(abilityTemplate -> canBeUpgraded(stack, abilityTemplate) && isAbilityUnlocked(stack, abilityTemplate))
+                .mapToInt(abilityTemplate -> getAbilityQuality(entity, stack, abilityTemplate))
+                .toArray();
+
+        if (filtered.length == 0)
+            return 0;
+
+        var avg = Arrays.stream(filtered).average().orElse(0);
+
+        var min = 0;
+        var max = getRelicMaxQuality(entity, stack);
+
+        if (avg == min)
+            return min;
+
+        if (avg == max)
+            return max;
+
+        return (int) Mth.clamp(Math.floor(avg), min + 1, max - 1);
+    }
+
+
     default void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
 
     }
@@ -388,91 +476,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
     default StyleTemplate getStyleData(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getStyle();
-    }
-
-    default int getStatQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
-        StatTemplate statData = getStatTemplate(entity, stack, ability, stat);
-
-        if (statData == null)
-            return 0;
-
-        Function<Double, ? extends Number> format = statData.getFormatValue();
-
-        double initial = format.apply(getStatOverrideValue(stack, ability, stat)).doubleValue();
-
-        double min = format.apply(statData.getInitialValue().getKey()).doubleValue();
-        double max = format.apply(statData.getInitialValue().getValue()).doubleValue();
-
-        if (min == max)
-            return getStatMaxQuality(entity, stack);
-
-        if (initial == min)
-            return 0;
-
-        if (initial == max)
-            return getStatMaxQuality(entity, stack);
-
-        return Mth.clamp((int) Math.round((initial - min) / ((max - min) / getStatMaxQuality(entity, stack))), 1, getStatMaxQuality(entity, stack) - 1);
-    }
-
-    default int getAbilityQuality(LivingEntity entity, ItemStack stack, String ability) {
-        Map<String, StatTemplate> stats = getAbilityTemplate(entity, stack, ability).getStats();
-
-        if (stats.isEmpty())
-            return getStatMaxQuality(entity, stack);
-
-        double sum = 0;
-
-        for (String stat : stats.keySet())
-            sum += getStatQuality(entity, stack, ability, stat);
-
-        sum = (int) Math.floor(sum / stats.size());
-
-        int min = 0;
-        int max = getStatMaxQuality(entity, stack);
-
-        if (sum == min)
-            return min;
-
-        if (sum == max)
-            return max;
-
-        return (int) Mth.clamp(sum, min + 1, max - 1);
-    }
-
-    default int getRelicQuality(LivingEntity entity, ItemStack stack) {
-        Map<String, AbilityTemplate> abilities = getAbilitiesTemplate(entity, stack).getAbilities();
-
-        if (abilities.isEmpty())
-            return 0;
-
-        int size = abilities.size();
-        double sum = 0;
-
-        for (Map.Entry<String, AbilityTemplate> entry : abilities.entrySet()) {
-            var ability = entry.getKey();
-
-            if (!canBeUpgraded(stack, ability) || !isAbilityUnlocked(stack, ability)) {
-                --size;
-
-                continue;
-            }
-
-            sum += getAbilityQuality(entity, stack, entry.getKey());
-        }
-
-        sum = (int) Math.floor(sum / size);
-
-        int min = 0;
-        int max = getStatMaxQuality(entity, stack);
-
-        if (sum == min)
-            return min;
-
-        if (sum == max)
-            return max;
-
-        return (int) Mth.clamp(sum, min + 1, max - 1);
     }
 
     default int getMaxLuck(LivingEntity entity, ItemStack stack) {

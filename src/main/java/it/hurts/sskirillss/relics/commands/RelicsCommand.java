@@ -269,7 +269,7 @@ public class RelicsCommand {
                                                                         for (String abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().keySet()) {
                                                                             if (stat.equals("all")) {
                                                                                 for (String statEntry : relic.getAbilityData(abilityEntry).getStats().keySet()) {
-                                                                                    double value = relic.getStatValueByQuality(abilityEntry, statEntry, quality);
+                                                                                    double value = relic.getStatValueFromQuality(abilityEntry, statEntry, quality);
 
                                                                                     switch (action) {
                                                                                         case SET -> relic.setStatOverrideValue(stack, abilityEntry, statEntry, value);
@@ -278,7 +278,7 @@ public class RelicsCommand {
                                                                                     }
                                                                                 }
                                                                             } else {
-                                                                                double value = relic.getStatValueByQuality(abilityEntry, stat, quality);
+                                                                                double value = relic.getStatValueFromQuality(abilityEntry, stat, quality);
 
                                                                                 switch (action) {
                                                                                     case SET -> relic.setStatOverrideValue(stack, abilityEntry, stat, value);
@@ -290,7 +290,7 @@ public class RelicsCommand {
                                                                     } else {
                                                                         if (stat.equals("all")) {
                                                                             for (String statEntry : relic.getAbilityData(ability).getStats().keySet()) {
-                                                                                double value = relic.getStatValueByQuality(ability, statEntry, quality);
+                                                                                double value = relic.getStatValueFromQuality(ability, statEntry, quality);
 
                                                                                 switch (action) {
                                                                                     case SET -> relic.setStatOverrideValue(stack, ability, statEntry, value);
@@ -299,7 +299,7 @@ public class RelicsCommand {
                                                                                 }
                                                                             }
                                                                         } else {
-                                                                            double value = relic.getStatValueByQuality(ability, stat, quality);
+                                                                            double value = relic.getStatValueFromQuality(ability, stat, quality);
 
                                                                             switch (action) {
                                                                                 case SET -> relic.setStatOverrideValue(stack, ability, stat, value);
