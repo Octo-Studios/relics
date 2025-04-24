@@ -1,5 +1,8 @@
 package it.hurts.sskirillss.relics.api.relics;
 
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.utils.MathUtils;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
@@ -48,5 +51,44 @@ public interface IRelicUtilities {
         } while (amount <= experience);
 
         return result - 1;
+    }
+
+    default double getRelativeStatValue(LivingEntity entity, ItemStack stack, String ability, String stat, double value, int points) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return 0D;
+
+        var template = relic.getStatTemplate(entity, stack, ability, stat);
+
+        if (template == null)
+            return 0D;
+
+        var threshold = template.getThresholdValue();
+
+        return MathUtils.round(Mth.clamp(template.getUpgradeModifier().getKey().evaluate(entity, stack, value, template.getUpgradeModifier().getValue(), points), threshold.getKey(), threshold.getValue()), 5);
+    }
+
+    default double getStatValueByQuality(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return 0D;
+
+        StatTemplate template = relic.getStatTemplate(entity, stack, ability, stat);
+
+        if (template == null)
+            return 0;
+
+        double min = template.getInitialValue().getKey();
+        double max = template.getInitialValue().getValue();
+
+        if (min == max)
+            return max;
+
+        return MathUtils.round(min + (((max - min) / relic.getStatMaxQuality(entity, stack, ability, stat)) * quality), 5);
+    }
+
+    default double getStatValueForLevel(LivingEntity entity, ItemStack stack, String ability, String stat, int level) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return 0D;
+
+        return getRelativeStatValue(entity, stack, ability, stat, relic.getStatOverrideValue(entity, stack, ability, stat).orElse(getStatValueByQuality(entity, stack, ability, stat, relic.getStatQuality(entity, stack, ability, stat))), level);
     }
 }

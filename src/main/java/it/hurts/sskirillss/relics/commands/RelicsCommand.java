@@ -40,7 +40,7 @@ public class RelicsCommand {
                                 relic.setAbilityResearched(stack, abilityId, true);
 
                                 for (var statEntry : abilityData.getStats().entrySet())
-                                    relic.setStatInitialValue(stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getValue());
+                                    relic.setStatOverrideValue(stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getValue());
                             }
 
                             return Command.SINGLE_SUCCESS;
@@ -72,7 +72,7 @@ public class RelicsCommand {
                                     relic.setLockUnlocks(stack, abilityId, 0);
 
                                 for (var statEntry : abilityEntry.getValue().getStats().entrySet())
-                                    relic.setStatInitialValue(stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getKey());
+                                    relic.setStatOverrideValue(stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getKey());
                             }
 
                             return Command.SINGLE_SUCCESS;
@@ -211,16 +211,16 @@ public class RelicsCommand {
                                                                             if (stat.equals("all")) {
                                                                                 for (var statEntry : relic.getAbilityData(abilityEntry).getStats().keySet()) {
                                                                                     switch (action) {
-                                                                                        case SET -> relic.setStatInitialValue(stack, abilityEntry, statEntry, value);
-                                                                                        case ADD -> relic.addStatInitialValue(stack, abilityEntry, statEntry, value);
-                                                                                        case TAKE -> relic.addStatInitialValue(stack, abilityEntry, statEntry, -value);
+                                                                                        case SET -> relic.setStatOverrideValue(stack, abilityEntry, statEntry, value);
+                                                                                        case ADD -> relic.addStatOverrideValue(stack, abilityEntry, statEntry, value);
+                                                                                        case TAKE -> relic.addStatOverrideValue(stack, abilityEntry, statEntry, -value);
                                                                                     }
                                                                                 }
                                                                             } else {
                                                                                 switch (action) {
-                                                                                    case SET -> relic.setStatInitialValue(stack, abilityEntry, stat, value);
-                                                                                    case ADD -> relic.addStatInitialValue(stack, abilityEntry, stat, value);
-                                                                                    case TAKE -> relic.addStatInitialValue(stack, abilityEntry, stat, -value);
+                                                                                    case SET -> relic.setStatOverrideValue(stack, abilityEntry, stat, value);
+                                                                                    case ADD -> relic.addStatOverrideValue(stack, abilityEntry, stat, value);
+                                                                                    case TAKE -> relic.addStatOverrideValue(stack, abilityEntry, stat, -value);
                                                                                 }
                                                                             }
                                                                         }
@@ -228,16 +228,16 @@ public class RelicsCommand {
                                                                         if (stat.equals("all")) {
                                                                             for (var statEntry : relic.getAbilityData(ability).getStats().keySet()) {
                                                                                 switch (action) {
-                                                                                    case SET -> relic.setStatInitialValue(stack, ability, statEntry, value);
-                                                                                    case ADD -> relic.addStatInitialValue(stack, ability, statEntry, value);
-                                                                                    case TAKE -> relic.addStatInitialValue(stack, ability, statEntry, -value);
+                                                                                    case SET -> relic.setStatOverrideValue(stack, ability, statEntry, value);
+                                                                                    case ADD -> relic.addStatOverrideValue(stack, ability, statEntry, value);
+                                                                                    case TAKE -> relic.addStatOverrideValue(stack, ability, statEntry, -value);
                                                                                 }
                                                                             }
                                                                         } else {
                                                                             switch (action) {
-                                                                                case SET -> relic.setStatInitialValue(stack, ability, stat, value);
-                                                                                case ADD -> relic.addStatInitialValue(stack, ability, stat, value);
-                                                                                case TAKE -> relic.addStatInitialValue(stack, ability, stat, -value);
+                                                                                case SET -> relic.setStatOverrideValue(stack, ability, stat, value);
+                                                                                case ADD -> relic.addStatOverrideValue(stack, ability, stat, value);
+                                                                                case TAKE -> relic.addStatOverrideValue(stack, ability, stat, -value);
                                                                             }
                                                                         }
                                                                     }
@@ -272,18 +272,18 @@ public class RelicsCommand {
                                                                                     double value = relic.getStatValueByQuality(abilityEntry, statEntry, quality);
 
                                                                                     switch (action) {
-                                                                                        case SET -> relic.setStatInitialValue(stack, abilityEntry, statEntry, value);
-                                                                                        case ADD -> relic.addStatInitialValue(stack, abilityEntry, statEntry, value);
-                                                                                        case TAKE -> relic.addStatInitialValue(stack, abilityEntry, statEntry, -value);
+                                                                                        case SET -> relic.setStatOverrideValue(stack, abilityEntry, statEntry, value);
+                                                                                        case ADD -> relic.addStatOverrideValue(stack, abilityEntry, statEntry, value);
+                                                                                        case TAKE -> relic.addStatOverrideValue(stack, abilityEntry, statEntry, -value);
                                                                                     }
                                                                                 }
                                                                             } else {
                                                                                 double value = relic.getStatValueByQuality(abilityEntry, stat, quality);
 
                                                                                 switch (action) {
-                                                                                    case SET -> relic.setStatInitialValue(stack, abilityEntry, stat, value);
-                                                                                    case ADD -> relic.addStatInitialValue(stack, abilityEntry, stat, value);
-                                                                                    case TAKE -> relic.addStatInitialValue(stack, abilityEntry, stat, -value);
+                                                                                    case SET -> relic.setStatOverrideValue(stack, abilityEntry, stat, value);
+                                                                                    case ADD -> relic.addStatOverrideValue(stack, abilityEntry, stat, value);
+                                                                                    case TAKE -> relic.addStatOverrideValue(stack, abilityEntry, stat, -value);
                                                                                 }
                                                                             }
                                                                         }
@@ -293,18 +293,18 @@ public class RelicsCommand {
                                                                                 double value = relic.getStatValueByQuality(ability, statEntry, quality);
 
                                                                                 switch (action) {
-                                                                                    case SET -> relic.setStatInitialValue(stack, ability, statEntry, value);
-                                                                                    case ADD -> relic.addStatInitialValue(stack, ability, statEntry, value);
-                                                                                    case TAKE -> relic.addStatInitialValue(stack, ability, statEntry, -value);
+                                                                                    case SET -> relic.setStatOverrideValue(stack, ability, statEntry, value);
+                                                                                    case ADD -> relic.addStatOverrideValue(stack, ability, statEntry, value);
+                                                                                    case TAKE -> relic.addStatOverrideValue(stack, ability, statEntry, -value);
                                                                                 }
                                                                             }
                                                                         } else {
                                                                             double value = relic.getStatValueByQuality(ability, stat, quality);
 
                                                                             switch (action) {
-                                                                                case SET -> relic.setStatInitialValue(stack, ability, stat, value);
-                                                                                case ADD -> relic.addStatInitialValue(stack, ability, stat, value);
-                                                                                case TAKE -> relic.addStatInitialValue(stack, ability, stat, -value);
+                                                                                case SET -> relic.setStatOverrideValue(stack, ability, stat, value);
+                                                                                case ADD -> relic.addStatOverrideValue(stack, ability, stat, value);
+                                                                                case TAKE -> relic.addStatOverrideValue(stack, ability, stat, -value);
                                                                             }
                                                                         }
                                                                     }

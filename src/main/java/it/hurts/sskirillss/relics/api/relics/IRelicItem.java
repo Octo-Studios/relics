@@ -4,14 +4,13 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.MultimapBuilder;
 import io.netty.util.internal.UnstableApi;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.api.relics.events.RelicExperienceChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelingPointsChangeEvent;
-import it.hurts.sskirillss.relics.components.AbilityComponent;
-import it.hurts.sskirillss.relics.components.ResearchComponent;
-import it.hurts.sskirillss.relics.components.StatComponent;
 import it.hurts.sskirillss.relics.config.data.RelicConfigData;
 import it.hurts.sskirillss.relics.init.RegistryRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
@@ -327,6 +326,10 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return config;
     }
 
+    default double getStatValue(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        return getStatValueForLevel(entity, stack, ability, stat, getAbilityLevel(entity, stack, ability));
+    }
+
     default void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
 
     }
@@ -387,10 +390,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return getRelicTemplate(entity, stack).getStyle();
     }
 
-    default int getMaxQuality(LivingEntity entity, ItemStack stack) {
-        return 10;
-    }
-
     default int getStatQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
         StatTemplate statData = getStatTemplate(entity, stack, ability, stat);
 
@@ -399,43 +398,28 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
         Function<Double, ? extends Number> format = statData.getFormatValue();
 
-        double initial = format.apply(getStatInitialValue(stack, ability, stat)).doubleValue();
+        double initial = format.apply(getStatOverrideValue(stack, ability, stat)).doubleValue();
 
         double min = format.apply(statData.getInitialValue().getKey()).doubleValue();
         double max = format.apply(statData.getInitialValue().getValue()).doubleValue();
 
         if (min == max)
-            return getMaxQuality(entity, stack);
+            return getStatMaxQuality(entity, stack);
 
         if (initial == min)
             return 0;
 
         if (initial == max)
-            return getMaxQuality(entity, stack);
+            return getStatMaxQuality(entity, stack);
 
-        return Mth.clamp((int) Math.round((initial - min) / ((max - min) / getMaxQuality(entity, stack))), 1, getMaxQuality(entity, stack) - 1);
-    }
-
-    default double getStatValueByQuality(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
-        StatTemplate statData = getStatTemplate(entity, stack, ability, stat);
-
-        if (statData == null)
-            return 0;
-
-        double min = statData.getInitialValue().getKey();
-        double max = statData.getInitialValue().getValue();
-
-        if (min == max)
-            return max;
-
-        return MathUtils.round(min + (((max - min) / getMaxQuality(entity, stack)) * quality), 5);
+        return Mth.clamp((int) Math.round((initial - min) / ((max - min) / getStatMaxQuality(entity, stack))), 1, getStatMaxQuality(entity, stack) - 1);
     }
 
     default int getAbilityQuality(LivingEntity entity, ItemStack stack, String ability) {
         Map<String, StatTemplate> stats = getAbilityTemplate(entity, stack, ability).getStats();
 
         if (stats.isEmpty())
-            return getMaxQuality(entity, stack);
+            return getStatMaxQuality(entity, stack);
 
         double sum = 0;
 
@@ -445,7 +429,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         sum = (int) Math.floor(sum / stats.size());
 
         int min = 0;
-        int max = getMaxQuality(entity, stack);
+        int max = getStatMaxQuality(entity, stack);
 
         if (sum == min)
             return min;
@@ -480,7 +464,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         sum = (int) Math.floor(sum / size);
 
         int min = 0;
-        int max = getMaxQuality(entity, stack);
+        int max = getStatMaxQuality(entity, stack);
 
         if (sum == min)
             return min;
@@ -556,7 +540,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     }
 
     default boolean isRelicMaxQuality(LivingEntity entity, ItemStack stack) {
-        return getRelicQuality(entity, stack) >= getMaxQuality(entity, stack);
+        return getRelicQuality(entity, stack) >= getStatMaxQuality(entity, stack);
     }
 
     default boolean isRelicFlawless(LivingEntity entity, ItemStack stack) {
@@ -568,7 +552,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     }
 
     default boolean isAbilityMaxQuality(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityQuality(entity, stack, ability) >= getMaxQuality(entity, stack);
+        return getAbilityQuality(entity, stack, ability) >= getStatMaxQuality(entity, stack);
     }
 
     default boolean isAbilityFlawless(LivingEntity entity, ItemStack stack, String ability) {
@@ -709,49 +693,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return 50;
     }
 
-    default StatComponent getStatComponent(ItemStack stack, String ability, String stat) {
-        AbilityComponent abilityComponent = getAbilityComponent(stack, ability);
-
-        @Nullable StatComponent statComponent = abilityComponent.stats().get(stat);
-
-        StatTemplate statData = getStatData(ability, stat);
-
-        if (statComponent != null)
-            return statComponent;
-        else if (statData != null) {
-            statComponent = StatComponent.EMPTY.toBuilder()
-                    .initialValue(MathUtils.round(MathUtils.randomBetween(new Random(), statData.getInitialValue().getKey(), statData.getInitialValue().getValue()), 5))
-                    .build();
-
-            setAbilityComponent(stack, ability, abilityComponent.toBuilder()
-                    .stat(stat, statComponent)
-                    .build());
-
-            return statComponent;
-        } else
-            return null;
-    }
-
-    default void setStatComponent(ItemStack stack, String ability, String stat, StatComponent component) {
-        setAbilityComponent(stack, ability, getAbilityComponent(stack, ability).toBuilder()
-                .stat(stat, component)
-                .build());
-    }
-
-    default double getStatInitialValue(ItemStack stack, String ability, String stat) {
-        return getStatComponent(stack, ability, stat).initialValue();
-    }
-
-    default void setStatInitialValue(ItemStack stack, String ability, String stat, double value) {
-        setStatComponent(stack, ability, stat, getStatComponent(stack, ability, stat).toBuilder()
-                .initialValue(value)
-                .build());
-    }
-
-    default void addStatInitialValue(ItemStack stack, String ability, String stat, double value) {
-        setStatInitialValue(stack, ability, stat, getStatInitialValue(stack, ability, stat) + value);
-    }
-
     default int getAbilityLevel(LivingEntity entity, ItemStack stack, String ability) {
         return getAbilityComponent(stack, ability).points();
     }
@@ -774,7 +715,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         double targetQuality;
 
         do {
-            int maxQuality = getMaxQuality();
+            int maxQuality = getStatMaxQuality();
             int maxLuck = getMaxLuck();
 
             // Random value in the [-1, 1] range
@@ -801,7 +742,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         Map<String, Double> generatedQualities = new HashMap<>();
 
         for (String stat : stats.keySet()) {
-            double randomQuality = MathUtils.randomBetween(random, 0, getMaxQuality());
+            double randomQuality = MathUtils.randomBetween(random, 0, getStatMaxQuality());
 
             generatedQualities.put(stat, randomQuality);
 
@@ -814,7 +755,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
             if (currentAverageQuality < targetQuality) {
                 String minStat = generatedQualities.entrySet().stream().min(Map.Entry.comparingByValue()).get().getKey();
 
-                double increment = Math.min((targetQuality - currentAverageQuality) * stats.size(), getMaxQuality() - generatedQualities.get(minStat));
+                double increment = Math.min((targetQuality - currentAverageQuality) * stats.size(), getStatMaxQuality() - generatedQualities.get(minStat));
 
                 generatedQualities.put(minStat, generatedQualities.get(minStat) + increment);
             } else if (currentAverageQuality > targetQuality) {
@@ -844,34 +785,15 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
         double diff = maxValue - minValue;
 
-        double result = minValue + (diff * ((double) quality / getMaxQuality()));
+        double result = minValue + (diff * ((double) quality / getStatMaxQuality()));
 
-        setStatInitialValue(stack, ability, stat, result);
+        setStatOverrideValue(stack, ability, stat, result);
 
         return getStatComponent(stack, ability, stat);
     }
 
     default StatComponent randomizeStat(ItemStack stack, String ability, String stat) {
-        return randomizeStat(stack, ability, stat, new Random().nextInt(getMaxQuality() + 1));
-    }
-
-    default double getRelativeStatValue(String ability, String stat, double value, int points) {
-        var data = getStatData(ability, stat);
-
-        if (data == null)
-            return 0D;
-
-        var threshold = data.getThresholdValue();
-
-        return MathUtils.round(Mth.clamp(data.getUpgradeModifier().getKey().apply(value, data.getUpgradeModifier().getValue(), points), threshold.getKey(), threshold.getValue()), 5);
-    }
-
-    default double getStatValue(ItemStack stack, String ability, String stat, int points) {
-        return getRelativeStatValue(ability, stat, getStatInitialValue(stack, ability, stat), points);
-    }
-
-    default double getStatValue(ItemStack stack, String ability, String stat) {
-        return getStatValue(stack, ability, stat, getAbilityLevel(stack, ability));
+        return randomizeStat(stack, ability, stat, new Random().nextInt(getStatMaxQuality() + 1));
     }
 
     default boolean isEnoughLevel(ItemStack stack, String ability) {

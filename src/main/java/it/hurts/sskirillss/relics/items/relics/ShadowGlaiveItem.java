@@ -115,21 +115,21 @@ public class ShadowGlaiveItem extends RelicItem {
 
             for (var stack : EntityUtils.findEquippedCurios(player, ItemRegistry.SHADOW_GLAIVE.get())) {
                 if (!(stack.getItem() instanceof IRelicItem relic) || !relic.canPlayerUseAbility(player, stack, "mayhem")
-                        || source.getRandom().nextDouble() > relic.getStatValue(stack, "mayhem", "chance"))
+                        || source.getRandom().nextDouble() > relic.getStatValue(player, stack, "mayhem", "chance"))
                     continue;
 
                 var level = target.getCommandSenderWorld();
 
                 var entity = new ShadowGlaiveEntity(EntityRegistry.SHADOW_GLAIVE.get(), level);
 
-                entity.setDamage((float) (damage * relic.getStatValue(stack, "mayhem", "damage")));
-                entity.setMaxBounces((int) relic.getStatValue(stack, "mayhem", "bounces"));
+                entity.setDamage((float) (damage * relic.getStatValue(player, stack, "mayhem", "damage")));
+                entity.setMaxBounces((int) relic.getStatValue(player, stack, "mayhem", "bounces"));
                 entity.getBouncedTargets().add(target.getStringUUID());
                 entity.setPos(target.getEyePosition());
                 entity.setOwner(source);
 
                 if (relic.canPlayerUseAbility(player, stack, "cloning"))
-                    entity.setChance((float) relic.getStatValue(stack, "cloning", "chance"));
+                    entity.setChance((float) relic.getStatValue(player, stack, "cloning", "chance"));
 
                 if (entity.locateNearestTargets().size() > 1) {
                     level.addFreshEntity(entity);

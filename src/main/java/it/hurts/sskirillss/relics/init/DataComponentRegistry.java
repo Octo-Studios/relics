@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.init;
 
 import com.mojang.serialization.Codec;
-import it.hurts.sskirillss.relics.components.DataComponent;
+import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.WorldPosition;
@@ -21,9 +21,9 @@ public class DataComponentRegistry {
 
     // TODO: Rename to RELIC_DATA or just RELIC instead of DATA
     @Deprecated(since = "1.21", forRemoval = true)
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<DataComponent>> DATA = DATA_COMPONENTS.register("data",
-            () -> DataComponentType.<DataComponent>builder()
-                    .persistent(DataComponent.CODEC)
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<RelicComponent>> DATA = DATA_COMPONENTS.register("data",
+            () -> DataComponentType.<RelicComponent>builder()
+                    .persistent(RelicComponent.CODEC)
                     .build()
     );
 
@@ -117,6 +117,6 @@ public class DataComponentRegistry {
 
     @SubscribeEvent
     public static void modifyComponents(ModifyDefaultComponentsEvent event) {
-        event.modifyMatching(item -> item instanceof IRelicItem, builder -> builder.set(DATA.get(), DataComponent.EMPTY));
+        event.modifyMatching(item -> item instanceof IRelicItem, builder -> builder.set(DATA.get(), RelicComponent.EMPTY));
     }
 }

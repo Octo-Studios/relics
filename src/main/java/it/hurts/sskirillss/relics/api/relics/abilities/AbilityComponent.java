@@ -1,10 +1,14 @@
-package it.hurts.sskirillss.relics.components;
+package it.hurts.sskirillss.relics.api.relics.abilities;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
+import it.hurts.sskirillss.relics.api.relics.LockComponent;
+import it.hurts.sskirillss.relics.api.relics.ResearchComponent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Singular;
 
 import java.util.Map;
 
@@ -12,6 +16,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class AbilityComponent {
+    @Singular
     private final Map<String, StatComponent> stats;
     private final ResearchComponent research;
     private final LockComponent lock;

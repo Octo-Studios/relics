@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.components;
+package it.hurts.sskirillss.relics.api.relics.abilities;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -13,6 +13,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class AbilitiesComponent {
+    @Singular
     private final Map<String, AbilityComponent> abilities;
 
     public static final AbilitiesComponent EMPTY = new AbilitiesComponent(Map.of());

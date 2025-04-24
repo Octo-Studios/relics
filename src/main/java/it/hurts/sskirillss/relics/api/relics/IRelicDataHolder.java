@@ -1,22 +1,27 @@
 package it.hurts.sskirillss.relics.api.relics;
 
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesComponent;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityExtenderComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.components.*;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
 import it.hurts.sskirillss.relics.init.DataComponentRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 @ApiStatus.Internal
 public interface IRelicDataHolder {
-    default DataComponent getRelicData(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.DATA, DataComponent.EMPTY);
+    default RelicComponent getRelicData(ItemStack stack) {
+        return stack.getOrDefault(DataComponentRegistry.DATA, RelicComponent.EMPTY);
     }
 
-    default void setRelicData(ItemStack stack, DataComponent data) {
+    default void setRelicData(ItemStack stack, RelicComponent data) {
         stack.set(DataComponentRegistry.DATA, data);
     }
 
@@ -36,29 +41,19 @@ public interface IRelicDataHolder {
         setRelicData(stack, getRelicData(stack).toBuilder().abilities(data).build());
     }
 
-    default AbilityComponent getAbilityComponent(ItemStack stack, String ability) {
-        AbilitiesComponent abilitiesComponent = getAbilitiesComponent(stack);
+    @Nullable
+    default AbilityComponent getAbilityComponent(LivingEntity entity, ItemStack stack, String ability) {
+        if (!(stack.getItem() instanceof IRelicTemplateHolder templateHolder))
+            return null;
 
-        @Nullable AbilityComponent abilityComponent = abilitiesComponent.abilities().get(ability);
-
-        AbilityTemplate abilityData = getAbilityData(ability);
+        var abilitiesComponent = getAbilitiesComponent(stack);
+        var abilityComponent = abilitiesComponent.getAbilities().get(ability);
+        var abilityTemplate = templateHolder.getAbilityTemplate(entity, stack, ability);
 
         if (abilityComponent != null)
             return abilityComponent;
-        else if (abilityData != null) {
-            AbilityComponent.AbilityComponentBuilder builder = AbilityComponent.EMPTY.toBuilder();
-
-            if (abilityData.getCastData().getType() == CastType.TOGGLEABLE)
-                builder.extender(AbilityExtenderComponent.EMPTY.toBuilder()
-                        .ticking(true)
-                        .build());
-
-            if (isEnoughLevel(stack, ability))
-                builder.lock(LockComponent.EMPTY.toBuilder()
-                        .unlocks(getMaxLockUnlocks())
-                        .build());
-
-            abilityComponent = builder.build();
+        else if (abilityTemplate != null) {
+            abilityComponent = AbilityComponent.EMPTY;
 
             setAbilitiesComponent(stack, abilitiesComponent.toBuilder()
                     .ability(ability, abilityComponent)
@@ -71,6 +66,64 @@ public interface IRelicDataHolder {
 
     default void setAbilityComponent(ItemStack stack, String ability, AbilityComponent component) {
         setAbilitiesComponent(stack, getAbilitiesComponent(stack).toBuilder().ability(ability, component).build());
+    }
+
+    @Nullable
+    default StatComponent getStatComponent(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        var abilityComponent = getAbilityComponent(entity, stack, ability);
+        var statComponent = getStatComponent(entity, stack, ability, stat);
+        var statData = getStatTemplate(entity, stack, ability, stat);
+
+        if (statComponent != null)
+            return statComponent;
+        else if (statData != null) {
+            statComponent = StatComponent.EMPTY;
+
+            setAbilityComponent(stack, ability, abilityComponent.toBuilder()
+                    .stat(stat, statComponent)
+                    .build());
+
+            return statComponent;
+        } else
+            return null;
+    }
+
+    default void setStatComponent(LivingEntity entity, ItemStack stack, String ability, String stat, StatComponent component) {
+        setAbilityComponent(stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
+                .stat(stat, component)
+                .build());
+    }
+
+    default int getStatMaxQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        return 10;
+    }
+
+    default int getStatInitialQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        return getStatComponent(entity, stack, ability, stat).getInitialQuality();
+    }
+
+    default void setStatInitialQuality(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
+        setStatComponent(entity, stack, ability, stat, getStatComponent(entity, stack, ability, stat).toBuilder()
+                .initialQuality(Math.clamp(quality, 0, getStatMaxQuality(entity, stack, ability, stat)))
+                .build());
+    }
+
+    default void addStatInitialQuality(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
+        setStatOverrideValue(entity, stack, ability, stat, getStatInitialQuality(entity, stack, ability, stat) + quality);
+    }
+
+    default Optional<Double> getStatOverrideValue(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        return getStatComponent(entity, stack, ability, stat).getOverrideValue();
+    }
+
+    default void setStatOverrideValue(LivingEntity entity, ItemStack stack, String ability, String stat, double value) {
+        setStatComponent(entity, stack, ability, stat, getStatComponent(entity, stack, ability, stat).toBuilder()
+                .overrideValue(Optional.of(value))
+                .build());
+    }
+
+    default void addStatOverrideValue(LivingEntity entity, ItemStack stack, String ability, String stat, double value) {
+        setStatOverrideValue(entity, stack, ability, stat, getStatOverrideValue(entity, stack, ability, stat).orElse(0D) + value);
     }
 
     default AbilityExtenderComponent getAbilityExtenderComponent(ItemStack stack, String ability) {

@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.components;
+package it.hurts.sskirillss.relics.api.relics.abilities;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
