@@ -104,7 +104,7 @@
 //                        .ability(AbilityData.builder("leap")
 //                                .requiredLevel(5)
 //                                .maxLevel(10)
-//                                .active(CastData.builder()
+//                                .castData(CastData.builder()
 //                                        .type(CastType.INSTANTANEOUS)
 //                                        .castPredicate("target", (player, stack) -> {
 //                                            Level level = player.level();
@@ -150,7 +150,7 @@
 //                        .ability(AbilityData.builder("rain")
 //                                .requiredLevel(15)
 //                                .maxLevel(10)
-//                                .active(CastData.builder()
+//                                .castData(CastData.builder()
 //                                        .type(CastType.INSTANTANEOUS)
 //                                        .castPredicate("arrow", (player, stack) -> {
 //                                                    int count = 0;

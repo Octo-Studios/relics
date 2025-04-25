@@ -59,10 +59,10 @@ public class EnderHandItem extends RelicItem implements IRenderableCurio {
                                 .build())
                         .ability(AbilityTemplate.builder("swap")
                                 .maxLevel(10)
-                                .active(CastData.builder()
+                                .castData(CastData.builder()
                                         .type(CastType.INSTANTANEOUS)
                                         .predicate("target", PredicateType.CAST, (player, stack) -> {
-                                            EntityHitResult result = EntityUtils.rayTraceEntity(player, (entity) -> !entity.isSpectator() && entity.isPickable(), getStatValue(entity, stack, "swap", "distance"));
+                                            EntityHitResult result = EntityUtils.rayTraceEntity(player, (entity) -> !entity.isSpectator() && entity.isPickable(), getStatValue(player, stack, "swap", "distance"));
 
                                             return result != null && result.getEntity() instanceof LivingEntity;
                                         })
@@ -74,7 +74,11 @@ public class EnderHandItem extends RelicItem implements IRenderableCurio {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 100))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(100)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.THE_END, LootEntries.END_LIKE)
                         .build())
@@ -89,7 +93,7 @@ public class EnderHandItem extends RelicItem implements IRenderableCurio {
 
             Level level = player.level();
 
-            EntityHitResult result = EntityUtils.rayTraceEntity(player, (entity) -> !entity.isSpectator() && entity.isPickable(), getStatValue(entity, stack, "swap", "distance"));
+            EntityHitResult result = EntityUtils.rayTraceEntity(player, (entity) -> !entity.isSpectator() && entity.isPickable(), getStatValue(player, stack, "swap", "distance"));
 
             if (result == null || !(result.getEntity() instanceof LivingEntity entity))
                 return;

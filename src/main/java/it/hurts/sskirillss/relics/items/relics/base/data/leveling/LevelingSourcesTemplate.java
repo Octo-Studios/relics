@@ -14,7 +14,7 @@ public class LevelingSourcesTemplate {
     @Builder.Default
     private Map<String, LevelingSourceTemplate> sources;
 
-    public static class LevelingSourcesDataBuilder {
+    public static class LevelingSourcesTemplateBuilder {
         private Map<String, LevelingSourceTemplate> sources = new LinkedHashMap<>();
 
         // TODO: Replace static init with registry entry
@@ -27,7 +27,7 @@ public class LevelingSourcesTemplate {
             sources.put(entry.getId(), entry);
         }
 
-        public LevelingSourcesDataBuilder source(LevelingSourceTemplate source) {
+        public LevelingSourcesTemplateBuilder source(LevelingSourceTemplate source) {
             sources.put(source.getId(), source);
 
             return this;

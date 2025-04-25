@@ -34,7 +34,7 @@ public class TooltipBorderHandler {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        TooltipData tooltip = relic.getStyleData().getTooltip().apply(player, stack);
+        TooltipData tooltip = relic.getStyleTemplate(player, stack).getTooltip().apply(player, stack);
 
         if (!tooltip.isTextured())
             return;
@@ -97,7 +97,7 @@ public class TooltipBorderHandler {
 
         int xOff = 0;
 
-        for (int i = 1; i < relic.getRelicQuality(stack) + 1; i++) {
+        for (int i = 1; i < relic.getRelicQuality(player, stack) + 1; i++) {
             boolean isAliquot = i % 2 == 1;
 
             float color = (float) (0.85F + Math.sin(player.tickCount * Math.ceil(i / 2F) * 0.075F) * 0.2F);
@@ -125,7 +125,7 @@ public class TooltipBorderHandler {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        TooltipData tooltip = relic.getStyleData().getTooltip().apply(Minecraft.getInstance().player, stack);
+        TooltipData tooltip = relic.getStyleTemplate(Minecraft.getInstance().player, stack).getTooltip().apply(Minecraft.getInstance().player, stack);
 
         if (tooltip.getBorderTop() != -1)
             event.setBorderStart(tooltip.getBorderTop());

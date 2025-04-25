@@ -50,7 +50,11 @@ public class ChorusInhibitorItem extends RelicItem {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 100))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(100)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.THE_END, LootEntries.END_LIKE)
                         .build())
@@ -82,7 +86,7 @@ public class ChorusInhibitorItem extends RelicItem {
         Vec3 view = player.getViewVector(0);
         Vec3 eyeVec = player.getEyePosition(0);
 
-        double distance = getStatValue(entity, stack, "blink", "distance");
+        double distance = getStatValue(player, stack, "blink", "distance");
 
         BlockHitResult ray = world.clip(new ClipContext(eyeVec, eyeVec.add(view.x * distance, view.y * distance,
                 view.z * distance), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
@@ -129,7 +133,7 @@ public class ChorusInhibitorItem extends RelicItem {
 
             player.teleportTo(pos.getX() + 0.5D, pos.getY(), pos.getZ() + 0.5D);
             player.level().playSound(null, pos, SoundEvents.CHORUS_FRUIT_TELEPORT, SoundSource.PLAYERS, 1F, 1F);
-            player.getCooldowns().addCooldown(Items.CHORUS_FRUIT, Math.max((int) Math.round(relic.getStatValue(entity, stack, "blink", "cooldown") * 20D), 0));
+            player.getCooldowns().addCooldown(Items.CHORUS_FRUIT, Math.max((int) Math.round(relic.getStatValue(player, stack, "blink", "cooldown") * 20D), 0));
         }
     }
 }

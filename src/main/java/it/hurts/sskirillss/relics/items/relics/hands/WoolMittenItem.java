@@ -59,7 +59,11 @@ public class WoolMittenItem extends RelicItem {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 100))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(100)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.FROST, LootEntries.TAIGA, LootEntries.MOUNTAIN)
                         .build())
@@ -89,7 +93,7 @@ public class WoolMittenItem extends RelicItem {
 
             Inventory inventory = player.getInventory();
 
-            int size = (int) Math.round(relic.getStatValue(relicStack, "mold", "size"));
+            int size = (int) Math.round(relic.getStatValue(player, relicStack, "mold", "size"));
 
             Optional<Integer> slot = EntityUtils.getSlotsWithItem(player, ItemRegistry.SOLID_SNOWBALL.get()).stream()
                     .filter(id -> inventory.getItem(id).getOrDefault(CHARGE, 0) < size)

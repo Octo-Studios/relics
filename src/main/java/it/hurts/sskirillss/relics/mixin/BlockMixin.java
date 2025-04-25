@@ -28,7 +28,7 @@ public class BlockMixin {
 
         var stack = EntityUtils.findEquippedCurio(player, ItemRegistry.SPRINGY_BOOT.get());
 
-        if (!(stack.getItem() instanceof SpringyBootItem relic) || !relic.isAbilityTicking(stack, "bounce"))
+        if (!(stack.getItem() instanceof SpringyBootItem relic) || !relic.isAbilityTicking(player, stack, "bounce"))
             return;
 
         var motion = player.getKnownMovement();
@@ -49,7 +49,7 @@ public class BlockMixin {
 
         var stack = EntityUtils.findEquippedCurio(player, ItemRegistry.SPRINGY_BOOT.get());
 
-        if (!(stack.getItem() instanceof SpringyBootItem relic) || !relic.isAbilityTicking(stack, "bounce"))
+        if (!(stack.getItem() instanceof SpringyBootItem relic) || !relic.isAbilityTicking(player, stack, "bounce"))
             return;
 
         var motion = player.getKnownMovement();
@@ -65,7 +65,7 @@ public class BlockMixin {
 
         speed = Math.abs(speed);
 
-        var power = relic.getStatValue(entity, stack, "bounce", "power");
+        var power = relic.getStatValue(player, stack, "bounce", "power");
 
         player.setDeltaMovement(motion.multiply(1D, -power, 1D));
 

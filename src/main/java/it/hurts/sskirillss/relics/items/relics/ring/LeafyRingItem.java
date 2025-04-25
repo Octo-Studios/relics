@@ -41,7 +41,11 @@ public class LeafyRingItem extends RelicItem {
                                 .textured(true)
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 200))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(200)
+                        .build())
                 .build();
     }
 

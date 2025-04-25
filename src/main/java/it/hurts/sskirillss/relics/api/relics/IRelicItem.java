@@ -417,7 +417,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return (int) Mth.clamp(Math.floor(avg), min + 1, max - 1);
     }
 
-
+    // TODO: Switch places of ItemStack and Player
     default void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
 
     }
@@ -429,14 +429,14 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     // TODO: Probably remove?
     @Nullable
     @ApiStatus.Internal
-    default RelicAttributeModifier getRelicAttributeModifiers(ItemStack stack) {
+    default RelicAttributeModifier getRelicAttributeModifiers(LivingEntity entity, ItemStack stack) {
         return RelicAttributeModifier.builder().build();
     }
 
     // TODO: Probably remove?
     @Nullable
     @ApiStatus.Internal
-    default RelicSlotModifier getSlotModifiers(ItemStack stack) {
+    default RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
         return RelicSlotModifier.builder().build();
     }
 
@@ -470,11 +470,11 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return 1;
     }
 
-    default LootTemplate getLootData(LivingEntity entity, ItemStack stack) {
+    default LootTemplate getLootTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getLoot();
     }
 
-    default StyleTemplate getStyleData(LivingEntity entity, ItemStack stack) {
+    default StyleTemplate getStyleTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getStyle();
     }
 

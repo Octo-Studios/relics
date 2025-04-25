@@ -20,6 +20,7 @@ import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.TamableAnimal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -52,7 +53,11 @@ public class HunterBeltItem extends RelicItem implements IRenderableCurio {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 100))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(100)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.OVERWORLD)
                         .build())
@@ -60,7 +65,7 @@ public class HunterBeltItem extends RelicItem implements IRenderableCurio {
     }
 
     @Override
-    public RelicSlotModifier getSlotModifiers(ItemStack stack) {
+    public RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
         return RelicSlotModifier.builder()
                 .modifier("charm", (int) Math.round(getStatValue(entity, stack, "slots", "charm")))
                 .build();
@@ -100,7 +105,7 @@ public class HunterBeltItem extends RelicItem implements IRenderableCurio {
 
             relic.spreadRelicExperience(player, stack, 1);
 
-            event.setAmount((float) (event.getAmount() * relic.getStatValue(entity, stack, "training", "damage")));
+            event.setAmount((float) (event.getAmount() * relic.getStatValue(player, stack, "training", "damage")));
         }
     }
 }

@@ -57,7 +57,7 @@ public class PacketAbilityUnlock implements CustomPacketPayload {
                 return;
             }
 
-            relic.setLockUnlocks(stack, ability, unlocks);
+            relic.setLockUnlocks(player, stack, ability, unlocks);
 
             try {
                 player.containerMenu.getSlot(slot).set(stack);

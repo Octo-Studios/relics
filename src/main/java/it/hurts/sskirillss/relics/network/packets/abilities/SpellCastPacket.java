@@ -48,8 +48,8 @@ public class SpellCastPacket implements CustomPacketPayload {
                 return;
 
             if (!relic.canPlayerUseAbility(player, stack, reference.getId())) {
-                if (relic.isAbilityTicking(stack, reference.getId())) {
-                    relic.setAbilityTicking(stack, reference.getId(), false);
+                if (relic.isAbilityTicking(player, stack, reference.getId())) {
+                    relic.setAbilityTicking(player, stack, reference.getId(), false);
 
                     relic.castActiveAbility(stack, player, reference.getId(), type, CastStage.END);
                 }
@@ -60,8 +60,8 @@ public class SpellCastPacket implements CustomPacketPayload {
             switch (type) {
                 case CYCLICAL, TOGGLEABLE -> {
                     switch (stage) {
-                        case START -> relic.setAbilityTicking(stack, reference.getId(), true);
-                        case END -> relic.setAbilityTicking(stack, reference.getId(), false);
+                        case START -> relic.setAbilityTicking(player, stack, reference.getId(), true);
+                        case END -> relic.setAbilityTicking(player, stack, reference.getId(), false);
                     }
                 }
             }

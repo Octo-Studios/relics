@@ -33,12 +33,12 @@ public class RelicAbilityArgument implements ArgumentType<String> {
     @Override
     @SneakyThrows
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        LocalPlayer player = Minecraft.getInstance().player;
+        var player = Minecraft.getInstance().player;
 
         if (player == null || !(player.getMainHandItem().getItem() instanceof IRelicItem relic))
             return Suggestions.empty();
 
-        List<String> result = new ArrayList<>(relic.getRelicTemplate().getAbilities().getAbilities().keySet());
+        List<String> result = new ArrayList<>(relic.getRelicTemplate(player, player.getMainHandItem()).getAbilities().getAbilities().keySet());
 
         result.add("all");
 

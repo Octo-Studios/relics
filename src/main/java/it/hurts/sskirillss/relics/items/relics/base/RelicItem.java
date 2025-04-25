@@ -43,8 +43,8 @@ public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicIt
     public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(SlotContext slotContext, ResourceLocation id, ItemStack stack) {
         Multimap<Holder<Attribute>, AttributeModifier> modifiers = LinkedHashMultimap.create();
 
-        RelicAttributeModifier attributes = getRelicAttributeModifiers(stack);
-        RelicSlotModifier slots = getSlotModifiers(stack);
+        RelicAttributeModifier attributes = getRelicAttributeModifiers(slotContext.entity(), stack);
+        RelicSlotModifier slots = getSlotModifiers(slotContext.entity(), stack);
 
         if (attributes != null)
             attributes.getAttributes().forEach(attribute ->

@@ -58,7 +58,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("bridge")
-                                .active(CastData.builder()
+                                .castData(CastData.builder()
                                         .type(CastType.TOGGLEABLE)
                                         .build())
                                 .stat(StatTemplate.builder("duration")
@@ -66,7 +66,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .research(ResearchTemplate.builder()
+                                .researchTemplate(ResearchTemplate.builder()
                                         .star(0, 11, 8).star(1, 7, 13).star(2, 15, 14)
                                         .star(3, 11, 21).star(4, 3, 29).star(5, 19, 29)
                                         .link(0, 1).link(0, 2).link(0, 3).link(3, 4).link(3, 5).link(4, 5)
@@ -133,16 +133,16 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
             if (onBridge) {
                 if (player.getKnownMovement().multiply(1F, 0F, 1F).length() > 0) {
                     if (time > 0)
-                        addTime(stack, -1);
+                        addTime(player, stack, -1);
                 } else {
-                    if (time < getMaxTime(stack))
-                        addTime(stack, 1);
+                    if (time < getMaxTime(player, stack))
+                        addTime(player, stack, 1);
                     else setToggled(stack, false);
                 }
             } else if (time > 0)
-                addTime(stack, -1);
+                addTime(player, stack, -1);
 
-            if (!player.isShiftKeyDown() && isAbilityTicking(stack, "bridge")) {
+            if (!player.isShiftKeyDown() && isAbilityTicking(player, stack, "bridge")) {
                 var horizontalMotion = player.getKnownMovement().multiply(1F, 0F, 1F);
 
                 var motionSpeed = (float) horizontalMotion.length();
@@ -181,7 +181,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
         }
     }
 
-    public int getMaxTime(ItemStack stack) {
+    public int getMaxTime(LivingEntity entity, ItemStack stack) {
         return (int) Math.round(getStatValue(entity, stack, "bridge", "duration") * 20D);
     }
 
@@ -189,12 +189,12 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
         return stack.getOrDefault(TIME, 0);
     }
 
-    public void setTime(ItemStack stack, int time) {
-        stack.set(TIME, Mth.clamp(time, 0, getMaxTime(stack)));
+    public void setTime(LivingEntity entity, ItemStack stack, int time) {
+        stack.set(TIME, Mth.clamp(time, 0, getMaxTime(entity, stack)));
     }
 
-    public void addTime(ItemStack stack, int time) {
-        setTime(stack, getTime(stack) + time);
+    public void addTime(LivingEntity entity, ItemStack stack, int time) {
+        setTime(entity, stack, getTime(stack) + time);
     }
 
     public boolean isToggled(ItemStack stack) {

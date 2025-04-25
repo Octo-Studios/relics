@@ -10,6 +10,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -33,19 +34,19 @@ public class ItemMixin {
         Item item = (Item) (Object) this;
 
         if (item instanceof IRelicItem relic)
-            RelicStorage.RELIC_TEMPLATES.put(relic, relic.getRelicTemplate());
+            RelicStorage.RELIC_TEMPLATES.put(relic, relic.getDefaultRelicTemplate()); // TODO: Use dynamic template?
     }
 
     @Inject(method = "inventoryTick", at = @At("HEAD"))
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean isSelected, CallbackInfo ci) {
-        if (level.isClientSide() || !(stack.getItem() instanceof IRelicItem relic))
+        if (level.isClientSide() || !(entity instanceof LivingEntity livingEntity) || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        for (Map.Entry<String, AbilityTemplate> entry : relic.getRelicTemplate().getAbilities().getAbilities().entrySet()) {
+        for (Map.Entry<String, AbilityTemplate> entry : relic.getAbilitiesTemplate(livingEntity, stack).getAbilities().entrySet()) {
             String ability = entry.getKey();
 
-            if (relic.getAbilityCooldown(stack, ability) > 0)
-                relic.addAbilityCooldown(stack, ability, -1);
+            if (relic.getAbilityCooldown(livingEntity, stack, ability) > 0)
+                relic.addAbilityCooldown(livingEntity, stack, ability, -1);
         }
     }
 
@@ -70,22 +71,23 @@ public class ItemMixin {
         tooltip.add(Component.literal(" "));
     }
 
+    // TODO: I think there should be less nulls :/
     @Inject(method = "verifyComponentsAfterLoad", at = @At("HEAD"))
     public void onVerifyComponentsAfterLoad(ItemStack stack, CallbackInfo ci) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        for (AbilityTemplate abilityData : relic.getAbilitiesTemplate().getAbilities().values()) {
+        for (AbilityTemplate abilityData : relic.getDefaultAbilitiesTemplate().getAbilities().values()) {
             String abilityId = abilityData.getId();
 
-            if (relic.getAbilityComponent(stack, abilityId) == null)
-                relic.randomizeAbilityStats(stack, abilityId, 0);
+            if (relic.getAbilityComponent(null, stack, abilityId) == null)
+                relic.randomizeAbilityStats(null, stack, abilityId, 0);
             else {
-                for (StatTemplate statData : relic.getAbilityTemplate(abilityId).getStats().values()) {
+                for (StatTemplate statData : relic.getDefaultAbilityTemplate(abilityId).getStats().values()) {
                     String statId = statData.getId();
 
-                    if (relic.getStatComponent(stack, abilityId, statId) == null)
-                        relic.randomizeStat(stack, abilityId, statId);
+                    if (relic.getStatComponent(null, stack, abilityId, statId) == null)
+                        relic.randomizeStat(null, stack, abilityId, statId);
                 }
             }
         }

@@ -80,7 +80,7 @@ public class InfiniteHamItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .research(ResearchTemplate.builder()
+                                .researchTemplate(ResearchTemplate.builder()
                                         .star(0, 8, 7).star(1, 19, 7).star(2, 5, 15)
                                         .star(3, 10, 16).star(4, 17, 20).star(5, 7, 24)
                                         .link(1, 3).link(3, 0).link(3, 2).link(3, 4).link(3, 5)
@@ -93,7 +93,7 @@ public class InfiniteHamItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .research(ResearchTemplate.builder()
+                                .researchTemplate(ResearchTemplate.builder()
                                         .star(0, 18, 5).star(1, 8, 7).star(2, 4, 16)
                                         .star(3, 17, 16).star(4, 10, 21).star(5, 17, 23)
                                         .star(6, 5, 25).star(7, 10, 29)
@@ -112,7 +112,7 @@ public class InfiniteHamItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 2))
                                         .build())
-                                .research(ResearchTemplate.builder()
+                                .researchTemplate(ResearchTemplate.builder()
                                         .star(0, 10, 5).star(1, 18, 7).star(2, 3, 9)
                                         .star(3, 17, 14).star(4, 10, 17).star(5, 3, 19)
                                         .star(6, 9, 24).star(7, 18, 24)
@@ -165,7 +165,7 @@ public class InfiniteHamItem extends RelicItem {
     @Override
     public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entityIn, int itemSlot, boolean isSelected) {
         if (level.isClientSide() || !(entityIn instanceof Player player) || !canPlayerUseAbility(player, stack, "regeneration")
-                || entityIn.tickCount % (int) Math.max(1, getStatValue(entity, stack, "regeneration", "cooldown") * 20) != 0 || getPieces(stack) >= getMaxPieces())
+                || entityIn.tickCount % (int) Math.max(1, getStatValue(player, stack, "regeneration", "cooldown") * 20) != 0 || getPieces(stack) >= getMaxPieces())
             return;
 
         addPieces(stack, 1);
@@ -201,7 +201,7 @@ public class InfiniteHamItem extends RelicItem {
         if (eaten > 0) {
             addPieces(stack, -eaten);
 
-            if (isLevelingSourceUnlocked(stack, "regeneration"))
+            if (isLevelingSourceUnlocked(player, stack, "regeneration"))
                 spreadRelicExperience(player, stack, eaten);
         }
 
@@ -343,11 +343,11 @@ public class InfiniteHamItem extends RelicItem {
             if (charge <= 0)
                 return;
 
-            if (relic.isLevelingSourceUnlocked(stack, "meat_bat"))
+            if (relic.isLevelingSourceUnlocked(player, stack, "meat_bat"))
                 relic.spreadRelicExperience(player, stack, charge);
 
-            event.setAmount((float) (event.getAmount() + (relic.getStatValue(entity, stack, "meat_bat", "damage") * charge)));
-            event.getEntity().addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) Math.round(relic.getStatValue(entity, stack, "meat_bat", "stun") * charge * 20), 0));
+            event.setAmount((float) (event.getAmount() + (relic.getStatValue(player, stack, "meat_bat", "damage") * charge)));
+            event.getEntity().addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) Math.round(relic.getStatValue(player, stack, "meat_bat", "stun") * charge * 20), 0));
 
             relic.setPieces(stack, 0);
         }
@@ -374,7 +374,7 @@ public class InfiniteHamItem extends RelicItem {
             else {
                 slotStack.set(DataComponents.POTION_CONTENTS, new PotionContents(Optional.empty(), Optional.empty(), effects));
 
-                if (relic.isLevelingSourceUnlocked(slotStack, "marinade"))
+                if (relic.isLevelingSourceUnlocked(player, slotStack, "marinade"))
                     relic.spreadRelicExperience(player, slotStack, effects.size());
             }
 

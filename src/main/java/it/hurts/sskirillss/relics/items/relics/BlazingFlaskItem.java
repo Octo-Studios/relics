@@ -18,6 +18,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -55,7 +56,11 @@ public class BlazingFlaskItem extends RelicItem {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 100))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(100)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.THE_NETHER, LootEntries.NETHER_LIKE)
                         .build())
@@ -69,7 +74,7 @@ public class BlazingFlaskItem extends RelicItem {
 
         Level world = player.getCommandSenderWorld();
 
-        int fire = getFireAround(stack, world);
+        int fire = getFireAround(player, stack, world);
 
         if (fire <= 0) {
             stack.set(WORLD_POSITION, null);
@@ -89,14 +94,14 @@ public class BlazingFlaskItem extends RelicItem {
                     if (player.tickCount % 100 == 0)
                         spreadRelicExperience(player, stack, 1);
 
-                    double speed = getStatValue(entity, stack, "bonfire", "speed");
+                    double speed = getStatValue(player, stack, "bonfire", "speed");
 
                     if (world.isClientSide()) {
                         if (!player.onGround() && (player.zza != 0 || player.xxa != 0))
                             player.move(MoverType.SELF, player.getDeltaMovement().multiply(speed, 0, speed));
 
                         if (player instanceof LocalPlayer localPlayer && localPlayer.input.jumping
-                                && (WorldUtils.getGroundHeight(player, player.position(), 64) + getStatValue(entity, stack, "bonfire", "height")) - player.getY() > 0) {
+                                && (WorldUtils.getGroundHeight(player, player.position(), 64) + getStatValue(player, stack, "bonfire", "height")) - player.getY() > 0) {
                             Vec3 motion = player.getDeltaMovement();
 
                             if (motion.y() < 0)
@@ -108,7 +113,7 @@ public class BlazingFlaskItem extends RelicItem {
                 }
             }
 
-            double size = stack.getOrDefault(COUNT, 0) * getStatValue(entity, stack, "bonfire", "step");
+            double size = stack.getOrDefault(COUNT, 0) * getStatValue(player, stack, "bonfire", "step");
             double step = 0.1D;
             int time = 0;
 
@@ -150,12 +155,12 @@ public class BlazingFlaskItem extends RelicItem {
         Vec3 view = player.getViewVector(0);
         Vec3 eyeVec = player.getEyePosition(0);
 
-        float distance = (float) (8F + getStatValue(entity, stack, "bonfire", "height"));
+        float distance = (float) (8F + getStatValue(player, stack, "bonfire", "height"));
 
         Vec3 end = level.clip(new ClipContext(eyeVec, eyeVec.add(view.x * distance, view.y * distance,
                 view.z * distance), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player)).getLocation();
 
-        if (getFireAround(stack, end, level) > 0) {
+        if (getFireAround(player, stack, end, level) > 0) {
             WorldPosition center = stack.get(WORLD_POSITION);
 
             double radius = stack.getOrDefault(RADIUS, 0D);
@@ -169,16 +174,16 @@ public class BlazingFlaskItem extends RelicItem {
         return InteractionResultHolder.pass(stack);
     }
 
-    public int getFireAround(ItemStack stack, Level level) {
+    public int getFireAround(LivingEntity entity, ItemStack stack, Level level) {
         WorldPosition center = stack.get(WORLD_POSITION);
 
         if (center == null)
             return 0;
 
-        return getFireAround(stack, center.getPos(), level);
+        return getFireAround(entity, stack, center.getPos(), level);
     }
 
-    public int getFireAround(ItemStack stack, Vec3 center, Level level) {
+    public int getFireAround(LivingEntity entity, ItemStack stack, Vec3 center, Level level) {
         List<BlockPos> positions = WorldUtils.getBlockSphere(new BlockPos((int) center.x, (int) center.y, (int) center.z), getStatValue(entity, stack, "bonfire", "step"))
                 .stream().filter(pos -> (level.getBlockState(pos).getBlock() instanceof BaseFireBlock)).toList();
 

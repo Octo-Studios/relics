@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.screen.description.research.widgets;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
@@ -10,7 +11,6 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtil
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.research.AbilityResearchScreen;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.research.PacketResearchHint;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -42,12 +42,12 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
 
     @Override
     public void onPress() {
-        if (!(screen.stack.getItem() instanceof IRelicItem relic) || relic.isAbilityResearched(screen.stack, screen.ability))
+        if (!(screen.stack.getItem() instanceof IRelicItem relic) || relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability))
             return;
 
-        int links = relic.getResearchData(screen.ability).getLinks().size();
+        int links = relic.getResearchTemplate(minecraft.player, screen.stack, screen.ability).getLinks().size();
 
-        int requiredExperience = relic.getResearchHintPlayerExperienceCost(screen.ability) * (Screen.hasShiftDown() ? links : 1);
+        int requiredExperience = relic.getResearchHintPlayerExperienceCost(minecraft.player, screen.stack, screen.ability) * (Screen.hasShiftDown() ? links : 1);
         long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         if (experience >= requiredExperience)
@@ -70,7 +70,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
                 .pos(getX(), getY() - 10)
                 .end();
 
-        if (relic.isAbilityResearched(screen.stack, screen.ability)) {
+        if (relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability)) {
             GUIRenderer.begin(DescriptionTextures.BULB_BROKEN, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() + 34, getY() - 3)
@@ -114,7 +114,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
 
     @Override
     public void onTick() {
-        if (!isHovered() || !(screen.stack.getItem() instanceof IRelicItem relic) || relic.isAbilityResearched(screen.stack, screen.ability))
+        if (!isHovered() || !(screen.stack.getItem() instanceof IRelicItem relic) || relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability))
             return;
 
         RandomSource random = minecraft.player.getRandom();
@@ -137,7 +137,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
         int maxWidth = 150;
         int renderWidth = 0;
 
-        int requiredExperience = relic.getResearchHintPlayerExperienceCost(screen.ability) * (Screen.hasShiftDown() ? relic.getResearchData(screen.ability).getLinks().size() : 1);
+        int requiredExperience = relic.getResearchHintPlayerExperienceCost(minecraft.player, screen.stack, screen.ability) * (Screen.hasShiftDown() ? relic.getResearchTemplate(minecraft.player, screen.stack, screen.ability).getLinks().size() : 1);
         long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
@@ -150,7 +150,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
 
         boolean hasExperience = requiredExperience <= experience;
 
-        if (relic.isAbilityResearched(screen.stack, screen.ability))
+        if (relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability))
             entries.add(Component.translatable("tooltip.relics.researching.research.hint.locked"));
         else {
             entries.add(Component.translatable("tooltip.relics.researching.research.hint.cost", requiredExperience,

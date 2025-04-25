@@ -4,19 +4,19 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.hurts.sskirillss.relics.api.events.common.ContainerSlotClickEvent;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -62,7 +62,7 @@ public class ElytraBoosterItem extends RelicItem implements IRenderableCurio {
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("boost")
                                 .maxLevel(10)
-                                .active(CastData.builder()
+                                .castData(CastData.builder()
                                         .type(CastType.CYCLICAL)
                                         .predicate("fuel", PredicateType.CAST, (player, stack) -> stack.getOrDefault(CHARGE, 0) > 0)
                                         .predicate("elytra", PredicateType.CAST, (player, stack) -> player.isFallFlying())
@@ -79,15 +79,15 @@ public class ElytraBoosterItem extends RelicItem implements IRenderableCurio {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 100))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(100)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.THE_END, LootEntries.END_LIKE)
                         .build())
                 .build();
-    }
-
-    public int getBreathCapacity(ItemStack stack) {
-        return (int) Math.round(getStatValue(entity, stack, "boost", "capacity"));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ElytraBoosterItem extends RelicItem implements IRenderableCurio {
                 double speed = stack.getOrDefault(SPEED, 0D);
 
                 if (player.tickCount % 3 == 0) {
-                    double maxSpeed = getStatValue(entity, stack, "boost", "speed");
+                    double maxSpeed = getStatValue(player, stack, "boost", "speed");
 
                     if (speed < maxSpeed) {
                         speed = Math.min(maxSpeed, speed + ((maxSpeed - 1D) / 100D));
@@ -215,7 +215,7 @@ public class ElytraBoosterItem extends RelicItem implements IRenderableCurio {
 
         int time = heldStack.getBurnTime(RecipeType.SMELTING) / 20;
         int amount = slotStack.getOrDefault(CHARGE, 0);
-        int capacity = booster.getBreathCapacity(slotStack);
+        int capacity = (int) Math.round(booster.getStatValue(player, slotStack, "boost", "capacity"));
         int sum = amount + time;
 
         if (time <= 0)

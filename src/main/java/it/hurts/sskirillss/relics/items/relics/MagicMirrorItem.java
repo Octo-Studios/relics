@@ -61,7 +61,11 @@ public class MagicMirrorItem extends RelicItem {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 200))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(200)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.CAVE, LootEntries.MINESHAFT)
                         .build())
@@ -191,7 +195,7 @@ public class MagicMirrorItem extends RelicItem {
         ServerLevel level = data.getLeft();
 
         return !(player.position().distanceTo(new Vec3(pos.x(), player.getY(), pos.z())) * DimensionType.getTeleportationScale(player.level().dimensionType(),
-                level.dimensionType()) > getStatValue(entity, stack, "teleport", "distance"));
+                level.dimensionType()) > getStatValue(player, stack, "teleport", "distance"));
     }
 
     @EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)

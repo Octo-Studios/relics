@@ -52,7 +52,7 @@ public class JellyfishNecklaceItem extends RelicItem implements IRenderableCurio
                                 .maxLevel(0)
                                 .build())
                         .ability(AbilityTemplate.builder("shock")
-                                .active(CastData.builder()
+                                .castData(CastData.builder()
                                         .type(CastType.TOGGLEABLE)
                                         .build())
                                 .stat(StatTemplate.builder("damage")
@@ -70,7 +70,11 @@ public class JellyfishNecklaceItem extends RelicItem implements IRenderableCurio
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 200))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(200)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.AQUATIC)
                         .build())
@@ -89,7 +93,7 @@ public class JellyfishNecklaceItem extends RelicItem implements IRenderableCurio
 
         Level level = player.getCommandSenderWorld();
 
-        if (!player.isSpectator() && isAbilityTicking(stack, "shock")) {
+        if (!player.isSpectator() && isAbilityTicking(player, stack, "shock")) {
             for (LivingEntity entity : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox())) {
                 if (entity == player)
                     continue;
@@ -97,7 +101,7 @@ public class JellyfishNecklaceItem extends RelicItem implements IRenderableCurio
                 if (EntityUtils.hurt(entity, level.damageSources().playerAttack(player), (float) getStatValue(entity, stack, "shock", "damage"))) {
                     spreadRelicExperience(player, stack, 1);
 
-                    if (isAbilityUnlocked(stack, "paralysis"))
+                    if (isAbilityUnlocked(player, stack, "paralysis"))
                         entity.addEffect(new MobEffectInstance(EffectRegistry.PARALYSIS, (int) Math.round(getStatValue(entity, stack, "paralysis", "duration") * 20), 0));
                 }
             }

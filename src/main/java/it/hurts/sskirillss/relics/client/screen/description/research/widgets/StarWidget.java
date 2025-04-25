@@ -37,7 +37,7 @@ public class StarWidget extends AbstractDescriptionWidget implements ITickingWid
 
     @Override
     public boolean isLocked() {
-        return screen.stack.getItem() instanceof IRelicItem relic && relic.isAbilityResearched(screen.stack, screen.ability);
+        return screen.stack.getItem() instanceof IRelicItem relic && relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability);
     }
 
     @Override

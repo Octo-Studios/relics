@@ -37,7 +37,7 @@ public abstract class PiglinAiMixin {
         ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.BASTION_RING.get());
 
         if (stack.getItem() instanceof IRelicItem relic) {
-            for (int i = 0; i < Math.round(relic.getStatValue(entity, stack, "trade", "rolls")); i++) {
+            for (int i = 0; i < Math.round(relic.getStatValue(player, stack, "trade", "rolls")); i++) {
                 if (piglin.getRandom().nextBoolean()) {
                     PiglinAi.throwItems(piglin, getBarterResponseItems(piglin));
 

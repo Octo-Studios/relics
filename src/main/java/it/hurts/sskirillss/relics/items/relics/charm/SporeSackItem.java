@@ -20,6 +20,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
@@ -86,7 +87,7 @@ public class SporeSackItem extends RelicItem {
         stack.set(DataComponentRegistry.CHARGE, charges);
     }
 
-    public void addCharges(ItemStack stack, int charges) {
+    public void addCharges(LivingEntity entity, ItemStack stack, int charges) {
         setCharges(stack, Math.clamp(getCharges(stack) + charges, 0, (int) Math.round(getStatValue(entity, stack, "spore_mist", "amount"))));
     }
 
@@ -121,18 +122,18 @@ public class SporeSackItem extends RelicItem {
                 entity.setRelicStack(stack);
                 entity.setPos(player.position().add(0F, player.getBbHeight() / 2F, 0F));
                 entity.setDeltaMovement(Math.cos(angle) * 0.5F, 0.35F, Math.sin(angle) * 0.5F);
-                entity.setDamage((float) ((player.getMaxHealth() - player.getHealth()) * getStatValue(entity, stack, "spore_mist", "damage")));
+                entity.setDamage((float) ((player.getMaxHealth() - player.getHealth()) * getStatValue(player, stack, "spore_mist", "damage")));
 
                 level.addFreshEntity(entity);
 
                 level.playSound(null, player.blockPosition(), SoundEvents.PUFFER_FISH_FLOP, SoundSource.MASTER, 1F, 1.5F);
 
-                addCharges(stack, -1);
+                addCharges(player, stack, -1);
             } else if (percentage > percentageMedian)
                 setToggled(stack, false);
         } else if (percentage < percentageMedian) {
             setToggled(stack, true);
-            setCharges(stack, (int) Math.round(getStatValue(entity, stack, "spore_mist", "amount")));
+            setCharges(stack, (int) Math.round(getStatValue(player, stack, "spore_mist", "amount")));
         }
     }
 }

@@ -78,16 +78,16 @@ public class PacketManageLink implements CustomPacketPayload {
 
             switch (operation) {
                 case ADD -> {
-                    relic.addResearchLink(stack, ability, from, to);
+                    relic.addResearchLink(player, stack, ability, from, to);
 
-                    if (relic.testAbilityResearch(stack, ability)) {
-                        relic.setAbilityResearched(stack, ability, true);
+                    if (relic.testAbilityResearch(player, stack, ability)) {
+                        relic.setAbilityResearched(player, stack, ability, true);
 
                         player.connection.send(new ClientboundSoundPacket(Holder.direct(SoundRegistry.FINISH_RESEARCH.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1F, 1F, random.nextLong()));
                     } else
                         player.connection.send(new ClientboundSoundPacket(Holder.direct(SoundRegistry.CONNECT_STARS.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.75F, 0.75F + random.nextFloat() * 0.5F, random.nextLong()));
                 }
-                case REMOVE -> relic.removeResearchLink(stack, ability, from, to);
+                case REMOVE -> relic.removeResearchLink(player, stack, ability, from, to);
             }
 
             try {

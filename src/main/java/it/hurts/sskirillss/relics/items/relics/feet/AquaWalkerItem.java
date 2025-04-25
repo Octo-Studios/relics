@@ -63,7 +63,11 @@ public class AquaWalkerItem extends RelicItem implements IRenderableCurio {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 100))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(100)
+                        .build())
                 .style(StyleTemplate.builder()
                         .tooltip(TooltipData.builder()
                                 .borderTop(0xff488376)
@@ -160,7 +164,7 @@ public class AquaWalkerItem extends RelicItem implements IRenderableCurio {
 
         int drench = stack.getOrDefault(CHARGE, 0);
 
-        if (!(event.getEntity() instanceof Player player) || drench > relic.getStatValue(entity, stack, "walking", "time")
+        if (!(event.getEntity() instanceof Player player) || drench > relic.getStatValue(player, stack, "walking", "time")
                 || !event.getFluid().is(FluidTags.WATER) || player.isShiftKeyDown())
             return;
 

@@ -44,7 +44,11 @@ public class LeatherBeltItem extends RelicItem implements IRenderableCurio {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 100))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(100)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.OVERWORLD)
                         .build())
@@ -52,7 +56,7 @@ public class LeatherBeltItem extends RelicItem implements IRenderableCurio {
     }
 
     @Override
-    public RelicSlotModifier getSlotModifiers(ItemStack stack) {
+    public RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
         return RelicSlotModifier.builder()
                 .modifier("charm", (int) Math.round(getStatValue(entity, stack, "slots", "charm")))
                 .build();

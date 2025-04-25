@@ -2,9 +2,9 @@ package it.hurts.sskirillss.relics.network.packets.research;
 
 import com.google.common.collect.Multimap;
 import io.netty.buffer.ByteBuf;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
@@ -20,6 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -72,17 +73,17 @@ public class PacketResearchHint implements CustomPacketPayload {
 
             RandomSource random = player.getRandom();
 
-            int cost = relic.getResearchHintPlayerExperienceCost(ability) * amount;
+            int cost = relic.getResearchHintPlayerExperienceCost(player, stack, ability) * amount;
 
             if (EntityUtils.getPlayerTotalExperience(player) < cost)
                 return;
 
             player.giveExperiencePoints(-cost);
 
-            research(stack, amount);
+            research(player, stack, amount);
 
-            if (relic.testAbilityResearch(stack, ability)) {
-                relic.setAbilityResearched(stack, ability, true);
+            if (relic.testAbilityResearch(player, stack, ability)) {
+                relic.setAbilityResearched(player, stack, ability, true);
 
                 player.connection.send(new ClientboundSoundPacket(Holder.direct(SoundRegistry.FINISH_RESEARCH.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1F, 1F, random.nextLong()));
             } else
@@ -98,12 +99,12 @@ public class PacketResearchHint implements CustomPacketPayload {
         });
     }
 
-    public void research(ItemStack stack, int amount) {
+    public void research(LivingEntity entity, ItemStack stack, int amount) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        Multimap<Integer, Integer> pattern = relic.getResearchData(ability).getLinks();
-        Multimap<Integer, Integer> links = relic.getResearchLinks(stack, ability);
+        Multimap<Integer, Integer> pattern = relic.getResearchTemplate(entity, stack, ability).getLinks();
+        Multimap<Integer, Integer> links = relic.getResearchLinks(entity, stack, ability);
 
         int iteration = 0;
 
@@ -112,7 +113,7 @@ public class PacketResearchHint implements CustomPacketPayload {
             Integer end = entry.getValue();
 
             if (!(pattern.containsEntry(start, end) || pattern.containsEntry(end, start))) {
-                relic.removeResearchLink(stack, ability, start, end);
+                relic.removeResearchLink(entity, stack, ability, start, end);
 
                 if (++iteration >= amount)
                     break;
@@ -126,7 +127,7 @@ public class PacketResearchHint implements CustomPacketPayload {
             Integer end = entry.getValue();
 
             if (!(links.containsEntry(start, end) || links.containsEntry(end, start))) {
-                relic.addResearchLink(stack, ability, start, end);
+                relic.addResearchLink(entity, stack, ability, start, end);
 
                 if (++iteration >= amount)
                     break;

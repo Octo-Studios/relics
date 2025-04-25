@@ -88,7 +88,7 @@ public class RemoteRegistry {
                         if (relic.isEmpty())
                             return 3;
 
-                        return (int) Math.floor(stack.getOrDefault(CHARGE, 0) / (((IRelicItem) relic.getItem()).getStatValue(relic, "mold", "size") / 3F));
+                        return (int) Math.floor(stack.getOrDefault(CHARGE, 0) / (((IRelicItem) relic.getItem()).getStatValue(entity, relic, "mold", "size") / 3F));
                     });
             ItemProperties.register(ItemRegistry.ROLLER_SKATES.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "active"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) > 0 ? 1 : 0);

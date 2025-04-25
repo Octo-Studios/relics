@@ -19,12 +19,10 @@ public class LevelingConfigData {
     private double step;
 
     public LevelingTemplate toData(IRelicItem relic) {
-        var data = relic.getDefaultLevelingTemplate();
-
-        data.setInitialCost(initialCost);
-        data.setMaxLevel(maxLevel);
-        data.setStep(step);
-
-        return data;
+        return relic.getDefaultLevelingTemplate().toBuilder()
+                .initialCost(initialCost)
+                .maxLevel(maxLevel)
+                .step(step)
+                .build();
     }
 }

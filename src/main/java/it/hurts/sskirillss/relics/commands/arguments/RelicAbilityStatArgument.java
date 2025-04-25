@@ -45,10 +45,10 @@ public class RelicAbilityStatArgument implements ArgumentType<String> {
         List<String> result = new ArrayList<>();
 
         if (ability.equals("all")) {
-            for (AbilityTemplate abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().values())
+            for (AbilityTemplate abilityEntry : relic.getRelicTemplate(player, player.getMainHandItem()).getAbilities().getAbilities().values())
                 result.addAll(abilityEntry.getStats().keySet());
         } else {
-            AbilityTemplate data = relic.getAbilityTemplate(ability);
+            AbilityTemplate data = relic.getAbilityTemplate(player, player.getMainHandItem(), ability);
 
             if (data == null)
                 return Suggestions.empty();

@@ -106,7 +106,8 @@ public class RelicLootModifier extends LootModifier {
 
         LOOT_ENTRIES.removeIf(entry -> entry.getItem() == relic);
 
-        for (var entry : relic.getLootData().getEntries()) {
+        // FIXME: Should not use default template
+        for (var entry : relic.getDefaultLootTemplate().getEntries()) {
             var item = relic.getItem();
 
             if (item == null)

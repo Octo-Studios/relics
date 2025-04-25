@@ -44,7 +44,11 @@ public class RollerSkatesItem extends RelicItem {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 200))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(200)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.OVERWORLD)
                         .build())
@@ -62,7 +66,7 @@ public class RollerSkatesItem extends RelicItem {
             if (player.tickCount % 20 == 0)
                 spreadRelicExperience(player, stack, 1);
 
-            if (duration < getStatValue(entity, stack, "skating", "duration") && player.tickCount % 4 == 0)
+            if (duration < getStatValue(player, stack, "skating", "duration") && player.tickCount % 4 == 0)
                 stack.set(CHARGE, duration + 1);
         } else if (duration > 0)
             stack.set(CHARGE, --duration);
@@ -70,7 +74,7 @@ public class RollerSkatesItem extends RelicItem {
         EntityUtils.removeAttribute(player, stack, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
         if (duration > 0) {
-            EntityUtils.applyAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) (duration * getStatValue(entity, stack, "skating", "speed")), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.applyAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) (duration * getStatValue(player, stack, "skating", "speed")), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             EntityUtils.applyAttribute(player, stack, Attributes.STEP_HEIGHT, 0.6F, AttributeModifier.Operation.ADD_VALUE);
         } else
             EntityUtils.removeAttribute(player, stack, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE);

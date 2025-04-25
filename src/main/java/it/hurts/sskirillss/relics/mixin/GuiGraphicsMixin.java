@@ -60,8 +60,8 @@ public class GuiGraphicsMixin {
         var renderedUpgradeIcon = false;
         var renderedResearchIcon = false;
 
-        for (var ability : relic.getAbilitiesTemplate().getAbilities().values()) {
-            if (!renderedUpgradeIcon && relic.mayUpgrade(stack, ability.getId())) {
+        for (var ability : relic.getAbilitiesTemplate(player, stack).getAbilities().values()) {
+            if (!renderedUpgradeIcon && relic.mayUpgrade(player, stack, ability.getId())) {
                 poseStack.pushPose();
 
                 poseStack.translate(x + 9, y, 200);
@@ -82,7 +82,7 @@ public class GuiGraphicsMixin {
                 renderedUpgradeIcon = true;
             }
 
-            if (!renderedResearchIcon && (relic.mayResearch(stack, ability.getId()) || relic.mayUnlock(stack, ability.getId()))) {
+            if (!renderedResearchIcon && (relic.mayResearch(player, stack, ability.getId()) || relic.mayUnlock(player, stack, ability.getId()))) {
                 poseStack.pushPose();
 
                 poseStack.translate(x + 9, y + 9, 200);
@@ -119,8 +119,8 @@ public class GuiGraphicsMixin {
 
         var time = seed + player.tickCount + partialTicks;
 
-        if (relic.isRelicFlawless(stack)) {
-            var data = relic.getStyleData().getBeams().apply(player, stack);
+        if (relic.isRelicFlawless(player, stack)) {
+            var data = relic.getStyleTemplate(player, stack).getBeams().apply(player, stack);
 
             var beams = 8;
 

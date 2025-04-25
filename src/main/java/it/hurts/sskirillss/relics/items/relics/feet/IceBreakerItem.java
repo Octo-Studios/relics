@@ -26,6 +26,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -51,7 +52,7 @@ public class IceBreakerItem extends RelicItem {
                                 .build())
                         .ability(AbilityTemplate.builder("impact")
                                 .maxLevel(10)
-                                .active(CastData.builder()
+                                .castData(CastData.builder()
                                         .type(CastType.INSTANTANEOUS)
                                         .predicate("falling", PredicateType.CAST, (player, stack) -> !(player.onGround() || player.isSpectator()) && WorldUtils.getGroundHeight(player, player.position(), 3) <= 3)
                                         .build())
@@ -67,7 +68,11 @@ public class IceBreakerItem extends RelicItem {
                                         .build())
                                 .build())
                         .build())
-                .leveling(new LevelingTemplate(100, 10, 200))
+                .leveling(LevelingTemplate.builder()
+                        .initialCost(100)
+                        .maxLevel(10)
+                        .step(200)
+                        .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.TAIGA, LootEntries.FROST, LootEntries.MOUNTAIN)
                         .build())
@@ -75,7 +80,7 @@ public class IceBreakerItem extends RelicItem {
     }
 
     @Override
-    public RelicAttributeModifier getRelicAttributeModifiers(ItemStack stack) {
+    public RelicAttributeModifier getRelicAttributeModifiers(LivingEntity entity, ItemStack stack) {
         return RelicAttributeModifier.builder()
                 .attribute(new RelicAttributeModifier.Modifier(Attributes.KNOCKBACK_RESISTANCE, (float) getStatValue(entity, stack, "sustainability", "modifier")))
                 .build();
@@ -124,14 +129,14 @@ public class IceBreakerItem extends RelicItem {
             if (distance <= 0)
                 return;
 
-            var radius = (int) Math.round(Math.min(getStatValue(entity, stack, "impact", "size"), distance * 0.25D));
+            var radius = (int) Math.round(Math.min(getStatValue(player, stack, "impact", "size"), distance * 0.25D));
 
             if (radius <= 0)
                 return;
 
             spreadRelicExperience(player, stack, (int) Math.min(10, Math.round(distance / 3F)));
 
-            ShockwaveEntity shockwave = new ShockwaveEntity(level, radius, (float) getStatValue(entity, stack, "impact", "damage"));
+            ShockwaveEntity shockwave = new ShockwaveEntity(level, radius, (float) getStatValue(player, stack, "impact", "damage"));
 
             BlockPos blockPos = player.getOnPos();
 

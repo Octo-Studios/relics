@@ -40,7 +40,7 @@ public class PhantomBootBridgeLayer implements LayeredDraw.Layer {
         if (progress <= 0)
             return;
 
-        var maxProgress = relic.getMaxTime(stack);
+        var maxProgress = relic.getMaxTime(player, stack);
 
         var partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
 

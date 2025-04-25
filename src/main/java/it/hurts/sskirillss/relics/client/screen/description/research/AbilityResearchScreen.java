@@ -6,6 +6,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
@@ -20,8 +22,6 @@ import it.hurts.sskirillss.relics.client.screen.description.research.widgets.Tip
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.StarData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
@@ -107,7 +107,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0;
 
-        return relic.getAbilityTemplate(ability).getResearchTemplate().getConnectedStars(star).size();
+        return relic.getAbilityTemplate(minecraft.player, stack, ability).getResearchTemplate().getConnectedStars(star).size();
     }
 
     public int getOccupiedConnectionsCount(StarData star) {
@@ -116,7 +116,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
         int index = star.getIndex();
 
-        return (int) relic.getResearchLinks(stack, ability).entries().stream()
+        return (int) relic.getResearchLinks(minecraft.player, stack, ability).entries().stream()
                 .filter(entry -> entry.getKey() == index || entry.getValue() == index)
                 .map(entry -> entry.getKey() < entry.getValue()
                         ? entry.getKey() + "-" + entry.getValue()
@@ -142,7 +142,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
         this.addRenderableWidget(new LogoWidget(x + 313, y + 57, this));
 
-        if (relic.isSomethingWrongWithLevelingPoints(stack))
+        if (relic.isSomethingWrongWithLevelingPoints(minecraft.player, stack))
             this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
         this.addRenderableWidget(new RankPlateWidget(x + 313, y + 77, this));
@@ -156,7 +156,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
         int starSize = 17;
 
-        for (var entry : relic.getAbilityTemplate(ability).getResearchTemplate().getStars().values())
+        for (var entry : relic.getAbilityTemplate(minecraft.player, stack, ability).getResearchTemplate().getStars().values())
             stars.add(this.addWidget(new StarWidget((int) (x + 67 + (entry.getX() * 5F) - starSize / 2F), (int) (y + 54 + (entry.getY() * 5F) - starSize / 2F), this, entry)));
     }
 
@@ -178,14 +178,14 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
         RandomSource random = minecraft.player.getRandom();
 
-        if (relic.isAbilityResearched(stack, ability)) {
+        if (relic.isAbilityResearched(minecraft.player, stack, ability)) {
             if (researchProgress >= 0 && researchProgress < maxResearchProgress) {
                 researchProgress++;
 
                 if (researchProgress % 3 == 0) {
-                    ResearchTemplate researchData = relic.getResearchData(ability);
+                    ResearchTemplate researchData = relic.getResearchTemplate(minecraft.player, stack, ability);
 
-                    for (var link : relic.getResearchLinks(stack, ability).entries()) {
+                    for (var link : relic.getResearchLinks(minecraft.player, stack, ability).entries()) {
                         var start = researchData.getStars().get(link.getKey()).getPos();
                         var end = researchData.getStars().get(link.getValue()).getPos();
 
@@ -199,7 +199,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         }
 
         if (minecraft.player.tickCount % 3 == 0) {
-            var links = relic.getResearchLinks(stack, ability);
+            var links = relic.getResearchLinks(minecraft.player, stack, ability);
 
             for (var pair : links.entries()) {
                 var start = pair.getKey();
@@ -315,7 +315,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
             return;
 
-        RelicTemplate relicData = relic.getRelicTemplate();
+        RelicTemplate relicData = relic.getRelicTemplate(player, stack);
 
         if (relicData == null)
             return;
@@ -349,9 +349,9 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         }
 
         {
-            ResearchTemplate researchData = relic.getAbilityTemplate(ability).getResearchTemplate();
+            ResearchTemplate researchData = relic.getAbilityTemplate(player, stack, ability).getResearchTemplate();
 
-            for (var link : relic.getResearchLinks(stack, ability).entries()) {
+            for (var link : relic.getResearchLinks(player, stack, ability).entries()) {
                 var start = researchData.getStars().get(link.getKey()).getPos();
                 var end = researchData.getStars().get(link.getValue()).getPos();
 
@@ -409,7 +409,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
             var title = Component.translatableWithFallback("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability);
 
-            if (!relic.isAbilityUnlocked(stack, ability)) {
+            if (!relic.isAbilityUnlocked(player, stack, ability)) {
                 title = ScreenUtils.stylizeWithReplacement(title, 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(0x9E00B0), ability.length());
 
                 var random = player.getRandom();
@@ -441,8 +441,8 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
             List<Number> placeholders = new ArrayList<>();
 
-            for (var stat : relic.getAbilityTemplate(ability).getStats().values())
-                placeholders.add(stat.getFormatValue().apply(relic.getStatValue(entity, stack, ability, stat.getId(), relic.getAbilityLevel(stack, ability))));
+            for (var stat : relic.getAbilityTemplate(player, stack, ability).getStats().values())
+                placeholders.add(stat.getFormatValue().apply(relic.getStatValueForLevel(minecraft.player, stack, ability, stat.getId(), relic.getAbilityLevel(minecraft.player, stack, ability))));
 
             var component = Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description", placeholders.toArray());
 
@@ -495,7 +495,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         float offset = (float) (Math.sin(((minecraft.player.tickCount + partialTick + start.length()) * 0.2F)) * 0.1F);
         float color = 1.25F + offset;
 
-        if (!relic.isAbilityResearched(stack, ability) && isHoveringConnection(start, end, mouseX, mouseY))
+        if (!relic.isAbilityResearched(minecraft.player, stack, ability) && isHoveringConnection(start, end, mouseX, mouseY))
             RenderSystem.setShaderColor(color, 0.25F, 0.25F, 0.75F + offset);
         else
             RenderSystem.setShaderColor(color, color, color, 0.75F + offset);
@@ -600,12 +600,12 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if (stack.getItem() instanceof IRelicItem relic && !relic.isAbilityResearched(stack, ability) && pButton == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            ResearchTemplate researchData = relic.getResearchData(ability);
+        if (stack.getItem() instanceof IRelicItem relic && !relic.isAbilityResearched(minecraft.player, stack, ability) && pButton == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            ResearchTemplate researchData = relic.getResearchTemplate(minecraft.player, stack, ability);
 
             Pair<Integer, Integer> toRemove = null;
 
-            for (var link : relic.getResearchLinks(stack, ability).entries())
+            for (var link : relic.getResearchLinks(minecraft.player, stack, ability).entries())
                 if (isHoveringConnection(getScaledPos(researchData.getStars().get(link.getKey()).getPos()), getScaledPos(researchData.getStars().get(link.getValue()).getPos()), (int) pMouseX, (int) pMouseY))
                     toRemove = Pair.of(link.getKey(), link.getValue());
 
@@ -660,7 +660,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
                 if (!widget.isHovered())
                     continue;
 
-                Multimap<Integer, Integer> links = relic.getResearchLinks(stack, ability);
+                Multimap<Integer, Integer> links = relic.getResearchLinks(minecraft.player, stack, ability);
 
                 int start = selectedStar.getIndex();
                 int end = widget.getStar().getIndex();

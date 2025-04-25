@@ -50,7 +50,7 @@ public class HolyLocketItem extends RelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("faith")
-                                .active(CastData.builder()
+                                .castData(CastData.builder()
                                         .type(CastType.INSTANTANEOUS)
                                         .build())
                                 .icon((player, stack, ability) -> ability + "_" + getMode(stack).name().toLowerCase(Locale.ROOT))
@@ -69,7 +69,7 @@ public class HolyLocketItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .research(ResearchTemplate.builder()
+                                .researchTemplate(ResearchTemplate.builder()
                                         .star(0, 13, 5).star(1, 6, 8).star(2, 10, 12)
                                         .star(3, 4, 13).star(4, 18, 13).star(5, 8, 16)
                                         .star(6, 14, 16).star(7, 5, 20).star(8, 17, 20)
@@ -85,7 +85,7 @@ public class HolyLocketItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.3D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .research(ResearchTemplate.builder()
+                                .researchTemplate(ResearchTemplate.builder()
                                         .star(0, 7, 12).star(1, 15, 12).star(2, 6, 19)
                                         .star(3, 16, 19).star(4, 9, 26).star(5, 13, 26)
                                         .link(0, 1).link(0, 2).link(1, 3).link(2, 4).link(3, 5).link(4, 5)
@@ -105,7 +105,7 @@ public class HolyLocketItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .research(ResearchTemplate.builder()
+                                .researchTemplate(ResearchTemplate.builder()
                                         .star(0, 11, 27).star(1, 3, 19).star(2, 3, 4)
                                         .star(3, 11, 17).star(4, 6, 13).star(5, 11, 13)
                                         .star(6, 16, 13).star(7, 19, 19).star(8, 19, 4)
@@ -220,12 +220,12 @@ public class HolyLocketItem extends RelicItem {
 
                 var effect = player.getEffect(EffectRegistry.IMMORTALITY);
                 var duration = effect == null ? 0 : effect.getDuration();
-                var maxDuration = (int) (relic.getStatValue(entity, stack, "ascension", "max_duration") * 20);
+                var maxDuration = (int) (relic.getStatValue(player, stack, "ascension", "max_duration") * 20);
 
                 if (duration >= maxDuration)
                     continue;
 
-                player.addEffect(new MobEffectInstance(EffectRegistry.IMMORTALITY, (int) Math.min((relic.getStatValue(entity, stack, "ascension", "duration") * 20) + duration, maxDuration)));
+                player.addEffect(new MobEffectInstance(EffectRegistry.IMMORTALITY, (int) Math.min((relic.getStatValue(player, stack, "ascension", "duration") * 20) + duration, maxDuration)));
 
                 relic.spreadRelicExperience(player, stack, 1);
             }
@@ -238,9 +238,7 @@ public class HolyLocketItem extends RelicItem {
             if (amount <= 0.5F)
                 return;
 
-            var item = ItemRegistry.HOLY_LOCKET.get();
-
-            var maxDistance = item.getRelativeStatValue("faith", "radius", item.getStatData("faith", "radius").getInitialValue().getValue(), item.getLevelingTemplate().getMaxLevel());
+            var maxDistance = 32;
 
             var entity = event.getEntity();
             var level = entity.getCommandSenderWorld();
