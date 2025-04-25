@@ -106,14 +106,14 @@ public class AmphibianBootItem extends RelicItem implements IRenderableCurio {
             if (player.tickCount % 20 == 0)
                 spreadRelicExperience(player, stack, 1);
 
-            if (charge < getStatValue(stack, "swimming", "duration"))
+            if (charge < getStatValue(entity, stack, "swimming", "duration"))
                 stack.set(CHARGE, charge + 1);
         }
 
         EntityUtils.removeAttribute(player, stack, NeoForgeMod.SWIM_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
         if (charge > 0)
-            EntityUtils.applyAttribute(player, stack, NeoForgeMod.SWIM_SPEED, (float) (charge * getStatValue(stack, "swimming", "speed")), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.applyAttribute(player, stack, NeoForgeMod.SWIM_SPEED, (float) (charge * getStatValue(entity, stack, "swimming", "speed")), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
         if (player.isSprinting() && player.level().isRainingAt(player.blockPosition()) && !player.isShiftKeyDown() && !player.isInWater() && !player.isInLava()) {
             isSlipping = true;
@@ -121,7 +121,7 @@ public class AmphibianBootItem extends RelicItem implements IRenderableCurio {
             if (player.tickCount % 20 == 0)
                 spreadRelicExperience(player, stack, 1);
 
-            if (charge < getStatValue(stack, "slipping", "duration") && player.tickCount % 4 == 0)
+            if (charge < getStatValue(entity, stack, "slipping", "duration") && player.tickCount % 4 == 0)
                 stack.set(CHARGE, charge + 1);
         }
 
@@ -131,7 +131,7 @@ public class AmphibianBootItem extends RelicItem implements IRenderableCurio {
         EntityUtils.removeAttribute(player, stack, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
         if (charge > 0) {
-            EntityUtils.applyAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) (charge * getStatValue(stack, "slipping", "speed")), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.applyAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) (charge * getStatValue(entity, stack, "slipping", "speed")), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             EntityUtils.applyAttribute(player, stack, Attributes.STEP_HEIGHT, 0.6F, AttributeModifier.Operation.ADD_VALUE);
         } else
             EntityUtils.removeAttribute(player, stack, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE);
@@ -219,7 +219,7 @@ public class AmphibianBootItem extends RelicItem implements IRenderableCurio {
             if (!(stack.getItem() instanceof IRelicItem relic))
                 return;
 
-            double chance = relic.getStatValue(stack, "gills", "chance");
+            double chance = relic.getStatValue(entity, stack, "gills", "chance");
 
             if (event.getConsumeAirAmount() > 0 && entity.getRandom().nextDouble() <= chance)
                 event.setConsumeAirAmount(0);

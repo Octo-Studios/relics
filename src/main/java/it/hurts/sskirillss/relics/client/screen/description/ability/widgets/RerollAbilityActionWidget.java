@@ -38,8 +38,11 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public void playDownSound(SoundManager handler) {
-        if (isLocked() || !(getScreen().getStack().getItem() instanceof IRelicItem relic)
-                || (relic.getAbilityQuality(getScreen().getStack(), getAbility()) == relic.getStatMaxQuality() && !Screen.hasShiftDown()))
+        var player = minecraft.player;
+        var stack = getScreen().getStack();
+
+        if (isLocked() || !(stack.getItem() instanceof IRelicItem relic)
+                || (relic.getAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility()) && !Screen.hasShiftDown()))
             return;
 
         handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_REROLL.get(), 1F));
@@ -47,10 +50,13 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public void onPress() {
+        var player = minecraft.player;
+        var stack = getScreen().getStack();
+
         if (isLocked() || !(getScreen().getStack().getItem() instanceof IRelicItem relic))
             return;
 
-        boolean hasWarning = relic.getAbilityQuality(getScreen().getStack(), getAbility()) == relic.getStatMaxQuality();
+        boolean hasWarning = relic.getAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility());
 
         if (hasWarning && !Screen.hasShiftDown())
             return;
@@ -60,13 +66,16 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        var player = minecraft.player;
+        var stack = getScreen().getStack();
+
         if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
             return;
 
-        boolean isWarning = relic.getAbilityQuality(getScreen().getStack(), getAbility()) == relic.getStatMaxQuality();
-        boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerReroll(minecraft.player, getScreen().getStack(), getAbility());
+        boolean isWarning = relic.getAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility());
+        boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerReroll(player, getScreen().getStack(), getAbility());
 
-        float color = (isWarning && Screen.hasShiftDown()) || isQuick ? (float) (1.05F + (Math.sin((minecraft.player.tickCount + (getAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;
+        float color = (isWarning && Screen.hasShiftDown()) || isQuick ? (float) (1.05F + (Math.sin((player.tickCount + (getAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;
 
         RenderSystem.setShaderColor(color, color, color, 1F);
 
@@ -80,10 +89,13 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(getScreen().getStack(), getAbility()))
+        var player = minecraft.player;
+        var stack = getScreen().getStack();
+
+        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(player, stack, getAbility()))
             return;
 
-        AbilityTemplate data = relic.getAbilityData(getAbility());
+        AbilityTemplate data = relic.getAbilityTemplate(player, stack, getAbility());
 
         if (data.getStats().isEmpty())
             return;
@@ -95,14 +107,14 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         int maxWidth = 120;
         int renderWidth = 0;
 
-        int requiredExperience = relic.getRerollPlayerExperienceCost(getScreen().getStack(), getAbility());
+        int requiredExperience = relic.getRerollPlayerExperienceCost(player, stack, getAbility());
         long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
         MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
         MutableComponent unknownStatus = Component.translatable("tooltip.relics.relic.status.unknown");
 
-        boolean isQuick = relic.mayPlayerReroll(minecraft.player, getScreen().getStack(), getAbility()) && relic.getAbilityQuality(getScreen().getStack(), getAbility()) != relic.getStatMaxQuality();
+        boolean isQuick = relic.mayPlayerReroll(minecraft.player, getScreen().getStack(), getAbility()) && relic.getAbilityQuality(player, stack, getAbility()) != relic.getAbilityMaxQuality(player, stack, getAbility());
         boolean hasExperience = requiredExperience <= experience;
 
         List<MutableComponent> entries = Lists.newArrayList(
@@ -113,7 +125,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
                         hasExperience ? isQuick && Screen.hasShiftDown() ? unknownStatus : positiveStatus : negativeStatus)
         );
 
-        if (relic.getAbilityQuality(getScreen().getStack(), getAbility()) == relic.getStatMaxQuality()) {
+        if (relic.getAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility())) {
             entries.add(Component.literal(" "));
             entries.add(Component.literal("▶ ").append(Component.translatable("tooltip.relics.relic.reroll.warning")));
         } else if (relic.mayPlayerReroll(minecraft.player, getScreen().getStack(), getAbility())) {

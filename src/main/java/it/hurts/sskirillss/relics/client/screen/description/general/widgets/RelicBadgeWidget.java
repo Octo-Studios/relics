@@ -46,13 +46,13 @@ public class RelicBadgeWidget extends AbstractBadgeWidget {
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                getBadge().getTitle(stack).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
+                getBadge().getTitle(minecraft.player, stack).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
                 Component.literal(" ")
         );
 
-        entries.addAll(getBadge().getDescription(stack));
+        entries.addAll(getBadge().getDescription(minecraft.player, stack));
 
-        List<MutableComponent> hint = getBadge().getHint(stack);
+        List<MutableComponent> hint = getBadge().getHint(minecraft.player, stack);
 
         if (!hint.isEmpty()) {
             entries.add(Component.literal(" "));

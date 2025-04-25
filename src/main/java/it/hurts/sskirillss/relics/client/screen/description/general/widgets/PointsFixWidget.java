@@ -3,11 +3,11 @@ package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.leveling.FixLevelingPoints;
 import it.hurts.sskirillss.relics.utils.Reference;
@@ -38,7 +38,7 @@ public class PointsFixWidget extends AbstractDescriptionWidget implements IHover
 
     @Override
     public void onPress() {
-        if (!(provider.getStack().getItem() instanceof IRelicItem relic) || !relic.isSomethingWrongWithLevelingPoints(provider.getStack()))
+        if (!(provider.getStack().getItem() instanceof IRelicItem relic) || !relic.isSomethingWrongWithLevelingPoints(minecraft.player, provider.getStack()))
             return;
 
         NetworkHandler.sendToServer(new FixLevelingPoints(provider.getContainer(), provider.getSlot()));
@@ -49,7 +49,7 @@ public class PointsFixWidget extends AbstractDescriptionWidget implements IHover
         LocalPlayer player = Minecraft.getInstance().player;
 
         if (player == null || !(provider.getStack().getItem() instanceof IRelicItem relic)
-                || !relic.isSomethingWrongWithLevelingPoints(provider.getStack()))
+                || !relic.isSomethingWrongWithLevelingPoints(player, provider.getStack()))
             return;
 
         PoseStack poseStack = guiGraphics.pose();
@@ -73,7 +73,7 @@ public class PointsFixWidget extends AbstractDescriptionWidget implements IHover
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         ItemStack stack = getProvider().getStack();
 
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isSomethingWrongWithLevelingPoints(provider.getStack()))
+        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isSomethingWrongWithLevelingPoints(minecraft.player, provider.getStack()))
             return;
 
         PoseStack poseStack = guiGraphics.pose();

@@ -18,7 +18,7 @@ public class LootConfigData {
     private List<LootEntryConfigData> entries;
 
     public LootTemplate toData(IRelicItem relic) {
-        LootTemplate data = relic.getLootData();
+        var data = relic.getDefaultLootTemplate();
 
         data.setEntries(entries.stream().map(entry -> new LootEntry(entry.getDimensions(), entry.getBiomes(), entry.getTables(), entry.getWeight())).toList());
 

@@ -74,9 +74,9 @@ public class ExperienceGemWidget extends AbstractDescriptionWidget implements IT
 
         var stack = screen.getStack();
         var poseStack = guiGraphics.pose();
-        var sourceData = relic.getLevelingSourcesData().getSources().get(source);
+        var sourceData = relic.getLevelingSourceTemplate(player, stack, source);
 
-        var isUnlocked = relic.isLevelingSourceUnlocked(stack, source);
+        var isUnlocked = relic.isLevelingSourceUnlocked(player, stack, source);
 
         poseStack.pushPose();
 
@@ -166,7 +166,7 @@ public class ExperienceGemWidget extends AbstractDescriptionWidget implements IT
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var data = relic.getLevelingSourceData(source);
+        var data = relic.getLevelingSourceTemplate(minecraft.player, stack, source);
 
         if (data == null)
             return;
@@ -187,11 +187,11 @@ public class ExperienceGemWidget extends AbstractDescriptionWidget implements IT
         var requiredLevel = data.getRequiredLevel();
         var requiredAbility = data.getRequiredAbility();
 
-        if (relic.getRelicLevel(screen.stack) < requiredLevel) {
+        if (relic.getRelicLevel(minecraft.player, screen.stack) < requiredLevel) {
             entries.add(Component.literal(" "));
 
             entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.gem.low_level", Component.literal(String.valueOf(requiredLevel)).withStyle(ChatFormatting.BOLD))));
-        } else if (!requiredAbility.isEmpty() && !relic.isAbilityUnlocked(stack, requiredAbility)) {
+        } else if (!requiredAbility.isEmpty() && !relic.isAbilityUnlocked(minecraft.player, stack, requiredAbility)) {
             entries.add(Component.literal(" "));
 
             entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.gem.locked_ability")));
@@ -226,7 +226,7 @@ public class ExperienceGemWidget extends AbstractDescriptionWidget implements IT
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        if (!relic.isLevelingSourceUnlocked(stack, source)) {
+        if (!relic.isLevelingSourceUnlocked(minecraft.player, stack, source)) {
             title = ScreenUtils.stylizeWithReplacement(title, 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(0x9E00B0), source.length());
 
             var random = minecraft.player.getRandom();

@@ -86,7 +86,7 @@ public class SolidSnowballEntity extends ThrowableProjectile {
         if (stack.getItem() instanceof IRelicItem relic) {
             boolean mayContinue = false;
 
-            float damage = (float) (getSize() * relic.getStatValue(stack, "mold", "damage"));
+            float damage = (float) (getSize() * relic.getStatValue(entity, stack, "mold", "damage"));
 
             if (this.getOwner() instanceof Player player) {
                 if (EntityUtils.hurt(entity, level().damageSources().thrown(this, player), damage))
@@ -97,7 +97,7 @@ public class SolidSnowballEntity extends ThrowableProjectile {
             }
 
             if (mayContinue)
-                entity.addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) Math.round(getSize() * relic.getStatValue(stack, "mold", "stun")) * 20, 0, true, false));
+                entity.addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) Math.round(getSize() * relic.getStatValue(entity, stack, "mold", "stun")) * 20, 0, true, false));
         }
 
         this.discard();
@@ -122,7 +122,7 @@ public class SolidSnowballEntity extends ThrowableProjectile {
 
         for (LivingEntity entity : level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getSize() / 15F))) {
             if (!entity.getStringUUID().equals(owner.getStringUUID()))
-                entity.setTicksFrozen((int) (100 + Math.round(getSize() * relic.getStatValue(EntityUtils.findEquippedCurio(owner, ItemRegistry.WOOL_MITTEN.get()), "mold", "freeze"))));
+                entity.setTicksFrozen((int) (100 + Math.round(getSize() * relic.getStatValue(entity, EntityUtils.findEquippedCurio(owner, ItemRegistry.WOOL_MITTEN.get()), "mold", "freeze"))));
         }
 
         if (owner instanceof LivingEntity entity)

@@ -220,12 +220,12 @@ public class HolyLocketItem extends RelicItem {
 
                 var effect = player.getEffect(EffectRegistry.IMMORTALITY);
                 var duration = effect == null ? 0 : effect.getDuration();
-                var maxDuration = (int) (relic.getStatValue(stack, "ascension", "max_duration") * 20);
+                var maxDuration = (int) (relic.getStatValue(entity, stack, "ascension", "max_duration") * 20);
 
                 if (duration >= maxDuration)
                     continue;
 
-                player.addEffect(new MobEffectInstance(EffectRegistry.IMMORTALITY, (int) Math.min((relic.getStatValue(stack, "ascension", "duration") * 20) + duration, maxDuration)));
+                player.addEffect(new MobEffectInstance(EffectRegistry.IMMORTALITY, (int) Math.min((relic.getStatValue(entity, stack, "ascension", "duration") * 20) + duration, maxDuration)));
 
                 relic.spreadRelicExperience(player, stack, 1);
             }
@@ -240,7 +240,7 @@ public class HolyLocketItem extends RelicItem {
 
             var item = ItemRegistry.HOLY_LOCKET.get();
 
-            var maxDistance = item.getRelativeStatValue("faith", "radius", item.getStatData("faith", "radius").getInitialValue().getValue(), item.getLevelingData().getMaxLevel());
+            var maxDistance = item.getRelativeStatValue("faith", "radius", item.getStatData("faith", "radius").getInitialValue().getValue(), item.getLevelingTemplate().getMaxLevel());
 
             var entity = event.getEntity();
             var level = entity.getCommandSenderWorld();
@@ -256,10 +256,10 @@ public class HolyLocketItem extends RelicItem {
 
                 for (var stack : EntityUtils.findEquippedCurios(player, ItemRegistry.HOLY_LOCKET.get())) {
                     if (!(stack.getItem() instanceof HolyLocketItem relic) || relic.getMode(stack) != Mode.HOLINESS || !relic.canPlayerUseAbility(player, stack, "faith")
-                            || entity.position().distanceTo(player.position()) > relic.getStatValue(stack, "faith", "radius"))
+                            || entity.position().distanceTo(player.position()) > relic.getStatValue(entity, stack, "faith", "radius"))
                         continue;
 
-                    var heal = (float) (amount * relic.getStatValue(stack, "faith", "health"));
+                    var heal = (float) (amount * relic.getStatValue(entity, stack, "faith", "health"));
 
                     var essence = new LifeEssenceEntity(EntityRegistry.LIFE_ESSENCE.get(), level);
 
@@ -287,7 +287,7 @@ public class HolyLocketItem extends RelicItem {
 
                     targets = 0;
 
-                    for (var target : EntityUtils.gatherPotentialTargets(player, LivingEntity.class, relic.getStatValue(stack, "faith", "radius")).toList()) {
+                    for (var target : EntityUtils.gatherPotentialTargets(player, LivingEntity.class, relic.getStatValue(entity, stack, "faith", "radius")).toList()) {
                         if (player.getStringUUID().equals(target.getStringUUID()))
                             continue;
 
@@ -298,7 +298,7 @@ public class HolyLocketItem extends RelicItem {
                         essence.setOwner(player);
                         essence.setTarget(target);
                         essence.setPos(player.getEyePosition());
-                        essence.setDamage((float) (event.getAmount() * relic.getStatValue(stack, "faith", "damage")));
+                        essence.setDamage((float) (event.getAmount() * relic.getStatValue(entity, stack, "faith", "damage")));
                         essence.setDeltaMovement(MathUtils.randomFloat(random), random.nextFloat(), MathUtils.randomFloat(random));
 
                         level.addFreshEntity(essence);
@@ -328,7 +328,7 @@ public class HolyLocketItem extends RelicItem {
                 if (amount >= 1F && !entity.isOnFire())
                     relic.spreadRelicExperience(player, stack, 1);
 
-                event.setAmount((float) (amount + (amount * relic.getStatValue(stack, "penitence", "amount"))));
+                event.setAmount((float) (amount + (amount * relic.getStatValue(entity, stack, "penitence", "amount"))));
 
                 entity.igniteForSeconds(10F);
             }

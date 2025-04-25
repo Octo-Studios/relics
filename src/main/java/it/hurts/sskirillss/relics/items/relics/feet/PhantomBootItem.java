@@ -182,7 +182,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
     }
 
     public int getMaxTime(ItemStack stack) {
-        return (int) Math.round(getStatValue(stack, "bridge", "duration") * 20D);
+        return (int) Math.round(getStatValue(entity, stack, "bridge", "duration") * 20D);
     }
 
     public int getTime(ItemStack stack) {

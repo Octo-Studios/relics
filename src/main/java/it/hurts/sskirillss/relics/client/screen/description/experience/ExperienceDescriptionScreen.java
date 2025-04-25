@@ -3,12 +3,12 @@ package it.hurts.sskirillss.relics.client.screen.description.experience;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.AbilityPageWidget;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.ExperienceSourcePageWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.BigExperienceCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ExperienceGemWidget;
@@ -22,7 +22,6 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtil
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -83,8 +82,8 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         stack = DescriptionUtils.gatherRelicStack(player, slot);
 
         if (stack.getItem() instanceof IRelicItem relic) {
-            var sources = relic.getLevelingSourcesData().getSources().keySet().stream()
-                    .filter(entry -> relic.isLevelingSourceEnabled(stack, entry))
+            var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
+                    .filter(entry -> relic.isLevelingSourceEnabled(player, stack, entry))
                     .toList();
 
             setPage(sources.indexOf(getSelectedSource()) / 5);
@@ -92,11 +91,11 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
     }
 
     public String getSelectedSource() {
-        return DescriptionCache.getSelectedExperienceSource(stack);
+        return DescriptionCache.getSelectedExperienceSource(minecraft.player, stack);
     }
 
     public void setSelectedSource(String source) {
-        DescriptionCache.setSelectedExperienceSource(stack, source);
+        DescriptionCache.setSelectedExperienceSource(minecraft.player, stack, source);
     }
 
     @Override
@@ -104,9 +103,10 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
+        var player = minecraft.player;
         var source = getSelectedSource();
 
-        if (relic.getLevelingSourceData(source) == null)
+        if (relic.getLevelingSourceTemplate(player, stack, source) == null)
             return;
 
         updateCache(relic);
@@ -114,11 +114,11 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
-        var sources = relic.getLevelingSourcesData().getSources().keySet().stream()
-                .filter(entry -> relic.isLevelingSourceEnabled(stack, entry))
+        var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
+                .filter(entry -> relic.isLevelingSourceEnabled(player, stack, entry))
                 .toList();
-        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream()
-                .filter(entry -> relic.isAbilityEnabled(stack, entry))
+        var abilities = relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream()
+                .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
                 .toList();
 
         var maxEntries = 5;
@@ -150,7 +150,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
         this.addRenderableWidget(new LogoWidget(x + 313, y + 57, this));
 
-        if (relic.isSomethingWrongWithLevelingPoints(stack))
+        if (relic.isSomethingWrongWithLevelingPoints(player, stack))
             this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
         this.addRenderableWidget(new RankPlateWidget(x + 313, y + 77, this));
@@ -177,7 +177,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
         this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 121, this));
 
-        if (relic.isLevelingSourceUnlocked(stack, source)) {
+        if (relic.isLevelingSourceUnlocked(player, stack, source)) {
             this.upgradeButton = this.addRenderableWidget(new UpgradeExperienceActionWidget(x + 288, y + 70, this));
             this.resetButton = this.addRenderableWidget(new ResetExperienceActionWidget(x + 288, y + 90, this));
         }
@@ -207,7 +207,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
             return;
 
         var source = getSelectedSource();
-        var sourceData = relic.getLevelingSourceData(source);
+        var sourceData = relic.getLevelingSourceTemplate(player, stack, source);
 
         if (sourceData == null)
             return;
@@ -251,8 +251,8 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
                 .pos(x + 60, y + 133)
                 .end();
 
-        var sources = relic.getLevelingSourcesData().getSources().keySet().stream()
-                .filter(entry -> relic.isLevelingSourceEnabled(stack, entry))
+        var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
+                .filter(entry -> relic.isLevelingSourceEnabled(player, stack, entry))
                 .toList();
 
         if (sources.size() > 5) {
@@ -275,7 +275,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
         var title = Component.translatableWithFallback(sourceData.getTranslationPath().apply(stack) + ".title", source);
 
-        if (!relic.isLevelingSourceUnlocked(stack, source)) {
+        if (!relic.isLevelingSourceUnlocked(player, stack, source)) {
             title = ScreenUtils.stylizeWithReplacement(title, 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(0x9E00B0), source.length());
 
             var random = player.getRandom();
@@ -301,7 +301,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
         title = Component.literal("«").append(ability.isEmpty() ? title : Component.translatableWithFallback("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability)).append("»").withStyle(ChatFormatting.BOLD);
 
-        if (relic.isLevelingSourceUnlocked(stack, source)) {
+        if (relic.isLevelingSourceUnlocked(player, stack, source)) {
             List<MutableComponent> components = new ArrayList<>();
 
             var wantsUpgrade = upgradeButton != null && upgradeButton.isHovered();
@@ -309,7 +309,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
             int color = DescriptionUtils.TEXT_COLOR;
 
-            var component = Component.literal(String.valueOf(relic.getLevelingSourceData(source).getInitialValue())).withStyle(ChatFormatting.BOLD);
+            var component = Component.literal(String.valueOf(relic.getLevelingSourceTemplate(player, stack, source).getInitialValue())).withStyle(ChatFormatting.BOLD);
 
             if (wantsUpgrade)
                 color = 0x228B22;
@@ -384,7 +384,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
             }
         } else {
             List<Object> placeholders = Arrays.asList(
-                    relic.getLevelingSourceData(source).getInitialValue(),
+                    relic.getLevelingSourceTemplate(player, stack, source).getInitialValue(),
                     title
             );
 

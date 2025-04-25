@@ -25,13 +25,13 @@ public class AbilityConfigData {
     private Map<String, StatConfigData> stats = new LinkedHashMap<>();
 
     public AbilityTemplate toData(IRelicItem relic, String ability) {
-        AbilityTemplate data = relic.constructDefaultRelicTemplate().getAbilities().getAbilities().get(ability);
+        var template = relic.getDefaultAbilityTemplate(ability);
 
-        data.setRequiredPoints(requiredPoints);
-        data.setRequiredLevel(requiredLevel);
-        data.setMaxLevel(maxLevel);
-        data.setStats(data.getStats().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> stats.get(entry.getKey()).toData(relic, ability, entry.getKey()), (o1, o2) -> o1, LinkedHashMap::new)));
-
-        return data;
+        return template.toBuilder()
+                .requiredPoints(requiredPoints)
+                .requiredLevel(requiredLevel)
+                .maxLevel(maxLevel)
+                .stats(template.getStats().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> stats.get(entry.getKey()).toData(relic, ability, entry.getKey()), (o1, o2) -> o1, LinkedHashMap::new)))
+                .build();
     }
 }

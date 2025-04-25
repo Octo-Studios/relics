@@ -160,7 +160,7 @@ public class AquaWalkerItem extends RelicItem implements IRenderableCurio {
 
         int drench = stack.getOrDefault(CHARGE, 0);
 
-        if (!(event.getEntity() instanceof Player player) || drench > relic.getStatValue(stack, "walking", "time")
+        if (!(event.getEntity() instanceof Player player) || drench > relic.getStatValue(entity, stack, "walking", "time")
                 || !event.getFluid().is(FluidTags.WATER) || player.isShiftKeyDown())
             return;
 

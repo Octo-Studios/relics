@@ -125,6 +125,13 @@ public interface IRelicTemplateHolder {
         return getDefaultRelicTemplate().getAbilities();
     }
 
+    // TODO: ???
+    // FIXME: Add API annotations
+    @ApiStatus.Internal
+    default LootTemplate getDefaultLootTemplate() {
+        return getDefaultRelicTemplate().getLoot();
+    }
+
     /**
      * Returns the default {@link AbilityTemplate} by its ID from this relic's base template.
      *

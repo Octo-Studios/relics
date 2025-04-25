@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.badges.ability;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 public class SilenceBadge extends AbilityBadge {
@@ -11,10 +12,10 @@ public class SilenceBadge extends AbilityBadge {
     }
 
     @Override
-    public boolean isVisible(ItemStack stack, String ability) {
+    public boolean isVisible(LivingEntity entity, ItemStack stack, String ability) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return false;
 
-        return relic.getAbilityCastData(ability).getType() != CastType.NONE;
+        return relic.getAbilityCastData(entity, stack, ability).getType() != CastType.NONE;
     }
 }

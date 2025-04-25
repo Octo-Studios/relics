@@ -45,10 +45,10 @@ public abstract class AbstractBadgeWidget extends AbstractDescriptionWidget impl
             poseStack.translate(-(width / 2F), -(height / 2F), 0);
         }
 
-        guiGraphics.blit(getBadge().getIconTexture(), 0, 0, 0, 0, width, height, width, height);
+        guiGraphics.blit(getBadge().getIconTexture(minecraft.player, provider.getStack()), 0, 0, 0, 0, width, height, width, height);
 
         if (isHovered)
-            guiGraphics.blit(getBadge().getOutlineTexture(), -1, -1, 0, 0, width + 2, height + 2, width + 2, height + 2);
+            guiGraphics.blit(getBadge().getOutlineTexture(minecraft.player, provider.getStack()), -1, -1, 0, 0, width + 2, height + 2, width + 2, height + 2);
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 

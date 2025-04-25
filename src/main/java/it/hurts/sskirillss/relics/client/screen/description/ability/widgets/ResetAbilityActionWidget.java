@@ -38,10 +38,13 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(getScreen().getStack(), getAbility()))
+        var player = minecraft.player;
+        var stack = getScreen().getStack();
+
+        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(player, stack, getAbility()))
             return;
 
-        AbilityTemplate data = relic.getAbilityData(getAbility());
+        AbilityTemplate data = relic.getAbilityTemplate(player, stack, getAbility());
 
         if (data.getStats().isEmpty())
             return;
@@ -53,8 +56,8 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
         int maxWidth = 120;
         int renderWidth = 0;
 
-        int requiredExperience = relic.getResetPlayerExperienceCost(getScreen().getStack(), getAbility());
-        long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
+        int requiredExperience = relic.getResetPlayerExperienceCost(player, stack, getAbility());
+        long experience = EntityUtils.getPlayerTotalExperience(player);
 
         boolean hasExperience = requiredExperience <= experience;
 
@@ -65,7 +68,7 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
                 Component.translatable("tooltip.relics.relic.reset.description").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
                 Component.literal(" "));
 
-        if (relic.getAbilityLevel(getScreen().getStack(), getAbility()) > 0)
+        if (relic.getAbilityLevel(player, stack, getAbility()) > 0)
             entries.add(Component.translatable("tooltip.relics.relic.reset.cost", requiredExperience,
                     hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
                     hasExperience ? positiveStatus : negativeStatus));

@@ -17,19 +17,17 @@ public class RelicConfigData implements OctoConfig {
     public RelicConfigData(IRelicItem relic) {
         this.relic = relic;
 
-        this.setAbilitiesData(relic.getAbilitiesData().toConfigData());
-        this.setLevelingData(relic.getLevelingData().toConfigData());
-        this.setLootData(relic.getLootData().toConfigData());
+        this.setAbilitiesData(relic.getDefaultAbilitiesTemplate().toConfigData());
+        this.setLevelingData(relic.getDefaultLevelingTemplate().toConfigData());
+        this.setLootData(relic.getDefaultLootTemplate().toConfigData());
     }
 
     public RelicTemplate toData(IRelicItem relic) {
-        RelicTemplate data = relic.getRelicTemplate();
-
-        data.setAbilities(abilitiesData.toData(relic));
-        data.setLeveling(levelingData.toData(relic));
-        data.setLoot(lootData.toData(relic));
-
-        return data;
+        return relic.getDefaultRelicTemplate().toBuilder()
+                .abilities(abilitiesData.toData(relic))
+                .leveling(levelingData.toData(relic))
+                .loot(lootData.toData(relic))
+                .build();
     }
 
     private AbilitiesConfigData abilitiesData;

@@ -36,7 +36,7 @@ public class LuckPlateWidget extends AbstractPlateWidget {
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.general.luck.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLuck(stack) + "%"),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.general.luck.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLuck(minecraft.player, stack) + "%"),
                 Component.literal(" ")
         );
 
@@ -80,6 +80,6 @@ public class LuckPlateWidget extends AbstractPlateWidget {
 
     @Override
     public String getValue(ItemStack stack) {
-        return (stack.getItem() instanceof IRelicItem relic ? relic.getRelicLuck(stack) : 0) + "%";
+        return (stack.getItem() instanceof IRelicItem relic ? relic.getRelicLuck(minecraft.player, stack) : 0) + "%";
     }
 }

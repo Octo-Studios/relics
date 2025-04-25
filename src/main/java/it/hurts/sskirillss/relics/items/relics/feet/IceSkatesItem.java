@@ -69,7 +69,7 @@ public class IceSkatesItem extends RelicItem {
 
         int duration = stack.getOrDefault(CHARGE, 0);
 
-        int maxDuration = (int) Math.round(getStatValue(stack, "skating", "duration"));
+        int maxDuration = (int) Math.round(getStatValue(entity, stack, "skating", "duration"));
 
         if (player.isSprinting() && !player.isShiftKeyDown() && !player.isInWater() && !player.isInLava()
                 && (level.getBlockState(pos).is(BlockTags.ICE))) {
@@ -91,7 +91,7 @@ public class IceSkatesItem extends RelicItem {
                 if (entity == player || entity.hurtTime > 0)
                     continue;
 
-                EntityUtils.hurt(entity, level.damageSources().playerAttack(player), (float) (duration * getStatValue(stack, "ram", "damage")));
+                EntityUtils.hurt(entity, level.damageSources().playerAttack(player), (float) (duration * getStatValue(entity, stack, "ram", "damage")));
 
                 double factor = Mth.clamp(duration * 0.025D, 1D, 2D);
 
@@ -102,7 +102,7 @@ public class IceSkatesItem extends RelicItem {
         EntityUtils.removeAttribute(player, stack, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
         if (duration > 0) {
-            EntityUtils.applyAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) (duration * getStatValue(stack, "skating", "speed")), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.applyAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) (duration * getStatValue(entity, stack, "skating", "speed")), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             EntityUtils.applyAttribute(player, stack, Attributes.STEP_HEIGHT, 0.6F, AttributeModifier.Operation.ADD_VALUE);
         } else
             EntityUtils.removeAttribute(player, stack, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE);

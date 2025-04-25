@@ -48,7 +48,7 @@ public class RelicAbilityStatArgument implements ArgumentType<String> {
             for (AbilityTemplate abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().values())
                 result.addAll(abilityEntry.getStats().keySet());
         } else {
-            AbilityTemplate data = relic.getAbilityData(ability);
+            AbilityTemplate data = relic.getAbilityTemplate(ability);
 
             if (data == null)
                 return Suggestions.empty();

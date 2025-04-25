@@ -78,8 +78,8 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
-        var sources = relic.getLevelingSourcesData().getSources();
-        var abilities = relic.getAbilitiesData().getAbilities();
+        var sources = relic.getLevelingSourcesTemplate(minecraft.player, stack).getSources();
+        var abilities = relic.getAbilitiesTemplate(minecraft.player, stack).getAbilities();
 
         this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
 
@@ -98,7 +98,7 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
 
         this.addRenderableWidget(new LogoWidget(x + 313, y + 57, this));
 
-        if (relic.isSomethingWrongWithLevelingPoints(stack))
+        if (relic.isSomethingWrongWithLevelingPoints(minecraft.player, stack))
             this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
         this.addRenderableWidget(new RankPlateWidget(x + 313, y + 77, this));
@@ -109,7 +109,7 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
         xOff = 0;
 
         for (RelicBadge badge : BadgeRegistry.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof RelicBadge).map(entry -> (RelicBadge) entry).toList()) {
-            if (!badge.isVisible(stack))
+            if (!badge.isVisible(minecraft.player, stack))
                 continue;
 
             this.addRenderableWidget(new RelicBadgeWidget(x + 270 - xOff, y + 63, this, badge));
@@ -160,12 +160,12 @@ public class RelicDescriptionScreen extends Screen implements IAutoScaledScreen,
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
             return;
 
-        RelicTemplate relicData = relic.getRelicTemplate();
+        RelicTemplate relicData = relic.getRelicTemplate(player, stack);
 
         if (relicData == null)
             return;
 
-        int level = relic.getRelicLevel(stack);
+        int level = relic.getRelicLevel(player, stack);
 
         PoseStack poseStack = guiGraphics.pose();
 

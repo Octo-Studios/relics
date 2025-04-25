@@ -59,7 +59,7 @@ public class FixLevelingPoints implements CustomPacketPayload {
 
             relic.setRelicLevelingPoints(stack, relic.getRelicLevel(stack));
 
-            for (var data : relic.getAbilitiesData().getAbilities().values())
+            for (var data : relic.getAbilitiesTemplate().getAbilities().values())
                 relic.setAbilityLevel(stack, data.getId(), 0);
 
             try {

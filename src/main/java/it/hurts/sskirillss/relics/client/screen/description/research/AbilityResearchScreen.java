@@ -107,7 +107,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0;
 
-        return relic.getAbilityData(ability).getResearchTemplate().getConnectedStars(star).size();
+        return relic.getAbilityTemplate(ability).getResearchTemplate().getConnectedStars(star).size();
     }
 
     public int getOccupiedConnectionsCount(StarData star) {
@@ -156,7 +156,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
         int starSize = 17;
 
-        for (var entry : relic.getAbilityData(ability).getResearchTemplate().getStars().values())
+        for (var entry : relic.getAbilityTemplate(ability).getResearchTemplate().getStars().values())
             stars.add(this.addWidget(new StarWidget((int) (x + 67 + (entry.getX() * 5F) - starSize / 2F), (int) (y + 54 + (entry.getY() * 5F) - starSize / 2F), this, entry)));
     }
 
@@ -349,7 +349,7 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         }
 
         {
-            ResearchTemplate researchData = relic.getAbilityData(ability).getResearchTemplate();
+            ResearchTemplate researchData = relic.getAbilityTemplate(ability).getResearchTemplate();
 
             for (var link : relic.getResearchLinks(stack, ability).entries()) {
                 var start = researchData.getStars().get(link.getKey()).getPos();
@@ -441,8 +441,8 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
             List<Number> placeholders = new ArrayList<>();
 
-            for (var stat : relic.getAbilityData(ability).getStats().values())
-                placeholders.add(stat.getFormatValue().apply(relic.getStatValue(stack, ability, stat.getId(), relic.getAbilityLevel(stack, ability))));
+            for (var stat : relic.getAbilityTemplate(ability).getStats().values())
+                placeholders.add(stat.getFormatValue().apply(relic.getStatValue(entity, stack, ability, stat.getId(), relic.getAbilityLevel(stack, ability))));
 
             var component = Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description", placeholders.toArray());
 

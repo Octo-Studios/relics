@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.badges.relic;
 
 import it.hurts.sskirillss.relics.badges.base.RelicBadge;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 public class FlawlessRelicBadge extends RelicBadge {
@@ -10,10 +11,10 @@ public class FlawlessRelicBadge extends RelicBadge {
     }
 
     @Override
-    public boolean isVisible(ItemStack stack) {
+    public boolean isVisible(LivingEntity entity, ItemStack stack) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return false;
 
-        return relic.isRelicFlawless(stack);
+        return relic.isRelicFlawless(entity, stack);
     }
 }

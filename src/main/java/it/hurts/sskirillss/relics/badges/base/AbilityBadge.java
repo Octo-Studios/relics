@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -15,29 +16,29 @@ public abstract non-sealed class AbilityBadge extends AbstractBadge {
         super(id);
     }
 
-    public MutableComponent getTitle(ItemStack stack, String ability) {
+    public MutableComponent getTitle(LivingEntity entity, ItemStack stack, String ability) {
         return Component.translatable("tooltip.relics.researching.badge.ability." + getId() + ".title");
     }
 
-    public List<MutableComponent> getDescription(ItemStack stack, String ability) {
+    public List<MutableComponent> getDescription(LivingEntity entity, ItemStack stack, String ability) {
         return Arrays.asList(Component.translatable("tooltip.relics.researching.badge.ability." + getId() + ".description"));
     }
 
-    public List<MutableComponent> getHint(ItemStack stack, String ability) {
+    public List<MutableComponent> getHint(LivingEntity entity, ItemStack stack, String ability) {
         return new ArrayList<>();
     }
 
-    public boolean isVisible(ItemStack stack, String ability) {
+    public boolean isVisible(LivingEntity entity, ItemStack stack, String ability) {
         return false;
     }
 
     @Override
-    public final ResourceLocation getIconTexture() {
+    public final ResourceLocation getIconTexture(LivingEntity entity, ItemStack stack) {
         return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/badges/ability/" + getId() + ".png");
     }
 
     @Override
-    public final ResourceLocation getOutlineTexture() {
+    public final ResourceLocation getOutlineTexture(LivingEntity entity, ItemStack stack) {
         return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/badges/ability/" + getId() + "_outline.png");
     }
 }

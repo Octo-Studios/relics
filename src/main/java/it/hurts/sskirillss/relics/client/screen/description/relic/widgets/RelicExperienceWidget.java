@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
@@ -11,7 +12,6 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionText
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -78,7 +78,7 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        MutableComponent percentage = Component.literal(relic.isRelicMaxLevel(screen.getStack()) ? "MAX" : MathUtils.round(calculateFillerPercentage(relic), 1) + "%").withStyle(ChatFormatting.BOLD);
+        MutableComponent percentage = Component.literal(relic.isRelicMaxLevel(minecraft.player, screen.getStack()) ? "MAX" : MathUtils.round(calculateFillerPercentage(relic), 1) + "%").withStyle(ChatFormatting.BOLD);
 
         guiGraphics.drawString(minecraft.font, percentage, (getX() + 67) * 2 - (minecraft.font.width(percentage) / 2), (getY() + 6) * 2, DescriptionUtils.TEXT_COLOR, false);
 
@@ -114,13 +114,13 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
         int maxWidth = 150;
         int renderWidth = 0;
 
-        int level = relic.getRelicLevel(screen.getStack());
+        int level = relic.getRelicLevel(minecraft.player, screen.getStack());
 
-        var experience = String.valueOf(MathUtils.round(relic.getRelicExperience(screen.getStack()), 1));
+        var experience = String.valueOf(MathUtils.round(relic.getRelicExperience(minecraft.player, screen.getStack()), 1));
 
         List<MutableComponent> entries = Lists.newArrayList(
                 Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.experience.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE))
-                        .append(" " + (relic.isRelicMaxLevel(screen.getStack()) ? "MAX" : (experience.endsWith(".0") ? experience.replace(".0", "") : experience) + "/" + relic.getTotalRelicExperienceBetweenLevels(level, level + 1))),
+                        .append(" " + (relic.isRelicMaxLevel(minecraft.player, screen.getStack()) ? "MAX" : (experience.endsWith(".0") ? experience.replace(".0", "") : experience) + "/" + relic.getTotalRelicExperienceBetweenLevels(minecraft.player, screen.getStack(), level, level + 1))),
                 Component.literal(" ")
         );
 
@@ -163,12 +163,12 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
     }
 
     private float calculateFillerPercentage(IRelicItem relic) {
-        int level = relic.getRelicLevel(screen.getStack());
+        int level = relic.getRelicLevel(minecraft.player, screen.getStack());
 
-        return (float) (relic.getRelicExperience(screen.getStack()) / (relic.getTotalRelicExperienceBetweenLevels(level, level + 1) / 100D));
+        return (float) (relic.getRelicExperience(minecraft.player, screen.getStack()) / (relic.getTotalRelicExperienceBetweenLevels(minecraft.player, screen.getStack(), level, level + 1) / 100D));
     }
 
     private int calculateFillerWidth(IRelicItem relic) {
-        return relic.isRelicMaxLevel(screen.getStack()) ? FILLER_WIDTH : (int) Math.ceil(calculateFillerPercentage(relic) / 100F * FILLER_WIDTH);
+        return relic.isRelicMaxLevel(minecraft.player, screen.getStack()) ? FILLER_WIDTH : (int) Math.ceil(calculateFillerPercentage(relic) / 100F * FILLER_WIDTH);
     }
 }

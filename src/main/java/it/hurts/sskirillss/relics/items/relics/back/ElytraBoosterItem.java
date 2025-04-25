@@ -87,7 +87,7 @@ public class ElytraBoosterItem extends RelicItem implements IRenderableCurio {
     }
 
     public int getBreathCapacity(ItemStack stack) {
-        return (int) Math.round(getStatValue(stack, "boost", "capacity"));
+        return (int) Math.round(getStatValue(entity, stack, "boost", "capacity"));
     }
 
     @Override
@@ -102,7 +102,7 @@ public class ElytraBoosterItem extends RelicItem implements IRenderableCurio {
                 double speed = stack.getOrDefault(SPEED, 0D);
 
                 if (player.tickCount % 3 == 0) {
-                    double maxSpeed = getStatValue(stack, "boost", "speed");
+                    double maxSpeed = getStatValue(entity, stack, "boost", "speed");
 
                     if (speed < maxSpeed) {
                         speed = Math.min(maxSpeed, speed + ((maxSpeed - 1D) / 100D));

@@ -41,9 +41,9 @@ public class BigExperienceCardWidget extends AbstractDescriptionWidget implement
         var player = minecraft.player;
         var poseStack = guiGraphics.pose();
         var source = screen.getSelectedSource();
-        var sourceData = relic.getLevelingSourcesData().getSources().get(source);
+        var sourceData = relic.getLevelingSourceTemplate(player, stack, source);
 
-        var isUnlocked = relic.isLevelingSourceUnlocked(stack, source);
+        var isUnlocked = relic.isLevelingSourceUnlocked(player, stack, source);
 
         float color = (float) (1.05F + (Math.sin((player.tickCount + (sourceData.getId().length() * 10)) * 0.2F) * 0.1F));
 
@@ -100,7 +100,7 @@ public class BigExperienceCardWidget extends AbstractDescriptionWidget implement
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var isUnlocked = relic.isLevelingSourceUnlocked(stack, source);
+        var isUnlocked = relic.isLevelingSourceUnlocked(minecraft.player, stack, source);
 
         if (!isUnlocked) {
             RandomSource random = minecraft.player.getRandom();

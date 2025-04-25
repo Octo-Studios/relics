@@ -82,14 +82,14 @@ public class SpaceDissectorItem extends RelicItem {
         Vec3 view = player.getViewVector(0);
         Vec3 eyeVec = player.getEyePosition(0);
 
-        float distance = Math.round(getStatValue(stack, "dissection", "distance"));
+        float distance = Math.round(getStatValue(entity, stack, "dissection", "distance"));
 
         BlockHitResult ray = world.clip(new ClipContext(eyeVec, eyeVec.add(view.x * distance, view.y * distance,
                 view.z * distance), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
 
         DissectionEntity portal = new DissectionEntity(world);
 
-        int time = (int) Math.round(getStatValue(stack, "dissection", "time")) * 20;
+        int time = (int) Math.round(getStatValue(entity, stack, "dissection", "time")) * 20;
 
         portal.setPos(ray.getLocation());
         portal.setMaxLifeTime(time);
@@ -113,7 +113,7 @@ public class SpaceDissectorItem extends RelicItem {
         Vec3 view = player.getViewVector(0);
         Vec3 eyeVec = player.getEyePosition(0);
 
-        float distance = Math.round(getStatValue(stack, "dissection", "distance"));
+        float distance = Math.round(getStatValue(entity, stack, "dissection", "distance"));
 
         BlockHitResult ray = world.clip(new ClipContext(eyeVec, eyeVec.add(view.x * distance, view.y * distance,
                 view.z * distance), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, player));
@@ -154,7 +154,7 @@ public class SpaceDissectorItem extends RelicItem {
         Vec3 view = entity.getViewVector(0);
         Vec3 eyeVec = entity.getEyePosition(0);
 
-        float distance = Math.round(getStatValue(stack, "dissection", "distance"));
+        float distance = Math.round(getStatValue(entity, stack, "dissection", "distance"));
 
         BlockHitResult ray = level.clip(new ClipContext(eyeVec, eyeVec.add(view.x * distance, view.y * distance,
                 view.z * distance), ClipContext.Block.OUTLINE, ClipContext.Fluid.NONE, entity));

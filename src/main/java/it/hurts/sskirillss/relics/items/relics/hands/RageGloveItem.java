@@ -152,7 +152,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
         if (ability.equals("spurt")) {
             int stacks = stack.getOrDefault(CHARGE, 0);
 
-            double maxDistance = getStatValue(stack, "spurt", "distance");
+            double maxDistance = getStatValue(entity, stack, "spurt", "distance");
 
             Vec3 view = player.getViewVector(0);
             Vec3 eyeVec = player.getEyePosition(0);
@@ -175,7 +175,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
             if (!level.isClientSide()) {
                 NetworkHandler.sendToClient(new PacketPlayerMotion(motion.x, motion.y, motion.z), (ServerPlayer) player);
 
-                setAbilityCooldown(stack, "spurt", (int) Math.round(getStatValue(stack, "spurt", "cooldown") * 20));
+                setAbilityCooldown(stack, "spurt", (int) Math.round(getStatValue(entity, stack, "spurt", "cooldown") * 20));
             }
 
             player.fallDistance = 0F;
@@ -214,7 +214,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
 
             if (!targets.isEmpty()) {
                 EntityUtils.resetAttribute(player, stack, Attributes.ATTACK_SPEED, Integer.MAX_VALUE, AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-                EntityUtils.resetAttribute(player, stack, Attributes.ATTACK_DAMAGE, (float) (getStatValue(stack, "spurt", "damage") * stacks), AttributeModifier.Operation.ADD_VALUE);
+                EntityUtils.resetAttribute(player, stack, Attributes.ATTACK_DAMAGE, (float) (getStatValue(entity, stack, "spurt", "damage") * stacks), AttributeModifier.Operation.ADD_VALUE);
 
                 for (LivingEntity entity : targets) {
                     if (entity.invulnerableTime > 0 || EntityUtils.isAlliedTo(player, entity))
@@ -244,10 +244,10 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
         if (isAbilityUnlocked(stack, "phlebotomy")) {
             float percentage = 100F - (player.getHealth() / player.getMaxHealth() * 100F);
 
-            player.heal((float) getStatValue(stack, "phlebotomy", "heal") * percentage);
+            player.heal((float) getStatValue(entity, stack, "phlebotomy", "heal") * percentage);
 
-            EntityUtils.resetAttribute(player, stack, Attributes.ATTACK_SPEED, (float) (getStatValue(stack, "phlebotomy", "attack_speed") * percentage), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-            EntityUtils.resetAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) (getStatValue(stack, "phlebotomy", "movement_speed") * percentage), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.resetAttribute(player, stack, Attributes.ATTACK_SPEED, (float) (getStatValue(entity, stack, "phlebotomy", "attack_speed") * percentage), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.resetAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) (getStatValue(entity, stack, "phlebotomy", "movement_speed") * percentage), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         }
 
         if (isAbilityUnlocked(stack, "rage")) {
@@ -352,11 +352,11 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
                     int stacks = stack.getOrDefault(CHARGE, 0);
 
                     stack.set(CHARGE, ++stacks);
-                    stack.set(TIME, (int) Math.round(relic.getStatValue(stack, "rage", "duration") * 20));
+                    stack.set(TIME, (int) Math.round(relic.getStatValue(entity, stack, "rage", "duration") * 20));
 
                     relic.spreadRelicExperience(player, stack, 1);
 
-                    event.setAmount((float) (event.getAmount() + (event.getAmount() * (stacks * relic.getStatValue(stack, "rage", "dealt_damage")))));
+                    event.setAmount((float) (event.getAmount() + (event.getAmount() * (stacks * relic.getStatValue(entity, stack, "rage", "dealt_damage")))));
                 }
             } else if (event.getEntity() instanceof Player player) {
                 ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.RAGE_GLOVE.get());
@@ -370,7 +370,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
                     if (stacks <= 0)
                         return;
 
-                    event.setAmount((float) (event.getAmount() + (event.getAmount() * (stacks * relic.getStatValue(stack, "rage", "incoming_damage")))));
+                    event.setAmount((float) (event.getAmount() + (event.getAmount() * (stacks * relic.getStatValue(entity, stack, "rage", "incoming_damage")))));
                 }
             }
         }

@@ -75,13 +75,13 @@ public class ItemMixin {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        for (AbilityTemplate abilityData : relic.getAbilitiesData().getAbilities().values()) {
+        for (AbilityTemplate abilityData : relic.getAbilitiesTemplate().getAbilities().values()) {
             String abilityId = abilityData.getId();
 
             if (relic.getAbilityComponent(stack, abilityId) == null)
                 relic.randomizeAbilityStats(stack, abilityId, 0);
             else {
-                for (StatTemplate statData : relic.getAbilityData(abilityId).getStats().values()) {
+                for (StatTemplate statData : relic.getAbilityTemplate(abilityId).getStats().values()) {
                     String statId = statData.getId();
 
                     if (relic.getStatComponent(stack, abilityId, statId) == null)

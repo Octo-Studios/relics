@@ -62,7 +62,7 @@ public class HunterBeltItem extends RelicItem implements IRenderableCurio {
     @Override
     public RelicSlotModifier getSlotModifiers(ItemStack stack) {
         return RelicSlotModifier.builder()
-                .modifier("charm", (int) Math.round(getStatValue(stack, "slots", "charm")))
+                .modifier("charm", (int) Math.round(getStatValue(entity, stack, "slots", "charm")))
                 .build();
     }
 
@@ -100,7 +100,7 @@ public class HunterBeltItem extends RelicItem implements IRenderableCurio {
 
             relic.spreadRelicExperience(player, stack, 1);
 
-            event.setAmount((float) (event.getAmount() * relic.getStatValue(stack, "training", "damage")));
+            event.setAmount((float) (event.getAmount() * relic.getStatValue(entity, stack, "training", "damage")));
         }
     }
 }

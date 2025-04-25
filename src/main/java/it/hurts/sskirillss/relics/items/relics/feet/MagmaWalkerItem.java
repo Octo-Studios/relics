@@ -80,8 +80,8 @@ public class MagmaWalkerItem extends RelicItem implements IRenderableCurio {
             return;
 
         if (heat > 0) {
-            if (heat > getStatValue(stack, "pace", "time"))
-                player.hurt(level.damageSources().hotFloor(), (float) (1F + ((heat - getStatValue(stack, "pace", "time")) / 10F)));
+            if (heat > getStatValue(entity, stack, "pace", "time"))
+                player.hurt(level.damageSources().hotFloor(), (float) (1F + ((heat - getStatValue(entity, stack, "pace", "time")) / 10F)));
 
             if (!level.getFluidState(player.blockPosition().below()).is(FluidTags.LAVA)
                     && !level.getFluidState(player.blockPosition()).is(FluidTags.LAVA))
@@ -155,7 +155,7 @@ public class MagmaWalkerItem extends RelicItem implements IRenderableCurio {
         ItemStack stack = EntityUtils.findEquippedCurio(event.getEntity(), ItemRegistry.MAGMA_WALKER.get());
 
         if (stack.getItem() instanceof IRelicItem relic && event.getSource() == event.getEntity().level().damageSources().hotFloor()
-                && stack.getOrDefault(CHARGE, 0) <= relic.getStatValue(stack, "pace", "time")) {
+                && stack.getOrDefault(CHARGE, 0) <= relic.getStatValue(entity, stack, "pace", "time")) {
             event.setCanceled(true);
         }
     }

@@ -1,11 +1,12 @@
 package it.hurts.sskirillss.relics.api.relics.abilities;
 
 import com.mojang.datafixers.util.Function3;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import lombok.Builder;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -15,64 +16,65 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Data
-@Builder(toBuilder = true)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AbilityTemplate {
     private final String id;
 
+    private final Function3<Player, ItemStack, String, String> icon;
+    private final Map<String, StatTemplate> stats;
+    private final int maxLevel;
+    private final int requiredLevel;
+    private final int requiredPoints;
+    private final CastData castData;
+    private final ResearchTemplate researchTemplate;
+
     public static AbilityTemplateBuilder builder(String id) {
-        AbilityTemplateBuilder builder = new AbilityTemplateBuilder();
-
-        builder.id(id);
-
-        return builder;
+        return new AbilityTemplateBuilder(id);
     }
 
-    @Builder.Default
-    private Function3<Player, ItemStack, String, String> icon = (player, stack, ability) -> ability;
-
-    @Builder.Default
-    private Map<String, StatTemplate> stats;
-
-    @Builder.Default
-    private int maxLevel = 10;
-
-    @Builder.Default
-    private int requiredLevel = 0;
-
-    @Builder.Default
-    private int requiredPoints = 1;
-
-    @Builder.Default
-    private CastData castData;
-
-    @Builder.Default
-    private ResearchTemplate researchTemplate;
+    public AbilityTemplateBuilder toBuilder() {
+        return new AbilityTemplateBuilder(this);
+    }
 
     public AbilityConfigData toConfigData() {
         return new AbilityConfigData(requiredPoints, requiredLevel, maxLevel, stats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toConfigData(), (o1, o2) -> o1, LinkedHashMap::new)));
     }
 
     public static class AbilityTemplateBuilder {
+        private final String id;
+
+        private Function3<Player, ItemStack, String, String> icon = (player, stack, ability) -> ability;
         private Map<String, StatTemplate> stats = new LinkedHashMap<>();
+        private int maxLevel = 10;
+        private int requiredLevel = 0;
+        private int requiredPoints = 1;
         private CastData castData = CastData.builder().build();
-        private ResearchTemplate researchData = ResearchTemplate.builder().build();
+        private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
 
-        private AbilityTemplateBuilder castData(CastData data) {
+        public AbilityTemplateBuilder(String id) {
+            this.id = id;
+        }
+
+        private AbilityTemplateBuilder(AbilityTemplate base) {
+            this.id = base.getId();
+
+            this.icon = base.getIcon();
+            this.stats = new LinkedHashMap<>(base.getStats());
+            this.maxLevel = base.getMaxLevel();
+            this.requiredLevel = base.getRequiredLevel();
+            this.requiredPoints = base.getRequiredPoints();
+            this.castData = base.getCastData();
+            this.researchTemplate = base.getResearchTemplate();
+        }
+
+        public AbilityTemplateBuilder icon(Function3<Player, ItemStack, String, String> icon) {
+            this.icon = icon;
+
             return this;
         }
 
-        private AbilityTemplateBuilder researchData(ResearchTemplate data) {
-            return this;
-        }
-
-        public AbilityTemplateBuilder research(ResearchTemplate data) {
-            this.researchData = data;
-
-            return this;
-        }
-
-        public AbilityTemplateBuilder active(CastData data) {
-            this.castData = data;
+        public AbilityTemplateBuilder stats(Map<String, StatTemplate> stats) {
+            this.stats = stats;
 
             return this;
         }
@@ -83,10 +85,38 @@ public class AbilityTemplate {
             return this;
         }
 
-        private AbilityTemplateBuilder id(String id) {
-            this.id = id;
+        public AbilityTemplateBuilder maxLevel(int maxLevel) {
+            this.maxLevel = maxLevel;
 
             return this;
+        }
+
+        public AbilityTemplateBuilder requiredLevel(int requiredLevel) {
+            this.requiredLevel = requiredLevel;
+
+            return this;
+        }
+
+        public AbilityTemplateBuilder requiredPoints(int requiredPoints) {
+            this.requiredPoints = requiredPoints;
+
+            return this;
+        }
+
+        public AbilityTemplateBuilder castData(CastData castData) {
+            this.castData = castData;
+
+            return this;
+        }
+
+        public AbilityTemplateBuilder researchTemplate(ResearchTemplate researchTemplate) {
+            this.researchTemplate = researchTemplate;
+
+            return this;
+        }
+
+        public AbilityTemplate build() {
+            return new AbilityTemplate(id, icon, stats, maxLevel, requiredLevel, requiredPoints, castData, researchTemplate);
         }
     }
 }

@@ -12,14 +12,14 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class LevelingConfigData {
     @Prop(comment = "Amount of experience required to level up to relic level 1")
-    private int initialCost;
+    private double initialCost;
     @Prop(comment = "Maximum level of the relic")
     private int maxLevel;
     @Prop(comment = "Increment in experience required for each subsequent level of the relic")
-    private int step;
+    private double step;
 
     public LevelingTemplate toData(IRelicItem relic) {
-        LevelingTemplate data = relic.getLevelingData();
+        var data = relic.getDefaultLevelingTemplate();
 
         data.setInitialCost(initialCost);
         data.setMaxLevel(maxLevel);

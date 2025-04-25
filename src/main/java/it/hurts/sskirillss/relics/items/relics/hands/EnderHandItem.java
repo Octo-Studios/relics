@@ -62,7 +62,7 @@ public class EnderHandItem extends RelicItem implements IRenderableCurio {
                                 .active(CastData.builder()
                                         .type(CastType.INSTANTANEOUS)
                                         .predicate("target", PredicateType.CAST, (player, stack) -> {
-                                            EntityHitResult result = EntityUtils.rayTraceEntity(player, (entity) -> !entity.isSpectator() && entity.isPickable(), getStatValue(stack, "swap", "distance"));
+                                            EntityHitResult result = EntityUtils.rayTraceEntity(player, (entity) -> !entity.isSpectator() && entity.isPickable(), getStatValue(entity, stack, "swap", "distance"));
 
                                             return result != null && result.getEntity() instanceof LivingEntity;
                                         })
@@ -89,7 +89,7 @@ public class EnderHandItem extends RelicItem implements IRenderableCurio {
 
             Level level = player.level();
 
-            EntityHitResult result = EntityUtils.rayTraceEntity(player, (entity) -> !entity.isSpectator() && entity.isPickable(), getStatValue(stack, "swap", "distance"));
+            EntityHitResult result = EntityUtils.rayTraceEntity(player, (entity) -> !entity.isSpectator() && entity.isPickable(), getStatValue(entity, stack, "swap", "distance"));
 
             if (result == null || !(result.getEntity() instanceof LivingEntity entity))
                 return;

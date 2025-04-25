@@ -17,10 +17,8 @@ public class AbilitiesConfigData {
     private Map<String, AbilityConfigData> abilities = new LinkedHashMap<>();
 
     public AbilitiesTemplate toData(IRelicItem relic) {
-        AbilitiesTemplate data = relic.getAbilitiesData();
-
-        data.setAbilities(abilities.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toData(relic, e.getKey()), (o1, o2) -> o1, LinkedHashMap::new)));
-
-        return data;
+        return relic.getDefaultAbilitiesTemplate().toBuilder()
+                .abilities(abilities.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toData(relic, e.getKey()), (o1, o2) -> o1, LinkedHashMap::new)))
+                .build();
     }
 }

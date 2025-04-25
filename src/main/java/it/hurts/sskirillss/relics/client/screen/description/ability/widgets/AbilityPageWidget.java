@@ -25,13 +25,14 @@ public class AbilityPageWidget extends AbstractDescriptionWidget {
 
     @Override
     public void onPress() {
+        var player = minecraft.player;
         var stack = screen.getStack();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream()
-                .filter(entry -> relic.isAbilityEnabled(stack, entry))
+        var abilities = relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream()
+                .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
                 .toList();
 
         var maxEntries = 5;

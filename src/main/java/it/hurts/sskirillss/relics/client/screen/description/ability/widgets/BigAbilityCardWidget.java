@@ -36,17 +36,17 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        var player = minecraft.player;
         var stack = screen.getStack();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var player = minecraft.player;
         var poseStack = guiGraphics.pose();
         var ability = screen.getSelectedAbility();
 
-        var isUnlocked = relic.isAbilityUnlocked(stack, ability);
-        var canBeUpgraded = relic.canBeUpgraded(stack, ability);
+        var isUnlocked = relic.isAbilityUnlocked(player, stack, ability);
+        var canBeUpgraded = relic.canBeUpgraded(player, stack, ability);
 
         poseStack.pushPose();
 
@@ -84,7 +84,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
             xOff = 0;
 
-            var quality = relic.getAbilityQuality(stack, ability);
+            var quality = relic.getAbilityQuality(player, stack, ability);
             var isAliquot = quality % 2 == 1;
 
             for (int i = 0; i < Math.floor(quality / 2D); i++) {
@@ -108,7 +108,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         if (canBeUpgraded) {
             poseStack.pushPose();
 
-            MutableComponent pointsComponent = Component.literal(isUnlocked ? String.valueOf(relic.getAbilityLevel(stack, ability)) : "?").withStyle(ChatFormatting.BOLD);
+            MutableComponent pointsComponent = Component.literal(isUnlocked ? String.valueOf(relic.getAbilityLevel(player, stack, ability)) : "?").withStyle(ChatFormatting.BOLD);
 
             poseStack.scale(0.75F, 0.75F, 1F);
 
@@ -128,10 +128,11 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        var player = minecraft.player;
         var stack = screen.getStack();
         var ability = screen.getSelectedAbility();
 
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(stack, ability) || !relic.canBeUpgraded(stack, ability))
+        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(player, stack, ability) || !relic.canBeUpgraded(player, stack, ability))
             return;
 
         PoseStack poseStack = guiGraphics.pose();
@@ -142,8 +143,8 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getAbilityLevel(stack, ability) + "/" + relic.getAbilityMaxLevel(stack, ability)),
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getAbilityQuality(stack, ability) / 2F, 1) + "/" + relic.getStatMaxQuality() / 2),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getAbilityLevel(player, stack, ability) + "/" + relic.getAbilityTemplate(player, stack, ability).getMaxLevel()),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getAbilityQuality(player, stack, ability) / 2F, 1) + "/" + relic.getAbilityMaxQuality(player, stack, ability) / 2),
                 Component.literal(" ")
         );
 
@@ -182,13 +183,14 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
     @Override
     public void onTick() {
+        var player = minecraft.player;
         var stack = screen.getStack();
         var ability = screen.getSelectedAbility();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var isUnlocked = relic.isAbilityUnlocked(stack, ability);
+        var isUnlocked = relic.isAbilityUnlocked(player, stack, ability);
 
         if (!isUnlocked) {
             RandomSource random = minecraft.player.getRandom();

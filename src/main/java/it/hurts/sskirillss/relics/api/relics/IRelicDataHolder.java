@@ -3,10 +3,8 @@ package it.hurts.sskirillss.relics.api.relics;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityExtenderComponent;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
 import it.hurts.sskirillss.relics.init.DataComponentRegistry;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -25,7 +23,7 @@ public interface IRelicDataHolder {
         stack.set(DataComponentRegistry.DATA, data);
     }
 
-    default LevelingComponent getLevelingData(ItemStack stack) {
+    default LevelingComponent getLevelingTemplate(ItemStack stack) {
         return getRelicData(stack).getLeveling();
     }
 
@@ -70,9 +68,12 @@ public interface IRelicDataHolder {
 
     @Nullable
     default StatComponent getStatComponent(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return null;
+
         var abilityComponent = getAbilityComponent(entity, stack, ability);
         var statComponent = getStatComponent(entity, stack, ability, stat);
-        var statData = getStatTemplate(entity, stack, ability, stat);
+        var statData = relic.getStatTemplate(entity, stack, ability, stat);
 
         if (statComponent != null)
             return statComponent;
@@ -99,8 +100,11 @@ public interface IRelicDataHolder {
     }
 
     default void setStatInitialQuality(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return;
+
         setStatComponent(entity, stack, ability, stat, getStatComponent(entity, stack, ability, stat).toBuilder()
-                .initialQuality(Math.clamp(quality, 0, getStatMaxQuality(entity, stack, ability, stat)))
+                .initialQuality(Math.clamp(quality, 0, relic.getStatMaxQuality(entity, stack, ability, stat)))
                 .build());
     }
 
@@ -122,22 +126,22 @@ public interface IRelicDataHolder {
         setStatOverrideValue(entity, stack, ability, stat, getStatOverrideValue(entity, stack, ability, stat).orElse(0D) + value);
     }
 
-    default AbilityExtenderComponent getAbilityExtenderComponent(ItemStack stack, String ability) {
-        return getAbilityComponent(stack, ability).extender();
+    default AbilityExtenderComponent getAbilityExtenderComponent(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityComponent(entity, stack, ability).getExtender();
     }
 
-    default void setAbilityExtenderComponent(ItemStack stack, String ability, AbilityExtenderComponent component) {
-        setAbilityComponent(stack, ability, getAbilityComponent(stack, ability).toBuilder()
+    default void setAbilityExtenderComponent(LivingEntity entity, ItemStack stack, String ability, AbilityExtenderComponent component) {
+        setAbilityComponent(stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
                 .extender(component)
                 .build());
     }
 
-    default LockComponent getLockComponent(ItemStack stack, String ability) {
-        return getAbilityComponent(stack, ability).lock();
+    default LockComponent getLockComponent(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityComponent(entity, stack, ability).getLock();
     }
 
-    default void setLockComponent(ItemStack stack, String ability, LockComponent component) {
-        setAbilityComponent(stack, ability, getAbilityComponent(stack, ability).toBuilder()
+    default void setLockComponent(LivingEntity entity, ItemStack stack, String ability, LockComponent component) {
+        setAbilityComponent(stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
                 .lock(component)
                 .build());
     }
@@ -146,25 +150,25 @@ public interface IRelicDataHolder {
         return 5;
     }
 
-    default int getLockUnlocks(ItemStack stack, String ability) {
-        return getLockComponent(stack, ability).unlocks();
+    default int getLockUnlocks(LivingEntity entity, ItemStack stack, String ability) {
+        return getLockComponent(entity, stack, ability).getUnlocks();
     }
 
-    default void setLockUnlocks(ItemStack stack, String ability, int unlocks) {
-        setLockComponent(stack, ability, getLockComponent(stack, ability).toBuilder()
+    default void setLockUnlocks(LivingEntity entity, ItemStack stack, String ability, int unlocks) {
+        setLockComponent(entity, stack, ability, getLockComponent(entity, stack, ability).toBuilder()
                 .unlocks(Mth.clamp(unlocks, 0, getMaxLockUnlocks()))
                 .build());
     }
 
-    default void addLockUnlocks(ItemStack stack, String ability, int unlocks) {
-        setLockUnlocks(stack, ability, getLockUnlocks(stack, ability) + unlocks);
+    default void addLockUnlocks(LivingEntity entity, ItemStack stack, String ability, int unlocks) {
+        setLockUnlocks(entity, stack, ability, getLockUnlocks(entity, stack, ability) + unlocks);
     }
 
-    default boolean isLockUnlocked(ItemStack stack, String ability) {
-        return getLockUnlocks(stack, ability) >= getMaxLockUnlocks();
+    default boolean isLockUnlocked(LivingEntity entity, ItemStack stack, String ability) {
+        return getLockUnlocks(entity, stack, ability) >= getMaxLockUnlocks();
     }
 
-    default ResearchComponent getResearchComponent(ItemStack stack, String ability) {
-        return getAbilityComponent(stack, ability).research();
+    default ResearchComponent getResearchComponent(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityComponent(entity, stack, ability).getResearch();
     }
 }

@@ -106,7 +106,7 @@ public class MagicMirrorItem extends RelicItem {
         player.teleportTo(data.getLeft(), pos.x() + 0.5F, pos.y() + 1.0F, pos.z() + 0.5F, player.getYRot(), player.getXRot());
 
         if (!player.isCreative())
-            player.getCooldowns().addCooldown(stack.getItem(), (int) Math.round(getStatValue(stack, "teleport", "cooldown") * 20));
+            player.getCooldowns().addCooldown(stack.getItem(), (int) Math.round(getStatValue(entity, stack, "teleport", "cooldown") * 20));
 
         world.playSound(null, player.blockPosition(), SoundEvents.TOTEM_USE, SoundSource.PLAYERS, 1.0F, 1.0F);
 
@@ -191,7 +191,7 @@ public class MagicMirrorItem extends RelicItem {
         ServerLevel level = data.getLeft();
 
         return !(player.position().distanceTo(new Vec3(pos.x(), player.getY(), pos.z())) * DimensionType.getTeleportationScale(player.level().dimensionType(),
-                level.dimensionType()) > getStatValue(stack, "teleport", "distance"));
+                level.dimensionType()) > getStatValue(entity, stack, "teleport", "distance"));
     }
 
     @EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)

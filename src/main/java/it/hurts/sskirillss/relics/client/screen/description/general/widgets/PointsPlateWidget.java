@@ -36,7 +36,7 @@ public class PointsPlateWidget extends AbstractPlateWidget {
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.general.leveling_point.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevelingPoints(stack)),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.general.leveling_point.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevelingPoints(minecraft.player, stack)),
                 Component.literal(" ")
         );
 
@@ -80,6 +80,6 @@ public class PointsPlateWidget extends AbstractPlateWidget {
 
     @Override
     public String getValue(ItemStack stack) {
-        return stack.getItem() instanceof IRelicItem relic ? String.valueOf(relic.getRelicLevelingPoints(stack)) : "";
+        return stack.getItem() instanceof IRelicItem relic ? String.valueOf(relic.getRelicLevelingPoints(minecraft.player, stack)) : "";
     }
 }

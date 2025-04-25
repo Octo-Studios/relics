@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -15,29 +16,29 @@ public abstract non-sealed class RelicBadge extends AbstractBadge {
         super(id);
     }
 
-    public MutableComponent getTitle(ItemStack stack) {
+    public MutableComponent getTitle(LivingEntity entity, ItemStack stack) {
         return Component.translatable("tooltip.relics.researching.badge.relic." + getId() + ".title");
     }
 
-    public List<MutableComponent> getDescription(ItemStack stack) {
+    public List<MutableComponent> getDescription(LivingEntity entity, ItemStack stack) {
         return Arrays.asList(Component.translatable("tooltip.relics.researching.badge.relic." + getId() + ".description"));
     }
 
-    public List<MutableComponent> getHint(ItemStack stack) {
+    public List<MutableComponent> getHint(LivingEntity entity, ItemStack stack) {
         return new ArrayList<>();
     }
 
-    public boolean isVisible(ItemStack stack) {
+    public boolean isVisible(LivingEntity entity, ItemStack stack) {
         return false;
     }
 
     @Override
-    public final ResourceLocation getIconTexture() {
+    public final ResourceLocation getIconTexture(LivingEntity entity, ItemStack stack) {
         return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/badges/relic/" + getId() + ".png");
     }
 
     @Override
-    public final ResourceLocation getOutlineTexture() {
+    public final ResourceLocation getOutlineTexture(LivingEntity entity, ItemStack stack) {
         return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/badges/relic/" + getId() + "_outline.png");
     }
 }

@@ -62,7 +62,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @return the current experience value
      */
     default double getRelicExperience(LivingEntity entity, ItemStack stack) {
-        return getLevelingData(stack).getExperience();
+        return getLevelingTemplate(stack).getExperience();
     }
 
     /**
@@ -73,7 +73,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @param experience the experience value to set
      */
     default void setRelicExperience(LivingEntity entity, ItemStack stack, double experience) {
-        setLevelingData(stack, getLevelingData(stack).toBuilder()
+        setLevelingData(stack, getLevelingTemplate(stack).toBuilder()
                 .experience(Math.clamp(experience, 0D, getTotalRelicExperienceForLevel(entity, stack, getRelicLevel(entity, stack) + 1)))
                 .build());
     }
@@ -148,7 +148,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @return the current level of the relic
      */
     default int getRelicLevel(LivingEntity entity, ItemStack stack) {
-        return getLevelingData(stack).getLevel();
+        return getLevelingTemplate(stack).getLevel();
     }
 
     /**
@@ -159,7 +159,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @param level  the new level to set
      */
     default void setRelicLevel(LivingEntity entity, ItemStack stack, int level) {
-        setLevelingData(stack, getLevelingData(stack).toBuilder().level(Math.max(0, level)).build());
+        setLevelingData(stack, getLevelingTemplate(stack).toBuilder().level(Math.max(0, level)).build());
     }
 
     /**
@@ -204,7 +204,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @return the number of leveling points
      */
     default int getRelicLevelingPoints(LivingEntity entity, ItemStack stack) {
-        return getLevelingData(stack).getPoints();
+        return getLevelingTemplate(stack).getPoints();
     }
 
     /**
@@ -215,7 +215,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @param amount the number of leveling points to set
      */
     default void setRelicLevelingPoints(LivingEntity entity, ItemStack stack, int amount) {
-        setLevelingData(stack, getLevelingData(stack).toBuilder().points(Math.max(0, amount)).build());
+        setLevelingData(stack, getLevelingTemplate(stack).toBuilder().points(Math.max(0, amount)).build());
     }
 
     /**
@@ -279,7 +279,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @return the current rank of the relic
      */
     default int getRelicRank(LivingEntity entity, ItemStack stack) {
-        return getLevelingData(stack).getRank();
+        return getLevelingTemplate(stack).getRank();
     }
 
     /**
@@ -290,7 +290,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @param amount the rank value to set
      */
     default void setRelicRank(LivingEntity entity, ItemStack stack, int amount) {
-        setLevelingData(stack, getLevelingData(stack).toBuilder().rank(Math.max(0, amount)).build());
+        setLevelingData(stack, getLevelingTemplate(stack).toBuilder().rank(Math.max(0, amount)).build());
     }
 
     /**
@@ -396,7 +396,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
             return 0;
 
         var filtered = abilities.keySet().stream()
-                .filter(abilityTemplate -> canBeUpgraded(stack, abilityTemplate) && isAbilityUnlocked(stack, abilityTemplate))
+                .filter(abilityTemplate -> canBeUpgraded(entity, stack, abilityTemplate) && isAbilityUnlocked(entity, stack, abilityTemplate))
                 .mapToInt(abilityTemplate -> getAbilityQuality(entity, stack, abilityTemplate))
                 .toArray();
 
@@ -445,7 +445,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         var data = getLevelingSourceTemplate(entity, stack, source);
         var ability = data.getRequiredAbility();
 
-        return isLevelingSourceEnabled(entity, stack, source) && getRelicLevel(entity, stack) >= data.getRequiredLevel() && (ability.isEmpty() || isAbilityUnlocked(stack, ability));
+        return isLevelingSourceEnabled(entity, stack, source) && getRelicLevel(entity, stack) >= data.getRequiredLevel() && (ability.isEmpty() || isAbilityUnlocked(entity, stack, ability));
     }
 
     @UnstableApi
@@ -453,7 +453,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         var data = getLevelingSourceTemplate(entity, stack, source);
         var ability = data.getRequiredAbility();
 
-        return data.getRequiredAbility().isEmpty() || isAbilityEnabled(stack, ability);
+        return data.getRequiredAbility().isEmpty() || isAbilityEnabled(entity, stack, ability);
     }
 
     @UnstableApi
@@ -487,11 +487,11 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     }
 
     default int getRelicLuck(LivingEntity entity, ItemStack stack) {
-        return getLevelingData(stack).luck();
+        return getLevelingTemplate(stack).getLuck();
     }
 
     default void setRelicLuck(LivingEntity entity, ItemStack stack, int amount) {
-        setLevelingData(stack, getLevelingData(stack).toBuilder().luck(Mth.clamp(amount, 0, getMaxLuck(entity, stack))).build());
+        setLevelingData(stack, getLevelingTemplate(stack).toBuilder().luck(Mth.clamp(amount, 0, getMaxLuck(entity, stack))).build());
     }
 
     default void addRelicLuck(LivingEntity entity, ItemStack stack, int amount) {
@@ -533,7 +533,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         int current = getRelicLevelingPoints(entity, stack);
 
         for (var data : getAbilitiesTemplate(entity, stack).getAbilities().values())
-            current += getAbilityComponent(stack, data.getId()).points() * data.getRequiredPoints();
+            current += getAbilityComponent(entity, stack, data.getId()).getPoints() * data.getRequiredPoints();
 
         return current != getRelicLevel(entity, stack);
     }
@@ -543,23 +543,23 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     }
 
     default boolean isRelicMaxQuality(LivingEntity entity, ItemStack stack) {
-        return getRelicQuality(entity, stack) >= getStatMaxQuality(entity, stack);
+        return getRelicQuality(entity, stack) >= getRelicMaxQuality(entity, stack);
     }
 
     default boolean isRelicFlawless(LivingEntity entity, ItemStack stack) {
-        return isRelicMaxLevel(entity, stack) && getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().filter(ability -> isAbilityEnabled(stack, ability)).allMatch(ability -> isAbilityFlawless(entity, stack, ability));
+        return isRelicMaxLevel(entity, stack) && getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().filter(ability -> isAbilityEnabled(entity, stack, ability)).allMatch(ability -> isAbilityFlawless(entity, stack, ability));
     }
 
     default boolean isAbilityMaxLevel(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityLevel(stack, ability) >= getAbilityMaxLevel(stack, ability);
+        return getAbilityLevel(entity, stack, ability) >= getAbilityTemplate(entity, stack, ability).getMaxLevel();
     }
 
     default boolean isAbilityMaxQuality(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityQuality(entity, stack, ability) >= getStatMaxQuality(entity, stack);
+        return getAbilityQuality(entity, stack, ability) >= getAbilityMaxQuality(entity, stack, ability);
     }
 
     default boolean isAbilityFlawless(LivingEntity entity, ItemStack stack, String ability) {
-        return isAbilityUnlocked(stack, ability) && isAbilityMaxQuality(entity, stack, ability);
+        return isAbilityUnlocked(entity, stack, ability) && isAbilityMaxQuality(entity, stack, ability);
     }
 
     default CastData getAbilityCastData(LivingEntity entity, ItemStack stack, String ability) {
@@ -586,23 +586,23 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return true;
     }
 
-    default void setResearchComponent(ItemStack stack, String ability, ResearchComponent component) {
-        setAbilityComponent(stack, ability, getAbilityComponent(stack, ability).toBuilder()
+    default void setResearchComponent(LivingEntity entity, ItemStack stack, String ability, ResearchComponent component) {
+        setAbilityComponent(stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
                 .research(component)
                 .build());
     }
 
-    default Multimap<Integer, Integer> getResearchLinks(ItemStack stack, String ability) {
-        return getResearchComponent(stack, ability).links().entrySet().stream()
+    default Multimap<Integer, Integer> getResearchLinks(LivingEntity entity, ItemStack stack, String ability) {
+        return getResearchComponent(entity, stack, ability).getLinks().entrySet().stream()
                 .collect(MultimapBuilder.hashKeys().arrayListValues()::build, (multimap, entry) -> multimap.putAll(Integer.parseInt(entry.getKey()), entry.getValue()), Multimap::putAll);
     }
 
-    default void addResearchLink(ItemStack stack, String ability, int from, int to) {
-        var links = getResearchLinks(stack, ability);
+    default void addResearchLink(LivingEntity entity, ItemStack stack, String ability, int from, int to) {
+        var links = getResearchLinks(entity, stack, ability);
 
         links.put(from, to);
 
-        setResearchComponent(stack, ability, getResearchComponent(stack, ability).toBuilder()
+        setResearchComponent(entity, stack, ability, getResearchComponent(entity, stack, ability).toBuilder()
                 .links(links.asMap().entrySet().stream()
                         .collect(Collectors.toMap(
                                 entry -> String.valueOf(entry.getKey()),
@@ -611,12 +611,12 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
                 .build());
     }
 
-    default void removeResearchLink(ItemStack stack, String ability, int from, int to) {
-        var links = getResearchLinks(stack, ability);
+    default void removeResearchLink(LivingEntity entity, ItemStack stack, String ability, int from, int to) {
+        var links = getResearchLinks(entity, stack, ability);
 
         links.remove(from, to);
 
-        setResearchComponent(stack, ability, getResearchComponent(stack, ability).toBuilder()
+        setResearchComponent(entity, stack, ability, getResearchComponent(entity, stack, ability).toBuilder()
                 .links(links.asMap().entrySet().stream()
                         .collect(Collectors.toMap(
                                 entry -> String.valueOf(entry.getKey()),
@@ -625,19 +625,19 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
                 .build());
     }
 
-    default boolean isAbilityResearched(ItemStack stack, String ability) {
-        return getResearchData(ability).getStars().isEmpty() || getResearchComponent(stack, ability).researched();
+    default boolean isAbilityResearched(LivingEntity entity, ItemStack stack, String ability) {
+        return getResearchTemplate(entity, stack, ability).getStars().isEmpty() || getResearchComponent(entity, stack, ability).isResearched();
     }
 
-    default void setAbilityResearched(ItemStack stack, String ability, boolean researched) {
-        setResearchComponent(stack, ability, getResearchComponent(stack, ability).toBuilder()
+    default void setAbilityResearched(LivingEntity entity, ItemStack stack, String ability, boolean researched) {
+        setResearchComponent(entity, stack, ability, getResearchComponent(entity, stack, ability).toBuilder()
                 .researched(researched)
                 .build());
     }
 
-    default Multimap<Integer, Integer> getCorrectResearchLinks(ItemStack stack, String ability) {
-        Multimap<Integer, Integer> schema = getResearchData(ability).getLinks();
-        Multimap<Integer, Integer> links = getResearchLinks(stack, ability);
+    default Multimap<Integer, Integer> getCorrectResearchLinks(LivingEntity entity, ItemStack stack, String ability) {
+        Multimap<Integer, Integer> schema = getResearchTemplate(entity, stack, ability).getLinks();
+        Multimap<Integer, Integer> links = getResearchLinks(entity, stack, ability);
 
         if (schema.isEmpty())
             return LinkedHashMultimap.create();
@@ -652,9 +652,9 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
                 .collect(LinkedHashMultimap::create, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Multimap::putAll);
     }
 
-    default Multimap<Integer, Integer> getIncorrectResearchLinks(ItemStack stack, String ability) {
-        Multimap<Integer, Integer> schema = getResearchData(ability).getLinks();
-        Multimap<Integer, Integer> links = getResearchLinks(stack, ability);
+    default Multimap<Integer, Integer> getIncorrectResearchLinks(LivingEntity entity, ItemStack stack, String ability) {
+        Multimap<Integer, Integer> schema = getResearchTemplate(entity, stack, ability).getLinks();
+        Multimap<Integer, Integer> links = getResearchLinks(entity, stack, ability);
 
         if (schema.isEmpty())
             return LinkedHashMultimap.create();
@@ -669,9 +669,9 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
                 .collect(LinkedHashMultimap::create, (map, entry) -> map.put(entry.getKey(), entry.getValue()), Multimap::putAll);
     }
 
-    default double testAbilityResearchPercentage(ItemStack stack, String ability) {
-        Multimap<Integer, Integer> schema = getResearchData(ability).getLinks();
-        Multimap<Integer, Integer> links = getResearchLinks(stack, ability);
+    default double testAbilityResearchPercentage(LivingEntity entity, ItemStack stack, String ability) {
+        Multimap<Integer, Integer> schema = getResearchTemplate(entity, stack, ability).getLinks();
+        Multimap<Integer, Integer> links = getResearchLinks(entity, stack, ability);
 
         if (schema.isEmpty())
             return 0D;
@@ -688,44 +688,44 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return (double) matchingLinks / schema.size();
     }
 
-    default boolean testAbilityResearch(ItemStack stack, String ability) {
-        return testAbilityResearchPercentage(stack, ability) >= 1D;
+    default boolean testAbilityResearch(LivingEntity entity, ItemStack stack, String ability) {
+        return testAbilityResearchPercentage(entity, stack, ability) >= 1D;
     }
 
-    default int getResearchHintPlayerExperienceCost(String ability) {
+    default int getResearchHintPlayerExperienceCost(LivingEntity entity, ItemStack stack, String ability) {
         return 50;
     }
 
     default int getAbilityLevel(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityComponent(stack, ability).points();
+        return getAbilityComponent(entity, stack, ability).getPoints();
     }
 
     default void setAbilityLevel(LivingEntity entity, ItemStack stack, String ability, int points) {
-        setAbilityComponent(stack, ability, getAbilityComponent(stack, ability).toBuilder()
+        setAbilityComponent(stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
                 .points(points)
                 .build());
     }
 
     default void addAbilityLevel(LivingEntity entity, ItemStack stack, String ability, int points) {
-        setAbilityLevel(stack, ability, getAbilityLevel(stack, ability) + points);
+        setAbilityLevel(entity, stack, ability, getAbilityLevel(entity, stack, ability) + points);
     }
 
-    default AbilityComponent randomizeAbilityStats(ItemStack stack, String ability, int luck) {
-        Map<String, StatTemplate> stats = getAbilityData(ability).getStats();
+    default AbilityComponent randomizeAbilityStats(LivingEntity entity, ItemStack stack, String ability, int luck) {
+        Map<String, StatTemplate> stats = getAbilityTemplate(entity, stack, ability).getStats();
 
         Random random = new Random();
 
         double targetQuality;
 
         do {
-            int maxQuality = getStatMaxQuality();
-            int maxLuck = getMaxLuck();
+            int maxQuality = getAbilityMaxQuality(entity, stack, ability);
+            int maxLuck = getMaxLuck(entity, stack);
 
             // Random value in the [-1, 1] range
             double randomValue = (random.nextDouble() * 2D) - 1D;
 
             // Luck effect modifier. Lower value = lower chance to get 5 stars
-            double modifier = getLuckModifier();
+            double modifier = getLuckModifier(entity, stack);
 
             // Bias based on luck (ranging from -0.5 to 0.5), multiplied by the modifier
             double bias = ((luck - (maxLuck / 2D)) / maxLuck) * modifier;
@@ -738,14 +738,14 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
             // Clamping the value to avoid overflow
             targetQuality = Mth.clamp(weightedRandom, 0, maxQuality);
-        } while (targetQuality == getAbilityQuality(stack, ability));
+        } while (targetQuality == getAbilityQuality(entity, stack, ability));
 
         double sumQuality = 0;
 
         Map<String, Double> generatedQualities = new HashMap<>();
 
         for (String stat : stats.keySet()) {
-            double randomQuality = MathUtils.randomBetween(random, 0, getStatMaxQuality());
+            double randomQuality = MathUtils.randomBetween(random, 0, getStatMaxQuality(entity, stack, ability, stat));
 
             generatedQualities.put(stat, randomQuality);
 
@@ -758,7 +758,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
             if (currentAverageQuality < targetQuality) {
                 String minStat = generatedQualities.entrySet().stream().min(Map.Entry.comparingByValue()).get().getKey();
 
-                double increment = Math.min((targetQuality - currentAverageQuality) * stats.size(), getStatMaxQuality() - generatedQualities.get(minStat));
+                double increment = Math.min((targetQuality - currentAverageQuality) * stats.size(), getStatMaxQuality(entity, stack, ability, minStat) - generatedQualities.get(minStat));
 
                 generatedQualities.put(minStat, generatedQualities.get(minStat) + increment);
             } else if (currentAverageQuality > targetQuality) {
@@ -775,201 +775,201 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         }
 
         for (Map.Entry<String, Double> entry : generatedQualities.entrySet())
-            randomizeStat(stack, ability, entry.getKey(), (int) Math.round(entry.getValue()));
+            randomizeStat(entity, stack, ability, entry.getKey(), (int) Math.round(entry.getValue()));
 
-        return getAbilityComponent(stack, ability);
+        return getAbilityComponent(entity, stack, ability);
     }
 
-    default StatComponent randomizeStat(ItemStack stack, String ability, String stat, int quality) {
-        StatTemplate entry = getStatData(ability, stat);
+    default StatComponent randomizeStat(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
+        StatTemplate entry = getStatTemplate(entity, stack, ability, stat);
 
         double minValue = entry.getInitialValue().getKey();
         double maxValue = entry.getInitialValue().getValue();
 
         double diff = maxValue - minValue;
 
-        double result = minValue + (diff * ((double) quality / getStatMaxQuality()));
+        double result = minValue + (diff * ((double) quality / getStatMaxQuality(entity, stack, ability, stat)));
 
-        setStatOverrideValue(stack, ability, stat, result);
+        setStatOverrideValue(entity, stack, ability, stat, result);
 
-        return getStatComponent(stack, ability, stat);
+        return getStatComponent(entity, stack, ability, stat);
     }
 
-    default StatComponent randomizeStat(ItemStack stack, String ability, String stat) {
-        return randomizeStat(stack, ability, stat, new Random().nextInt(getStatMaxQuality() + 1));
+    default StatComponent randomizeStat(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        return randomizeStat(entity, stack, ability, stat, new Random().nextInt(getStatMaxQuality(entity, stack, ability, stat) + 1));
     }
 
-    default boolean isEnoughLevel(ItemStack stack, String ability) {
-        return getRelicLevel(stack) >= getAbilityData(ability).getRequiredLevel();
+    default boolean isEnoughLevel(LivingEntity entity, ItemStack stack, String ability) {
+        return getRelicLevel(entity, stack) >= getAbilityTemplate(entity, stack, ability).getRequiredLevel();
     }
 
     @UnstableApi
-    default boolean isAbilityEnabled(ItemStack stack, String ability) {
+    default boolean isAbilityEnabled(LivingEntity entity, ItemStack stack, String ability) {
         return true;
     }
 
-    default boolean isAbilityUnlocked(ItemStack stack, String ability) {
-        return isAbilityEnabled(stack, ability) && isEnoughLevel(stack, ability) && isLockUnlocked(stack, ability) && isAbilityResearched(stack, ability);
+    default boolean isAbilityUnlocked(LivingEntity entity, ItemStack stack, String ability) {
+        return isAbilityEnabled(entity, stack, ability) && isEnoughLevel(entity, stack, ability) && isLockUnlocked(entity, stack, ability) && isAbilityResearched(entity, stack, ability);
     }
 
-    default boolean hasUnlockedUpgradeableAbility(ItemStack stack) {
-        return getAbilitiesData().getAbilities().keySet().stream().anyMatch(ability -> canBeUpgraded(stack, ability) && isAbilityUnlocked(stack, ability));
+    default boolean hasUnlockedUpgradeableAbility(LivingEntity entity, ItemStack stack) {
+        return getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().anyMatch(ability -> canBeUpgraded(entity, stack, ability) && isAbilityUnlocked(entity, stack, ability));
     }
 
-    default boolean hasUnlockedAbility(ItemStack stack) {
-        return getAbilitiesData().getAbilities().keySet().stream().anyMatch(ability -> isAbilityUnlocked(stack, ability));
+    default boolean hasUnlockedAbility(LivingEntity entity, ItemStack stack) {
+        return getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().anyMatch(ability -> isAbilityUnlocked(entity, stack, ability));
     }
 
     default boolean canPlayerUseAbility(Player player, ItemStack stack, String ability) {
-        return isAbilityUnlocked(stack, ability) && testAbilityPredicates(player, stack, ability, PredicateType.CAST) && getAbilityCooldown(stack, ability) <= 0;
+        return isAbilityUnlocked(player, stack, ability) && testAbilityPredicates(player, stack, ability, PredicateType.CAST) && getAbilityCooldown(player, stack, ability) <= 0;
     }
 
     default boolean canPlayerSeeAbility(Player player, ItemStack stack, String ability) {
         return testAbilityPredicates(player, stack, ability, PredicateType.VISIBILITY);
     }
 
-    default boolean mayUnlock(ItemStack stack, String ability) {
-        return isEnoughLevel(stack, ability) && !isLockUnlocked(stack, ability);
+    default boolean mayUnlock(LivingEntity entity, ItemStack stack, String ability) {
+        return isEnoughLevel(entity, stack, ability) && !isLockUnlocked(entity, stack, ability);
     }
 
-    default boolean mayResearch(ItemStack stack, String ability) {
-        return isEnoughLevel(stack, ability) && isLockUnlocked(stack, ability) && !isAbilityResearched(stack, ability);
+    default boolean mayResearch(LivingEntity entity, ItemStack stack, String ability) {
+        return isEnoughLevel(entity, stack, ability) && isLockUnlocked(entity, stack, ability) && !isAbilityResearched(entity, stack, ability);
     }
 
-    default int getUpgradePlayerExperienceCost(ItemStack stack, String ability) {
-        return (getAbilityLevel(stack, ability) + 1) * 50;
+    default int getUpgradePlayerExperienceCost(LivingEntity entity, ItemStack stack, String ability) {
+        return (getAbilityLevel(entity, stack, ability) + 1) * 50;
     }
 
-    default boolean canBeUpgraded(ItemStack stack, String ability) {
-        return getAbilityMaxLevel(stack, ability) > 0 && !getAbilityData(ability).getStats().isEmpty();
+    default boolean canBeUpgraded(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityTemplate(entity, stack, ability).getMaxLevel() > 0 && !getAbilityTemplate(entity, stack, ability).getStats().isEmpty();
     }
 
-    default boolean mayUpgrade(ItemStack stack, String ability) {
-        AbilityTemplate entry = getAbilityData(ability);
+    default boolean mayUpgrade(LivingEntity entity, ItemStack stack, String ability) {
+        AbilityTemplate entry = getAbilityTemplate(entity, stack, ability);
 
-        return canBeUpgraded(stack, ability) && !isAbilityMaxLevel(stack, ability) && getRelicLevelingPoints(stack) >= entry.getRequiredPoints() && isAbilityUnlocked(stack, ability);
+        return canBeUpgraded(entity, stack, ability) && !isAbilityMaxLevel(entity, stack, ability) && getRelicLevelingPoints(entity, stack) >= entry.getRequiredPoints() && isAbilityUnlocked(entity, stack, ability);
     }
 
     default boolean mayPlayerUpgrade(Player player, ItemStack stack, String ability) {
-        return mayUpgrade(stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getUpgradePlayerExperienceCost(stack, ability);
+        return mayUpgrade(player, stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getUpgradePlayerExperienceCost(player, stack, ability);
     }
 
     default boolean upgrade(Player player, ItemStack stack, String ability) {
         if (!mayPlayerUpgrade(player, stack, ability))
             return false;
 
-        player.giveExperiencePoints(-getUpgradePlayerExperienceCost(stack, ability));
+        player.giveExperiencePoints(-getUpgradePlayerExperienceCost(player, stack, ability));
 
-        setAbilityLevel(stack, ability, getAbilityLevel(stack, ability) + 1);
-        addRelicLevelingPoints(stack, -getAbilityData(ability).getRequiredPoints());
+        setAbilityLevel(player, stack, ability, getAbilityLevel(player, stack, ability) + 1);
+        addRelicLevelingPoints(player, stack, -getAbilityTemplate(player, stack, ability).getRequiredPoints());
 
         return true;
     }
 
-    default int getRerollPlayerExperienceCost(ItemStack stack, String ability) {
-        return (getRelicLuck(stack) * 5) + 50;
+    default int getRerollPlayerExperienceCost(LivingEntity entity, ItemStack stack, String ability) {
+        return (getRelicLuck(entity, stack) * 5) + 50;
     }
 
-    default boolean mayReroll(ItemStack stack, String ability) {
-        return !getAbilityData(ability).getStats().isEmpty() && isAbilityUnlocked(stack, ability);
+    default boolean mayReroll(LivingEntity entity, ItemStack stack, String ability) {
+        return !getAbilityTemplate(entity, stack, ability).getStats().isEmpty() && isAbilityUnlocked(entity, stack, ability);
     }
 
     default boolean mayPlayerReroll(Player player, ItemStack stack, String ability) {
-        return mayReroll(stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getRerollPlayerExperienceCost(stack, ability);
+        return mayReroll(player, stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getRerollPlayerExperienceCost(player, stack, ability);
     }
 
     default boolean reroll(Player player, ItemStack stack, String ability) {
         if (!mayPlayerReroll(player, stack, ability))
             return false;
 
-        player.giveExperiencePoints(-getRerollPlayerExperienceCost(stack, ability));
+        player.giveExperiencePoints(-getRerollPlayerExperienceCost(player, stack, ability));
 
-        int prevQuality = getAbilityQuality(stack, ability);
+        int prevQuality = getAbilityQuality(player, stack, ability);
 
-        randomizeAbilityStats(stack, ability, getRelicLuck(stack));
+        randomizeAbilityStats(player, stack, ability, getRelicLuck(player, stack));
 
-        int newQuality = getAbilityQuality(stack, ability);
+        int newQuality = getAbilityQuality(player, stack, ability);
 
         if (newQuality < prevQuality)
-            addRelicLuck(stack, (int) (Math.ceil((prevQuality - newQuality) / 2D)));
+            addRelicLuck(player, stack, (int) (Math.ceil((prevQuality - newQuality) / 2D)));
 
         return true;
     }
 
-    default int getResetPlayerExperienceCost(ItemStack stack, String ability) {
-        return getAbilityLevel(stack, ability) * 250;
+    default int getResetPlayerExperienceCost(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityLevel(entity, stack, ability) * 250;
     }
 
-    default boolean mayReset(ItemStack stack, String ability) {
-        return getAbilityLevel(stack, ability) > 0 && isAbilityUnlocked(stack, ability);
+    default boolean mayReset(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityLevel(entity, stack, ability) > 0 && isAbilityUnlocked(entity, stack, ability);
     }
 
     default boolean mayPlayerReset(Player player, ItemStack stack, String ability) {
-        return !getAbilityData(ability).getStats().isEmpty() && mayReset(stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getResetPlayerExperienceCost(stack, ability);
+        return !getAbilityTemplate(player, stack, ability).getStats().isEmpty() && mayReset(player, stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getResetPlayerExperienceCost(player, stack, ability);
     }
 
     default boolean reset(Player player, ItemStack stack, String ability) {
         if (!mayPlayerReset(player, stack, ability))
             return false;
 
-        player.giveExperiencePoints(-getResetPlayerExperienceCost(stack, ability));
+        player.giveExperiencePoints(-getResetPlayerExperienceCost(player, stack, ability));
 
-        addRelicLevelingPoints(stack, getAbilityLevel(stack, ability) * getAbilityData(ability).getRequiredPoints());
-        setAbilityLevel(stack, ability, 0);
+        addRelicLevelingPoints(player, stack, getAbilityLevel(player, stack, ability) * getAbilityTemplate(player, stack, ability).getRequiredPoints());
+        setAbilityLevel(player, stack, ability, 0);
 
         return true;
     }
 
-    default int getAbilityCooldownCap(ItemStack stack, String ability) {
-        return getAbilityExtenderComponent(stack, ability).cooldownCap();
+    default int getAbilityCooldownCap(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityExtenderComponent(entity, stack, ability).getCooldownCap();
     }
 
-    default void setAbilityCooldownCap(ItemStack stack, String ability, int amount) {
-        setAbilityExtenderComponent(stack, ability, getAbilityExtenderComponent(stack, ability).toBuilder()
+    default void setAbilityCooldownCap(LivingEntity entity, ItemStack stack, String ability, int amount) {
+        setAbilityExtenderComponent(entity, stack, ability, getAbilityExtenderComponent(entity, stack, ability).toBuilder()
                 .cooldownCap(amount)
                 .build());
     }
 
-    default int getAbilityCooldown(ItemStack stack, String ability) {
-        return getAbilityExtenderComponent(stack, ability).cooldown();
+    default int getAbilityCooldown(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityExtenderComponent(entity, stack, ability).getCooldown();
     }
 
-    default void setAbilityCooldown(ItemStack stack, String ability, int amount) {
-        setAbilityExtenderComponent(stack, ability, getAbilityExtenderComponent(stack, ability).toBuilder()
+    default void setAbilityCooldown(LivingEntity entity, ItemStack stack, String ability, int amount) {
+        setAbilityExtenderComponent(entity, stack, ability, getAbilityExtenderComponent(entity, stack, ability).toBuilder()
                 .cooldownCap(amount)
                 .cooldown(amount)
                 .build());
     }
 
-    default void addAbilityCooldown(ItemStack stack, String ability, int amount) {
-        setAbilityExtenderComponent(stack, ability, getAbilityExtenderComponent(stack, ability).toBuilder()
-                .cooldown(getAbilityCooldown(stack, ability) + amount)
+    default void addAbilityCooldown(LivingEntity entity, ItemStack stack, String ability, int amount) {
+        setAbilityExtenderComponent(entity, stack, ability, getAbilityExtenderComponent(entity, stack, ability).toBuilder()
+                .cooldown(getAbilityCooldown(entity, stack, ability) + amount)
                 .build());
     }
 
-    default void setAbilityTicking(ItemStack stack, String ability, boolean ticking) {
-        setAbilityExtenderComponent(stack, ability, getAbilityExtenderComponent(stack, ability).toBuilder()
+    default void setAbilityTicking(LivingEntity entity, ItemStack stack, String ability, boolean ticking) {
+        setAbilityExtenderComponent(entity, stack, ability, getAbilityExtenderComponent(entity, stack, ability).toBuilder()
                 .ticking(ticking)
                 .build());
     }
 
-    default boolean isAbilityTicking(ItemStack stack, String ability) {
-        return isAbilityUnlocked(stack, ability) && getAbilityExtenderComponent(stack, ability).ticking();
+    default boolean isAbilityTicking(LivingEntity entity, ItemStack stack, String ability) {
+        return isAbilityUnlocked(entity, stack, ability) && getAbilityExtenderComponent(entity, stack, ability).isTicking();
     }
 
-    default boolean isAbilityOnCooldown(ItemStack stack, String ability) {
-        return getAbilityCooldown(stack, ability) > 0;
+    default boolean isAbilityOnCooldown(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityCooldown(entity, stack, ability) > 0;
     }
 
-    default boolean isAbilityUpgradeEnabled(ItemStack stack, String ability) {
-        return isAbilityUnlocked(stack, ability) && !getAbilityData(ability).getStats().isEmpty();
+    default boolean isAbilityUpgradeEnabled(LivingEntity entity, ItemStack stack, String ability) {
+        return isAbilityUnlocked(entity, stack, ability) && !getAbilityTemplate(entity, stack, ability).getStats().isEmpty();
     }
 
-    default boolean isAbilityRerollEnabled(ItemStack stack, String ability) {
-        return isAbilityUnlocked(stack, ability) && !getAbilityData(ability).getStats().isEmpty();
+    default boolean isAbilityRerollEnabled(LivingEntity entity, ItemStack stack, String ability) {
+        return isAbilityUnlocked(entity, stack, ability) && !getAbilityTemplate(entity, stack, ability).getStats().isEmpty();
     }
 
-    default boolean isAbilityResetEnabled(ItemStack stack, String ability) {
-        return isAbilityUnlocked(stack, ability) && !getAbilityData(ability).getStats().isEmpty();
+    default boolean isAbilityResetEnabled(LivingEntity entity, ItemStack stack, String ability) {
+        return isAbilityUnlocked(entity, stack, ability) && !getAbilityTemplate(entity, stack, ability).getStats().isEmpty();
     }
 }

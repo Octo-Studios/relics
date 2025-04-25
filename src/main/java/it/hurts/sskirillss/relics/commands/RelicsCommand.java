@@ -27,20 +27,20 @@ public class RelicsCommand {
                                 return 0;
                             }
 
-                            var relicData = relic.getRelicTemplate();
+                            var relicData = relic.getRelicTemplate(player, stack);
 
-                            relic.setRelicLevel(stack, relicData.getLeveling().getMaxLevel());
+                            relic.setRelicLevel(player, stack, relicData.getLeveling().getMaxLevel());
 
                             for (var abilityEntry : relicData.getAbilities().getAbilities().entrySet()) {
                                 var abilityId = abilityEntry.getKey();
                                 var abilityData = abilityEntry.getValue();
 
-                                relic.setAbilityLevel(stack, abilityId, relic.getAbilityMaxLevel(stack, abilityId));
-                                relic.setLockUnlocks(stack, abilityId, relic.getMaxLockUnlocks());
-                                relic.setAbilityResearched(stack, abilityId, true);
+                                relic.setAbilityLevel(player, stack, abilityId, relic.getAbilityTemplate(player, stack, abilityId).getMaxLevel());
+                                relic.setLockUnlocks(player, stack, abilityId, relic.getMaxLockUnlocks());
+                                relic.setAbilityResearched(player, stack, abilityId, true);
 
                                 for (var statEntry : abilityData.getStats().entrySet())
-                                    relic.setStatOverrideValue(stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getValue());
+                                    relic.setStatOverrideValue(player, stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getValue());
                             }
 
                             return Command.SINGLE_SUCCESS;
@@ -57,22 +57,22 @@ public class RelicsCommand {
                                 return 0;
                             }
 
-                            var relicData = relic.getRelicTemplate();
+                            var relicData = relic.getRelicTemplate(player, stack);
 
-                            relic.setRelicLevel(stack, relicData.getLeveling().getMaxLevel());
-                            relic.setRelicExperience(stack, 0);
+                            relic.setRelicLevel(player, stack, relicData.getLeveling().getMaxLevel());
+                            relic.setRelicExperience(player, stack, 0);
 
                             for (var abilityEntry : relicData.getAbilities().getAbilities().entrySet()) {
                                 var abilityId = abilityEntry.getKey();
 
-                                relic.setAbilityResearched(stack, abilityId, false);
-                                relic.setAbilityLevel(stack, abilityId, 0);
+                                relic.setAbilityResearched(player, stack, abilityId, false);
+                                relic.setAbilityLevel(player, stack, abilityId, 0);
 
-                                if (!relic.isEnoughLevel(stack, abilityId))
-                                    relic.setLockUnlocks(stack, abilityId, 0);
+                                if (!relic.isEnoughLevel(player, stack, abilityId))
+                                    relic.setLockUnlocks(player, stack, abilityId, 0);
 
                                 for (var statEntry : abilityEntry.getValue().getStats().entrySet())
-                                    relic.setStatOverrideValue(stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getKey());
+                                    relic.setStatOverrideValue(player, stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getKey());
                             }
 
                             return Command.SINGLE_SUCCESS;
@@ -94,9 +94,9 @@ public class RelicsCommand {
                                             var level = IntegerArgumentType.getInteger(context, "level");
 
                                             switch (context.getArgument("action", CommandAction.class)) {
-                                                case SET -> relic.setRelicLevel(stack, level);
-                                                case ADD -> relic.addRelicLevel(stack, level);
-                                                case TAKE -> relic.addRelicLevel(stack, -level);
+                                                case SET -> relic.setRelicLevel(player, stack, level);
+                                                case ADD -> relic.addRelicLevel(player, stack, level);
+                                                case TAKE -> relic.addRelicLevel(player, stack, -level);
                                             }
 
                                             return Command.SINGLE_SUCCESS;
@@ -140,9 +140,9 @@ public class RelicsCommand {
                                             var points = IntegerArgumentType.getInteger(context, "points");
 
                                             switch (context.getArgument("action", CommandAction.class)) {
-                                                case SET -> relic.setRelicLevelingPoints(stack, points);
-                                                case ADD -> relic.addRelicLevelingPoints(stack, points);
-                                                case TAKE -> relic.addRelicLevelingPoints(stack, -points);
+                                                case SET -> relic.setRelicLevelingPoints(player, stack, points);
+                                                case ADD -> relic.addRelicLevelingPoints(player, stack, points);
+                                                case TAKE -> relic.addRelicLevelingPoints(player, stack, -points);
                                             }
 
                                             return Command.SINGLE_SUCCESS;
@@ -168,18 +168,18 @@ public class RelicsCommand {
                                                             var points = IntegerArgumentType.getInteger(context, "points");
 
                                                             if (ability.equals("all")) {
-                                                                for (var entry : relic.getRelicTemplate().getAbilities().getAbilities().keySet()) {
+                                                                for (var entry : relic.getAbilitiesTemplate(player, stack).getAbilities().keySet()) {
                                                                     switch (action) {
-                                                                        case SET -> relic.setAbilityLevel(stack, entry, points);
-                                                                        case ADD -> relic.addAbilityLevel(stack, entry, points);
-                                                                        case TAKE -> relic.addAbilityLevel(stack, entry, -points);
+                                                                        case SET -> relic.setAbilityLevel(player, stack, entry, points);
+                                                                        case ADD -> relic.addAbilityLevel(player, stack, entry, points);
+                                                                        case TAKE -> relic.addAbilityLevel(player, stack, entry, -points);
                                                                     }
                                                                 }
                                                             } else {
                                                                 switch (action) {
-                                                                    case SET -> relic.setAbilityLevel(stack, ability, points);
-                                                                    case ADD -> relic.addAbilityLevel(stack, ability, points);
-                                                                    case TAKE -> relic.addAbilityLevel(stack, ability, -points);
+                                                                    case SET -> relic.setAbilityLevel(player, stack, ability, points);
+                                                                    case ADD -> relic.addAbilityLevel(player, stack, ability, points);
+                                                                    case TAKE -> relic.addAbilityLevel(player, stack, ability, -points);
                                                                 }
                                                             }
 
@@ -207,37 +207,37 @@ public class RelicsCommand {
                                                                     var value = DoubleArgumentType.getDouble(context, "value");
 
                                                                     if (ability.equals("all")) {
-                                                                        for (var abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().keySet()) {
+                                                                        for (var abilityEntry : relic.getAbilitiesTemplate(player, stack).getAbilities().keySet()) {
                                                                             if (stat.equals("all")) {
-                                                                                for (var statEntry : relic.getAbilityData(abilityEntry).getStats().keySet()) {
+                                                                                for (var statEntry : relic.getAbilityTemplate(player, stack, abilityEntry).getStats().keySet()) {
                                                                                     switch (action) {
-                                                                                        case SET -> relic.setStatOverrideValue(stack, abilityEntry, statEntry, value);
-                                                                                        case ADD -> relic.addStatOverrideValue(stack, abilityEntry, statEntry, value);
-                                                                                        case TAKE -> relic.addStatOverrideValue(stack, abilityEntry, statEntry, -value);
+                                                                                        case SET -> relic.setStatOverrideValue(player, stack, abilityEntry, statEntry, value);
+                                                                                        case ADD -> relic.addStatOverrideValue(player, stack, abilityEntry, statEntry, value);
+                                                                                        case TAKE -> relic.addStatOverrideValue(player, stack, abilityEntry, statEntry, -value);
                                                                                     }
                                                                                 }
                                                                             } else {
                                                                                 switch (action) {
-                                                                                    case SET -> relic.setStatOverrideValue(stack, abilityEntry, stat, value);
-                                                                                    case ADD -> relic.addStatOverrideValue(stack, abilityEntry, stat, value);
-                                                                                    case TAKE -> relic.addStatOverrideValue(stack, abilityEntry, stat, -value);
+                                                                                    case SET -> relic.setStatOverrideValue(player, stack, abilityEntry, stat, value);
+                                                                                    case ADD -> relic.addStatOverrideValue(player, stack, abilityEntry, stat, value);
+                                                                                    case TAKE -> relic.addStatOverrideValue(player, stack, abilityEntry, stat, -value);
                                                                                 }
                                                                             }
                                                                         }
                                                                     } else {
                                                                         if (stat.equals("all")) {
-                                                                            for (var statEntry : relic.getAbilityData(ability).getStats().keySet()) {
+                                                                            for (var statEntry : relic.getAbilityTemplate(player, stack, ability).getStats().keySet()) {
                                                                                 switch (action) {
-                                                                                    case SET -> relic.setStatOverrideValue(stack, ability, statEntry, value);
-                                                                                    case ADD -> relic.addStatOverrideValue(stack, ability, statEntry, value);
-                                                                                    case TAKE -> relic.addStatOverrideValue(stack, ability, statEntry, -value);
+                                                                                    case SET -> relic.setStatOverrideValue(player, stack, ability, statEntry, value);
+                                                                                    case ADD -> relic.addStatOverrideValue(player, stack, ability, statEntry, value);
+                                                                                    case TAKE -> relic.addStatOverrideValue(player, stack, ability, statEntry, -value);
                                                                                 }
                                                                             }
                                                                         } else {
                                                                             switch (action) {
-                                                                                case SET -> relic.setStatOverrideValue(stack, ability, stat, value);
-                                                                                case ADD -> relic.addStatOverrideValue(stack, ability, stat, value);
-                                                                                case TAKE -> relic.addStatOverrideValue(stack, ability, stat, -value);
+                                                                                case SET -> relic.setStatOverrideValue(player, stack, ability, stat, value);
+                                                                                case ADD -> relic.addStatOverrideValue(player, stack, ability, stat, value);
+                                                                                case TAKE -> relic.addStatOverrideValue(player, stack, ability, stat, -value);
                                                                             }
                                                                         }
                                                                     }
@@ -266,45 +266,45 @@ public class RelicsCommand {
                                                                     var quality = IntegerArgumentType.getInteger(context, "quality");
 
                                                                     if (ability.equals("all")) {
-                                                                        for (String abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().keySet()) {
+                                                                        for (String abilityEntry : relic.getAbilitiesTemplate(player, stack).getAbilities().keySet()) {
                                                                             if (stat.equals("all")) {
-                                                                                for (String statEntry : relic.getAbilityData(abilityEntry).getStats().keySet()) {
-                                                                                    double value = relic.getStatValueFromQuality(abilityEntry, statEntry, quality);
+                                                                                for (String statEntry : relic.getAbilityTemplate(player, stack, abilityEntry).getStats().keySet()) {
+                                                                                    double value = relic.getStatValueFromQuality(player, stack, abilityEntry, statEntry, quality);
 
                                                                                     switch (action) {
-                                                                                        case SET -> relic.setStatOverrideValue(stack, abilityEntry, statEntry, value);
-                                                                                        case ADD -> relic.addStatOverrideValue(stack, abilityEntry, statEntry, value);
-                                                                                        case TAKE -> relic.addStatOverrideValue(stack, abilityEntry, statEntry, -value);
+                                                                                        case SET -> relic.setStatOverrideValue(player, stack, abilityEntry, statEntry, value);
+                                                                                        case ADD -> relic.addStatOverrideValue(player, stack, abilityEntry, statEntry, value);
+                                                                                        case TAKE -> relic.addStatOverrideValue(player, stack, abilityEntry, statEntry, -value);
                                                                                     }
                                                                                 }
                                                                             } else {
-                                                                                double value = relic.getStatValueFromQuality(abilityEntry, stat, quality);
+                                                                                double value = relic.getStatValueFromQuality(player, stack, abilityEntry, stat, quality);
 
                                                                                 switch (action) {
-                                                                                    case SET -> relic.setStatOverrideValue(stack, abilityEntry, stat, value);
-                                                                                    case ADD -> relic.addStatOverrideValue(stack, abilityEntry, stat, value);
-                                                                                    case TAKE -> relic.addStatOverrideValue(stack, abilityEntry, stat, -value);
+                                                                                    case SET -> relic.setStatOverrideValue(player, stack, abilityEntry, stat, value);
+                                                                                    case ADD -> relic.addStatOverrideValue(player, stack, abilityEntry, stat, value);
+                                                                                    case TAKE -> relic.addStatOverrideValue(player, stack, abilityEntry, stat, -value);
                                                                                 }
                                                                             }
                                                                         }
                                                                     } else {
                                                                         if (stat.equals("all")) {
-                                                                            for (String statEntry : relic.getAbilityData(ability).getStats().keySet()) {
-                                                                                double value = relic.getStatValueFromQuality(ability, statEntry, quality);
+                                                                            for (String statEntry : relic.getAbilityTemplate(player, stack, ability).getStats().keySet()) {
+                                                                                double value = relic.getStatValueFromQuality(player, stack, ability, statEntry, quality);
 
                                                                                 switch (action) {
-                                                                                    case SET -> relic.setStatOverrideValue(stack, ability, statEntry, value);
-                                                                                    case ADD -> relic.addStatOverrideValue(stack, ability, statEntry, value);
-                                                                                    case TAKE -> relic.addStatOverrideValue(stack, ability, statEntry, -value);
+                                                                                    case SET -> relic.setStatOverrideValue(player, stack, ability, statEntry, value);
+                                                                                    case ADD -> relic.addStatOverrideValue(player, stack, ability, statEntry, value);
+                                                                                    case TAKE -> relic.addStatOverrideValue(player, stack, ability, statEntry, -value);
                                                                                 }
                                                                             }
                                                                         } else {
-                                                                            double value = relic.getStatValueFromQuality(ability, stat, quality);
+                                                                            double value = relic.getStatValueFromQuality(player, stack, ability, stat, quality);
 
                                                                             switch (action) {
-                                                                                case SET -> relic.setStatOverrideValue(stack, ability, stat, value);
-                                                                                case ADD -> relic.addStatOverrideValue(stack, ability, stat, value);
-                                                                                case TAKE -> relic.addStatOverrideValue(stack, ability, stat, -value);
+                                                                                case SET -> relic.setStatOverrideValue(player, stack, ability, stat, value);
+                                                                                case ADD -> relic.addStatOverrideValue(player, stack, ability, stat, value);
+                                                                                case TAKE -> relic.addStatOverrideValue(player, stack, ability, stat, -value);
                                                                             }
                                                                         }
                                                                     }
@@ -328,20 +328,20 @@ public class RelicsCommand {
                                                     var stat = RelicAbilityStatArgument.getAbilityStat(context, "stat");
 
                                                     if (ability.equals("all")) {
-                                                        for (var abilityEntry : relic.getRelicTemplate().getAbilities().getAbilities().keySet()) {
+                                                        for (var abilityEntry : relic.getAbilitiesTemplate(player, stack).getAbilities().keySet()) {
                                                             if (stat.equals("all")) {
-                                                                for (var statEntry : relic.getAbilityData(abilityEntry).getStats().keySet())
-                                                                    relic.randomizeStat(stack, abilityEntry, statEntry);
+                                                                for (var statEntry : relic.getAbilityTemplate(player, stack, abilityEntry).getStats().keySet())
+                                                                    relic.randomizeStat(player, stack, abilityEntry, statEntry);
                                                             } else {
-                                                                relic.randomizeStat(stack, abilityEntry, stat);
+                                                                relic.randomizeStat(player, stack, abilityEntry, stat);
                                                             }
                                                         }
                                                     } else {
                                                         if (stat.equals("all")) {
-                                                            for (var statEntry : relic.getAbilityData(ability).getStats().keySet())
-                                                                relic.randomizeStat(stack, ability, statEntry);
+                                                            for (var statEntry : relic.getAbilityTemplate(player, stack, ability).getStats().keySet())
+                                                                relic.randomizeStat(player, stack, ability, statEntry);
                                                         } else {
-                                                            relic.randomizeStat(stack, ability, stat);
+                                                            relic.randomizeStat(player, stack, ability, stat);
                                                         }
                                                     }
 

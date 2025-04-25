@@ -50,7 +50,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         int xOff = 0;
 
-        if (relic.hasUnlockedUpgradeableAbility(stack)) {
+        if (relic.hasUnlockedUpgradeableAbility(player, stack)) {
             for (int i = 0; i < 5; i++) {
                 GUIRenderer.begin(DescriptionTextures.BIG_STAR_HOLE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
@@ -62,7 +62,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
             xOff = 0;
 
-            var quality = relic.getRelicQuality(stack);
+            var quality = relic.getRelicQuality(player, stack);
             var isAliquot = quality % 2 == 1;
 
             for (int i = 0; i < Math.floor(quality / 2D); i++) {
@@ -104,13 +104,13 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.scale(0.75F, 0.75F, 1F);
 
-        MutableComponent levelComponent = Component.literal(String.valueOf(relic.getRelicLevel(stack))).withStyle(ChatFormatting.BOLD);
+        MutableComponent levelComponent = Component.literal(String.valueOf(relic.getRelicLevel(player, stack))).withStyle(ChatFormatting.BOLD);
 
         guiGraphics.drawString(minecraft.font, levelComponent, (int) (((getX() + 25.5F) * 1.33F) - (minecraft.font.width(levelComponent) / 2F)), (int) ((getY() + 4) * 1.33F), 0xFFE278, true);
 
         poseStack.popPose();
 
-        if (isHovered() && relic.hasUnlockedUpgradeableAbility(stack))
+        if (isHovered() && relic.hasUnlockedUpgradeableAbility(player, stack))
             GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() - 1, getY() - 1)
@@ -123,7 +123,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         ItemStack stack = screen.getStack();
 
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.hasUnlockedUpgradeableAbility(stack))
+        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.hasUnlockedUpgradeableAbility(minecraft.player, stack))
             return;
 
         var poseStack = guiGraphics.pose();
@@ -134,8 +134,8 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevel(stack) + "/" + relic.getLevelingData().getMaxLevel()),
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getRelicQuality(stack) / 2F, 1) + "/" + relic.getStatMaxQuality() / 2),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevel(minecraft.player, stack) + "/" + relic.getLevelingTemplate(minecraft.player, stack).getMaxLevel()),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getRelicQuality(minecraft.player, stack) / 2F, 1) + "/" + relic.getRelicMaxQuality(minecraft.player, stack) / 2),
                 Component.literal(" ")
         );
 

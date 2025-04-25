@@ -105,7 +105,7 @@ public class MidnightRobeItem extends RelicItem implements IRenderableCurio {
         LivingEntity target = getTarget(serverLevel, stack);
 
         if (target != null) {
-            double radius = getStatValue(stack, "backstab", "distance");
+            double radius = getStatValue(entity, stack, "backstab", "distance");
             double step = 0.15D;
             int offset = 16;
 
@@ -166,12 +166,12 @@ public class MidnightRobeItem extends RelicItem implements IRenderableCurio {
         if (!canHide(player)) {
             EntityUtils.removeAttribute(player, stack, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
-            if (target != null && (target.isDeadOrDying() || target.position().distanceTo(player.position()) >= getStatValue(stack, "backstab", "distance")))
+            if (target != null && (target.isDeadOrDying() || target.position().distanceTo(player.position()) >= getStatValue(entity, stack, "backstab", "distance")))
                 stack.set(TARGET, "");
         } else {
             player.addEffect(new MobEffectInstance(EffectRegistry.VANISHING, 5, 0, false, false));
 
-            EntityUtils.applyAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) getStatValue(stack, "vanish", "speed"), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.applyAttribute(player, stack, Attributes.MOVEMENT_SPEED, (float) getStatValue(entity, stack, "vanish", "speed"), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         }
     }
 
@@ -205,7 +205,7 @@ public class MidnightRobeItem extends RelicItem implements IRenderableCurio {
         Level world = entity.getCommandSenderWorld();
         BlockPos position = entity.blockPosition().above();
 
-        double light = relic.getStatValue(stack, "vanish", "light");
+        double light = relic.getStatValue(entity, stack, "vanish", "light");
 
         return relic.isAbilityTicking(stack, "vanish") && stack.getOrDefault(TARGET, "").isEmpty()
                 && world.getBrightness(LightLayer.BLOCK, position) + world.getBrightness(LightLayer.SKY, position) / 2D <= (world.isNight() ? light * 1.5D : light);
@@ -267,12 +267,12 @@ public class MidnightRobeItem extends RelicItem implements IRenderableCurio {
             ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.MIDNIGHT_ROBE.get());
 
             if (!(stack.getItem() instanceof IRelicItem relic) || !canHide(player) || player.position().distanceTo(new Vec3(target.getX(),
-                    player.getY(), target.getZ())) > relic.getStatValue(stack, "backstab", "distance"))
+                    player.getY(), target.getZ())) > relic.getStatValue(entity, stack, "backstab", "distance"))
                 return;
 
             relic.spreadRelicExperience(player, stack, Math.round(event.getAmount() * 0.5F));
 
-            event.setAmount((float) (event.getAmount() * relic.getStatValue(stack, "backstab", "damage")));
+            event.setAmount((float) (event.getAmount() * relic.getStatValue(entity, stack, "backstab", "damage")));
 
             stack.set(TARGET, target.getStringUUID());
         }

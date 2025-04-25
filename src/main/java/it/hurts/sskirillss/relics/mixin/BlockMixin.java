@@ -65,7 +65,7 @@ public class BlockMixin {
 
         speed = Math.abs(speed);
 
-        var power = relic.getStatValue(stack, "bounce", "power");
+        var power = relic.getStatValue(entity, stack, "bounce", "power");
 
         player.setDeltaMovement(motion.multiply(1D, -power, 1D));
 

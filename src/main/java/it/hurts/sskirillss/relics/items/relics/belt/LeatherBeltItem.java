@@ -54,7 +54,7 @@ public class LeatherBeltItem extends RelicItem implements IRenderableCurio {
     @Override
     public RelicSlotModifier getSlotModifiers(ItemStack stack) {
         return RelicSlotModifier.builder()
-                .modifier("charm", (int) Math.round(getStatValue(stack, "slots", "charm")))
+                .modifier("charm", (int) Math.round(getStatValue(entity, stack, "slots", "charm")))
                 .build();
     }
 

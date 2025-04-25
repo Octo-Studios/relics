@@ -184,7 +184,7 @@ public class HUDRenderHandler {
 
         boolean isLocked = !relic.canPlayerUseAbility(player, stack, ability.getId());
 
-        ResourceLocation card = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/abilities/" + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "/" + relic.getAbilityData(ability.getId()).getIcon().apply(player, stack, ability.getId()) + ".png");
+        ResourceLocation card = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/abilities/" + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "/" + relic.getAbilityTemplate(ability.getId()).getIcon().apply(player, stack, ability.getId()) + ".png");
 
         RenderSystem.setShaderTexture(0, card);
 
@@ -221,7 +221,7 @@ public class HUDRenderHandler {
         RenderUtils.renderTextureFromCenter(poseStack, x, y + 1, 0, 0, 30, 41, 30, 41, scale);
 
         if (relic.isAbilityTicking(stack, ability.getId())) {
-            CastType type = relic.getAbilityData(ability.getId()).getCastData().getType();
+            CastType type = relic.getAbilityTemplate(ability.getId()).getCastData().getType();
 
             if (type == CastType.TOGGLEABLE) {
                 RenderSystem.setShaderTexture(0, STATE_TOGGLEABLE);
@@ -418,7 +418,7 @@ public class HUDRenderHandler {
                 if (ability != null) {
                     ItemStack stack = ability.getSlot().gatherStack(player);
 
-                    if (stack.getItem() instanceof IRelicItem relic && relic.getAbilityData(ability.getId()) != null && relic.canPlayerUseAbility(player, stack, ability.getId()))
+                    if (stack.getItem() instanceof IRelicItem relic && relic.getAbilityTemplate(ability.getId()) != null && relic.canPlayerUseAbility(player, stack, ability.getId()))
                         relic.tickActiveAbilitySelection(stack, player, ability.getId());
                 }
 
@@ -485,7 +485,7 @@ public class HUDRenderHandler {
 
             boolean isTicking = relic.isAbilityTicking(stack, ability.getId());
 
-            CastType type = relic.getAbilityData(ability.getId()).getCastData().getType();
+            CastType type = relic.getAbilityTemplate(ability.getId()).getCastData().getType();
 
             MC.getSoundManager().play(SimpleSoundInstance.forUI(SoundRegistry.ABILITY_CAST.get(), 1F));
 
@@ -535,13 +535,13 @@ public class HUDRenderHandler {
 
             ItemStack stack = ability.getSlot().gatherStack(player);
 
-            if (!(stack.getItem() instanceof IRelicItem relic) || !relic.getAbilitiesData().getAbilities().containsKey(ability.getId()))
+            if (!(stack.getItem() instanceof IRelicItem relic) || !relic.getAbilitiesTemplate().getAbilities().containsKey(ability.getId()))
                 return;
 
             boolean isTicking = relic.isAbilityTicking(stack, ability.getId());
             boolean isCasting = Minecraft.getInstance().mouseHandler.isLeftPressed();
 
-            AbilityTemplate entry = relic.getAbilityData(ability.getId());
+            AbilityTemplate entry = relic.getAbilityTemplate(ability.getId());
 
             if (entry == null)
                 return;

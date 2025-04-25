@@ -50,7 +50,7 @@ public class RelicExperienceOrbEntity extends Entity {
         List<ItemStack> relics = new ArrayList<>();
 
         for (RelicContainer source : RegistryRegistry.RELIC_CONTAINER_REGISTRY.entrySet().stream().map(Map.Entry::getValue).toList())
-            relics.addAll(source.gatherRelics().apply(player).stream().filter(entry -> !((IRelicItem) entry.getItem()).isRelicMaxLevel(entry)).toList());
+            relics.addAll(source.gatherRelics().apply(player).stream().filter(entry -> !((IRelicItem) entry.getItem()).isRelicMaxLevel(player, entry)).toList());
 
         return relics;
     }

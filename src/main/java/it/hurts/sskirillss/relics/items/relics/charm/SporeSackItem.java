@@ -87,7 +87,7 @@ public class SporeSackItem extends RelicItem {
     }
 
     public void addCharges(ItemStack stack, int charges) {
-        setCharges(stack, Math.clamp(getCharges(stack) + charges, 0, (int) Math.round(getStatValue(stack, "spore_mist", "amount"))));
+        setCharges(stack, Math.clamp(getCharges(stack) + charges, 0, (int) Math.round(getStatValue(entity, stack, "spore_mist", "amount"))));
     }
 
     @Override
@@ -121,7 +121,7 @@ public class SporeSackItem extends RelicItem {
                 entity.setRelicStack(stack);
                 entity.setPos(player.position().add(0F, player.getBbHeight() / 2F, 0F));
                 entity.setDeltaMovement(Math.cos(angle) * 0.5F, 0.35F, Math.sin(angle) * 0.5F);
-                entity.setDamage((float) ((player.getMaxHealth() - player.getHealth()) * getStatValue(stack, "spore_mist", "damage")));
+                entity.setDamage((float) ((player.getMaxHealth() - player.getHealth()) * getStatValue(entity, stack, "spore_mist", "damage")));
 
                 level.addFreshEntity(entity);
 
@@ -132,7 +132,7 @@ public class SporeSackItem extends RelicItem {
                 setToggled(stack, false);
         } else if (percentage < percentageMedian) {
             setToggled(stack, true);
-            setCharges(stack, (int) Math.round(getStatValue(stack, "spore_mist", "amount")));
+            setCharges(stack, (int) Math.round(getStatValue(entity, stack, "spore_mist", "amount")));
         }
     }
 }

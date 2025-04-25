@@ -77,7 +77,7 @@ public class IceBreakerItem extends RelicItem {
     @Override
     public RelicAttributeModifier getRelicAttributeModifiers(ItemStack stack) {
         return RelicAttributeModifier.builder()
-                .attribute(new RelicAttributeModifier.Modifier(Attributes.KNOCKBACK_RESISTANCE, (float) getStatValue(stack, "sustainability", "modifier")))
+                .attribute(new RelicAttributeModifier.Modifier(Attributes.KNOCKBACK_RESISTANCE, (float) getStatValue(entity, stack, "sustainability", "modifier")))
                 .build();
     }
 
@@ -124,14 +124,14 @@ public class IceBreakerItem extends RelicItem {
             if (distance <= 0)
                 return;
 
-            var radius = (int) Math.round(Math.min(getStatValue(stack, "impact", "size"), distance * 0.25D));
+            var radius = (int) Math.round(Math.min(getStatValue(entity, stack, "impact", "size"), distance * 0.25D));
 
             if (radius <= 0)
                 return;
 
             spreadRelicExperience(player, stack, (int) Math.min(10, Math.round(distance / 3F)));
 
-            ShockwaveEntity shockwave = new ShockwaveEntity(level, radius, (float) getStatValue(stack, "impact", "damage"));
+            ShockwaveEntity shockwave = new ShockwaveEntity(level, radius, (float) getStatValue(entity, stack, "impact", "damage"));
 
             BlockPos blockPos = player.getOnPos();
 

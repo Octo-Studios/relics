@@ -94,11 +94,11 @@ public class JellyfishNecklaceItem extends RelicItem implements IRenderableCurio
                 if (entity == player)
                     continue;
 
-                if (EntityUtils.hurt(entity, level.damageSources().playerAttack(player), (float) getStatValue(stack, "shock", "damage"))) {
+                if (EntityUtils.hurt(entity, level.damageSources().playerAttack(player), (float) getStatValue(entity, stack, "shock", "damage"))) {
                     spreadRelicExperience(player, stack, 1);
 
                     if (isAbilityUnlocked(stack, "paralysis"))
-                        entity.addEffect(new MobEffectInstance(EffectRegistry.PARALYSIS, (int) Math.round(getStatValue(stack, "paralysis", "duration") * 20), 0));
+                        entity.addEffect(new MobEffectInstance(EffectRegistry.PARALYSIS, (int) Math.round(getStatValue(entity, stack, "paralysis", "duration") * 20), 0));
                 }
             }
         }

@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
-import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -30,8 +30,10 @@ public class ExperienceSourcePageWidget extends AbstractDescriptionWidget {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var sources = relic.getLevelingSourcesData().getSources().keySet().stream()
-                .filter(entry -> relic.isLevelingSourceEnabled(stack, entry))
+        var player = minecraft.player;
+
+        var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
+                .filter(entry -> relic.isLevelingSourceEnabled(player, stack, entry))
                 .toList();
 
         var maxEntries = 5;

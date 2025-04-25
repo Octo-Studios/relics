@@ -1,14 +1,13 @@
 package it.hurts.sskirillss.relics.config.data;
 
 import it.hurts.octostudios.octolib.modules.config.annotations.Prop;
-import it.hurts.sskirillss.relics.init.RegistryRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.init.RegistryRegistry;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minecraft.resources.ResourceLocation;
-import org.apache.commons.lang3.tuple.Pair;
 
 @Data
 @NoArgsConstructor
@@ -30,12 +29,10 @@ public class StatConfigData {
     private double upgradeModifier;
 
     public StatTemplate toData(IRelicItem relic, String ability, String stat) {
-        StatTemplate data = relic.constructDefaultRelicTemplate().getAbilities().getAbilities().get(ability).getStats().get(stat);
-
-        data.setInitialValue(Pair.of(minInitialValue, maxInitialValue));
-        data.setThresholdValue(Pair.of(minThresholdValue, maxThresholdValue));
-        data.setUpgradeModifier(Pair.of(RegistryRegistry.SCALING_MODEL_REGISTRY.get(ResourceLocation.parse(upgradeOperation)), upgradeModifier));
-
-        return data;
+        return relic.getDefaultStatTemplate(ability, stat).toBuilder()
+                .initialValue(minInitialValue, maxInitialValue)
+                .thresholdValue(minThresholdValue, maxThresholdValue)
+                .upgradeModifier(RegistryRegistry.SCALING_MODEL_REGISTRY.get(ResourceLocation.parse(upgradeOperation)), upgradeModifier)
+                .build();
     }
 }

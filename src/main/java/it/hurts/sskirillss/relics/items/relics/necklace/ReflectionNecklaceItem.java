@@ -98,7 +98,7 @@ public class ReflectionNecklaceItem extends RelicItem implements IRenderableCuri
         int time = stack.getOrDefault(TIME, 0);
         double charge = stack.getOrDefault(CHARGE, 0);
 
-        if (time > 0 && charge < getStatValue(stack, "explode", "capacity")) {
+        if (time > 0 && charge < getStatValue(entity, stack, "explode", "capacity")) {
             stack.set(TIME, --time);
         } else if (charge > 0) {
             Level level = player.level();
@@ -126,8 +126,8 @@ public class ReflectionNecklaceItem extends RelicItem implements IRenderableCuri
                             continue;
 
                         StalactiteEntity stalactite = new StalactiteEntity(level,
-                                (float) (charge * getStatValue(stack, "explode", "damage")),
-                                (float) (charge * getStatValue(stack, "explode", "stun")));
+                                (float) (charge * getStatValue(entity, stack, "explode", "damage")),
+                                (float) (charge * getStatValue(entity, stack, "explode", "stun")));
 
                         stalactite.setOwner(player);
                         stalactite.setPos(pos);
@@ -205,7 +205,7 @@ public class ReflectionNecklaceItem extends RelicItem implements IRenderableCuri
                 return;
 
             double charge = stack.getOrDefault(CHARGE, 0);
-            double capacity = relic.getStatValue(stack, "explode", "capacity");
+            double capacity = relic.getStatValue(entity, stack, "explode", "capacity");
 
             if (charge < capacity) {
                 stack.set(CHARGE, (int) Math.min(capacity, charge + (event.getAmount())));

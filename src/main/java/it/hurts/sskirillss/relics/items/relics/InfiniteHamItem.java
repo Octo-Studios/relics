@@ -165,7 +165,7 @@ public class InfiniteHamItem extends RelicItem {
     @Override
     public void inventoryTick(@NotNull ItemStack stack, @NotNull Level level, @NotNull Entity entityIn, int itemSlot, boolean isSelected) {
         if (level.isClientSide() || !(entityIn instanceof Player player) || !canPlayerUseAbility(player, stack, "regeneration")
-                || entityIn.tickCount % (int) Math.max(1, getStatValue(stack, "regeneration", "cooldown") * 20) != 0 || getPieces(stack) >= getMaxPieces())
+                || entityIn.tickCount % (int) Math.max(1, getStatValue(entity, stack, "regeneration", "cooldown") * 20) != 0 || getPieces(stack) >= getMaxPieces())
             return;
 
         addPieces(stack, 1);
@@ -196,7 +196,7 @@ public class InfiniteHamItem extends RelicItem {
 
         player.eat(level, stack.copy());
 
-        var eaten = (int) Math.ceil(properties.nutrition() / getStatValue(stack, "regeneration", "feed"));
+        var eaten = (int) Math.ceil(properties.nutrition() / getStatValue(entity, stack, "regeneration", "feed"));
 
         if (eaten > 0) {
             addPieces(stack, -eaten);
@@ -218,7 +218,7 @@ public class InfiniteHamItem extends RelicItem {
         if (charge == 0)
             return null;
 
-        var nutrition = Math.min((int) Math.ceil(charge * getStatValue(stack, "regeneration", "feed")), 20 - player.getFoodData().getFoodLevel());
+        var nutrition = Math.min((int) Math.ceil(charge * getStatValue(entity, stack, "regeneration", "feed")), 20 - player.getFoodData().getFoodLevel());
 
         var builder = new FoodProperties.Builder()
                 .nutrition(nutrition)
@@ -232,7 +232,7 @@ public class InfiniteHamItem extends RelicItem {
                     var holder = effect.getEffect();
                     var isInstant = holder.value().isInstantenous();
 
-                    builder.effect(() -> new MobEffectInstance(holder, isInstant ? 1 : (int) (nutrition * getStatValue(stack, "marinade", "duration") * 20),
+                    builder.effect(() -> new MobEffectInstance(holder, isInstant ? 1 : (int) (nutrition * getStatValue(entity, stack, "marinade", "duration") * 20),
                             effect.getAmplifier(), !isInstant && effect.isAmbient(), !isInstant && effect.isVisible(), !isInstant && effect.showIcon()), 1F);
                 });
         }
@@ -346,8 +346,8 @@ public class InfiniteHamItem extends RelicItem {
             if (relic.isLevelingSourceUnlocked(stack, "meat_bat"))
                 relic.spreadRelicExperience(player, stack, charge);
 
-            event.setAmount((float) (event.getAmount() + (relic.getStatValue(stack, "meat_bat", "damage") * charge)));
-            event.getEntity().addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) Math.round(relic.getStatValue(stack, "meat_bat", "stun") * charge * 20), 0));
+            event.setAmount((float) (event.getAmount() + (relic.getStatValue(entity, stack, "meat_bat", "damage") * charge)));
+            event.getEntity().addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) Math.round(relic.getStatValue(entity, stack, "meat_bat", "stun") * charge * 20), 0));
 
             relic.setPieces(stack, 0);
         }

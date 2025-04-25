@@ -7,6 +7,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import lombok.Getter;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Arrays;
@@ -24,15 +25,15 @@ public class CastTypeBadge extends AbilityBadge {
     }
 
     @Override
-    public List<MutableComponent> getHint(ItemStack stack, String ability) {
+    public List<MutableComponent> getHint(LivingEntity entity, ItemStack stack, String ability) {
         return Arrays.asList(Component.translatable("tooltip.relics.researching.badge.ability.cast_type.hint", HotkeyRegistry.ACTIVE_ABILITIES_LIST.getKey().getDisplayName()));
     }
 
     @Override
-    public boolean isVisible(ItemStack stack, String ability) {
+    public boolean isVisible(LivingEntity entity, ItemStack stack, String ability) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return false;
 
-        return relic.getAbilityCastData(ability).getType() == type;
+        return relic.getAbilityCastData(entity, stack, ability).getType() == type;
     }
 }

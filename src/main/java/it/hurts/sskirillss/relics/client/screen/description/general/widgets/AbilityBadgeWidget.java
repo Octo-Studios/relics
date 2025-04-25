@@ -48,13 +48,13 @@ public class AbilityBadgeWidget extends AbstractBadgeWidget {
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                getBadge().getTitle(stack, ability).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
+                getBadge().getTitle(minecraft.player, stack, ability).withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
                 Component.literal(" ")
         );
 
-        entries.addAll(getBadge().getDescription(stack, ability));
+        entries.addAll(getBadge().getDescription(minecraft.player, stack, ability));
 
-        List<MutableComponent> hint = getBadge().getHint(stack, ability);
+        List<MutableComponent> hint = getBadge().getHint(minecraft.player, stack, ability);
 
         if (!hint.isEmpty()) {
             entries.add(Component.literal(" "));

@@ -92,7 +92,7 @@ public class SpringyBootItem extends RelicItem implements IRenderableCurio {
         if (ability.equals("bounce") && stage == CastStage.START && player.onGround()) {
             var motion = player.getKnownMovement();
 
-            var speed = getStatValue(stack, "bounce", "power") * 1.25F;
+            var speed = getStatValue(entity, stack, "bounce", "power") * 1.25F;
 
             player.setDeltaMovement(motion.x, speed, motion.z);
 

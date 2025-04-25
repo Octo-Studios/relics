@@ -3,13 +3,13 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
@@ -38,8 +38,8 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
     @Override
     public void playDownSound(SoundManager handler) {
         if (getScreen().getStack().getItem() instanceof IRelicItem relic && !isLocked()) {
-            int level = relic.getAbilityLevel(getScreen().getStack(), getAbility());
-            int maxLevel = relic.getAbilityMaxLevel(getScreen().getStack(), getAbility());
+            int level = relic.getAbilityLevel(minecraft.player, getScreen().getStack(), getAbility());
+            int maxLevel = relic.getAbilityTemplate(minecraft.player, getScreen().getStack(), getAbility()).getMaxLevel();
 
             handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_UPGRADE.get(), Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility()) ? 2F : 1F + ((float) level / maxLevel)));
         }
@@ -66,10 +66,13 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(getScreen().getStack(), getAbility()))
+        var player = minecraft.player;
+        var stack = getScreen().getStack();
+
+        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(player, stack, getAbility()))
             return;
 
-        AbilityTemplate data = relic.getAbilityData(getAbility());
+        AbilityTemplate data = relic.getAbilityTemplate(player, stack, getAbility());
 
         if (data.getStats().isEmpty())
             return;
@@ -82,18 +85,18 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
         int renderWidth = 0;
 
         int requiredPoints = data.getRequiredPoints();
-        int requiredExperience = relic.getUpgradePlayerExperienceCost(getScreen().getStack(), getAbility());
+        int requiredExperience = relic.getUpgradePlayerExperienceCost(player, stack, getAbility());
 
-        int points = relic.getRelicLevelingPoints(getScreen().getStack());
-        long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
+        int points = relic.getRelicLevelingPoints(player, stack);
+        long experience = EntityUtils.getPlayerTotalExperience(player);
 
         MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
         MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
 
         List<MutableComponent> entries = Lists.newArrayList(Component.translatable("tooltip.relics.relic.upgrade.description").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE));
 
-        boolean isMaxLevel = relic.isAbilityMaxLevel(getScreen().getStack(), getAbility());
-        boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility());
+        boolean isMaxLevel = relic.isAbilityMaxLevel(player, stack, getAbility());
+        boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerUpgrade(player, stack, getAbility());
         boolean hasExperience = requiredExperience <= experience;
 
         Component obfuscated = Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED);

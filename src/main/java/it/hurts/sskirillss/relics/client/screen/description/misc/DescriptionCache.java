@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.misc;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import lombok.*;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.HashMap;
@@ -19,13 +20,13 @@ public class DescriptionCache {
         CACHE.put(relic, cache);
     }
 
-    public static String getSelectedAbility(ItemStack stack) {
+    public static String getSelectedAbility(LivingEntity entity, ItemStack stack) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return "";
 
         var cache = getEntry(relic);
         var index = cache.getSelectionIndex(DescriptionTab.ABILITY);
-        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
+        var abilities = relic.getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(entity, stack, entry)).toList();
         var size = abilities.size();
 
         if (size == 0)
@@ -49,13 +50,13 @@ public class DescriptionCache {
         return ability;
     }
 
-    public static void setSelectedAbility(ItemStack stack, String ability) {
+    public static void setSelectedAbility(LivingEntity entity, ItemStack stack, String ability) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
         var cache = getEntry(relic);
 
-        var abilities = relic.getAbilitiesData().getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(stack, entry)).toList();
+        var abilities = relic.getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().filter(entry -> relic.isAbilityEnabled(entity, stack, entry)).toList();
 
         if (!abilities.contains(ability))
             return;
@@ -67,13 +68,13 @@ public class DescriptionCache {
                 .build());
     }
 
-    public static String getSelectedExperienceSource(ItemStack stack) {
+    public static String getSelectedExperienceSource(LivingEntity entity, ItemStack stack) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return "";
 
         var cache = getEntry(relic);
         var index = cache.getSelectionIndex(DescriptionTab.EXPERIENCE);
-        var sources = relic.getLevelingSourcesData().getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(stack, entry)).toList();
+        var sources = relic.getLevelingSourcesTemplate(entity, stack).getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(entity, stack, entry)).toList();
         var size = sources.size();
 
         if (size == 0)
@@ -97,13 +98,13 @@ public class DescriptionCache {
         return source;
     }
 
-    public static void setSelectedExperienceSource(ItemStack stack, String source) {
+    public static void setSelectedExperienceSource(LivingEntity entity, ItemStack stack, String source) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
         var cache = getEntry(relic);
 
-        var sources = relic.getLevelingSourcesData().getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(stack, entry)).toList();
+        var sources = relic.getLevelingSourcesTemplate(entity, stack).getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(entity, stack, entry)).toList();
 
         if (!sources.contains(source))
             return;

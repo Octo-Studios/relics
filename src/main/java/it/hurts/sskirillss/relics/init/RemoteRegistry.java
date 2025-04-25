@@ -69,9 +69,9 @@ public class RemoteRegistry {
             ItemProperties.register(ItemRegistry.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "charges"),
                     (stack, world, entity, id) -> Math.min(8, stack.getOrDefault(CHARGE, 0)));
             ItemProperties.register(ItemRegistry.MAGMA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "heat"),
-                    (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(stack, "pace", "time") ? 1 : 0);
+                    (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(entity, stack, "pace", "time") ? 1 : 0);
             ItemProperties.register(ItemRegistry.AQUA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "drench"),
-                    (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(stack, "walking", "time") ? 1 : 0);
+                    (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(entity, stack, "walking", "time") ? 1 : 0);
 //            ItemProperties.register(ItemRegistry.ARROW_QUIVER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "fullness"),
 //                    (stack, world, entity, id) -> {
 //                        int maxAmount = ((ArrowQuiverItem) stack.getItem()).getSlotsAmount(stack);

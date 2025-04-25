@@ -23,6 +23,6 @@ public class RankPlateWidget extends AbstractPlateWidget {
 
     @Override
     public String getValue(ItemStack stack) {
-        return String.valueOf(stack.getItem() instanceof IRelicItem relic ? relic.getRelicRank(stack) : 0);
+        return String.valueOf(stack.getItem() instanceof IRelicItem relic ? relic.getRelicRank(minecraft.player, stack) : 0);
     }
 }

@@ -60,7 +60,7 @@ public class GuiGraphicsMixin {
         var renderedUpgradeIcon = false;
         var renderedResearchIcon = false;
 
-        for (var ability : relic.getAbilitiesData().getAbilities().values()) {
+        for (var ability : relic.getAbilitiesTemplate().getAbilities().values()) {
             if (!renderedUpgradeIcon && relic.mayUpgrade(stack, ability.getId())) {
                 poseStack.pushPose();
 
