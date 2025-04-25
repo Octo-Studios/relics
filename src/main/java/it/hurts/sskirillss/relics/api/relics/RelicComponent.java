@@ -3,11 +3,9 @@ package it.hurts.sskirillss.relics.api.relics;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesComponent;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 
-@Getter
+@Data
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class RelicComponent {
