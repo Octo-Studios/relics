@@ -62,7 +62,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @return the current experience value
      */
     default double getRelicExperience(LivingEntity entity, ItemStack stack) {
-        return getLevelingTemplate(stack).getExperience();
+        return getLevelingData(stack).getExperience();
     }
 
     /**
@@ -73,7 +73,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @param experience the experience value to set
      */
     default void setRelicExperience(LivingEntity entity, ItemStack stack, double experience) {
-        setLevelingData(stack, getLevelingTemplate(stack).toBuilder()
+        setLevelingData(stack, getLevelingData(stack).toBuilder()
                 .experience(Math.clamp(experience, 0D, getTotalRelicExperienceForLevel(entity, stack, getRelicLevel(entity, stack) + 1)))
                 .build());
     }
@@ -148,7 +148,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @return the current level of the relic
      */
     default int getRelicLevel(LivingEntity entity, ItemStack stack) {
-        return getLevelingTemplate(stack).getLevel();
+        return getLevelingData(stack).getLevel();
     }
 
     /**
@@ -159,7 +159,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @param level  the new level to set
      */
     default void setRelicLevel(LivingEntity entity, ItemStack stack, int level) {
-        setLevelingData(stack, getLevelingTemplate(stack).toBuilder().level(Math.max(0, level)).build());
+        setLevelingData(stack, getLevelingData(stack).toBuilder().level(Math.max(0, level)).build());
     }
 
     /**
@@ -204,7 +204,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @return the number of leveling points
      */
     default int getRelicLevelingPoints(LivingEntity entity, ItemStack stack) {
-        return getLevelingTemplate(stack).getPoints();
+        return getLevelingData(stack).getPoints();
     }
 
     /**
@@ -215,7 +215,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @param amount the number of leveling points to set
      */
     default void setRelicLevelingPoints(LivingEntity entity, ItemStack stack, int amount) {
-        setLevelingData(stack, getLevelingTemplate(stack).toBuilder().points(Math.max(0, amount)).build());
+        setLevelingData(stack, getLevelingData(stack).toBuilder().points(Math.max(0, amount)).build());
     }
 
     /**
@@ -279,7 +279,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @return the current rank of the relic
      */
     default int getRelicRank(LivingEntity entity, ItemStack stack) {
-        return getLevelingTemplate(stack).getRank();
+        return getLevelingData(stack).getRank();
     }
 
     /**
@@ -290,7 +290,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      * @param amount the rank value to set
      */
     default void setRelicRank(LivingEntity entity, ItemStack stack, int amount) {
-        setLevelingData(stack, getLevelingTemplate(stack).toBuilder().rank(Math.max(0, amount)).build());
+        setLevelingData(stack, getLevelingData(stack).toBuilder().rank(Math.max(0, amount)).build());
     }
 
     /**
@@ -333,31 +333,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return 10;
     }
 
-    default int getStatQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
-        var statData = getStatTemplate(entity, stack, ability, stat);
-
-        if (statData == null)
-            return 0;
-
-        var format = statData.getFormatValue();
-
-        var initial = format.apply(getOrCalculateStatValue(entity, stack, ability, stat)).doubleValue();
-
-        var min = format.apply(statData.getInitialValue().getKey()).doubleValue();
-        var max = format.apply(statData.getInitialValue().getValue()).doubleValue();
-
-        if (min == max)
-            return getStatMaxQuality(entity, stack, ability, stat);
-
-        if (initial == min)
-            return 0;
-
-        if (initial == max)
-            return getStatMaxQuality(entity, stack, ability, stat);
-
-        return Mth.clamp((int) Math.round((initial - min) / ((max - min) / getStatMaxQuality(entity, stack, ability, stat))), 1, getStatMaxQuality(entity, stack, ability, stat) - 1);
-    }
-
     default int getAbilityMaxQuality(LivingEntity entity, ItemStack stack, String ability) {
         return 10;
     }
@@ -369,7 +344,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
             return getAbilityMaxQuality(entity, stack, ability);
 
         var avg = stats.keySet().stream()
-                .mapToInt(stat -> getStatQuality(entity, stack, ability, stat))
+                .mapToInt(stat -> getOrCalculateStatQuality(entity, stack, ability, stat))
                 .average()
                 .orElse(0);
 
@@ -487,11 +462,11 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     }
 
     default int getRelicLuck(LivingEntity entity, ItemStack stack) {
-        return getLevelingTemplate(stack).getLuck();
+        return getLevelingData(stack).getLuck();
     }
 
     default void setRelicLuck(LivingEntity entity, ItemStack stack, int amount) {
-        setLevelingData(stack, getLevelingTemplate(stack).toBuilder().luck(Mth.clamp(amount, 0, getMaxLuck(entity, stack))).build());
+        setLevelingData(stack, getLevelingData(stack).toBuilder().luck(Mth.clamp(amount, 0, getMaxLuck(entity, stack))).build());
     }
 
     default void addRelicLuck(LivingEntity entity, ItemStack stack, int amount) {

@@ -53,11 +53,43 @@ public interface IRelicUtilities {
         return result - 1;
     }
 
+    default int getOrCalculateStatQuality(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return 0;
+
+        var statComponent = relic.getStatComponent(entity, stack, ability, stat);
+        
+        var optional = statComponent.getOverrideValue();
+        
+        if (optional.isEmpty())
+            return statComponent.getInitialQuality();
+        
+        var statData = relic.getStatTemplate(entity, stack, ability, stat);
+
+        var format = statData.getFormatValue();
+
+        var initial = format.apply(optional.get()).doubleValue();
+
+        var min = format.apply(statData.getInitialValue().getKey()).doubleValue();
+        var max = format.apply(statData.getInitialValue().getValue()).doubleValue();
+
+        if (min == max)
+            return relic.getStatMaxQuality(entity, stack, ability, stat);
+
+        if (initial == min)
+            return 0;
+
+        if (initial == max)
+            return relic.getStatMaxQuality(entity, stack, ability, stat);
+
+        return Mth.clamp((int) Math.round((initial - min) / ((max - min) / relic.getStatMaxQuality(entity, stack, ability, stat))), 1, relic.getStatMaxQuality(entity, stack, ability, stat) - 1);
+    }
+
     default double getOrCalculateStatValue(LivingEntity entity, ItemStack stack, String ability, String stat) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0D;
 
-        return relic.getStatOverrideValue(entity, stack, ability, stat).orElse(getStatValueFromQuality(entity, stack, ability, stat, relic.getStatQuality(entity, stack, ability, stat)));
+        return relic.getStatOverrideValue(entity, stack, ability, stat).orElse(getStatValueFromQuality(entity, stack, ability, stat, relic.getOrCalculateStatQuality(entity, stack, ability, stat)));
     }
 
     default double getRelativeStatValue(LivingEntity entity, ItemStack stack, String ability, String stat, double value, int points) {

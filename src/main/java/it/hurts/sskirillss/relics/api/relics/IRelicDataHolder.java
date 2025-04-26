@@ -23,7 +23,7 @@ public interface IRelicDataHolder {
         stack.set(DataComponentRegistry.DATA, data);
     }
 
-    default LevelingComponent getLevelingTemplate(ItemStack stack) {
+    default LevelingComponent getLevelingData(ItemStack stack) {
         return getRelicData(stack).getLeveling();
     }
 
@@ -68,12 +68,12 @@ public interface IRelicDataHolder {
 
     @Nullable
     default StatComponent getStatComponent(LivingEntity entity, ItemStack stack, String ability, String stat) {
-        if (!(stack.getItem() instanceof IRelicItem relic))
+        if (!(stack.getItem() instanceof IRelicTemplateHolder templateHolder))
             return null;
 
         var abilityComponent = getAbilityComponent(entity, stack, ability);
-        var statComponent = getStatComponent(entity, stack, ability, stat);
-        var statData = relic.getStatTemplate(entity, stack, ability, stat);
+        var statComponent = abilityComponent.getStats().get(stat);
+        var statData = templateHolder.getStatTemplate(entity, stack, ability, stat);
 
         if (statComponent != null)
             return statComponent;

@@ -93,11 +93,11 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     }
 
     public String getSelectedAbility() {
-        return DescriptionCache.getSelectedAbility(minecraft.player, stack);
+        return DescriptionCache.getSelectedAbility(Minecraft.getInstance().player, stack);
     }
 
     public void setSelectedAbility( String ability) {
-        DescriptionCache.setSelectedAbility(minecraft.player, stack, ability);
+        DescriptionCache.setSelectedAbility(Minecraft.getInstance().player, stack, ability);
     }
 
     @Override
@@ -105,7 +105,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var player = minecraft.player;
+        var player = Minecraft.getInstance().player;
         var ability = getSelectedAbility();
 
         if (relic.getAbilityTemplate(player, stack, ability) == null)
@@ -135,18 +135,18 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         var paginatedAbilities = (startIndex < abilities.size() && startIndex >= 0) ? abilities.subList(startIndex, endIndex) : new ArrayList<String>();
 
-        this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+        this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(player, this.container, this.slot, this.screen)));
 
         int xOff = 19;
 
         if (!paginatedAbilities.isEmpty()) {
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(player, this.container, this.slot, this.screen)));
 
             xOff += 19;
         }
 
         if (!sources.isEmpty())
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.EXPERIENCE, new ExperienceDescriptionScreen(player, this.container, this.slot, this.screen)));
 
         this.addRenderableWidget(new BigAbilityCardWidget(x + 60, y + 47, this));
 
@@ -202,7 +202,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
     @Override
     public void rebuildWidgets() {
-        stack = DescriptionUtils.gatherRelicStack(minecraft.player, slot);
+        stack = DescriptionUtils.gatherRelicStack(Minecraft.getInstance().player, slot);
 
         super.rebuildWidgets();
     }
@@ -211,14 +211,14 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
     public void tick() {
         super.tick();
 
-        stack = DescriptionUtils.gatherRelicStack(minecraft.player, slot);
+        stack = DescriptionUtils.gatherRelicStack(Minecraft.getInstance().player, slot);
     }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.renderBackground(guiGraphics, pMouseX, pMouseY, pPartialTick);
 
-        LocalPlayer player = minecraft.player;
+        LocalPlayer player = Minecraft.getInstance().player;
 
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
             return;
@@ -282,7 +282,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
             var page = Component.literal(String.valueOf(this.page + 1)).withStyle(ChatFormatting.BOLD);
 
-            guiGraphics.drawString(minecraft.font, page, (int) (x + 296 - font.width(page) / 2F), y + 173, 0xffe278, true);
+            guiGraphics.drawString(Minecraft.getInstance().font, page, (int) (x + 296 - font.width(page) / 2F), y + 173, 0xffe278, true);
 
             poseStack.popPose();
         }
@@ -305,7 +305,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
         } else
             title.withStyle(ChatFormatting.BOLD);
 
-        guiGraphics.drawString(minecraft.font, title, (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
+        guiGraphics.drawString(Minecraft.getInstance().font, title, (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
 
         poseStack.popPose();
 
@@ -443,7 +443,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
     @Override
     public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
-        if (minecraft.options.keyInventory.isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+        if (Minecraft.getInstance().options.keyInventory.isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
             this.onClose();
 
             return true;

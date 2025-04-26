@@ -91,11 +91,11 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
     }
 
     public String getSelectedSource() {
-        return DescriptionCache.getSelectedExperienceSource(minecraft.player, stack);
+        return DescriptionCache.getSelectedExperienceSource(Minecraft.getInstance().player, stack);
     }
 
     public void setSelectedSource(String source) {
-        DescriptionCache.setSelectedExperienceSource(minecraft.player, stack, source);
+        DescriptionCache.setSelectedExperienceSource(Minecraft.getInstance().player, stack, source);
     }
 
     @Override
@@ -103,7 +103,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var player = minecraft.player;
+        var player = Minecraft.getInstance().player;
         var source = getSelectedSource();
 
         if (relic.getLevelingSourceTemplate(player, stack, source) == null)
@@ -133,18 +133,18 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
         var paginatedSources = (startIndex < sources.size() && startIndex >= 0) ? sources.subList(startIndex, endIndex) : new ArrayList<String>();
 
-        this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+        this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(player, this.container, this.slot, this.screen)));
 
         int xOff = 19;
 
         if (!abilities.isEmpty()) {
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(player, this.container, this.slot, this.screen)));
 
             xOff += 19;
         }
 
         if (!sources.isEmpty())
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.EXPERIENCE, new ExperienceDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.EXPERIENCE, new ExperienceDescriptionScreen(player, this.container, this.slot, this.screen)));
 
         this.addRenderableWidget(new BigExperienceCardWidget(x + 60, y + 47, this));
 
@@ -185,7 +185,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
     @Override
     public void rebuildWidgets() {
-        stack = DescriptionUtils.gatherRelicStack(minecraft.player, slot);
+        stack = DescriptionUtils.gatherRelicStack(Minecraft.getInstance().player, slot);
 
         super.rebuildWidgets();
     }
@@ -194,14 +194,14 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
     public void tick() {
         super.tick();
 
-        stack = DescriptionUtils.gatherRelicStack(minecraft.player, slot);
+        stack = DescriptionUtils.gatherRelicStack(Minecraft.getInstance().player, slot);
     }
 
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.renderBackground(guiGraphics, pMouseX, pMouseY, pPartialTick);
 
-        var player = minecraft.player;
+        var player = Minecraft.getInstance().player;
 
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
             return;
@@ -264,7 +264,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
             var page = Component.literal(String.valueOf(this.page + 1)).withStyle(ChatFormatting.BOLD);
 
-            guiGraphics.drawString(minecraft.font, page, (int) (x + 296 - font.width(page) / 2F), y + 173, 0xffe278, true);
+            guiGraphics.drawString(Minecraft.getInstance().font, page, (int) (x + 296 - font.width(page) / 2F), y + 173, 0xffe278, true);
 
             poseStack.popPose();
         }
@@ -287,7 +287,7 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         } else
             title.withStyle(ChatFormatting.BOLD);
 
-        guiGraphics.drawString(minecraft.font, title, (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
+        guiGraphics.drawString(Minecraft.getInstance().font, title, (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
 
         poseStack.popPose();
 
