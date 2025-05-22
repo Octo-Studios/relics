@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.items;
 
 import it.hurts.sskirillss.relics.entities.ThrownRelicExperienceBottle;
-import it.hurts.sskirillss.relics.init.EntityRegistry;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Position;
 import net.minecraft.sounds.SoundEvents;
@@ -28,7 +28,7 @@ public class RelicExperienceBottleItem extends ItemBase implements ProjectileIte
         level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.EXPERIENCE_BOTTLE_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
 
         if (!level.isClientSide) {
-            ThrownRelicExperienceBottle bottle = new ThrownRelicExperienceBottle(EntityRegistry.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), level);
+            ThrownRelicExperienceBottle bottle = new ThrownRelicExperienceBottle(RelicsEntities.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), level);
 
             bottle.setItem(stack);
             bottle.setOwner(player);
@@ -52,7 +52,7 @@ public class RelicExperienceBottleItem extends ItemBase implements ProjectileIte
     }
 
     public Projectile asProjectile(Level p_338868_, Position p_338766_, ItemStack p_338321_, Direction p_338772_) {
-        ThrownRelicExperienceBottle thrownexperiencebottle = new ThrownRelicExperienceBottle(EntityRegistry.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), p_338868_);
+        ThrownRelicExperienceBottle thrownexperiencebottle = new ThrownRelicExperienceBottle(RelicsEntities.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), p_338868_);
 
         thrownexperiencebottle.setPos(p_338766_.x(), p_338766_.y(), p_338766_.z());
         thrownexperiencebottle.setItem(p_338321_);

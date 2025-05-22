@@ -5,13 +5,11 @@ import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
 import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 @Data
@@ -33,7 +31,7 @@ public class S2CEntityTargetPacket implements CustomPacketPayload {
             var level = ctx.player().getCommandSenderWorld();
 
             if (level.getEntity(sourceId) instanceof ITargetableEntity source && level.getEntity(targetId) instanceof LivingEntity target)
-                source.setTarget(target);
+                source.setTargetPos(target);
         });
     }
 

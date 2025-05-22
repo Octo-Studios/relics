@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.mixin;
 
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -26,7 +26,7 @@ public class BlockMixin {
         if (!(entity instanceof Player player))
             return;
 
-        var stack = EntityUtils.findEquippedCurio(player, ItemRegistry.SPRINGY_BOOT.get());
+        var stack = EntityUtils.findEquippedCurio(player, RelicsItems.SPRINGY_BOOT.get());
 
         if (!(stack.getItem() instanceof SpringyBootItem relic) || !relic.isAbilityTicking(player, stack, "bounce"))
             return;
@@ -47,7 +47,7 @@ public class BlockMixin {
         if (!(entity instanceof Player player))
             return;
 
-        var stack = EntityUtils.findEquippedCurio(player, ItemRegistry.SPRINGY_BOOT.get());
+        var stack = EntityUtils.findEquippedCurio(player, RelicsItems.SPRINGY_BOOT.get());
 
         if (!(stack.getItem() instanceof SpringyBootItem relic) || !relic.isAbilityTicking(player, stack, "bounce"))
             return;

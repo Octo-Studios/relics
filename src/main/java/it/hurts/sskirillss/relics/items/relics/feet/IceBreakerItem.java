@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 
 import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
 import it.hurts.sskirillss.relics.entities.ShockwaveEntity;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
@@ -166,7 +166,7 @@ public class IceBreakerItem extends RelicItem {
                     || player.isInWater() || player.isInLava())
                 return;
 
-            ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.ICE_BREAKER.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.ICE_BREAKER.get());
 
             if (stack.isEmpty())
                 return;

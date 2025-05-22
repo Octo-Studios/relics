@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.mixin;
 
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
@@ -34,7 +34,7 @@ public abstract class PiglinAiMixin {
 
         Player player = optional.get();
 
-        ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.BASTION_RING.get());
+        ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.BASTION_RING.get());
 
         if (stack.getItem() instanceof IRelicItem relic) {
             for (int i = 0; i < Math.round(relic.getStatValue(player, stack, "trade", "rolls")); i++) {

@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics.belt;
 
 import com.google.common.collect.Lists;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -98,7 +98,7 @@ public class HunterBeltItem extends RelicItem implements IRenderableCurio {
                     || !(pet.getOwner() instanceof Player player))
                 return;
 
-            ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.HUNTER_BELT.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.HUNTER_BELT.get());
 
             if (!(stack.getItem() instanceof IRelicItem relic))
                 return;

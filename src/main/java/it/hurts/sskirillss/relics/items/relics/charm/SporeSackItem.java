@@ -5,7 +5,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.SporeEntity;
 import it.hurts.sskirillss.relics.init.DataComponentRegistry;
-import it.hurts.sskirillss.relics.init.EntityRegistry;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -116,7 +116,7 @@ public class SporeSackItem extends RelicItem {
                 var cycle = charges * 1D;
                 var angle = (Math.floor(time / speed) % cycle) / cycle * 2D * Math.PI;
 
-                var entity = new SporeEntity(EntityRegistry.SPORE.get(), level);
+                var entity = new SporeEntity(RelicsEntities.SPORE.get(), level);
 
                 entity.setOwner(player);
                 entity.setRelicStack(stack);

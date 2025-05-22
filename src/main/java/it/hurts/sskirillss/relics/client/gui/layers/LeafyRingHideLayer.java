@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.client.gui.layers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.ring.LeafyRingItem;
 import it.hurts.sskirillss.relics.utils.Easing;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -30,7 +30,7 @@ public class LeafyRingHideLayer implements LayeredDraw.Layer {
         if (player == null)
             return;
 
-        var stack = EntityUtils.findEquippedCurio(player, ItemRegistry.LEAFY_RING.get());
+        var stack = EntityUtils.findEquippedCurio(player, RelicsItems.LEAFY_RING.get());
 
         if (!(stack.getItem() instanceof LeafyRingItem relic))
             return;

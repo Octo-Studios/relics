@@ -17,12 +17,12 @@ public class Relics {
     public Relics(IEventBus bus, ModContainer container) {
         bus.addListener(this::setupCommon);
 
-        ItemRegistry.register(bus);
+        RelicsItems.register(bus);
         TileRegistry.register(bus);
         BlockRegistry.register(bus);
         SoundRegistry.register(bus);
         BadgeRegistry.register(bus);
-        EntityRegistry.register(bus);
+        RelicsEntities.register(bus);
         EffectRegistry.register(bus);
         CommandRegistry.register(bus);
         ParticleRegistry.register(bus);

@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.sskirillss.relics.init.EntityRegistry;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
@@ -19,7 +19,7 @@ public class ThrownRelicExperienceBottle extends ThrowableItemProjectile {
 
     @Override
     protected Item getDefaultItem() {
-        return ItemRegistry.RELIC_EXPERIENCE_BOTTLE.get();
+        return RelicsItems.RELIC_EXPERIENCE_BOTTLE.get();
     }
 
     @Override
@@ -37,7 +37,7 @@ public class ThrownRelicExperienceBottle extends ThrowableItemProjectile {
             int steps = 10 + random.nextInt(10);
 
             for (int i = 0; i < steps; i++) {
-                RelicExperienceOrbEntity orb = new RelicExperienceOrbEntity(EntityRegistry.RELIC_EXPERIENCE_ORB.get(), this.level());
+                RelicExperienceOrbEntity orb = new RelicExperienceOrbEntity(RelicsEntities.RELIC_EXPERIENCE_ORB.get(), this.level());
 
                 orb.setExperience(1 + random.nextInt(3));
                 orb.setPos(Vec3.atCenterOf(this.blockPosition()));

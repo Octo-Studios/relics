@@ -4,6 +4,6 @@ import net.minecraft.world.level.block.DispenserBlock;
 
 public class DispenserBehaviorRegistry {
     public static void register() {
-        DispenserBlock.registerProjectileBehavior(ItemRegistry.RELIC_EXPERIENCE_BOTTLE.get());
+        DispenserBlock.registerProjectileBehavior(RelicsItems.RELIC_EXPERIENCE_BOTTLE.get());
     }
 }

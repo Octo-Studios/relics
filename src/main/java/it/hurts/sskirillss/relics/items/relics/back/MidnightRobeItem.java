@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.back;
 
 import com.google.common.collect.Lists;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -201,7 +201,7 @@ public class MidnightRobeItem extends RelicItem implements IRenderableCurio {
     }
 
     private static boolean canHide(LivingEntity entity) {
-        ItemStack stack = EntityUtils.findEquippedCurio(entity, ItemRegistry.MIDNIGHT_ROBE.get());
+        ItemStack stack = EntityUtils.findEquippedCurio(entity, RelicsItems.MIDNIGHT_ROBE.get());
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return false;
@@ -268,7 +268,7 @@ public class MidnightRobeItem extends RelicItem implements IRenderableCurio {
                     || level.isClientSide() || target.getStringUUID().equals(player.getStringUUID()))
                 return;
 
-            ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.MIDNIGHT_ROBE.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.MIDNIGHT_ROBE.get());
 
             if (!(stack.getItem() instanceof IRelicItem relic) || !canHide(player) || player.position().distanceTo(new Vec3(target.getX(),
                     player.getY(), target.getZ())) > relic.getStatValue(player, stack, "backstab", "distance"))

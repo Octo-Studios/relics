@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.sskirillss.relics.init.EffectRegistry;
-import it.hurts.sskirillss.relics.init.EntityRegistry;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
@@ -43,7 +43,7 @@ public class SolidSnowballEntity extends ThrowableProjectile {
     }
 
     public SolidSnowballEntity(Level level) {
-        super(EntityRegistry.SOLID_SNOWBALL.get(), level);
+        super(RelicsEntities.SOLID_SNOWBALL.get(), level);
     }
 
     @Override
@@ -81,7 +81,7 @@ public class SolidSnowballEntity extends ThrowableProjectile {
                 || (this.getOwner() != null && entity.getStringUUID().equals(this.getOwner().getStringUUID())))
             return;
 
-        ItemStack stack = EntityUtils.findEquippedCurio(this.getOwner(), ItemRegistry.WOOL_MITTEN.get());
+        ItemStack stack = EntityUtils.findEquippedCurio(this.getOwner(), RelicsItems.WOOL_MITTEN.get());
 
         if (stack.getItem() instanceof IRelicItem relic) {
             boolean mayContinue = false;
@@ -115,14 +115,14 @@ public class SolidSnowballEntity extends ThrowableProjectile {
         if (owner == null)
             return;
 
-        ItemStack stack = EntityUtils.findEquippedCurio(owner, ItemRegistry.WOOL_MITTEN.get());
+        ItemStack stack = EntityUtils.findEquippedCurio(owner, RelicsItems.WOOL_MITTEN.get());
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
         for (LivingEntity entity : level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(getSize() / 15F))) {
             if (!entity.getStringUUID().equals(owner.getStringUUID()))
-                entity.setTicksFrozen((int) (100 + Math.round(getSize() * relic.getStatValue(entity, EntityUtils.findEquippedCurio(owner, ItemRegistry.WOOL_MITTEN.get()), "mold", "freeze"))));
+                entity.setTicksFrozen((int) (100 + Math.round(getSize() * relic.getStatValue(entity, EntityUtils.findEquippedCurio(owner, RelicsItems.WOOL_MITTEN.get()), "mold", "freeze"))));
         }
 
         if (owner instanceof LivingEntity entity)

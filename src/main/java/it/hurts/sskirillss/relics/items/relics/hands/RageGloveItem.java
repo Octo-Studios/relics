@@ -12,7 +12,7 @@ import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedCurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedFPRCurioModel;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -347,7 +347,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
                 if (!(event.getSource().getEntity() instanceof Player))
                     return;
 
-                ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.RAGE_GLOVE.get());
+                ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.RAGE_GLOVE.get());
 
                 if (!(stack.getItem() instanceof IRelicItem relic))
                     return;
@@ -363,7 +363,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
                     event.setAmount((float) (event.getAmount() + (event.getAmount() * (stacks * relic.getStatValue(player, stack, "rage", "dealt_damage")))));
                 }
             } else if (event.getEntity() instanceof Player player) {
-                ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.RAGE_GLOVE.get());
+                ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.RAGE_GLOVE.get());
 
                 if (!(stack.getItem() instanceof IRelicItem relic))
                     return;

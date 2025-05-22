@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.mixin;
 
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class PowderSnowBlockMixin {
     @Inject(method = "entityInside", at = @At(value = "HEAD"), cancellable = true)
     public void boilSnow(BlockState state, Level level, BlockPos pos, Entity entity, CallbackInfo ci) {
-        if (!EntityUtils.findEquippedCurio(entity, ItemRegistry.WOOL_MITTEN.get()).isEmpty())
+        if (!EntityUtils.findEquippedCurio(entity, RelicsItems.WOOL_MITTEN.get()).isEmpty())
             ci.cancel();
     }
 }

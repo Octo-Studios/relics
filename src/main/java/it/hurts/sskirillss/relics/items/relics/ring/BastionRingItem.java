@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics.ring;
 
 import com.mojang.datafixers.util.Pair;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -144,7 +144,7 @@ public class BastionRingItem extends RelicItem {
             if (!(event.getSource().getEntity() instanceof Player player))
                 return;
 
-            ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.BASTION_RING.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.BASTION_RING.get());
 
             if (!(stack.getItem() instanceof IRelicItem relic))
                 return;

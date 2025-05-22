@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedCurioModel;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -156,7 +156,7 @@ public class MagmaWalkerItem extends RelicItem implements IRenderableCurio {
 
     @SubscribeEvent
     public static void onLivingAttack(LivingIncomingDamageEvent event) {
-        ItemStack stack = EntityUtils.findEquippedCurio(event.getEntity(), ItemRegistry.MAGMA_WALKER.get());
+        ItemStack stack = EntityUtils.findEquippedCurio(event.getEntity(), RelicsItems.MAGMA_WALKER.get());
 
         if (stack.getItem() instanceof IRelicItem relic && event.getSource() == event.getEntity().level().damageSources().hotFloor()
                 && stack.getOrDefault(CHARGE, 0) <= relic.getStatValue(event.getEntity(), stack, "pace", "time")) {
@@ -166,7 +166,7 @@ public class MagmaWalkerItem extends RelicItem implements IRenderableCurio {
 
     @SubscribeEvent
     public static void onFluidCollide(FluidCollisionEvent event) {
-        ItemStack stack = EntityUtils.findEquippedCurio(event.getEntity(), ItemRegistry.MAGMA_WALKER.get());
+        ItemStack stack = EntityUtils.findEquippedCurio(event.getEntity(), RelicsItems.MAGMA_WALKER.get());
 
         if (!(event.getEntity() instanceof Player player) || !(stack.getItem() instanceof IRelicItem relic)
                 || !event.getFluid().is(FluidTags.LAVA) || player.isShiftKeyDown())

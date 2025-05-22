@@ -85,7 +85,7 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
             if (targets.isEmpty())
                 return;
 
-            setTarget(targets.get(random.nextInt(targets.size())));
+            setTargetPos(targets.get(random.nextInt(targets.size())));
 
             NetworkHandler.sendToClientsTrackingEntity(new S2CEntityTargetPacket(this.getId(), target.getId()), this);
 
@@ -179,13 +179,13 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
     }
 
     @Override
-    public @Nullable LivingEntity getTarget() {
+    public @Nullable LivingEntity getTargetPos() {
         return target;
     }
 
     @Override
-    public void setTarget(LivingEntity target) {
-        this.target = target;
+    public void setTargetPos(LivingEntity targetPos) {
+        this.target = targetPos;
     }
 
     @Override

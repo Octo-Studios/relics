@@ -6,7 +6,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedCurioModel;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -157,7 +157,7 @@ public class AquaWalkerItem extends RelicItem implements IRenderableCurio {
 
     @SubscribeEvent
     public static void onFluidCollide(FluidCollisionEvent event) {
-        ItemStack stack = EntityUtils.findEquippedCurio(event.getEntity(), ItemRegistry.AQUA_WALKER.get());
+        ItemStack stack = EntityUtils.findEquippedCurio(event.getEntity(), RelicsItems.AQUA_WALKER.get());
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;

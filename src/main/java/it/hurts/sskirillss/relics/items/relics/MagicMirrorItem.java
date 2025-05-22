@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics;
 
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -76,7 +76,7 @@ public class MagicMirrorItem extends RelicItem {
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         ItemStack stack = playerIn.getItemInHand(handIn);
 
-        if (playerIn.getCooldowns().isOnCooldown(ItemRegistry.MAGIC_MIRROR.get())
+        if (playerIn.getCooldowns().isOnCooldown(RelicsItems.MAGIC_MIRROR.get())
                 || worldIn.isClientSide())
             return InteractionResultHolder.fail(stack);
 
@@ -205,7 +205,7 @@ public class MagicMirrorItem extends RelicItem {
             Player player = event.getPlayer();
             ItemStack stack = player.getItemInHand(InteractionHand.MAIN_HAND);
 
-            if (stack.getItem() != ItemRegistry.MAGIC_MIRROR.get()
+            if (stack.getItem() != RelicsItems.MAGIC_MIRROR.get()
                     || !player.isUsingItem())
                 return;
 
@@ -220,7 +220,7 @@ public class MagicMirrorItem extends RelicItem {
     public static class ServerEvents {
         @SubscribeEvent
         public static void onLivingHurt(LivingIncomingDamageEvent event) {
-            Item item = ItemRegistry.MAGIC_MIRROR.get();
+            Item item = RelicsItems.MAGIC_MIRROR.get();
 
             if (!(event.getEntity() instanceof Player player) || !player.isUsingItem()
                     || (player.getMainHandItem().getItem() != item && player.getOffhandItem().getItem() != item))

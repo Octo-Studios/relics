@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.mixin;
 
 import it.hurts.sskirillss.relics.api.events.common.EntityBlockSpeedFactorEvent;
 import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -87,7 +87,7 @@ public class EntityMixin {
         if (!(entity instanceof LivingEntity))
             return;
 
-        if (!EntityUtils.findEquippedCurio(entity, ItemRegistry.DROWNED_BELT.get()).isEmpty())
+        if (!EntityUtils.findEquippedCurio(entity, RelicsItems.DROWNED_BELT.get()).isEmpty())
             info.setReturnValue(true);
     }
 

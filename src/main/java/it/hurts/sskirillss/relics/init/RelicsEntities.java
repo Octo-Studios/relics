@@ -9,8 +9,14 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class EntityRegistry {
+public class RelicsEntities {
     private static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, Reference.MODID);
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ReflectiveOrbEntity>> REFLECTIVE_ORB = ENTITIES.register("reflective_orb", () ->
+            EntityType.Builder.<ReflectiveOrbEntity>of(ReflectiveOrbEntity::new, MobCategory.MISC)
+                    .sized(0.25F, 0.25F)
+                    .build("reflective_orb")
+    );
 
     public static final DeferredHolder<EntityType<?>, EntityType<ShadowGlaiveEntity>> SHADOW_GLAIVE = ENTITIES.register("shadow_glaive", () ->
             EntityType.Builder.<ShadowGlaiveEntity>of(ShadowGlaiveEntity::new, MobCategory.MISC)
@@ -40,12 +46,6 @@ public class EntityRegistry {
             EntityType.Builder.<DeathEssenceEntity>of(DeathEssenceEntity::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)
                     .build("death_essence")
-    );
-
-    public static final DeferredHolder<EntityType<?>, EntityType<StalactiteEntity>> STALACTITE = ENTITIES.register("stalactite", () ->
-            EntityType.Builder.<StalactiteEntity>of(StalactiteEntity::new, MobCategory.MISC)
-                    .sized(0.35F, 0.35F)
-                    .build("stalactite")
     );
 
     public static final DeferredHolder<EntityType<?>, EntityType<DissectionEntity>> DISSECTION = ENTITIES.register("dissection", () ->

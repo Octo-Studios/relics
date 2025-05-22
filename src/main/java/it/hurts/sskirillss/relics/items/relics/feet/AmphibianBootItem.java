@@ -5,7 +5,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.hurts.sskirillss.relics.client.models.items.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.SidedCurioModel;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -218,7 +218,7 @@ public class AmphibianBootItem extends RelicItem implements IRenderableCurio {
         public static void onLivingBreath(LivingBreatheEvent event) {
             LivingEntity entity = event.getEntity();
 
-            ItemStack stack = EntityUtils.findEquippedCurio(entity, ItemRegistry.AMPHIBIAN_BOOT.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(entity, RelicsItems.AMPHIBIAN_BOOT.get());
 
             if (!(stack.getItem() instanceof IRelicItem relic))
                 return;

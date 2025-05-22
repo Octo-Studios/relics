@@ -48,11 +48,11 @@ public class RemoteRegistry {
         ItemBlockRenderTypes.setRenderLayer(BlockRegistry.RESEARCHING_TABLE.get(), RenderType.cutout());
 
         event.enqueueWork(() -> {
-            ItemProperties.register(ItemRegistry.INFINITY_HAM.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "pieces"),
+            ItemProperties.register(RelicsItems.INFINITY_HAM.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "pieces"),
                     (stack, world, entity, id) -> ((InfiniteHamItem) stack.getItem()).getPieces(stack));
-            ItemProperties.register(ItemRegistry.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "charges"),
+            ItemProperties.register(RelicsItems.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "charges"),
                     (stack, world, entity, id) -> Math.min(8, stack.getOrDefault(CHARGE, 0)));
-            ItemProperties.register(ItemRegistry.MAGIC_MIRROR.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "world"),
+            ItemProperties.register(RelicsItems.MAGIC_MIRROR.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "world"),
                     (stack, world, entity, id) -> {
                         Entity e = Minecraft.getInstance().getCameraEntity();
 
@@ -66,11 +66,11 @@ public class RemoteRegistry {
                             default -> 0;
                         };
                     });
-            ItemProperties.register(ItemRegistry.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "charges"),
+            ItemProperties.register(RelicsItems.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "charges"),
                     (stack, world, entity, id) -> Math.min(8, stack.getOrDefault(CHARGE, 0)));
-            ItemProperties.register(ItemRegistry.MAGMA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "heat"),
+            ItemProperties.register(RelicsItems.MAGMA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "heat"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(entity, stack, "pace", "time") ? 1 : 0);
-            ItemProperties.register(ItemRegistry.AQUA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "drench"),
+            ItemProperties.register(RelicsItems.AQUA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "drench"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(entity, stack, "walking", "time") ? 1 : 0);
 //            ItemProperties.register(ItemRegistry.ARROW_QUIVER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "fullness"),
 //                    (stack, world, entity, id) -> {
@@ -79,23 +79,23 @@ public class RemoteRegistry {
 //
 //                        return amount > 0 ? (int) Math.floor(amount / (maxAmount / 2F)) + 1 : 0;
 //                    });
-            ItemProperties.register(ItemRegistry.ELYTRA_BOOSTER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "fuel"),
+            ItemProperties.register(RelicsItems.ELYTRA_BOOSTER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "fuel"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) > 0 ? 1 : 0);
-            ItemProperties.register(ItemRegistry.SOLID_SNOWBALL.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "snow"),
+            ItemProperties.register(RelicsItems.SOLID_SNOWBALL.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "snow"),
                     (stack, world, entity, id) -> {
-                        ItemStack relic = EntityUtils.findEquippedCurio(entity, ItemRegistry.WOOL_MITTEN.get());
+                        ItemStack relic = EntityUtils.findEquippedCurio(entity, RelicsItems.WOOL_MITTEN.get());
 
                         if (relic.isEmpty())
                             return 3;
 
                         return (int) Math.floor(stack.getOrDefault(CHARGE, 0) / (((IRelicItem) relic.getItem()).getStatValue(entity, relic, "mold", "size") / 3F));
                     });
-            ItemProperties.register(ItemRegistry.ROLLER_SKATES.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "active"),
+            ItemProperties.register(RelicsItems.ROLLER_SKATES.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "active"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) > 0 ? 1 : 0);
 
-            ItemProperties.register(ItemRegistry.BLAZING_FLASK.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "active"),
+            ItemProperties.register(RelicsItems.BLAZING_FLASK.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "active"),
                     (stack, world, entity, id) -> stack.get(WORLD_POSITION) == null ? 0 : 1);
-            ItemProperties.register(ItemRegistry.HOLY_LOCKET.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "mode"),
+            ItemProperties.register(RelicsItems.HOLY_LOCKET.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "mode"),
                     (stack, world, entity, id) -> ((HolyLocketItem) stack.getItem()).getMode(stack).getIndex());
         });
 
@@ -130,19 +130,19 @@ public class RemoteRegistry {
 
     @SubscribeEvent
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerEntityRenderer(EntityRegistry.SHADOW_GLAIVE.get(), ShadowGlaiveRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.BLOCK_SIMULATION.get(), BlockSimulationRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.SHOCKWAVE.get(), NullRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.LIFE_ESSENCE.get(), NullRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.DEATH_ESSENCE.get(), NullRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.STALACTITE.get(), StalactiteRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.DISSECTION.get(), DissectionRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.SPORE.get(), SporeRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.SOLID_SNOWBALL.get(), SolidSnowballRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.BLOCK_SIMULATION.get(), BlockSimulationRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.SHOCKWAVE.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.LIFE_ESSENCE.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.DEATH_ESSENCE.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.REFLECTIVE_ORB.get(), ReflectiveOrbRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.DISSECTION.get(), DissectionRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.SPORE.get(), SporeRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.SOLID_SNOWBALL.get(), SolidSnowballRenderer::new);
 //        event.registerEntityRenderer(EntityRegistry.ARROW_RAIN.get(), NullRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.RELIC_EXPERIENCE_ORB.get(), RelicExperienceOrbRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), ThrownItemRenderer::new);
-        event.registerEntityRenderer(EntityRegistry.CHAIR.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.RELIC_EXPERIENCE_ORB.get(), RelicExperienceOrbRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.CHAIR.get(), NullRenderer::new);
 
         event.registerBlockEntityRenderer(TileRegistry.RESEARCHING_TABLE.get(), ResearchingTableRenderer::new);
     }

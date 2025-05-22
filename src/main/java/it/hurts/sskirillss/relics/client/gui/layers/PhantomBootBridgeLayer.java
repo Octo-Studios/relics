@@ -1,23 +1,16 @@
 package it.hurts.sskirillss.relics.client.gui.layers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.feet.PhantomBootItem;
-import it.hurts.sskirillss.relics.items.relics.ring.LeafyRingItem;
-import it.hurts.sskirillss.relics.utils.Easing;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
-import it.hurts.sskirillss.relics.utils.data.SpriteMirror;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
-import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.resources.ResourceLocation;
-
-import java.awt.*;
 
 public class PhantomBootBridgeLayer implements LayeredDraw.Layer {
     private static final ResourceLocation VIGNETTE = ResourceLocation.withDefaultNamespace("textures/misc/vignette.png");
@@ -30,7 +23,7 @@ public class PhantomBootBridgeLayer implements LayeredDraw.Layer {
         if (player == null)
             return;
 
-        var stack = EntityUtils.findEquippedCurio(player, ItemRegistry.PHANTOM_BOOT.get());
+        var stack = EntityUtils.findEquippedCurio(player, RelicsItems.PHANTOM_BOOT.get());
 
         if (!(stack.getItem() instanceof PhantomBootItem relic))
             return;

@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.sskirillss.relics.init.EffectRegistry;
-import it.hurts.sskirillss.relics.init.EntityRegistry;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.PacketPlayerMotion;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -63,7 +63,7 @@ public class DissectionEntity extends Entity {
     }
 
     public DissectionEntity(Level level) {
-        super(EntityRegistry.DISSECTION.get(), level);
+        super(RelicsEntities.DISSECTION.get(), level);
 
         this.noPhysics = true;
     }

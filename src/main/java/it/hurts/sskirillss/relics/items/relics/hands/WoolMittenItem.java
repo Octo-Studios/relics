@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.hands;
 
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -76,7 +76,7 @@ public class WoolMittenItem extends RelicItem {
         public static void onBlockClick(PlayerInteractEvent.RightClickBlock event) {
             Player player = event.getEntity();
 
-            ItemStack relicStack = EntityUtils.findEquippedCurio(player, ItemRegistry.WOOL_MITTEN.get());
+            ItemStack relicStack = EntityUtils.findEquippedCurio(player, RelicsItems.WOOL_MITTEN.get());
 
             if (!player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty() || !(relicStack.getItem() instanceof IRelicItem relic))
                 return;
@@ -95,13 +95,13 @@ public class WoolMittenItem extends RelicItem {
 
             int size = (int) Math.round(relic.getStatValue(player, relicStack, "mold", "size"));
 
-            Optional<Integer> slot = EntityUtils.getSlotsWithItem(player, ItemRegistry.SOLID_SNOWBALL.get()).stream()
+            Optional<Integer> slot = EntityUtils.getSlotsWithItem(player, RelicsItems.SOLID_SNOWBALL.get()).stream()
                     .filter(id -> inventory.getItem(id).getOrDefault(CHARGE, 0) < size)
                     .max(Comparator.comparingInt(s -> inventory.items.get(s).getOrDefault(CHARGE, 0)));
 
             if (slot.isEmpty()) {
-                if (inventory.add(new ItemStack(ItemRegistry.SOLID_SNOWBALL.get()))) {
-                    slot = EntityUtils.getSlotsWithItem(player, ItemRegistry.SOLID_SNOWBALL.get()).stream().findFirst();
+                if (inventory.add(new ItemStack(RelicsItems.SOLID_SNOWBALL.get()))) {
+                    slot = EntityUtils.getSlotsWithItem(player, RelicsItems.SOLID_SNOWBALL.get()).stream().findFirst();
 
                     if (slot.isEmpty())
                         return;

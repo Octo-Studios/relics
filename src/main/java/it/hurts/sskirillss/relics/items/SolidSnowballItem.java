@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.items;
 
 import it.hurts.sskirillss.relics.entities.SolidSnowballEntity;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -26,7 +26,7 @@ public class SolidSnowballItem extends ItemBase {
 
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        if (EntityUtils.findEquippedCurio(entity, ItemRegistry.WOOL_MITTEN.get()).isEmpty())
+        if (EntityUtils.findEquippedCurio(entity, RelicsItems.WOOL_MITTEN.get()).isEmpty())
             entity.setTicksFrozen(entity.getTicksFrozen() + 3);
     }
 

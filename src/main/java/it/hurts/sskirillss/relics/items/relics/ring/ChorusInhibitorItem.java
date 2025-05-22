@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.ring;
 
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -117,7 +117,7 @@ public class ChorusInhibitorItem extends RelicItem {
             if (!(event.getEntity() instanceof Player player))
                 return;
 
-            ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.CHORUS_INHIBITOR.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.CHORUS_INHIBITOR.get());
 
             if (!(stack.getItem() instanceof ChorusInhibitorItem relic))
                 return;

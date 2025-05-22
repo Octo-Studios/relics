@@ -6,8 +6,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.DeathEssenceEntity;
 import it.hurts.sskirillss.relics.entities.LifeEssenceEntity;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
-import it.hurts.sskirillss.relics.init.EntityRegistry;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -214,7 +214,7 @@ public class HolyLocketItem extends RelicItem {
             if (!(event.getSource().getEntity() instanceof Player player))
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(player, ItemRegistry.HOLY_LOCKET.get())) {
+            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HOLY_LOCKET.get())) {
                 if (!(stack.getItem() instanceof IRelicItem relic) || !relic.canPlayerUseAbility(player, stack, "ascension"))
                     continue;
 
@@ -252,18 +252,18 @@ public class HolyLocketItem extends RelicItem {
 
                 targets++;
 
-                for (var stack : EntityUtils.findEquippedCurios(player, ItemRegistry.HOLY_LOCKET.get())) {
+                for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HOLY_LOCKET.get())) {
                     if (!(stack.getItem() instanceof HolyLocketItem relic) || relic.getMode(stack) != Mode.HOLINESS || !relic.canPlayerUseAbility(player, stack, "faith")
                             || entity.position().distanceTo(player.position()) > relic.getStatValue(entity, stack, "faith", "radius"))
                         continue;
 
                     var heal = (float) (amount * relic.getStatValue(entity, stack, "faith", "health"));
 
-                    var essence = new LifeEssenceEntity(EntityRegistry.LIFE_ESSENCE.get(), level);
+                    var essence = new LifeEssenceEntity(RelicsEntities.LIFE_ESSENCE.get(), level);
 
                     essence.setHeal(heal);
                     essence.setOwner(player);
-                    essence.setTarget(player);
+                    essence.setTargetPos(player);
                     essence.setPos(entity.getEyePosition());
                     essence.setDeltaMovement(MathUtils.randomFloat(random), random.nextFloat(), MathUtils.randomFloat(random));
 
@@ -279,7 +279,7 @@ public class HolyLocketItem extends RelicItem {
             }
 
             if (entity instanceof Player player && player.getHealth() < player.getMaxHealth()) {
-                for (var stack : EntityUtils.findEquippedCurios(player, ItemRegistry.HOLY_LOCKET.get())) {
+                for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HOLY_LOCKET.get())) {
                     if (!(stack.getItem() instanceof HolyLocketItem relic) || relic.getMode(stack) != Mode.WICKEDNESS || !relic.canPlayerUseAbility(player, stack, "faith"))
                         continue;
 
@@ -291,10 +291,10 @@ public class HolyLocketItem extends RelicItem {
 
                         targets++;
 
-                        var essence = new DeathEssenceEntity(EntityRegistry.DEATH_ESSENCE.get(), level);
+                        var essence = new DeathEssenceEntity(RelicsEntities.DEATH_ESSENCE.get(), level);
 
                         essence.setOwner(player);
-                        essence.setTarget(target);
+                        essence.setTargetPos(target);
                         essence.setPos(player.getEyePosition());
                         essence.setDamage((float) (event.getAmount() * relic.getStatValue(entity, stack, "faith", "damage")));
                         essence.setDeltaMovement(MathUtils.randomFloat(random), random.nextFloat(), MathUtils.randomFloat(random));
@@ -317,7 +317,7 @@ public class HolyLocketItem extends RelicItem {
             if (!entity.isInvertedHealAndHarm() || !(event.getSource().getEntity() instanceof Player player))
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(player, ItemRegistry.HOLY_LOCKET.get())) {
+            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HOLY_LOCKET.get())) {
                 if (!(stack.getItem() instanceof HolyLocketItem relic) || !relic.canPlayerUseAbility(player, stack, "penitence"))
                     continue;
 

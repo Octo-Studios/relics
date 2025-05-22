@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics.belt;
 
 import com.google.common.collect.Lists;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -147,7 +147,7 @@ public class DrownedBeltItem extends RelicItem implements IRenderableCurio {
                     || !player.isUnderWater() || !event.getEntity().isUnderWater())
                 return;
 
-            ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.DROWNED_BELT.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.DROWNED_BELT.get());
 
             if (!(stack.getItem() instanceof IRelicItem relic))
                 return;
@@ -172,7 +172,7 @@ public class DrownedBeltItem extends RelicItem implements IRenderableCurio {
             if (!(event.getEntity() instanceof Player player) || trident.getItem() != Items.TRIDENT)
                 return;
 
-            ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.DROWNED_BELT.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.DROWNED_BELT.get());
 
             if (!(stack.getItem() instanceof IRelicItem relic))
                 return;

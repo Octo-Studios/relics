@@ -6,8 +6,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.ShadowGlaiveEntity;
-import it.hurts.sskirillss.relics.init.EntityRegistry;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourceTemplate;
@@ -113,14 +113,14 @@ public class ShadowGlaiveItem extends RelicItem {
             if (!(source instanceof Player player) || EntityUtils.isAlliedTo(source, target))
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(player, ItemRegistry.SHADOW_GLAIVE.get())) {
+            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.SHADOW_GLAIVE.get())) {
                 if (!(stack.getItem() instanceof IRelicItem relic) || !relic.canPlayerUseAbility(player, stack, "mayhem")
                         || source.getRandom().nextDouble() > relic.getStatValue(player, stack, "mayhem", "chance"))
                     continue;
 
                 var level = target.getCommandSenderWorld();
 
-                var entity = new ShadowGlaiveEntity(EntityRegistry.SHADOW_GLAIVE.get(), level);
+                var entity = new ShadowGlaiveEntity(RelicsEntities.SHADOW_GLAIVE.get(), level);
 
                 entity.setDamage((float) (damage * relic.getStatValue(player, stack, "mayhem", "damage")));
                 entity.setMaxBounces((int) relic.getStatValue(player, stack, "mayhem", "bounces"));

@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 
 import it.hurts.sskirillss.relics.api.events.common.EntityBlockSpeedFactorEvent;
 import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -98,7 +98,7 @@ public class RollerSkatesItem extends RelicItem {
             if (!(event.getEntity() instanceof Player player) || player.isInWater() || player.isFallFlying())
                 return;
 
-            ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.ROLLER_SKATES.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.ROLLER_SKATES.get());
 
             if (stack.isEmpty())
                 return;
@@ -111,7 +111,7 @@ public class RollerSkatesItem extends RelicItem {
             if (!(event.getEntity() instanceof Player player) || player.isInWater() || player.isFallFlying())
                 return;
 
-            ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.ROLLER_SKATES.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.ROLLER_SKATES.get());
 
             if (stack.isEmpty())
                 return;

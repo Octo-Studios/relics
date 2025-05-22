@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.sskirillss.relics.init.EntityRegistry;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -42,7 +42,7 @@ public class ShockwaveEntity extends ThrowableProjectile {
     }
 
     public ShockwaveEntity(Level level, int radius, float damage) {
-        super(EntityRegistry.SHOCKWAVE.get(), level);
+        super(RelicsEntities.SHOCKWAVE.get(), level);
 
         this.radius = radius;
         this.damage = damage;

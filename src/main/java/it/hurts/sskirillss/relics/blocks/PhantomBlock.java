@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.blocks;
 
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.feet.PhantomBootItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -108,7 +108,7 @@ public class PhantomBlock extends Block {
         if (entity == null)
             return Shapes.empty();
 
-        var stack = EntityUtils.findEquippedCurio(entity, ItemRegistry.PHANTOM_BOOT.get());
+        var stack = EntityUtils.findEquippedCurio(entity, RelicsItems.PHANTOM_BOOT.get());
 
         if (!entity.isShiftKeyDown() && !stack.isEmpty() && stack.getItem() instanceof PhantomBootItem relic && relic.isToggled(stack)) {
             var shape = Shapes.block();

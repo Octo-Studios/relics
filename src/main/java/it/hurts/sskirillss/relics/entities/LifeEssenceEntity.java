@@ -103,16 +103,16 @@ public class LifeEssenceEntity extends ThrowableProjectile implements ITargetabl
 
     @Nullable
     @Override
-    public LivingEntity getTarget() {
+    public LivingEntity getTargetPos() {
         return target;
     }
 
     @Override
-    public void setTarget(LivingEntity target) {
-        this.target = target;
+    public void setTargetPos(LivingEntity targetPos) {
+        this.target = targetPos;
 
-        if (!level().isClientSide() && target != null)
-            NetworkHandler.sendToClientsTrackingEntity(new S2CEntityTargetPacket(this.getId(), target.getId()), this);
+        if (!level().isClientSide() && targetPos != null)
+            NetworkHandler.sendToClientsTrackingEntity(new S2CEntityTargetPacket(this.getId(), targetPos.getId()), this);
     }
 
     @Override

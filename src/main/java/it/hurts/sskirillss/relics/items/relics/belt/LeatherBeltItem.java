@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.belt;
 
 import com.google.common.collect.Lists;
 import it.hurts.sskirillss.relics.api.events.leveling.ExperienceAddEvent;
-import it.hurts.sskirillss.relics.init.ItemRegistry;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -67,11 +67,11 @@ public class LeatherBeltItem extends RelicItem implements IRenderableCurio {
         LivingEntity entity = event.getEntity();
         ItemStack sourceStack = event.getStack();
 
-        if (entity == null || sourceStack.getItem() == ItemRegistry.LEATHER_BELT.get())
+        if (entity == null || sourceStack.getItem() == RelicsItems.LEATHER_BELT.get())
             return;
 
         if (sourceStack.getTags().map(tag -> tag.location().getPath()).anyMatch(tag -> tag.equals("charm"))) {
-            ItemStack stack = EntityUtils.findEquippedCurio(entity, ItemRegistry.LEATHER_BELT.get());
+            ItemStack stack = EntityUtils.findEquippedCurio(entity, RelicsItems.LEATHER_BELT.get());
 
             if (!(stack.getItem() instanceof IRelicItem relic))
                 return;

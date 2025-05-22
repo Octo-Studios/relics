@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.entities;
 import it.hurts.octostudios.octolib.modules.particles.OctoRenderManager;
 import it.hurts.octostudios.octolib.modules.particles.trail.TrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
-import it.hurts.sskirillss.relics.init.EntityRegistry;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -104,7 +104,7 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
             level.addParticle(ParticleUtils.constructSimpleSpark(new Color(50 + random.nextInt(100), 0, 150 + random.nextInt(100)), 0.1F + random.nextFloat() * 0.15F, 5 + random.nextInt(10), 0.85F),
                     particleCenter.x() + MathUtils.randomFloat(random) * 0.25F, particleCenter.y(), particleCenter.z() + MathUtils.randomFloat(random) * 0.25F, 0F, 0F, 0F);
 
-        var currentTarget = getTarget();
+        var currentTarget = getTargetPos();
 
         if (currentTarget != null && (this.position().distanceTo(currentTarget.position()) >= 16F || currentTarget.isDeadOrDying()))
             currentTarget = null;
@@ -135,7 +135,7 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
             if (potentialTarget != null && (currentTarget == null || !currentTarget.getStringUUID().equals(potentialTarget.getStringUUID()))) {
                 NetworkHandler.sendToClientsTrackingEntity(new S2CEntityTargetPacket(this.getId(), potentialTarget.getId()), this);
 
-                setTarget(potentialTarget);
+                setTargetPos(potentialTarget);
 
                 currentTarget = potentialTarget;
             }
@@ -155,11 +155,11 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
                 bouncedTargets.add(currentTarget.getStringUUID());
                 lastTarget = currentTarget;
 
-                setTarget(null);
+                setTargetPos(null);
                 addBounces(1);
 
                 if (random.nextDouble() <= getChance()) {
-                    var entity = new ShadowGlaiveEntity(EntityRegistry.SHADOW_GLAIVE.get(), level);
+                    var entity = new ShadowGlaiveEntity(RelicsEntities.SHADOW_GLAIVE.get(), level);
 
                     entity.setMaxBounces(getMaxBounces());
                     entity.setBounces(getBounces());
@@ -172,7 +172,7 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
             } else {
                 blacklistedTargets.add(currentTarget.getStringUUID());
 
-                setTarget(null);
+                setTargetPos(null);
             }
         } else {
             this.setDeltaMovement(currentTarget.getEyePosition().subtract(this.getEyePosition()).normalize());
@@ -225,13 +225,13 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
     }
 
     @Override
-    public @Nullable LivingEntity getTarget() {
+    public @Nullable LivingEntity getTargetPos() {
         return currentTarget;
     }
 
     @Override
-    public void setTarget(LivingEntity target) {
-        this.currentTarget = target;
+    public void setTargetPos(LivingEntity targetPos) {
+        this.currentTarget = targetPos;
     }
 
     @Override
