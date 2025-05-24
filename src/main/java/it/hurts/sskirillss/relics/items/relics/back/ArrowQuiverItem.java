@@ -5,7 +5,7 @@
 //import com.mojang.blaze3d.vertex.PoseStack;
 //import com.mojang.blaze3d.vertex.VertexConsumer;
 //import it.hurts.sskirillss.relics.api.events.common.ContainerSlotClickEvent;
-//import it.hurts.sskirillss.relics.client.models.items.CurioModel;
+//import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 //import it.hurts.sskirillss.relics.entities.ArrowRainEntity;
 //import it.hurts.sskirillss.relics.init.*;
 //import it.hurts.sskirillss.relics.api.relics.IRelicItem;

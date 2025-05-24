@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.client.models.items;
+package it.hurts.sskirillss.relics.client.models.items.base;
 
 import com.google.common.collect.ImmutableList;
 import it.hurts.sskirillss.relics.client.models.items.utils.ModelSide;

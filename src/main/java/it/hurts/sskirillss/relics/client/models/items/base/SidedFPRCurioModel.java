@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.client.models.items;
+package it.hurts.sskirillss.relics.client.models.items.base;
 
 import net.minecraft.world.item.Item;
 

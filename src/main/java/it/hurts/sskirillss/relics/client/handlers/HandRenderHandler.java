@@ -2,8 +2,8 @@ package it.hurts.sskirillss.relics.client.handlers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import it.hurts.sskirillss.relics.client.models.items.CurioModel;
-import it.hurts.sskirillss.relics.client.models.items.SidedFPRCurioModel;
+import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
+import it.hurts.sskirillss.relics.client.models.items.base.SidedFPRCurioModel;
 import it.hurts.sskirillss.relics.client.models.items.utils.ModelSide;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.utils.Reference;

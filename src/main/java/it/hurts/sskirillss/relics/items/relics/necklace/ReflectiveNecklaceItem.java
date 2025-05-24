@@ -99,7 +99,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
 
             var step = 0;
 
-            if (source != null && !EntityUtils.findEquippedCurio(entity, RelicsItems.REFLECTIVE_NECKLACE.get()).isEmpty()) {
+            if (source != null && EntityUtils.findEquippedCurio(entity, RelicsItems.REFLECTIVE_NECKLACE.get()).isEmpty()) {
                 for (var orb : level.getEntitiesOfClass(ReflectiveOrbEntity.class, source.getBoundingBox().inflate(32D)).stream()
                         .filter(orb -> !orb.isTargeted() && orb.getOwner() instanceof LivingEntity owner && owner.getStringUUID().equals(source.getStringUUID()))
                         .sorted(Comparator.comparingInt(orb -> (int) orb.position().distanceTo(entity.position())))

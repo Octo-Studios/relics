@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.base;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import it.hurts.sskirillss.relics.client.models.items.CurioModel;
+import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,6 +22,7 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 import java.util.List;
 
+@Deprecated(forRemoval = true)
 public interface IRenderableCurio {
     @OnlyIn(Dist.CLIENT)
     default CurioModel getModel(ItemStack stack) {
