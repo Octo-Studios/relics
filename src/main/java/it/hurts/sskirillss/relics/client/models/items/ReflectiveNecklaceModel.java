@@ -25,16 +25,12 @@ public class ReflectiveNecklaceModel extends HumanoidModel<LivingEntity> {
         MeshDefinition meshDefinition = HumanoidModel.createMesh(new CubeDeformation(0.4F), 0F);
         PartDefinition partDefinition = meshDefinition.getRoot();
 
-        PartDefinition body = partDefinition.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.offset(-0.0643F, 15.9463F, -0.475F));
+        PartDefinition body = partDefinition.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.offset(-0.0643F, 1.9463F, -0.475F));
 
-        PartDefinition amulet = body.addOrReplaceChild("amulet", CubeListBuilder.create().texOffs(18, 19).addBox(-2.0F, -3.0F, -1.35F, 4.0F, 6.0F, 3.0F, new CubeDeformation(-0.8F))
-                .texOffs(0, 28).addBox(-2.0F, -3.0F, -1.35F, 4.0F, 6.0F, 3.0F, new CubeDeformation(-1.0F)), PartPose.offset(0.0643F, -11.9463F, -2.675F));
+        PartDefinition amulet = body.addOrReplaceChild("pendant", CubeListBuilder.create().texOffs(18, 19).addBox(-2.0F, -1.0F, -1.35F, 4.0F, 6.0F, 3.0F, new CubeDeformation(-0.8F))
+                .texOffs(0, 28).addBox(-2.0F, -1.0F, -1.35F, 4.0F, 6.0F, 3.0F, new CubeDeformation(-1.0F)), PartPose.offset(0.0643F, -13.9463F, -2.675F));
 
-        PartDefinition cube_r1 = amulet.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(0, 19).addBox(-1.0F, -1.0F, -3.5F, 2.0F, 2.0F, 7.0F, new CubeDeformation(-0.7F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, -0.6109F, -1.5708F, 0.0F));
-
-        PartDefinition cube_r2 = amulet.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(0, 19).addBox(-1.0F, -1.0F, -3.5F, 2.0F, 2.0F, 7.0F, new CubeDeformation(-0.7F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.6109F, -1.5708F, 0.0F));
-
-        PartDefinition cube_r3 = amulet.addOrReplaceChild("cube_r3", CubeListBuilder.create().texOffs(0, 19).addBox(-1.0F, -1.0F, -3.5F, 2.0F, 2.0F, 7.0F, new CubeDeformation(-0.7F)), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, -1.5708F, 0.0F));
+        PartDefinition cube_r1 = amulet.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(14, 29).addBox(-3.0F, -3.0F, -1.5F, 5.0F, 5.0F, 3.0F, new CubeDeformation(-1.0F)), PartPose.offsetAndRotation(0.0F, 2.75F, 0.25F, 0.0F, 0.0F, 0.7854F));
 
         PartDefinition neck = body.addOrReplaceChild("neck", CubeListBuilder.create().texOffs(0, 0).addBox(-5.9357F, -13.4463F, -4.525F, 12.0F, 10.0F, 9.0F, new CubeDeformation(-2.0F)), PartPose.offset(0.0F, -4.75F, 0.0F));
 

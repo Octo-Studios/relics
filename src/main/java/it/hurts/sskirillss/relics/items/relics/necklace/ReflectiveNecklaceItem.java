@@ -29,7 +29,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
-                        .ability(AbilityTemplate.builder("orb")
+                        .ability(AbilityTemplate.builder("reflection")
                                 .maxLevel(10)
                                 .stat(StatTemplate.builder("chance")
                                         .initialValue(0.1D, 0.2D)
@@ -43,8 +43,13 @@ public class ReflectiveNecklaceItem extends RelicItem {
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("lifetime")
-                                        .initialValue(2.5D, 5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
+                                        .initialValue(5D, 10D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("radius")
+                                        .initialValue(7.5D, 15D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
@@ -79,13 +84,13 @@ public class ReflectiveNecklaceItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.REFLECTIVE_NECKLACE.get())) {
                 var relic = (ReflectiveNecklaceItem) stack.getItem();
 
-                if (level.getRandom().nextDouble() > relic.getStatValue(entity, stack, "orb", "chance"))
+                if (level.getRandom().nextDouble() > relic.getStatValue(entity, stack, "reflection", "chance"))
                     break;
 
                 var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
 
-                orb.setDamage((float) (event.getOriginalDamage() * relic.getStatValue(entity, stack, "orb", "damage")));
-                orb.setLifetime((int) (relic.getStatValue(entity, stack, "orb", "lifetime") * 20));
+                orb.setDamage((float) (event.getOriginalDamage() * relic.getStatValue(entity, stack, "reflection", "damage")));
+                orb.setLifetime((int) (relic.getStatValue(entity, stack, "reflection", "lifetime") * 20));
                 orb.setPos(entity.getEyePosition());
                 orb.setOwner(entity);
 
