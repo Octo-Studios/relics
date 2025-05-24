@@ -5,8 +5,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.ReflectiveOrbEntity;
-import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -30,20 +30,21 @@ public class ReflectiveNecklaceItem extends RelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("orb")
+                                .maxLevel(10)
                                 .stat(StatTemplate.builder("chance")
                                         .initialValue(0.1D, 0.2D)
                                         .thresholdValue(0D, 1D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.35D)
-                                        .formatValue(value -> MathUtils.round(value, 2))
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("lifetime")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.35D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
@@ -70,8 +71,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
     public static class CommonEvents {
         @SubscribeEvent
         public static void onEntityHurt(LivingDamageEvent.Pre event) {
-            if (!(event.getSource().getEntity() instanceof LivingEntity source))
-                return;
+            var source = event.getSource().getEntity();
 
             var entity = event.getEntity();
             var level = entity.level();
@@ -80,29 +80,35 @@ public class ReflectiveNecklaceItem extends RelicItem {
                 var relic = (ReflectiveNecklaceItem) stack.getItem();
 
                 if (level.getRandom().nextDouble() > relic.getStatValue(entity, stack, "orb", "chance"))
-                    return;
+                    break;
 
                 var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
 
                 orb.setDamage((float) (event.getOriginalDamage() * relic.getStatValue(entity, stack, "orb", "damage")));
                 orb.setLifetime((int) (relic.getStatValue(entity, stack, "orb", "lifetime") * 20));
-                orb.setDeltaMovement(entity.position().subtract(source.position()).normalize());
                 orb.setPos(entity.getEyePosition());
                 orb.setOwner(entity);
+
+                if (source != null)
+                    orb.setDeltaMovement(entity.position().subtract(source.position()).normalize());
+                else
+                    orb.setDeltaMovement(0, 0.5D, 0);
 
                 level.addFreshEntity(orb);
             }
 
             var step = 0;
 
-            for (var orb : level.getEntitiesOfClass(ReflectiveOrbEntity.class, source.getBoundingBox().inflate(32D)).stream()
-                    .filter(orb -> !orb.isTargeted() && orb.getOwner() instanceof LivingEntity owner && owner.getStringUUID().equals(source.getStringUUID()))
-                    .sorted(Comparator.comparingInt(orb -> (int) orb.position().distanceTo(entity.position())))
-                    .toList()) {
-                orb.setTarget(entity);
-                orb.setTargeted(true);
-                orb.setDelay(step++ * 2);
-                orb.setMotion(entity.position().add(0D, entity.getBbHeight() / 2D, 0D).subtract(orb.position()).scale(1.1D).normalize());
+            if (source != null && !EntityUtils.findEquippedCurio(entity, RelicsItems.REFLECTIVE_NECKLACE.get()).isEmpty()) {
+                for (var orb : level.getEntitiesOfClass(ReflectiveOrbEntity.class, source.getBoundingBox().inflate(32D)).stream()
+                        .filter(orb -> !orb.isTargeted() && orb.getOwner() instanceof LivingEntity owner && owner.getStringUUID().equals(source.getStringUUID()))
+                        .sorted(Comparator.comparingInt(orb -> (int) orb.position().distanceTo(entity.position())))
+                        .toList()) {
+                    orb.setTarget(entity);
+                    orb.setTargeted(true);
+                    orb.setDelay(step++ * 2);
+                    orb.setMotion(entity.position().add(0D, entity.getBbHeight() / 2D, 0D).subtract(orb.position()).scale(1.25D).normalize());
+                }
             }
         }
     }

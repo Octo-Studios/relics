@@ -2,6 +2,8 @@ package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.octostudios.octolib.modules.particles.OctoRenderManager;
 import it.hurts.octostudios.octolib.modules.particles.trail.TrailProvider;
+import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +20,9 @@ import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
+import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailProvider {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.FLOAT);
@@ -30,6 +35,9 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
     @Setter
     @Nullable
     private LivingEntity target;
+
+    @Getter
+    private List<String> impactedEntities = new ArrayList<>();
 
     public void setMotion(Vec3 motion) {
         this.getEntityData().set(MOTION, motion.toVector3f());
@@ -120,6 +128,13 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
         }
 
         this.setDeltaMovement(motion);
+
+        if (level.isClientSide()) {
+            var random = level.getRandom();
+
+            level.addParticle(ParticleUtils.constructSimpleSpark(new Color(50 + random.nextInt(100), 0, 255), 0.1F + (random.nextFloat() * 0.15F), 15, 0.9F), this.getX(), this.getY() + this.getBbHeight() / 2F, this.getZ(),
+                    MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F);
+        }
     }
 
     @Override
@@ -188,7 +203,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
 
     @Override
     public Vec3 getTrailPosition(float partialTicks) {
-        return getPosition(partialTicks).add(getDeltaMovement().scale(-1));
+        return this.getPosition(partialTicks).add(0D, this.getBbHeight() / 2D, 0D);
     }
 
     @Override
@@ -223,6 +238,6 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
 
     @Override
     public double getTrailScale() {
-        return 0.075F;
+        return 0.1F;
     }
 }

@@ -23,20 +23,56 @@ public class ReflectiveOrbRenderer extends EntityRenderer<ReflectiveOrbEntity> {
     }
 
     @Override
-    public void render(ReflectiveOrbEntity entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
-        var time = entityIn.tickCount + (Minecraft.getInstance().isPaused() ? 0 : partialTicks);
+    public void render(ReflectiveOrbEntity orb, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffers, int packedLight) {
+        var time = orb.tickCount + (Minecraft.getInstance().isPaused() ? 0 : partialTicks);
 
-        matrixStackIn.pushPose();
+        var velocity = orb.getDeltaMovement();
+        var speed = (float) velocity.length();
 
-        matrixStackIn.translate(0.0, 0.25, 0.0);
+        var spinSpeed = 7F / (speed + 1F);
+        var spinAngle = time * spinSpeed;
 
-        matrixStackIn.mulPose(Axis.ZP.rotationDegrees(time * 25F));
+        var zStretch = 1F + speed * 1.5F;
 
-        matrixStackIn.translate(0.0, -1.25, 0.0);
+        var invNorm = 1F / (speed + 1F);
 
-        new ReflectiveOrbModel<>().renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityTranslucentCull(getTextureLocation(entityIn))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        var jellyAmp = 0.15F * invNorm;
 
-        matrixStackIn.popPose();
+        var jellyX = 1F + (float) Math.sin(time) * jellyAmp;
+        var jellyY = 1F + (float) Math.cos(time) * jellyAmp;
+
+        poseStack.pushPose();
+
+        poseStack.translate(0, 0.125, 0);
+
+        var dx = velocity.x;
+        var dy = velocity.y;
+        var dz = velocity.z;
+
+        var yawAngle = (float) Math.toDegrees(Math.atan2(dx, dz));
+        var pitchAngle = (float) Math.toDegrees(Math.atan2(dy, Math.sqrt(dx * dx + dz * dz)));
+
+        poseStack.mulPose(Axis.YP.rotationDegrees(yawAngle));
+        poseStack.mulPose(Axis.XP.rotationDegrees(-pitchAngle));
+
+        poseStack.scale(1F, 1F, zStretch);
+        poseStack.scale(jellyX, jellyY, 1F);
+
+        poseStack.mulPose(Axis.ZP.rotationDegrees(spinAngle));
+        poseStack.mulPose(Axis.YN.rotationDegrees(spinAngle));
+        poseStack.mulPose(Axis.XP.rotationDegrees(pitchAngle));
+        poseStack.mulPose(Axis.YP.rotationDegrees(-yawAngle));
+
+        poseStack.translate(0, -0.125, 0);
+
+        var modelScale = 0.8F;
+
+        poseStack.scale(modelScale, modelScale, modelScale);
+        poseStack.translate(0, -1.125, 0);
+
+        new ReflectiveOrbModel<>().renderToBuffer(poseStack, buffers.getBuffer(RenderType.entityTranslucentCull(getTextureLocation(orb))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+
+        poseStack.popPose();
     }
 
     @Override
