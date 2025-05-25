@@ -52,6 +52,12 @@ public class ReflectiveNecklaceItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
+                                .stat(StatTemplate.builder("interval")
+                                        .initialValue(1D, 0.75D)
+                                        .thresholdValue(0, Double.MAX_VALUE)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.09D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
                                 .build())
                         .build())
                 .leveling(LevelingTemplate.builder()
@@ -80,6 +86,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
 
             var entity = event.getEntity();
             var level = entity.level();
+            var random = level.getRandom();
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.REFLECTIVE_NECKLACE.get())) {
                 var relic = (ReflectiveNecklaceItem) stack.getItem();
@@ -95,23 +102,27 @@ public class ReflectiveNecklaceItem extends RelicItem {
                 orb.setOwner(entity);
 
                 if (source != null)
-                    orb.setDeltaMovement(entity.position().subtract(source.position()).normalize());
+                    orb.setDeltaMovement(entity.position().subtract(source.position()).normalize().add(MathUtils.randomFloat(random) * 0.5F, 0, MathUtils.randomFloat(random) * 0.5F));
                 else
                     orb.setDeltaMovement(0, 0.5D, 0);
 
                 level.addFreshEntity(orb);
             }
 
+            var stack = EntityUtils.findEquippedCurio(source, RelicsItems.REFLECTIVE_NECKLACE.get());
+
             var step = 0;
 
-            if (source != null && EntityUtils.findEquippedCurio(entity, RelicsItems.REFLECTIVE_NECKLACE.get()).isEmpty()) {
+            if (source != null && !stack.isEmpty()) {
+                var relic = (ReflectiveNecklaceItem) stack.getItem();
+
                 for (var orb : level.getEntitiesOfClass(ReflectiveOrbEntity.class, source.getBoundingBox().inflate(32D)).stream()
                         .filter(orb -> !orb.isTargeted() && orb.getOwner() instanceof LivingEntity owner && owner.getStringUUID().equals(source.getStringUUID()))
                         .sorted(Comparator.comparingInt(orb -> (int) orb.position().distanceTo(entity.position())))
                         .toList()) {
                     orb.setTarget(entity);
                     orb.setTargeted(true);
-                    orb.setDelay(step++ * 2);
+                    orb.setDelay((int) (step++ * (relic.getStatValue(entity, stack, "reflection", "interval")) * 20));
                     orb.setMotion(entity.position().add(0D, entity.getBbHeight() / 2D, 0D).subtract(orb.position()).scale(1.25D).normalize());
                 }
             }
