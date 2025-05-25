@@ -109,8 +109,16 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
         if (tickCount < ARC_DURATION) {
             var damp = 1D - tickCount / (double) ARC_DURATION;
 
-            motion = new Vec3(cachedMotion.x() * damp, 0.25D, cachedMotion.z() * damp);
+            motion = new Vec3(cachedMotion.x() * damp, 0.25D + random.nextFloat() * 0.25D, cachedMotion.z() * damp);
         } else if (isTargeted) {
+            if (!level.isClientSide() && target != null && target.isDeadOrDying()) {
+                setTargeted(false);
+                setTarget(null);
+                setDelay(0);
+
+                return;
+            }
+
             var delay = this.getDelay();
             var target = this.getTarget();
 
@@ -132,7 +140,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
         if (level.isClientSide()) {
             var random = level.getRandom();
 
-            level.addParticle(ParticleUtils.constructSimpleSpark(new Color(50 + random.nextInt(100), 0, 255), 0.1F + (random.nextFloat() * 0.15F), 15, 0.9F), this.getX(), this.getY() + this.getBbHeight() / 2F, this.getZ(),
+            level.addParticle(ParticleUtils.constructSimpleSpark(new Color(random.nextInt(100), 0, 255), 0.1F + (random.nextFloat() * 0.15F), 15, 0.9F), this.getX(), this.getY() + this.getBbHeight() / 2F, this.getZ(),
                     MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F);
         }
     }
@@ -150,13 +158,15 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        if (!(result.getEntity() instanceof LivingEntity entity) || this.tickCount < ARC_DURATION
+        if (this.tickCount < ARC_DURATION || !(result.getEntity() instanceof LivingEntity entity) || impactedEntities.contains(entity.getStringUUID())
                 || (!(this.getOwner() instanceof LivingEntity owner) || entity.getStringUUID().equals(owner.getStringUUID())))
             return;
 
         entity.invulnerableTime = 0;
 
-        entity.hurt(this.level().damageSources().mobAttack(owner), this.getDamage());
+        entity.hurt(this.level().damageSources().thrown(owner, this), this.getDamage());
+
+        impactedEntities.add(entity.getStringUUID());
     }
 
     @Override
@@ -223,7 +233,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
 
     @Override
     public int getTrailMaxLength() {
-        return 5;
+        return 7;
     }
 
     @Override
@@ -238,6 +248,6 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
 
     @Override
     public double getTrailScale() {
-        return 0.1F;
+        return 0.15F;
     }
 }

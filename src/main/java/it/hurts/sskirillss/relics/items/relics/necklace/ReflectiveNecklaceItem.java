@@ -82,31 +82,33 @@ public class ReflectiveNecklaceItem extends RelicItem {
     public static class CommonEvents {
         @SubscribeEvent
         public static void onEntityHurt(LivingDamageEvent.Pre event) {
+            var damage = event.getOriginalDamage();
             var source = event.getSource().getEntity();
-
             var entity = event.getEntity();
             var level = entity.level();
             var random = level.getRandom();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.REFLECTIVE_NECKLACE.get())) {
-                var relic = (ReflectiveNecklaceItem) stack.getItem();
+            if (damage >= 1) {
+                for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.REFLECTIVE_NECKLACE.get())) {
+                    var relic = (ReflectiveNecklaceItem) stack.getItem();
 
-                if (level.getRandom().nextDouble() > relic.getStatValue(entity, stack, "reflection", "chance"))
-                    break;
+                    if (level.getRandom().nextDouble() > relic.getStatValue(entity, stack, "reflection", "chance"))
+                        continue;
 
-                var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
+                    var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
 
-                orb.setDamage((float) (event.getOriginalDamage() * relic.getStatValue(entity, stack, "reflection", "damage")));
-                orb.setLifetime((int) (relic.getStatValue(entity, stack, "reflection", "lifetime") * 20));
-                orb.setPos(entity.getEyePosition());
-                orb.setOwner(entity);
+                    orb.setDamage((float) (damage * relic.getStatValue(entity, stack, "reflection", "damage")));
+                    orb.setLifetime((int) (relic.getStatValue(entity, stack, "reflection", "lifetime") * 20));
+                    orb.setPos(entity.getEyePosition());
+                    orb.setOwner(entity);
 
-                if (source != null)
-                    orb.setDeltaMovement(entity.position().subtract(source.position()).normalize().add(MathUtils.randomFloat(random) * 0.5F, 0, MathUtils.randomFloat(random) * 0.5F));
-                else
-                    orb.setDeltaMovement(0, 0.5D, 0);
+                    if (source != null)
+                        orb.setDeltaMovement(entity.position().subtract(source.position()).normalize().add(MathUtils.randomFloat(random) * 0.5D, 0, MathUtils.randomFloat(random) * 0.5D));
+                    else
+                        orb.setDeltaMovement(MathUtils.randomFloat(random) * 0.5D, 0.5D + random.nextFloat() * 0.25D, MathUtils.randomFloat(random) * 0.5D);
 
-                level.addFreshEntity(orb);
+                    level.addFreshEntity(orb);
+                }
             }
 
             var stack = EntityUtils.findEquippedCurio(source, RelicsItems.REFLECTIVE_NECKLACE.get());
