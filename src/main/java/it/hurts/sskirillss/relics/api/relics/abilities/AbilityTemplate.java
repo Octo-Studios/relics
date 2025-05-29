@@ -1,6 +1,8 @@
 package it.hurts.sskirillss.relics.api.relics.abilities;
 
+import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
+import io.netty.util.internal.UnstableApi;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
@@ -10,8 +12,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.ApiStatus;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -27,6 +32,7 @@ public class AbilityTemplate {
     private final int requiredPoints;
     private final CastData castData;
     private final ResearchTemplate researchTemplate;
+    private final List<String> modes;
 
     public static AbilityTemplateBuilder builder(String id) {
         return new AbilityTemplateBuilder(id);
@@ -50,6 +56,7 @@ public class AbilityTemplate {
         private int requiredPoints = 1;
         private CastData castData = CastData.builder().build();
         private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
+        private List<String> modes = new ArrayList<>();
 
         public AbilityTemplateBuilder(String id) {
             this.id = id;
@@ -115,8 +122,16 @@ public class AbilityTemplate {
             return this;
         }
 
+        @UnstableApi
+        @ApiStatus.Experimental
+        public AbilityTemplateBuilder modes(String... mode) {
+            this.modes.addAll(Lists.newArrayList(mode));
+
+            return this;
+        }
+
         public AbilityTemplate build() {
-            return new AbilityTemplate(id, icon, stats, maxLevel, requiredLevel, requiredPoints, castData, researchTemplate);
+            return new AbilityTemplate(id, icon, stats, maxLevel, requiredLevel, requiredPoints, castData, researchTemplate, modes);
         }
     }
 }

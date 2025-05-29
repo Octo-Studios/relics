@@ -304,6 +304,18 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         setRelicRank(entity, stack, getRelicRank(entity, stack) + amount);
     }
 
+    @UnstableApi
+    @ApiStatus.Experimental
+    default String getAbilityMode(LivingEntity entity, ItemStack stack, String ability) {
+        return getAbilityComponent(entity, stack, ability).getMode();
+    }
+
+    @UnstableApi
+    @ApiStatus.Experimental
+    default void setAbilityMode(LivingEntity entity, ItemStack stack, String ability, String mode) {
+        setAbilityComponent(stack, ability, getAbilityComponent(entity, stack, ability).toBuilder().mode(mode).build());
+    }
+
     // TODO: Huh?
     @Override
     @ApiStatus.Internal
@@ -795,8 +807,8 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().anyMatch(ability -> isAbilityUnlocked(entity, stack, ability));
     }
 
-    default boolean canPlayerUseAbility(Player player, ItemStack stack, String ability) {
-        return isAbilityUnlocked(player, stack, ability) && testAbilityPredicates(player, stack, ability, PredicateType.CAST) && getAbilityCooldown(player, stack, ability) <= 0;
+    default boolean canPlayerUseAbility(LivingEntity entity, ItemStack stack, String ability) {
+        return isAbilityUnlocked(entity, stack, ability) && (!(entity instanceof Player player) || testAbilityPredicates(player, stack, ability, PredicateType.CAST)) && getAbilityCooldown(entity, stack, ability) <= 0;
     }
 
     default boolean canPlayerSeeAbility(Player player, ItemStack stack, String ability) {

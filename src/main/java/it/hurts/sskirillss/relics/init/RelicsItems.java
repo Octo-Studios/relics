@@ -4,7 +4,7 @@ import it.hurts.sskirillss.relics.items.RelicExperienceBottleItem;
 import it.hurts.sskirillss.relics.items.SolidSnowballItem;
 import it.hurts.sskirillss.relics.items.relics.*;
 import it.hurts.sskirillss.relics.items.relics.back.ElytraBoosterItem;
-import it.hurts.sskirillss.relics.items.relics.back.MidnightRobeItem;
+import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.belt.DrownedBeltItem;
 import it.hurts.sskirillss.relics.items.relics.belt.HunterBeltItem;
@@ -37,7 +37,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> REFLECTIVE_NECKLACE = ITEMS.register("reflection_necklace", ReflectiveNecklaceItem::new); // TODO: Replace ID with "reflective_necklace"
     public static final DeferredHolder<Item, RelicItem> MAGMA_WALKER = ITEMS.register("magma_walker", MagmaWalkerItem::new);
     public static final DeferredHolder<Item, RelicItem> AQUA_WALKER = ITEMS.register("aqua_walker", AquaWalkerItem::new);
-    public static final DeferredHolder<Item, RelicItem> MIDNIGHT_ROBE = ITEMS.register("midnight_robe", MidnightRobeItem::new);
+    public static final DeferredHolder<Item, RelicItem> MIDNIGHT_MANTLE = ITEMS.register("midnight_robe", MidnightMantleItem::new); // TODO: Replace ID with "midnight_mantle"
     public static final DeferredHolder<Item, RelicItem> DROWNED_BELT = ITEMS.register("drowned_belt", DrownedBeltItem::new);
     public static final DeferredHolder<Item, RelicItem> JELLYFISH_NECKLACE = ITEMS.register("jellyfish_necklace", JellyfishNecklaceItem::new);
     public static final DeferredHolder<Item, RelicItem> HUNTER_BELT = ITEMS.register("hunter_belt", HunterBeltItem::new);
