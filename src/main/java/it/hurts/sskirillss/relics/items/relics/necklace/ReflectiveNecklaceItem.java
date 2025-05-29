@@ -97,7 +97,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
 
                     var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
 
-                    orb.setDamage((float) (damage * relic.getStatValue(entity, stack, "reflection", "damage")));
+                    orb.setDamage(Math.clamp((float) (damage * relic.getStatValue(entity, stack, "reflection", "damage")), Float.MIN_VALUE, Float.MAX_VALUE));
                     orb.setLifetime((int) (relic.getStatValue(entity, stack, "reflection", "lifetime") * 20));
                     orb.setPos(entity.getEyePosition());
                     orb.setOwner(entity);
