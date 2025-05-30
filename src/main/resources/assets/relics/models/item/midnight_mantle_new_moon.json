@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "relics:item/reflection_necklace_broken"
+        "layer0": "relics:item/midnight_mantle_new_moon"
     }
 }
 

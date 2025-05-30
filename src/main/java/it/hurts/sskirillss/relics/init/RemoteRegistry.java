@@ -13,6 +13,7 @@ import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
 import it.hurts.sskirillss.relics.client.renderer.tiles.ResearchingTableRenderer;
 import it.hurts.sskirillss.relics.items.relics.InfiniteHamItem;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.necklace.HolyLocketItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -99,6 +100,13 @@ public class RemoteRegistry {
                     (stack, world, entity, id) -> stack.get(WORLD_POSITION) == null ? 0 : 1);
             ItemProperties.register(RelicsItems.HOLY_LOCKET.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "mode"),
                     (stack, world, entity, id) -> ((HolyLocketItem) stack.getItem()).getMode(stack).getIndex());
+            ItemProperties.register(RelicsItems.MIDNIGHT_MANTLE.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "mode"),
+                    (stack, world, entity, id) -> {
+                        var relic = (MidnightMantleItem) stack.getItem();
+                        var mode = relic.getAbilityMode(entity, stack, "phase");
+
+                        return mode.equals("full_moon") ? 1 : 0;
+                    });
         });
 
         CuriosRendererRegistry.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
