@@ -15,7 +15,7 @@ public abstract class AbstractBadgeWidget extends AbstractDescriptionWidget impl
     private IRelicScreenProvider provider;
 
     public AbstractBadgeWidget(int x, int y, IRelicScreenProvider provider, AbstractBadge badge) {
-        super(x, y, 13, 10);
+        super(x, y, 16, 16);
 
         this.provider = provider;
     }
@@ -48,7 +48,7 @@ public abstract class AbstractBadgeWidget extends AbstractDescriptionWidget impl
         guiGraphics.blit(getBadge().getIconTexture(minecraft.player, provider.getStack()), 0, 0, 0, 0, width, height, width, height);
 
         if (isHovered)
-            guiGraphics.blit(getBadge().getOutlineTexture(minecraft.player, provider.getStack()), -1, -1, 0, 0, width + 2, height + 2, width + 2, height + 2);
+            guiGraphics.blit(getBadge().getOutlineTexture(minecraft.player, provider.getStack()), 0, 0, 0, 0, width, height, width, height);
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 

@@ -26,7 +26,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
     private RelicDescriptionScreen screen;
 
     public BigRelicCardWidget(int x, int y, RelicDescriptionScreen screen) {
-        super(x, y, 48, 74);
+        super(x, y, 50, 87);
 
         this.screen = screen;
     }
@@ -43,6 +43,15 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.pushPose();
 
+        poseStack.translate(0,0,-100);
+
+        GUIRenderer.begin(DescriptionTextures.BIG_CARD_BACKGROUND, poseStack)
+                .anchor(SpriteAnchor.TOP_LEFT)
+                .pos(getX() + 8, getY() + 20)
+                .end();
+
+        poseStack.translate(0,0,100);
+
         GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_ACTIVE, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(getX(), getY())
@@ -54,7 +63,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
             for (int i = 0; i < 5; i++) {
                 GUIRenderer.begin(DescriptionTextures.BIG_STAR_HOLE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
-                        .pos(getX() + xOff + 4, getY() + 63)
+                        .pos(getX() + xOff + 5, getY() + 72)
                         .end();
 
                 xOff += 8;
@@ -68,7 +77,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
             for (int i = 0; i < Math.floor(quality / 2D); i++) {
                 GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
-                        .pos(getX() + xOff + 4, getY() + 63)
+                        .pos(getX() + xOff + 5, getY() + 72)
                         .end();
 
                 xOff += 8;
@@ -77,7 +86,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
             if (isAliquot)
                 GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
-                        .pos(getX() + xOff + 4, getY() + 63)
+                        .pos(getX() + xOff + 5, getY() + 72)
                         .patternSize(4, 7)
                         .texSize(8, 7)
                         .end();
@@ -87,7 +96,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         float scale = 1.75F;
 
-        poseStack.translate(getX() + 10 + 8 * scale, getY() + 21 + Math.sin((player.tickCount + pPartialTick) * 0.1F) * 2F + 8 * scale, 0);
+        poseStack.translate(getX() + 10 + 8 * scale, getY() + 31 + Math.sin((player.tickCount + pPartialTick) * 0.1F) * 2F + 8 * scale, 0);
 
         poseStack.mulPose(Axis.ZP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.05F) * 5F));
         poseStack.mulPose(Axis.YP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.075F) * 25F));

@@ -9,6 +9,7 @@ import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
@@ -40,7 +41,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -53,35 +53,17 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, ITabbedDescriptionScreen {
-    public final Screen screen;
-
-    @Getter
-    public final int container;
-    @Getter
-    public final int slot;
-    @Getter
-    public ItemStack stack;
-
+public class AbilityDescriptionScreen extends DescriptionScreen implements IAutoScaledScreen, ITabbedDescriptionScreen {
     @Getter
     @Setter
     private int page;
-
-    private final int backgroundHeight = 256;
-    private final int backgroundWidth = 418;
 
     public UpgradeAbilityActionWidget upgradeButton;
     public RerollAbilityActionWidget rerollButton;
     public ResetAbilityActionWidget resetButton;
 
     public AbilityDescriptionScreen(Player player, int container, int slot, Screen screen) {
-        super(Component.empty());
-
-        this.container = container;
-        this.slot = slot;
-        this.screen = screen;
-
-        stack = DescriptionUtils.gatherRelicStack(player, slot);
+        super(player, container, slot, screen);
 
         if (stack.getItem() instanceof IRelicItem relic) {
             var abilities = relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream()
@@ -102,6 +84,8 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
     @Override
     protected void init() {
+        super.init();
+
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
@@ -112,9 +96,6 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
             return;
 
         updateCache(relic);
-
-        int x = (this.width - backgroundWidth) / 2;
-        int y = (this.height - backgroundHeight) / 2;
 
         var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
                 .filter(entry -> relic.isLevelingSourceEnabled(player, stack, entry))
@@ -135,32 +116,9 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         var paginatedAbilities = (startIndex < abilities.size() && startIndex >= 0) ? abilities.subList(startIndex, endIndex) : new ArrayList<String>();
 
-        this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(player, this.container, this.slot, this.screen)));
+        int xOff = 0;
 
-        int xOff = 19;
-
-        if (!paginatedAbilities.isEmpty()) {
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(player, this.container, this.slot, this.screen)));
-
-            xOff += 19;
-        }
-
-        if (!sources.isEmpty())
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.EXPERIENCE, new ExperienceDescriptionScreen(player, this.container, this.slot, this.screen)));
-
-        this.addRenderableWidget(new BigAbilityCardWidget(x + 60, y + 47, this));
-
-        this.addRenderableWidget(new LogoWidget(x + 313, y + 57, this));
-
-        if (relic.isSomethingWrongWithLevelingPoints(player, stack))
-            this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
-
-        this.addRenderableWidget(new RankPlateWidget(x + 313, y + 77, this));
-        this.addRenderableWidget(new PointsPlateWidget(x + 313, y + 102, this));
-        this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 127, this));
-        this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 152, this));
-
-        xOff = 0;
+        this.addRenderableWidget(new BigAbilityCardWidget(x + 59, y + 43, this));
 
         if (relic.isAbilityUnlocked(player, stack, ability)) {
             for (AbilityBadge badge : BadgeRegistry.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof AbilityBadge).map(entry -> (AbilityBadge) entry).toList()) {
@@ -184,7 +142,7 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
             xOff = (containerWidth / 2) - (((objectWidth * count) + ((spacing - objectWidth) * Math.max(count - 1, 0))) / 2);
 
             for (String entry : paginatedAbilities) {
-                this.addRenderableWidget(new AbilityCardWidget(x + 77 + xOff, y + 153, this, entry));
+                this.addRenderableWidget(new AbilityCardWidget(x + 77 + xOff, y + 160, this, entry));
 
                 xOff += spacing;
             }
@@ -245,29 +203,6 @@ public class AbilityDescriptionScreen extends Screen implements IAutoScaledScree
 
         int yOff = 0;
         int xOff = 0;
-
-        GUIRenderer.begin(DescriptionTextures.SPACE_BACKGROUND, poseStack)
-                .texSize(418, 4096)
-                .patternSize(backgroundWidth, backgroundHeight)
-                .pos(x + (backgroundWidth / 2F), y + (backgroundHeight / 2F))
-                .animation(AnimationData.builder()
-                        .frame(0, 2).frame(1, 2).frame(2, 2)
-                        .frame(3, 2).frame(4, 2).frame(5, 2)
-                        .frame(6, 2).frame(7, 2).frame(8, 2)
-                        .frame(9, 2).frame(10, 2).frame(11, 2)
-                        .frame(12, 2).frame(13, 2).frame(14, 2)
-                        .frame(15, 2))
-                .end();
-
-        GUIRenderer.begin(DescriptionTextures.TOP_BACKGROUND, poseStack)
-                .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(x + 107, y + 47)
-                .end();
-
-        GUIRenderer.begin(DescriptionTextures.BOTTOM_BACKGROUND, poseStack)
-                .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(x + 60, y + 133)
-                .end();
 
         var abilities = relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream()
                 .filter(entry -> relic.isAbilityEnabled(player, stack, entry))

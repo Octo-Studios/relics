@@ -26,7 +26,7 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
     public abstract String getValue(ItemStack stack);
 
     public AbstractPlateWidget(int x, int y, IRelicScreenProvider provider, String icon) {
-        super(x, y, 54, 19);
+        super(x, y, 55, 20);
 
         this.provider = provider;
         this.icon = icon;
@@ -38,7 +38,7 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
 
         poseStack.pushPose();
 
-        poseStack.translate(getX() + Math.sin((minecraft.player.tickCount + pPartialTick + icon.length() * 10) * 0.075F), getY() + Math.cos((minecraft.player.tickCount + pPartialTick + icon.length() * 10) * 0.075F) * 0.5F, 0);
+        poseStack.translate(getX() + Math.sin((minecraft.player.tickCount + pPartialTick + icon.length() * 10D) * 0.075D), getY() + Math.cos((minecraft.player.tickCount + pPartialTick + icon.length() * 10D) * 0.075D) * 0.5D, 0);
 
         GUIRenderer.begin(DescriptionTextures.PLATE_BACKGROUND, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
@@ -46,17 +46,18 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
 
         GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/icons/" + icon + ".png"), poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(3, 3)
+                .pos(5, 5)
                 .end();
 
         MutableComponent value = Component.literal(getValue(provider.getStack())).withStyle(ChatFormatting.BOLD);
 
-        guiGraphics.drawString(minecraft.font, value, 19, 6, 0xffe278, true);
+        guiGraphics.drawString(minecraft.font, value, 20, 7, 0xffe278, true);
 
         renderContent(guiGraphics, pMouseX, pMouseY, pPartialTick);
 
         if (isHovered())
             GUIRenderer.begin(DescriptionTextures.PLATE_OUTLINE, poseStack)
+                    .pos(-1, -1)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .end();
 

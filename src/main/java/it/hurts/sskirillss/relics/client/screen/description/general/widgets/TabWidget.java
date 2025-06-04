@@ -37,7 +37,7 @@ public class TabWidget extends AbstractDescriptionWidget implements IHoverableWi
     private DescriptionTab tab;
 
     public TabWidget(int x, int y, IRelicScreenProvider source, DescriptionTab tab, IRelicScreenProvider target) {
-        super(x, y, 17, 19);
+        super(x, y, 16, 20);
 
         this.source = source;
         this.target = target;
@@ -60,7 +60,7 @@ public class TabWidget extends AbstractDescriptionWidget implements IHoverableWi
         poseStack.pushPose();
 
         if (isLocked()) {
-            GUIScissors.begin(getX(), getY(), width, 19);
+            GUIScissors.begin(getX(), getY(), width, getHeight());
 
             GUIRenderer.begin(DescriptionTextures.TAB, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
@@ -74,9 +74,14 @@ public class TabWidget extends AbstractDescriptionWidget implements IHoverableWi
                     .pos(getX(), getY())
                     .end();
 
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tabs/" + tab.name().toLowerCase(Locale.ROOT) + ".png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tabs/" + tab.name().toLowerCase(Locale.ROOT) + "_shadow" + ".png"), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(getX() + 2, getY() + 5)
+                    .pos(getX(), getY())
+                    .end();
+
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tabs/" + tab.name().toLowerCase(Locale.ROOT) + "_icon" + ".png"), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX(), getY())
                     .end();
 
             if (isHovered())

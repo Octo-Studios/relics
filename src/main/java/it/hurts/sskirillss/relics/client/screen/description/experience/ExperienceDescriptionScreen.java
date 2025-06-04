@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.ExperienceSourcePageWidget;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.BigExperienceCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ExperienceGemWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ResetExperienceActionWidget;
@@ -52,34 +53,16 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
-public class ExperienceDescriptionScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider, ITabbedDescriptionScreen {
-    public final Screen screen;
-
-    @Getter
-    public final int container;
-    @Getter
-    public final int slot;
-    @Getter
-    public ItemStack stack;
-
+public class ExperienceDescriptionScreen extends DescriptionScreen implements IAutoScaledScreen, ITabbedDescriptionScreen {
     @Getter
     @Setter
     private int page;
-
-    private final int backgroundHeight = 256;
-    private final int backgroundWidth = 418;
 
     public UpgradeExperienceActionWidget upgradeButton;
     public ResetExperienceActionWidget resetButton;
 
     public ExperienceDescriptionScreen(Player player, int container, int slot, Screen screen) {
-        super(Component.empty());
-
-        this.container = container;
-        this.slot = slot;
-        this.screen = screen;
-
-        stack = DescriptionUtils.gatherRelicStack(player, slot);
+        super(player, container, slot, screen);
 
         if (stack.getItem() instanceof IRelicItem relic) {
             var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
@@ -100,6 +83,8 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
     @Override
     protected void init() {
+        super.init();
+
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
@@ -110,9 +95,6 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
             return;
 
         updateCache(relic);
-
-        int x = (this.width - backgroundWidth) / 2;
-        int y = (this.height - backgroundHeight) / 2;
 
         var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
                 .filter(entry -> relic.isLevelingSourceEnabled(player, stack, entry))
@@ -133,30 +115,9 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
         var paginatedSources = (startIndex < sources.size() && startIndex >= 0) ? sources.subList(startIndex, endIndex) : new ArrayList<String>();
 
-        this.addRenderableWidget(new TabWidget(x + 81, y + 123, this, DescriptionTab.RELIC, new RelicDescriptionScreen(player, this.container, this.slot, this.screen)));
-
-        int xOff = 19;
-
-        if (!abilities.isEmpty()) {
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(player, this.container, this.slot, this.screen)));
-
-            xOff += 19;
-        }
-
-        if (!sources.isEmpty())
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 123, this, DescriptionTab.EXPERIENCE, new ExperienceDescriptionScreen(player, this.container, this.slot, this.screen)));
+        int xOff = 0;
 
         this.addRenderableWidget(new BigExperienceCardWidget(x + 60, y + 47, this));
-
-        this.addRenderableWidget(new LogoWidget(x + 313, y + 57, this));
-
-        if (relic.isSomethingWrongWithLevelingPoints(player, stack))
-            this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
-
-        this.addRenderableWidget(new RankPlateWidget(x + 313, y + 77, this));
-        this.addRenderableWidget(new PointsPlateWidget(x + 313, y + 102, this));
-        this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 127, this));
-        this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 152, this));
 
         if (!paginatedSources.isEmpty()) {
             int objectWidth = 32;
@@ -223,32 +184,9 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
         int yOff = 0;
         int xOff = 0;
 
-        GUIRenderer.begin(DescriptionTextures.SPACE_BACKGROUND, poseStack)
-                .texSize(418, 4096)
-                .patternSize(backgroundWidth, backgroundHeight)
-                .pos(x + (backgroundWidth / 2F), y + (backgroundHeight / 2F))
-                .animation(AnimationData.builder()
-                        .frame(0, 2).frame(1, 2).frame(2, 2)
-                        .frame(3, 2).frame(4, 2).frame(5, 2)
-                        .frame(6, 2).frame(7, 2).frame(8, 2)
-                        .frame(9, 2).frame(10, 2).frame(11, 2)
-                        .frame(12, 2).frame(13, 2).frame(14, 2)
-                        .frame(15, 2))
-                .end();
-
         GUIRenderer.begin(DescriptionTextures.BIG_CARD_BACKGROUND, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(x + 67, y + 57)
-                .end();
-
-        GUIRenderer.begin(DescriptionTextures.TOP_BACKGROUND, poseStack)
-                .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(x + 107, y + 47)
-                .end();
-
-        GUIRenderer.begin(DescriptionTextures.BOTTOM_BACKGROUND, poseStack)
-                .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(x + 60, y + 133)
                 .end();
 
         var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
@@ -444,6 +382,6 @@ public class ExperienceDescriptionScreen extends Screen implements IAutoScaledSc
 
     @Override
     public DescriptionTab getTab() {
-        return DescriptionTab.EXPERIENCE;
+        return DescriptionTab.SYNERGY;
     }
 }

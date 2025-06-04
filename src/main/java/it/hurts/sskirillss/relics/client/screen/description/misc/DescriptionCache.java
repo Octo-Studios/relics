@@ -73,7 +73,7 @@ public class DescriptionCache {
             return "";
 
         var cache = getEntry(relic);
-        var index = cache.getSelectionIndex(DescriptionTab.EXPERIENCE);
+        var index = cache.getSelectionIndex(DescriptionTab.SYNERGY);
         var sources = relic.getLevelingSourcesTemplate(entity, stack).getSources().keySet().stream().filter(entry -> relic.isLevelingSourceEnabled(entity, stack, entry)).toList();
         var size = sources.size();
 
@@ -91,7 +91,7 @@ public class DescriptionCache {
             source = sources.get(index);
 
             setEntry(relic, cache.toBuilder()
-                    .selectionIndex(DescriptionTab.EXPERIENCE, index)
+                    .selectionIndex(DescriptionTab.SYNERGY, index)
                     .build());
         }
 
@@ -112,7 +112,7 @@ public class DescriptionCache {
         var index = sources.indexOf(source);
 
         setEntry(relic, cache.toBuilder()
-                .selectionIndex(DescriptionTab.EXPERIENCE, index)
+                .selectionIndex(DescriptionTab.SYNERGY, index)
                 .build());
     }
 

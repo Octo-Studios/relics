@@ -15,7 +15,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 public class DescriptionUtils {
-    public static final int TEXT_COLOR = 0x662F13;
+    public static final int TEXT_COLOR = 0x732f20;
     private static final ResourceLocation TOOLTIP = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tooltip.png");
 
     @OnlyIn(Dist.CLIENT)
@@ -59,7 +59,7 @@ public class DescriptionUtils {
 
         switch (DescriptionCache.getEntry(relic).getSelectedPage()) {
             case ABILITY -> descriptionScreen = new AbilityDescriptionScreen(player, player.containerMenu.containerId, slot, screen);
-            case EXPERIENCE -> descriptionScreen = new ExperienceDescriptionScreen(player, player.containerMenu.containerId, slot, screen);
+            case SYNERGY -> descriptionScreen = new ExperienceDescriptionScreen(player, player.containerMenu.containerId, slot, screen);
             default -> descriptionScreen = new RelicDescriptionScreen(player, player.containerMenu.containerId, slot, screen);
         }
 

@@ -11,6 +11,7 @@ import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -64,23 +65,8 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, IRelicScreenProvider {
-    public final Screen screen;
-
-    @Getter
-    public final int container;
-    @Getter
-    public final int slot;
-    @Getter
-    public ItemStack stack;
-
+public class AbilityResearchScreen extends DescriptionScreen implements IAutoScaledScreen {
     public final String ability;
-
-    public int backgroundHeight = 256;
-    public int backgroundWidth = 418;
-
-    public int x;
-    public int y;
 
     @Nullable
     public StarData selectedStar;
@@ -92,15 +78,9 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
     private int researchProgress = 0;
 
     public AbilityResearchScreen(Player player, int container, int slot, Screen screen, String ability) {
-        super(Component.empty());
-
-        this.container = container;
-        this.slot = slot;
-        this.screen = screen;
+        super(player, container, slot, screen);
 
         this.ability = ability;
-
-        stack = DescriptionUtils.gatherRelicStack(player, slot);
     }
 
     public int getTotalConnectionsCount(StarData star) {
@@ -129,9 +109,6 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
     protected void init() {
         super.init();
 
-        this.x = (this.width - backgroundWidth) / 2;
-        this.y = (this.height - backgroundHeight) / 2;
-
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
@@ -139,16 +116,6 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
 
         stars.clear();
         points.clear();
-
-        this.addRenderableWidget(new LogoWidget(x + 313, y + 57, this));
-
-        if (relic.isSomethingWrongWithLevelingPoints(minecraft.player, stack))
-            this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
-
-        this.addRenderableWidget(new RankPlateWidget(x + 313, y + 77, this));
-        this.addRenderableWidget(new PointsPlateWidget(x + 313, y + 102, this));
-        this.addRenderableWidget(new PlayerExperiencePlateWidget(x + 313, y + 127, this));
-        this.addRenderableWidget(new LuckPlateWidget(x + 313, y + 152, this));
 
         this.addRenderableWidget(new TipWidget(x + 117, y + 207, this));
 
@@ -323,19 +290,6 @@ public class AbilityResearchScreen extends Screen implements IAutoScaledScreen, 
         PoseStack poseStack = guiGraphics.pose();
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-
-        GUIRenderer.begin(DescriptionTextures.SPACE_BACKGROUND, poseStack)
-                .texSize(418, 4096)
-                .patternSize(backgroundWidth, backgroundHeight)
-                .pos(x + (backgroundWidth / 2F), y + (backgroundHeight / 2F))
-                .animation(AnimationData.builder()
-                        .frame(0, 2).frame(1, 2).frame(2, 2)
-                        .frame(3, 2).frame(4, 2).frame(5, 2)
-                        .frame(6, 2).frame(7, 2).frame(8, 2)
-                        .frame(9, 2).frame(10, 2).frame(11, 2)
-                        .frame(12, 2).frame(13, 2).frame(14, 2)
-                        .frame(15, 2))
-                .end();
 
         {
             float color = (float) (0.5F + (Math.sin((player.tickCount + pPartialTick) * 0.1F) * 0.1F));

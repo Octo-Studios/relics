@@ -56,7 +56,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             GUIRenderer.begin(DescriptionTextures.getAbilityCardTexture(stack, ability), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .color(color, color, color, 1F)
-                    .pos(getX() + 7, getY() + 10)
+                    .pos(getX() + 8, getY() + 20)
                     .texSize(34, 49)
                     .end();
         else
@@ -76,7 +76,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             for (int i = 0; i < 5; i++) {
                 GUIRenderer.begin(DescriptionTextures.BIG_STAR_HOLE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
-                        .pos(getX() + xOff + 4, getY() + 63)
+                        .pos(getX() + xOff + 5, getY() + 72)
                         .end();
 
                 xOff += 8;
@@ -90,7 +90,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             for (int i = 0; i < Math.floor(quality / 2D); i++) {
                 GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
-                        .pos(getX() + xOff + 4, getY() + 63)
+                        .pos(getX() + xOff + 5, getY() + 72)
                         .end();
 
                 xOff += 8;
@@ -99,7 +99,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             if (isAliquot)
                 GUIRenderer.begin(DescriptionTextures.BIG_STAR_ACTIVE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
-                        .pos(getX() + xOff + 4, getY() + 63)
+                        .pos(getX() + xOff + 5, getY() + 72)
                         .patternSize(4, 7)
                         .texSize(8, 7)
                         .end();

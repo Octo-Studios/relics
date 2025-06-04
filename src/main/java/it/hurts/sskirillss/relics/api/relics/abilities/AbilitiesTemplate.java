@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AbilitiesTemplate {
     private final Map<String, AbilityTemplate> abilities;
+    // TODO
+    private final Map<String, AbilityTemplate> synergies;
 
     public static AbilitiesTemplateBuilder builder() {
         return new AbilitiesTemplateBuilder();
@@ -30,6 +32,7 @@ public class AbilitiesTemplate {
     @NoArgsConstructor
     public static class AbilitiesTemplateBuilder {
         private Map<String, AbilityTemplate> abilities = new LinkedHashMap<>();
+        private Map<String, AbilityTemplate> synergies = new LinkedHashMap<>();
 
         private AbilitiesTemplateBuilder(AbilitiesTemplate base) {
             this.abilities = new LinkedHashMap<>(base.getAbilities());
@@ -47,8 +50,20 @@ public class AbilitiesTemplate {
             return this;
         }
 
+        public AbilitiesTemplateBuilder synergies(Map<String, AbilityTemplate> synergies) {
+            this.synergies = synergies;
+
+            return this;
+        }
+
+        public AbilitiesTemplateBuilder synergy(AbilityTemplate synergy) {
+            synergies.put(synergy.getId(), synergy);
+
+            return this;
+        }
+
         public AbilitiesTemplate build() {
-            return new AbilitiesTemplate(abilities);
+            return new AbilitiesTemplate(abilities, synergies);
         }
     }
 }
