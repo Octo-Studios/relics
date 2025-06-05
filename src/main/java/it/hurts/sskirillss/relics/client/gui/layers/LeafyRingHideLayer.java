@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.client.gui.layers;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.hurts.octostudios.octolib.client.animator.Easing;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.ring.LeafyRingItem;
-import it.hurts.sskirillss.relics.utils.Easing;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -43,7 +43,7 @@ public class LeafyRingHideLayer implements LayeredDraw.Layer {
         var maxProgress = relic.getMaxProgress();
         var partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
 
-        var progressRatio = Easing.easeOutQuad(Math.min(1F, (progress + (partialTick * (relic.isHiding(stack) ? 1 : -1))) / maxProgress));
+        var progressRatio = (float) Easing.EASE_IN_OUT_QUAD.apply(Math.min(1F, (progress + (partialTick * (relic.isHiding(stack) ? 1 : -1))) / maxProgress));
 
         var poseStack = guiGraphics.pose();
 

@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.base;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
@@ -22,7 +23,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class DescriptionScreen extends Screen implements IRelicScreenProvider {
+public class DescriptionScreen extends Screen implements IRelicScreenProvider, IAutoScaledScreen {
     public final Screen screen;
 
     @Getter
@@ -70,7 +71,7 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider {
     }
 
     protected void initSidebar() {
-        this.addRenderableWidget(new LogoWidget(this.x + 313, this.y + 57, this));
+        this.addRenderableWidget(new LogoWidget(this.x + 313, this.y + 53, this));
 
 //        FIXME: Somebody do something :'\
 //        if (relic.isSomethingWrongWithLevelingPoints(minecraft.player, stack))
@@ -135,5 +136,10 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider {
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(x + 59, y + 144)
                 .end();
+    }
+
+    @Override
+    public int getAutoScale() {
+        return 4;
     }
 }

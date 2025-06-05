@@ -207,8 +207,6 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             MutableComponent level = Component.literal(String.valueOf(relic.getAbilityTemplate(player, stack, ability).getRequiredLevel())).withStyle(ChatFormatting.BOLD);
 
-            RenderSystem.setShaderColor(1, 1 - color, 1 - color, 1);
-
             poseStack.pushPose();
 
             GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/icons/lock_active_" + unlocks + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
@@ -217,8 +215,6 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             poseStack.scale(0.5F, 0.5F, 0.5F);
 
             guiGraphics.drawString(minecraft.font, level, (-(width / 2) + 16) * 2 - minecraft.font.width(level) / 2, (-(height / 2) + 24) * 2, isEnoughLevel ? 0xFFE278 : 0xB7AED9, true);
-
-            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
             poseStack.popPose();
         }

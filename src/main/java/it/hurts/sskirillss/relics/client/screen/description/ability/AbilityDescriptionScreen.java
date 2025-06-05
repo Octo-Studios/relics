@@ -53,7 +53,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityDescriptionScreen extends DescriptionScreen implements IAutoScaledScreen, ITabbedDescriptionScreen {
+public class AbilityDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen {
     @Getter
     @Setter
     private int page;
@@ -397,11 +397,6 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements IAuto
     @Override
     public boolean isPauseScreen() {
         return false;
-    }
-
-    @Override
-    public int getAutoScale() {
-        return 0;
     }
 
     @Override

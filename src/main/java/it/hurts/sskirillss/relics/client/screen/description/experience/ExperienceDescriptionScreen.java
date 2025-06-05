@@ -4,11 +4,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.ExperienceSourcePageWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.BigExperienceCardWidget;
@@ -16,15 +13,12 @@ import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.E
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ResetExperienceActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.UpgradeExperienceActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -42,7 +36,6 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -53,7 +46,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
-public class ExperienceDescriptionScreen extends DescriptionScreen implements IAutoScaledScreen, ITabbedDescriptionScreen {
+public class ExperienceDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen {
     @Getter
     @Setter
     private int page;
@@ -373,11 +366,6 @@ public class ExperienceDescriptionScreen extends DescriptionScreen implements IA
     @Override
     public boolean isPauseScreen() {
         return false;
-    }
-
-    @Override
-    public int getAutoScale() {
-        return 0;
     }
 
     @Override

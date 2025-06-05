@@ -28,7 +28,7 @@ public class LogoWidget extends AbstractDescriptionWidget implements IHoverableW
     private IRelicScreenProvider provider;
 
     public LogoWidget(int x, int y, IRelicScreenProvider provider) {
-        super(x, y, 54, 14);
+        super(x, y, 55, 18);
 
         this.provider = provider;
     }
@@ -53,16 +53,7 @@ public class LogoWidget extends AbstractDescriptionWidget implements IHoverableW
         poseStack.translate(getX() + Math.sin((minecraft.player.tickCount + pPartialTick) * 0.075F), getY() + Math.cos((minecraft.player.tickCount + pPartialTick) * 0.075F) * 0.5F, 0);
 
         GUIRenderer.begin(DescriptionTextures.LOGO, poseStack)
-                .animation(AnimationData.builder()
-                        .frame(0, 2).frame(1, 2).frame(2, 2)
-                        .frame(3, 2).frame(4, 2).frame(5, 2)
-                        .frame(6, 2).frame(7, 2).frame(8, 2)
-                        .frame(9, 2).frame(10, 2).frame(11, 2)
-                        .frame(12, 2).frame(13, 2).frame(14, 2)
-                        .frame(15, 20))
                 .anchor(SpriteAnchor.TOP_LEFT)
-                .texSize(width, height * 16)
-                .patternSize(width, height)
                 .end();
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);

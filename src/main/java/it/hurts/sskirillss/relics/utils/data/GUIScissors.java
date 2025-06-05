@@ -14,7 +14,7 @@ public class GUIScissors {
         int realHeight = window.getHeight();
 
         int scissorX = (int) (realWidth * (x / scaledWidth));
-        int scissorY = (int) (realHeight * (1 - (y + height) / scaledHeight)) - 2;
+        int scissorY = (int) (realHeight * (1 - (y + height) / scaledHeight));
         int scissorWidth = (int) (realWidth * (width / scaledWidth));
         int scissorHeight = (int) (realHeight * (height / scaledHeight));
 

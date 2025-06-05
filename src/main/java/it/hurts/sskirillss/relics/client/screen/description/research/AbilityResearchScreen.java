@@ -8,11 +8,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
-import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.research.misc.BurnPoint;
@@ -33,7 +30,6 @@ import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
-import lombok.Getter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
@@ -49,7 +45,6 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -65,7 +60,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityResearchScreen extends DescriptionScreen implements IAutoScaledScreen {
+public class AbilityResearchScreen extends DescriptionScreen {
     public final String ability;
 
     @Nullable
@@ -646,11 +641,6 @@ public class AbilityResearchScreen extends DescriptionScreen implements IAutoSca
     @Override
     public boolean isPauseScreen() {
         return false;
-    }
-
-    @Override
-    public int getAutoScale() {
-        return 0;
     }
 
     public float getAngle(Vec2 from, Vec2 to) {

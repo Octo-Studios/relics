@@ -2,9 +2,7 @@ package it.hurts.sskirillss.relics.client.screen.description.relic;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.badges.base.RelicBadge;
-import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
@@ -15,6 +13,7 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.TabW
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
@@ -29,7 +28,6 @@ import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -48,7 +46,7 @@ import java.util.List;
 import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
-public class RelicDescriptionScreen extends DescriptionScreen implements IAutoScaledScreen, ITabbedDescriptionScreen {
+public class RelicDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen {
     public RelicDescriptionScreen(Player player, int container, int slot, Screen screen) {
         super(player, container, slot, screen);
     }
@@ -78,14 +76,15 @@ public class RelicDescriptionScreen extends DescriptionScreen implements IAutoSc
 //            if (!badge.isVisible(minecraft.player, stack))
 //                continue;
 
-            this.addRenderableWidget(new RelicBadgeWidget(x + 260 - xOff, y + 55, this, badge));
+            this.addRenderableWidget(new RelicBadgeWidget(x + 260 - xOff, y + 54, this, badge));
 
             xOff += 15;
         }
 
         this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 133, this));
 
-        this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 54, this));
+        this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, this));
+        this.addRenderableWidget(new RelicDescriptionWidget(x + 107, y + 77, this));
     }
 
     @Override
@@ -120,32 +119,14 @@ public class RelicDescriptionScreen extends DescriptionScreen implements IAutoSc
     public void renderBackground(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.renderBackground(guiGraphics, pMouseX, pMouseY, pPartialTick);
 
-        LocalPlayer player = minecraft.player;
-
-        if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
-            return;
-
-        RelicTemplate relicData = relic.getRelicTemplate(player, stack);
-
-        if (relicData == null)
-            return;
-
-        int level = relic.getRelicLevel(player, stack);
-
         var poseStack = guiGraphics.pose();
-
-        int x = (this.width - backgroundWidth) / 2;
-        int y = (this.height - backgroundHeight) / 2;
-
-        int yOff, xOff = 0;
 
         poseStack.pushPose();
 
         poseStack.scale(0.75F, 0.75F, 1F);
 
-        guiGraphics.drawString(minecraft.font, Component.literal(stack.getDisplayName().getString()
-                        .replace("[", "").replace("]", ""))
-                .withStyle(ChatFormatting.BOLD), (int) ((x + 115) * 1.33F), (int) ((y + 63) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
+        guiGraphics.drawString(minecraft.font, Component.literal(stack.getDisplayName().getString().replace("[", "").replace("]", ""))
+                .withStyle(ChatFormatting.BOLD), (int) ((x + 114) * 1.33F), (int) ((y + 62) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
 
         poseStack.popPose();
 
@@ -153,30 +134,13 @@ public class RelicDescriptionScreen extends DescriptionScreen implements IAutoSc
 
         GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/top_background_delimiter.png"), poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(x + 105, y + 45)
+                .pos(x + 107, y + 70)
                 .end();
-
-        poseStack.popPose();
-
-        poseStack.pushPose();
-
-        poseStack.scale(0.5F, 0.5F, 0.5F);
-
-        yOff = 9;
-
-        for (FormattedCharSequence line : justifyStyledText(
-                Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".description"),
-                320,
-                minecraft.font)) {
-
-            guiGraphics.drawString(minecraft.font, line, (x + 115) * 2, (y + 74) * 2 + yOff, DescriptionUtils.TEXT_COLOR, false);
-            yOff += 10;
-        }
 
         poseStack.popPose();
     }
 
-    private List<FormattedCharSequence> justifyStyledText(Component text, int maxWidth, Font font) {
+    public static List<FormattedCharSequence> justifyStyledText(Component text, int maxWidth, Font font) {
         var splitter = font.getSplitter();
         var words = new ArrayList<FormattedText>();
         text.visit((style, str) -> {
@@ -266,11 +230,6 @@ public class RelicDescriptionScreen extends DescriptionScreen implements IAutoSc
     @Override
     public boolean isPauseScreen() {
         return false;
-    }
-
-    @Override
-    public int getAutoScale() {
-        return 0;
     }
 
     @Override
