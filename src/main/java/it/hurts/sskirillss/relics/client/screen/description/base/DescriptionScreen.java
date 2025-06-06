@@ -22,6 +22,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+// TODO: Get rid of IRelicScreenProvider, use DescriptionScreen instead
 @OnlyIn(Dist.CLIENT)
 public class DescriptionScreen extends Screen implements IRelicScreenProvider, IAutoScaledScreen {
     public final Screen screen;
@@ -71,7 +72,8 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider, I
     }
 
     protected void initSidebar() {
-        this.addRenderableWidget(new LogoWidget(this.x + 313, this.y + 53, this));
+        if (LogoWidget.getRemainingClicks() != 0)
+            this.addRenderableWidget(new LogoWidget(this.x + 313, this.y + 53, this));
 
 //        FIXME: Somebody do something :'\
 //        if (relic.isSomethingWrongWithLevelingPoints(minecraft.player, stack))

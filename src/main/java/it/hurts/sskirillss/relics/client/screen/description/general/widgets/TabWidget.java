@@ -2,12 +2,9 @@ package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
-import it.hurts.octostudios.octolib.client.animator.Animator;
-import it.hurts.octostudios.octolib.client.animator.Easing;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
@@ -30,7 +27,7 @@ import net.minecraft.util.FormattedCharSequence;
 import java.util.List;
 import java.util.Locale;
 
-public class TabWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
+public class TabWidget extends AbstractDescriptionWidget implements IHoverableWidget {
     @Getter
     private IRelicScreenProvider source;
 
@@ -43,8 +40,6 @@ public class TabWidget extends AbstractDescriptionWidget implements IHoverableWi
     @Getter
     @Setter
     private double xOffset, yOffset;
-
-    public Animator hoverAnimator = new Animator(Easing.EASE_OUT_QUINT, 0, 100, 1.75, this::setYOffset);
 
     public TabWidget(int x, int y, IRelicScreenProvider source, DescriptionTab tab, IRelicScreenProvider target) {
         super(x, y, 16, 20);
@@ -119,11 +114,6 @@ public class TabWidget extends AbstractDescriptionWidget implements IHoverableWi
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-//        FIXME
-//        if (!(this.hoverAnimator.isRunning() || this.hoverAnimator.isFinished())) {
-//            this.hoverAnimator.start();
-//        }
-
         PoseStack poseStack = guiGraphics.pose();
 
         List<FormattedCharSequence> tooltip = Lists.newArrayList();
@@ -161,15 +151,5 @@ public class TabWidget extends AbstractDescriptionWidget implements IHoverableWi
         }
 
         poseStack.popPose();
-    }
-
-    @Override
-    public void onTick() {
-        if (!this.isHovered() && (this.hoverAnimator.isRunning() || this.hoverAnimator.isFinished())) {
-            this.setXOffset(0);
-            this.setYOffset(0);
-
-            this.hoverAnimator.reset();
-        }
     }
 }

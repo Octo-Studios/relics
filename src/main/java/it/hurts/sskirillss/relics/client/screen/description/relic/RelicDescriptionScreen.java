@@ -13,7 +13,7 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.TabW
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicDescriptionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicDescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
@@ -83,8 +83,10 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
 
         this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 133, this));
 
-        this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, this));
-        this.addRenderableWidget(new RelicDescriptionWidget(x + 107, y + 77, this));
+        var container = new RelicDescriptionContainerWidget(x + 107, y + 77, this);
+
+        this.addRenderableWidget(container);
+        this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, this, container));
     }
 
     @Override
