@@ -66,7 +66,7 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
     public void onPress() {
         super.onPress();
 
-        var tween = Tween.create().setTransitionType(TransitionType.SINE).setParallel(true);
+        var tween = Tween.create().setParallel(true);
 
         tween.tweenProperty(this, "squeeze.y", 1.2, 0.05).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUAD);
         tween.tweenProperty(this, "squeeze.x", 1.2, 0.1).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUAD);

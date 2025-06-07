@@ -1,28 +1,42 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.client.model.data.ModelData;
 
+import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHoverableWidget {
+    private static final List<ResourceLocation> BACKGROUNDS = Stream.of("blue", "cyan", "green", "light_blue", "orange", "magenta", "purple", "red", "yellow")
+            .map(color -> ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/backgrounds/" + color + ".png"))
+            .toList();
+
     private RelicDescriptionScreen screen;
 
     public BigRelicCardWidget(int x, int y, RelicDescriptionScreen screen) {
@@ -43,14 +57,24 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.pushPose();
 
-        poseStack.translate(0,0,-100);
+        poseStack.translate(0, 0, -100);
 
-        GUIRenderer.begin(DescriptionTextures.BIG_CARD_BACKGROUND, poseStack)
-                .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(getX() + 8, getY() + 20)
-                .end();
 
-        poseStack.translate(0,0,100);
+        var color = (float) (1.05F + (Math.sin(player.tickCount * 0.25F) * 0.1F));
+
+        RenderSystem.setShaderColor(color, color, color, 1F);
+
+        var background = pickClosestBackground(stack, BACKGROUNDS);
+
+        if (background != null)
+            GUIRenderer.begin(background, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getX() + 8, getY() + 20)
+                    .end();
+
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+
+        poseStack.translate(0, 0, 100);
 
         GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_ACTIVE, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
@@ -126,6 +150,84 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
                     .end();
 
         poseStack.popPose();
+    }
+
+    public static int getTextureColor(ResourceLocation textureLocation) {
+        var resourceManager = Minecraft.getInstance().getResourceManager();
+        var resource = resourceManager.getResource(textureLocation).orElseThrow(() -> new RuntimeException("Texture not found: " + textureLocation));
+
+        try (var in = resource.open(); var img = NativeImage.read(in)) {
+            return averageColor(img.getWidth(), img.getHeight(), img::getPixelRGBA);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static int getItemColor(ItemStack itemStack) {
+        var mc = Minecraft.getInstance();
+        var renderer = mc.getItemRenderer();
+        var model = renderer.getModel(itemStack, mc.level, mc.player, 0);
+        var sprite = model.getParticleIcon(ModelData.EMPTY);
+
+        var w = sprite.contents().width();
+        var h = sprite.contents().height();
+
+        return averageColor(w, h, (x, y) -> sprite.getPixelRGBA(0, x, y));
+    }
+
+    public static double colorDistance(int colorA, int colorB) {
+        var rA = (colorA >>> 16) & 0xFF;
+        var gA = (colorA >>> 8) & 0xFF;
+        var bA = colorA & 0xFF;
+        var rB = (colorB >>> 16) & 0xFF;
+        var gB = (colorB >>> 8) & 0xFF;
+        var bB = colorB & 0xFF;
+
+        var dr = rA - rB;
+        var dg = gA - gB;
+        var db = bA - bB;
+
+        return Math.sqrt(dr * dr + dg * dg + db * db);
+    }
+
+    public static ResourceLocation pickClosestBackground(ItemStack itemStack, List<ResourceLocation> backgroundTextures) {
+        var itemColor = getItemColor(itemStack);
+
+        return backgroundTextures.stream()
+                .min(Comparator.comparingDouble(tex -> colorDistance(itemColor, getTextureColor(tex))))
+                .orElse(null);
+    }
+
+    private static int averageColor(int width, int height, PixelSampler sampler) {
+        long sumR = 0, sumG = 0, sumB = 0, count = 0;
+
+        for (var y = 0; y < height; y++) {
+            for (var x = 0; x < width; x++) {
+                var p = sampler.sample(x, y);
+                if (FastColor.ABGR32.alpha(p) < 16)
+                    continue;
+
+                sumR += FastColor.ABGR32.red(p);
+                sumG += FastColor.ABGR32.green(p);
+                sumB += FastColor.ABGR32.blue(p);
+
+                count++;
+            }
+        }
+
+        if (count == 0)
+            return 0;
+
+        var avgR = (int) (sumR / count);
+        var avgG = (int) (sumG / count);
+        var avgB = (int) (sumB / count);
+
+        return (avgR << 16) | (avgG << 8) | avgB;
+    }
+
+    @FunctionalInterface
+    private interface PixelSampler {
+        int sample(int x, int y);
     }
 
     @Override

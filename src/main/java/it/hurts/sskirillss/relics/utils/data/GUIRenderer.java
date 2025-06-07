@@ -189,7 +189,7 @@ public final class GUIRenderer {
         if (patternWidth == -1)
             patternWidth = texWidth;
 
-        texOffY = patternHeight * animation.getFrameByTime(time.get()).getKey();
+        texOffY += patternHeight * animation.getFrameByTime(time.get()).getKey();
 
         pose.pushPose();
 
