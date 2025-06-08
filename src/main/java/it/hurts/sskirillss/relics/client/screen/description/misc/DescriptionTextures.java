@@ -21,8 +21,10 @@ public class DescriptionTextures {
     public static final ResourceLocation ACTION_BUTTON_OUTLINE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/action_button_outline.png");
     public static final ResourceLocation STAT_DELIMITER = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/stat_delimiter.png");
 
-    public static final ResourceLocation TAB = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tab.png");
-    public static final ResourceLocation TAB_OUTLINE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tab_outline.png");
+    public static final ResourceLocation TAB = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/bookmarks/tab.png");
+    public static final ResourceLocation TAB_OUTLINE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/bookmarks/tab_outline.png");
+    public static final ResourceLocation PAGE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/bookmarks/page.png");
+    public static final ResourceLocation PAGE_OUTLINE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/bookmarks/page_outline.png");
 
     public static final ResourceLocation BIG_STAR_HOLE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/big_star_hole.png");
     public static final ResourceLocation BIG_STAR_ACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/big_star_active.png");

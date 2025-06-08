@@ -139,7 +139,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         MutableComponent levelComponent = Component.literal(String.valueOf(relic.getRelicLevel(player, stack))).withStyle(ChatFormatting.BOLD);
 
-        guiGraphics.drawString(minecraft.font, levelComponent, (int) (((getX() + 25.5F) * 1.33F) - (minecraft.font.width(levelComponent) / 2F)), (int) ((getY() + 4) * 1.33F), 0xFFE278, true);
+        guiGraphics.drawString(minecraft.font, levelComponent, (int) (((getX() + 26.5F) * 1.33F) - (minecraft.font.width(levelComponent) / 2F)), (int) ((getY() + 4.5F) * 1.33F), 0xFFE278, false);
 
         poseStack.popPose();
 
@@ -154,7 +154,10 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
     public static int getTextureColor(ResourceLocation textureLocation) {
         var resourceManager = Minecraft.getInstance().getResourceManager();
-        var resource = resourceManager.getResource(textureLocation).orElseThrow(() -> new RuntimeException("Texture not found: " + textureLocation));
+        var resource = resourceManager.getResource(textureLocation).orElse(null);
+
+        if (resource == null)
+            return 0x00000000;
 
         try (var in = resource.open(); var img = NativeImage.read(in)) {
             return averageColor(img.getWidth(), img.getHeight(), img::getPixelRGBA);

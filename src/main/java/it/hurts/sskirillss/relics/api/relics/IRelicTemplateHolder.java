@@ -203,6 +203,16 @@ public interface IRelicTemplateHolder {
         return getDefaultLevelingSourcesTemplate().getSources().get(source);
     }
 
+    @ApiStatus.Internal
+    default StatisticTemplate getDefaultStatisticTemplate() {
+        return getDefaultRelicTemplate().getStatistic();
+    }
+
+    @ApiStatus.Internal
+    default MetricTemplate getDefaultMetricTemplate(String metric) {
+        return getDefaultStatisticTemplate().getMetrics().get(metric);
+    }
+
     /**
      * Returns the {@link RelicTemplate} associated with the given entity and item context.
      * <p>
@@ -297,5 +307,13 @@ public interface IRelicTemplateHolder {
      */
     default LevelingSourceTemplate getLevelingSourceTemplate(LivingEntity entity, ItemStack stack, String source) {
         return getRelicTemplate(entity, stack).getLeveling().getSources().getSources().get(source);
+    }
+
+    default StatisticTemplate getStatisticTemplate(LivingEntity entity, ItemStack stack) {
+        return getRelicTemplate(entity, stack).getStatistic();
+    }
+
+    default MetricTemplate getMetricTemplate(LivingEntity entity, ItemStack stack, String metric) {
+        return getStatisticTemplate(entity, stack).getMetrics().get(metric);
     }
 }

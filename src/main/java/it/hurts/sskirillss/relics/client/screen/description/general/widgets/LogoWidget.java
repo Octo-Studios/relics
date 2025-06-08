@@ -11,6 +11,7 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
+import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -55,6 +56,8 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
 
         GUIRenderer.begin(DescriptionTextures.LOGO, poseStack)
                 .anchor(SpriteAnchor.CENTER)
+                .patternSize(55, 18)
+                .animation(AnimationData.construct(576, 18, 2))
                 .end();
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);

@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.base.IScrollableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.utils.Reference;
@@ -14,13 +13,12 @@ import net.minecraft.util.Mth;
 import org.lwjgl.glfw.GLFW;
 
 public class ScrollbarWidget extends AbstractDescriptionWidget implements ITickingWidget {
-    private final AbstractWidget container;
-    private final IRelicScreenProvider provider;
+    private final IScrollableWidget container;
+
     private double scrollPosition = 0.0;
     private double prevScrollPosition = 0.0;
     private double scrollVelocity = 0.0;
     private static final double FRICTION = 0.35;
-    private static final double SCROLL_SPEED = 0.045;
 
     private boolean dragging = false;
     private double dragOffsetY = 0.0;
@@ -32,18 +30,16 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
     private static final int SLIDER_OFFSET_X = -1;
     private static final int SLIDER_OFFSET_Y = 6;
 
-    public ScrollbarWidget(int x, int y, IRelicScreenProvider provider, AbstractWidget container) {
+    public ScrollbarWidget(int x, int y, IScrollableWidget container) {
         super(x, y, TRACK_WIDTH, TRACK_HEIGHT);
 
-        this.provider = provider;
         this.container = container;
     }
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        double interpScroll = this.getScrollPosition(partialTick);
+        var poseStack = guiGraphics.pose();
 
-        PoseStack poseStack = guiGraphics.pose();
         poseStack.pushPose();
 
         GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/top_scroll_bar.png"), poseStack)
@@ -51,27 +47,29 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .end();
 
-        int usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT - 4;
-        int sliderX = this.getX() + SLIDER_OFFSET_X;
-        int sliderY = this.getY() + SLIDER_OFFSET_Y + (int) Math.round(interpScroll * usableTrackHeight);
+        if (!this.isLocked()) {
+            int usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT - 4;
+            int sliderX = this.getX() + SLIDER_OFFSET_X;
+            int sliderY = this.getY() + SLIDER_OFFSET_Y + (int) Math.round(this.getScrollPosition(partialTick) * usableTrackHeight);
 
-        var color = (float) (container.isHovered() ? 1D + Math.sin(System.currentTimeMillis() * 0.01D) * 0.1D : 1D);
+            var color = (float) (((AbstractWidget) container).isHovered() ? 1D + Math.sin(System.currentTimeMillis() * 0.01D) * 0.1D : 1D);
 
-        poseStack.translate(sliderX + SLIDER_WIDTH / 2F, sliderY, 0);
+            poseStack.translate(sliderX + SLIDER_WIDTH / 2F, sliderY, 0);
 
-        var distance = Math.min(Math.abs(prevScrollPosition - scrollPosition), 0.5F);
+            var distance = Math.min(Math.abs(prevScrollPosition - scrollPosition) * 1.1F, 0.35F);
 
-        poseStack.scale((float) (1 - distance), (float) (1 + (distance * 2.5F)),1);
+            poseStack.scale((float) (1 - distance), (float) (1 + (distance * 2.5F)), 1);
 
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/scroll_bar_slider.png"), poseStack)
-                .color(color, color, color, 1F)
-                .anchor(SpriteAnchor.CENTER)
-                .end();
-
-        if (isHoveringSlider(mouseX, mouseY)) {
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/scroll_bar_slider_selection.png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/scroll_bar_slider.png"), poseStack)
+                    .color(color, color, color, 1F)
                     .anchor(SpriteAnchor.CENTER)
                     .end();
+
+            if (isHoveringSlider(mouseX, mouseY)) {
+                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/scroll_bar_slider_selection.png"), poseStack)
+                        .anchor(SpriteAnchor.CENTER)
+                        .end();
+            }
         }
 
         poseStack.popPose();
@@ -79,26 +77,26 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
 
     @Override
     public void onTick() {
-        prevScrollPosition = scrollPosition;
-        scrollPosition += scrollVelocity;
-        scrollVelocity *= FRICTION;
+        this.prevScrollPosition = this.scrollPosition;
+        this.scrollPosition += this.scrollVelocity;
+        this.scrollVelocity *= FRICTION;
 
-        if (Math.abs(scrollVelocity) < 0.0005) {
-            scrollVelocity = 0.0;
+        if (Math.abs(this.scrollVelocity) < 0.0005) {
+            this.scrollVelocity = 0.0;
         }
 
-        if (scrollPosition < 0.0) {
-            scrollPosition = 0.0;
-            scrollVelocity = 0.0;
-        } else if (scrollPosition > 1.0) {
-            scrollPosition = 1.0;
-            scrollVelocity = 0.0;
+        if (this.scrollPosition < 0.0) {
+            this.scrollPosition = 0.0;
+            this.scrollVelocity = 0.0;
+        } else if (this.scrollPosition > 1.0) {
+            this.scrollPosition = 1.0;
+            this.scrollVelocity = 0.0;
         }
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT || !isMouseOver(mouseX, mouseY))
+        if (this.isLocked() || button != GLFW.GLFW_MOUSE_BUTTON_LEFT || !isMouseOver(mouseX, mouseY))
             return false;
 
         this.dragOffsetY = this.isHoveringSlider(mouseX, mouseY) ? mouseY - this.getSliderTopY() : SLIDER_HEIGHT / 2D;
@@ -111,19 +109,19 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
 
     @Override
     public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (!dragging || button != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+        if (this.isLocked() || !dragging || button != GLFW.GLFW_MOUSE_BUTTON_LEFT)
             return false;
 
         this.scrollVelocity = 0D;
 
-        updateScrollPositionFromMouse(mouseX, mouseY);
+        this.updateScrollPositionFromMouse(mouseX, mouseY);
 
         return true;
     }
 
     @Override
     public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (button != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+        if (this.isLocked() || button != GLFW.GLFW_MOUSE_BUTTON_LEFT)
             return false;
 
         if (dragging) {
@@ -136,13 +134,11 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
     }
 
     private void updateScrollPositionFromMouse(double mouseX, double mouseY) {
-        double trackStartY = this.getY() + SLIDER_OFFSET_Y;
-        double usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT - 4;
-        double relativeY = (mouseY - dragOffsetY) - trackStartY;
-        double newPos = relativeY / usableTrackHeight;
+        var trackStartY = this.getY() + SLIDER_OFFSET_Y;
+        var usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT - 4;
+        var relativeY = (mouseY - dragOffsetY) - trackStartY;
 
-        newPos = Math.max(0.0, Math.min(1.0, newPos));
-        this.scrollPosition = newPos;
+        this.scrollPosition = Math.clamp(relativeY / usableTrackHeight, 0, 1);
     }
 
     public boolean isHoveringSlider(double mouseX, double mouseY) {
@@ -155,7 +151,8 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
     }
 
     private double getSliderTopY() {
-        int usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT;
+        var usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT;
+
         return this.getY() + SLIDER_OFFSET_Y + (this.scrollPosition * usableTrackHeight);
     }
 
@@ -164,11 +161,23 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
     }
 
     @Override
+    public boolean isLocked() {
+        return container.getContainerHeight() > container.getContentHeight();
+    }
+
+    @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (!isMouseOver(mouseX, mouseY) && !container.isHovered()) {
+        if (this.isLocked() || !isMouseOver(mouseX, mouseY) && !((AbstractWidget) container).isHovered())
             return false;
-        }
-        this.scrollVelocity -= scrollY * SCROLL_SPEED;
+
+        var contentHeight = container.getContentHeight();
+        var containerHeight = container.getContainerHeight();
+        var maxScrollPixels = Math.max(1, contentHeight - containerHeight);
+        var wheelScrollPixels = 10;
+        var scrollSpeedNormalized = wheelScrollPixels / (double) maxScrollPixels;
+
+        this.scrollVelocity -= scrollY * scrollSpeedNormalized;
+
         return true;
     }
 }

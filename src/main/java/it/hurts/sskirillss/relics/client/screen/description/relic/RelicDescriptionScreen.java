@@ -4,22 +4,23 @@ import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.badges.base.RelicBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
+import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RelicBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.TabWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicDescriptionContainerWidget;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
 import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -46,7 +47,11 @@ import java.util.List;
 import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
-public class RelicDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen {
+public class RelicDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
+    @Getter
+    @Setter
+    private DescriptionPage page = DescriptionPage.DESCRIPTION;
+
     public RelicDescriptionScreen(Player player, int container, int slot, Screen screen) {
         super(player, container, slot, screen);
     }
@@ -58,15 +63,10 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        updateCache(relic);
+        this.updateCache(relic);
 
-        int x = (this.width - backgroundWidth) / 2;
-        int y = (this.height - backgroundHeight) / 2;
-
-        var sources = relic.getLevelingSourcesTemplate(minecraft.player, stack).getSources();
-        var abilities = relic.getAbilitiesTemplate(minecraft.player, stack).getAbilities();
-
-        this.addRenderableWidget(new TabWidget(x + 81, y + 134, this, DescriptionTab.RELIC, new RelicDescriptionScreen(minecraft.player, this.container, this.slot, this.screen)));
+        this.addRenderableWidget(new PageWidget(x + 242, y + 35, this, DescriptionPage.DESCRIPTION));
+        this.addRenderableWidget(new PageWidget(x + 261, y + 35, this, DescriptionPage.STATISTIC));
 
         int xOff = 0;
 
@@ -83,10 +83,17 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
 
         this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 133, this));
 
-        var container = new RelicDescriptionContainerWidget(x + 107, y + 77, this);
+        DescriptionContainerWidget container = null;
 
-        this.addRenderableWidget(container);
-        this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, this, container));
+        switch (this.getPage()) {
+            case DESCRIPTION -> container = new RelicDescriptionContainerWidget(x + 107, y + 77, this);
+            case STATISTIC -> container = new RelicStatisticContainerWidget(x + 107, y + 77, this);
+        }
+
+        if (container != null) {
+            this.addRenderableWidget(container);
+            this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
+        }
     }
 
     @Override

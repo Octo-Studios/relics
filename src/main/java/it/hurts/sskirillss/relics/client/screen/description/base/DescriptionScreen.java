@@ -10,6 +10,8 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BookmarkWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.TabWidget;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;

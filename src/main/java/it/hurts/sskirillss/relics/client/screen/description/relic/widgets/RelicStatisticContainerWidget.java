@@ -1,8 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.client.screen.base.IScrollableWidget;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
@@ -11,11 +9,11 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
-import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 
-public class RelicDescriptionContainerWidget extends DescriptionContainerWidget {
-    public RelicDescriptionContainerWidget(int x, int y, RelicDescriptionScreen screen) {
+public class RelicStatisticContainerWidget extends DescriptionContainerWidget {
+    public RelicStatisticContainerWidget(int x, int y, RelicDescriptionScreen screen) {
         super(x, y, screen);
     }
 
@@ -36,7 +34,7 @@ public class RelicDescriptionContainerWidget extends DescriptionContainerWidget 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
         var lineOffset = 10;
-        var lines = RelicDescriptionScreen.justifyStyledText(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".description"), 320, minecraft.font);
+        var lines = this.getContent();
 
         var scroll = getScrollbar();
 
@@ -49,6 +47,7 @@ public class RelicDescriptionContainerWidget extends DescriptionContainerWidget 
         var yOff = 0;
 
         for (FormattedCharSequence line : lines) {
+
             guiGraphics.drawString(minecraft.font, line, (this.getX() + 7) * 2, (this.getY() * 2) + yOff, DescriptionUtils.TEXT_COLOR, false);
 
             yOff += lineOffset;
@@ -59,8 +58,20 @@ public class RelicDescriptionContainerWidget extends DescriptionContainerWidget 
         GUIScissors.end();
     }
 
+    public List<FormattedCharSequence> getContent() {
+        var sequences = new ArrayList<FormattedCharSequence>();
+
+        var stack = this.getScreen().getStack();
+        var relic = ((IRelicItem) stack.getItem());
+
+        for (var metric : relic.getStatisticTemplate(this.minecraft.player, stack).getMetrics().values())
+            sequences.addAll(this.minecraft.font.split(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".statistic." + metric.getId()), 300));
+
+        return sequences;
+    }
+
     @Override
     public int getContentHeight() {
-        return (int) (RelicDescriptionScreen.justifyStyledText(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".description"), 320, minecraft.font).size() * minecraft.font.lineHeight / 2F);
+        return 0;
     }
 }
