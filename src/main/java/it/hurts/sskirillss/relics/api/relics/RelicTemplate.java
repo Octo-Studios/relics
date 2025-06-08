@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RelicTemplate {
     private final AbilitiesTemplate abilities;
+    private final StatisticTemplate statistic;
     private final LevelingTemplate leveling;
     private final StyleTemplate style;
     private final LootTemplate loot;
@@ -28,12 +29,14 @@ public class RelicTemplate {
     @NoArgsConstructor
     public static class RelicTemplateBuilder {
         private AbilitiesTemplate abilities = AbilitiesTemplate.builder().build();
+        private StatisticTemplate statistic = StatisticTemplate.builder().build();
         private LevelingTemplate leveling = LevelingTemplate.builder().build();
         private StyleTemplate style = StyleTemplate.builder().build();
         private LootTemplate loot = LootTemplate.builder().build();
 
         private RelicTemplateBuilder(RelicTemplate base) {
             this.abilities = base.getAbilities();
+            this.statistic = base.getStatistic();
             this.leveling = base.getLeveling();
             this.style = base.getStyle();
             this.loot = base.getLoot();
@@ -41,6 +44,12 @@ public class RelicTemplate {
 
         public RelicTemplateBuilder abilities(AbilitiesTemplate abilities) {
             this.abilities = abilities;
+
+            return this;
+        }
+
+        public RelicTemplateBuilder statistic(StatisticTemplate statistic) {
+            this.statistic = statistic;
 
             return this;
         }
@@ -64,7 +73,7 @@ public class RelicTemplate {
         }
 
         public RelicTemplate build() {
-            return new RelicTemplate(abilities, leveling, style, loot);
+            return new RelicTemplate(abilities, statistic, leveling, style, loot);
         }
     }
 }

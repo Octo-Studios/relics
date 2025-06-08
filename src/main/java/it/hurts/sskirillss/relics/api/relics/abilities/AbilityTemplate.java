@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.api.relics.abilities;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Function3;
 import io.netty.util.internal.UnstableApi;
+import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
@@ -32,6 +33,7 @@ public class AbilityTemplate {
     private final int requiredPoints;
     private final CastData castData;
     private final ResearchTemplate researchTemplate;
+    private final StatisticTemplate statistic;
     private final List<String> modes;
 
     public static AbilityTemplateBuilder builder(String id) {
@@ -56,6 +58,7 @@ public class AbilityTemplate {
         private int requiredPoints = 1;
         private CastData castData = CastData.builder().build();
         private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
+        private StatisticTemplate statistic = StatisticTemplate.builder().build();
         private List<String> modes = new ArrayList<>();
 
         public AbilityTemplateBuilder(String id) {
@@ -122,6 +125,12 @@ public class AbilityTemplate {
             return this;
         }
 
+        public AbilityTemplateBuilder statistic(StatisticTemplate statistic) {
+            this.statistic = statistic;
+
+            return this;
+        }
+
         @UnstableApi
         @ApiStatus.Experimental
         public AbilityTemplateBuilder modes(String... mode) {
@@ -131,7 +140,7 @@ public class AbilityTemplate {
         }
 
         public AbilityTemplate build() {
-            return new AbilityTemplate(id, icon, stats, maxLevel, requiredLevel, requiredPoints, castData, researchTemplate, modes);
+            return new AbilityTemplate(id, icon, stats, maxLevel, requiredLevel, requiredPoints, castData, researchTemplate, statistic, modes);
         }
     }
 }
