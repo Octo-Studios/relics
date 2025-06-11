@@ -193,47 +193,8 @@ public final class GUIRenderer {
 
         pose.pushPose();
 
-        float xOff = 0F;
-        float yOff = 0F;
-
-        switch (anchor) {
-            case CENTER -> {
-                xOff = patternWidth / 2F * scale;
-                yOff = patternHeight / 2F * scale;
-            }
-            case TOP_RIGHT -> {
-                xOff = patternWidth * scale;
-                yOff = 0F;
-            }
-            case TOP_LEFT -> {
-                xOff = 0F;
-                yOff = 0F;
-            }
-            case BOTTOM_LEFT -> {
-                xOff = 0F;
-                yOff = patternHeight * scale;
-            }
-            case BOTTOM_RIGHT -> {
-                xOff = patternWidth * scale;
-                yOff = patternHeight * scale;
-            }
-            case TOP_CENTER -> {
-                xOff = (patternWidth / 2F) * scale;
-                yOff = 0F;
-            }
-            case CENTER_LEFT -> {
-                xOff = 0F;
-                yOff = (patternHeight / 2F) * scale;
-            }
-            case CENTER_RIGHT -> {
-                xOff = patternWidth * scale;
-                yOff = (patternHeight / 2F) * scale;
-            }
-            case BOTTOM_CENTER -> {
-                xOff = (patternWidth / 2F) * scale;
-                yOff = patternHeight * scale;
-            }
-        }
+        float xOff = anchor.getXOffset(patternWidth, scale);
+        float yOff = anchor.getYOffset(patternHeight, scale);
 
         pose.translate(posX - xOff, posY - yOff, 0);
         pose.scale(scale, scale, 0);
