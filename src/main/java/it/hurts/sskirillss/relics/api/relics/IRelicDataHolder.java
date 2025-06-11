@@ -15,28 +15,28 @@ import java.util.Optional;
 
 @ApiStatus.Internal
 public interface IRelicDataHolder {
-    default RelicComponent getRelicData(ItemStack stack) {
+    default RelicComponent getRelicComponent(LivingEntity entity, ItemStack stack) {
         return stack.getOrDefault(DataComponentRegistry.DATA, RelicComponent.EMPTY);
     }
 
-    default void setRelicData(ItemStack stack, RelicComponent data) {
+    default void setRelicComponent(LivingEntity entity, ItemStack stack, RelicComponent data) {
         stack.set(DataComponentRegistry.DATA, data);
     }
 
-    default LevelingComponent getLevelingData(ItemStack stack) {
-        return getRelicData(stack).getLeveling();
+    default LevelingComponent getLevelingData(LivingEntity entity, ItemStack stack) {
+        return getRelicComponent(entity, stack).getLeveling();
     }
 
-    default void setLevelingData(ItemStack stack, LevelingComponent data) {
-        setRelicData(stack, getRelicData(stack).toBuilder().leveling(data).build());
+    default void setLevelingData(LivingEntity entity, ItemStack stack, LevelingComponent data) {
+        setRelicComponent(entity, stack, getRelicComponent(entity, stack).toBuilder().leveling(data).build());
     }
 
-    default AbilitiesComponent getAbilitiesComponent(ItemStack stack) {
-        return getRelicData(stack).getAbilities();
+    default AbilitiesComponent getAbilitiesComponent(LivingEntity entity, ItemStack stack) {
+        return getRelicComponent(entity, stack).getAbilities();
     }
 
-    default void setAbilitiesComponent(ItemStack stack, AbilitiesComponent data) {
-        setRelicData(stack, getRelicData(stack).toBuilder().abilities(data).build());
+    default void setAbilitiesComponent(LivingEntity entity, ItemStack stack, AbilitiesComponent data) {
+        setRelicComponent(entity, stack, getRelicComponent(entity, stack).toBuilder().abilities(data).build());
     }
 
     @Nullable
@@ -44,7 +44,7 @@ public interface IRelicDataHolder {
         if (!(stack.getItem() instanceof IRelicTemplateHolder templateHolder))
             return null;
 
-        var abilitiesComponent = getAbilitiesComponent(stack);
+        var abilitiesComponent = getAbilitiesComponent(entity, stack);
         var abilityComponent = abilitiesComponent.getAbilities().get(ability);
         var abilityTemplate = templateHolder.getAbilityTemplate(entity, stack, ability);
 
@@ -53,7 +53,7 @@ public interface IRelicDataHolder {
         else if (abilityTemplate != null) {
             abilityComponent = AbilityComponent.EMPTY;
 
-            setAbilitiesComponent(stack, abilitiesComponent.toBuilder()
+            setAbilitiesComponent(entity, stack, abilitiesComponent.toBuilder()
                     .ability(ability, abilityComponent)
                     .build());
 
@@ -62,8 +62,8 @@ public interface IRelicDataHolder {
             return null;
     }
 
-    default void setAbilityComponent(ItemStack stack, String ability, AbilityComponent component) {
-        setAbilitiesComponent(stack, getAbilitiesComponent(stack).toBuilder().ability(ability, component).build());
+    default void setAbilityComponent(LivingEntity entity, ItemStack stack, String ability, AbilityComponent component) {
+        setAbilitiesComponent(entity, stack, getAbilitiesComponent(entity, stack).toBuilder().ability(ability, component).build());
     }
 
     @Nullable
@@ -80,7 +80,7 @@ public interface IRelicDataHolder {
         else if (statData != null) {
             statComponent = StatComponent.EMPTY;
 
-            setAbilityComponent(stack, ability, abilityComponent.toBuilder()
+            setAbilityComponent(entity, stack, ability, abilityComponent.toBuilder()
                     .stat(stat, statComponent)
                     .build());
 
@@ -90,7 +90,7 @@ public interface IRelicDataHolder {
     }
 
     default void setStatComponent(LivingEntity entity, ItemStack stack, String ability, String stat, StatComponent component) {
-        setAbilityComponent(stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
+        setAbilityComponent(entity, stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
                 .stat(stat, component)
                 .build());
     }
@@ -131,7 +131,7 @@ public interface IRelicDataHolder {
     }
 
     default void setAbilityExtenderComponent(LivingEntity entity, ItemStack stack, String ability, AbilityExtenderComponent component) {
-        setAbilityComponent(stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
+        setAbilityComponent(entity, stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
                 .extender(component)
                 .build());
     }
@@ -141,7 +141,7 @@ public interface IRelicDataHolder {
     }
 
     default void setLockComponent(LivingEntity entity, ItemStack stack, String ability, LockComponent component) {
-        setAbilityComponent(stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
+        setAbilityComponent(entity, stack, ability, getAbilityComponent(entity, stack, ability).toBuilder()
                 .lock(component)
                 .build());
     }
@@ -170,5 +170,55 @@ public interface IRelicDataHolder {
 
     default ResearchComponent getResearchComponent(LivingEntity entity, ItemStack stack, String ability) {
         return getAbilityComponent(entity, stack, ability).getResearch();
+    }
+
+    default StatisticComponent getStatisticComponent(LivingEntity entity, ItemStack stack) {
+        return getRelicComponent(entity, stack).getStatistic();
+    }
+
+    default void setStatisticComponent(LivingEntity entity, ItemStack stack, StatisticComponent component) {
+        setRelicComponent(entity, stack, getRelicComponent(entity, stack).toBuilder()
+                .statistic(component)
+                .build());
+    }
+
+    default MetricComponent getMetricComponent(LivingEntity entity, ItemStack stack, String metric) {
+        if (!(stack.getItem() instanceof IRelicTemplateHolder templateHolder))
+            return null;
+
+        var statisticComponent = getStatisticComponent(entity, stack);
+        var metricComponent = statisticComponent.getMetrics().get(metric);
+        var metricTemplate = templateHolder.getMetricTemplate(entity, stack, metric);
+
+        if (metricComponent != null)
+            return metricComponent;
+        else if (metricTemplate != null) {
+            metricComponent = MetricComponent.EMPTY;
+
+            setStatisticComponent(entity, stack, statisticComponent.toBuilder()
+                    .metric(metric, metricComponent)
+                    .build());
+
+            return metricComponent;
+        } else
+            return null;
+    }
+
+    default void setMetricComponent(LivingEntity entity, ItemStack stack, String metric, MetricComponent component) {
+        setStatisticComponent(entity, stack, getStatisticComponent(entity, stack).toBuilder()
+                .metric(metric, component)
+                .build());
+    }
+
+    default double getMetricValue(LivingEntity entity, ItemStack stack, String metric) {
+        return 0D;
+    }
+
+    default void setMetricValue(LivingEntity entity, ItemStack stack, String metric, double value) {
+
+    }
+
+    default void addMetricValue(LivingEntity entity, ItemStack stack, String metric, double value) {
+
     }
 }

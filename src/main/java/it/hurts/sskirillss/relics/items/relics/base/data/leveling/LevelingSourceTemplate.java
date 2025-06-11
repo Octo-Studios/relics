@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
 
-import it.hurts.sskirillss.relics.api.relics.ScalingModel;
+import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;

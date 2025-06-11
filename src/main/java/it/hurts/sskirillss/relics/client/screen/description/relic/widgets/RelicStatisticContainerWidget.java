@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -60,18 +61,31 @@ public class RelicStatisticContainerWidget extends DescriptionContainerWidget {
 
     public List<FormattedCharSequence> getContent() {
         var sequences = new ArrayList<FormattedCharSequence>();
-
         var stack = this.getScreen().getStack();
-        var relic = ((IRelicItem) stack.getItem());
+        var relic = (IRelicItem) stack.getItem();
+        var player = this.minecraft.player;
+        var font = this.minecraft.font;
+        var path = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
+        var maxWidth = 320;
+        var dot = ". ";
+        var dotWidth = font.width(dot);
 
-        for (var metric : relic.getStatisticTemplate(this.minecraft.player, stack).getMetrics().values())
-            sequences.addAll(this.minecraft.font.split(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".statistic." + metric.getId()), 300));
+        for (var metric : relic.getStatisticTemplate(player, stack).getMetrics().values()) {
+            var prefix = Component.translatable("tooltip.relics." + path + ".statistic." + metric.getId()).append(Component.literal(" "));
+            var suffix = Component.literal(metric.getFormatValue().apply(relic.getMetricComponent(player, stack, metric.getId()).getValue())).withStyle(ChatFormatting.BOLD);
+
+            var availableWidth = maxWidth - font.width(prefix) - font.width(suffix);
+            var repeatCount = availableWidth / dotWidth;
+            var line = prefix.append(dot.repeat(repeatCount)).append(suffix);
+
+            sequences.addAll(font.split(line, maxWidth));
+        }
 
         return sequences;
     }
 
     @Override
     public int getContentHeight() {
-        return 0;
+        return getContent().size() * 10;
     }
 }

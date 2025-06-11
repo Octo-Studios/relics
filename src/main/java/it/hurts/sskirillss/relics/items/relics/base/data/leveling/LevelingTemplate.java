@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
 
-import it.hurts.sskirillss.relics.api.relics.ScalingModel;
+import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.config.data.LevelingConfigData;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import lombok.AccessLevel;

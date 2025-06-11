@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.init;
 
-import it.hurts.sskirillss.relics.api.relics.ScalingModel;
+import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.scaling_models.*;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.neoforged.bus.api.IEventBus;

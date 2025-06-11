@@ -14,7 +14,7 @@ import java.util.function.Function;
 public class MetricTemplate {
     private final String id;
 
-    private final Function<Double, ? extends Number> formatValue;
+    private final Function<Double, ? extends String> formatValue;
 
     public static MetricTemplateBuilder builder(String id) {
         return new MetricTemplateBuilder(id);
@@ -27,7 +27,7 @@ public class MetricTemplate {
     @NoArgsConstructor
     public static class MetricTemplateBuilder {
         private String id;
-        private Function<Double, ? extends Number> formatValue;
+        private Function<Double, ? extends String> formatValue;
 
         private MetricTemplateBuilder(String id) {
             this.id = id;
@@ -45,7 +45,7 @@ public class MetricTemplate {
             return this;
         }
 
-        public MetricTemplateBuilder formatValue(Function<Double, ? extends Number> formatValue) {
+        public MetricTemplateBuilder formatValue(Function<Double, ? extends String> formatValue) {
             this.formatValue = formatValue;
 
             return this;

@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.api.relics.abilities.stats;
 
-import it.hurts.sskirillss.relics.api.relics.ScalingModel;
+import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.config.data.StatConfigData;
 import it.hurts.sskirillss.relics.init.RegistryRegistry;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;

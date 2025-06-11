@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.init;
 
-import it.hurts.sskirillss.relics.api.relics.ScalingModel;
+import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.badges.base.AbstractBadge;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
 import it.hurts.sskirillss.relics.utils.Reference;

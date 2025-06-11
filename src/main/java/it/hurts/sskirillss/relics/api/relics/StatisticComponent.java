@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Singular;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -13,6 +14,7 @@ import java.util.Map;
 @AllArgsConstructor
 @Builder(toBuilder = true)
 public class StatisticComponent {
+    @Singular
     private final Map<String, MetricComponent> metrics;
 
     public static final StatisticComponent EMPTY = new StatisticComponent(new HashMap<>());
@@ -20,7 +22,7 @@ public class StatisticComponent {
     public static final Codec<StatisticComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.unboundedMap(Codec.STRING, MetricComponent.CODEC)
-                            .fieldOf("metrics")
+                            .optionalFieldOf("metrics", new HashMap<>())
                             .forGetter(StatisticComponent::getMetrics)
             ).apply(instance, StatisticComponent::new)
     );

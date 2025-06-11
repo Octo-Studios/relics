@@ -22,19 +22,25 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>
  * The interface supports:
  * <ul>
- * - Default relic template construction and storage
- * - Lazy evaluation of template data and internal caching
- * - Access to nested templates such as {@link AbilitiesTemplate}, {@link LevelingTemplate}, {@link LootTemplate}, and related subcomponents
- * - Context-aware overrides based on {@link LivingEntity} and {@link ItemStack} data
+ *     <li>Default relic template construction and storage</li>
+ *     <li>Lazy evaluation of template data and internal caching</li>
+ *     <li>Access to nested templates such as {@link AbilitiesTemplate}, {@link LevelingTemplate},
+ *         {@link LootTemplate}, and related subcomponents</li>
+ *     <li>Context-aware overrides based on {@link LivingEntity} and {@link ItemStack} data</li>
  * </ul>
  * </p>
  *
  * <p>
- * Template construction of {@link #constructDefaultRelicTemplate()} can be decomposed and customized through helper methods such as {@link #constructDefaultAbilitiesTemplate()}, {@link #constructDefaultLevelingTemplate()}, and {@link #constructDefaultLootTemplate()} for modular setup.
+ * Template construction of {@link #constructDefaultRelicTemplate()} can be decomposed and
+ * customized through helper methods such as {@link #constructDefaultAbilitiesTemplate()},
+ * {@link #constructDefaultLevelingTemplate()}, and {@link #constructDefaultLootTemplate()} for modular setup.
  * </p>
  *
  * <p>
- * <strong>Note:</strong> This interface is already implemented and integrated in {@link IRelicItem}, which is the primary entry point for working with relic items. In most cases, you should implement {@link IRelicItem} instead of directly implementing this interface, unless you have a specific reason to separate concerns.
+ * <strong>Note:</strong> This interface is already implemented and integrated in {@link IRelicItem}, which
+ * is the primary entry point for working with relic items. In most cases, you should implement
+ * {@link IRelicItem} instead of directly implementing this interface, unless you have a specific
+ * reason to separate concerns.
  * </p>
  *
  * @implNote While default implementations are provided, overriding these methods is encouraged to accommodate specific relic designs or gameplay mechanics.
@@ -42,6 +48,7 @@ import org.jetbrains.annotations.ApiStatus;
  * @see IRelicItem
  */
 public interface IRelicTemplateHolder {
+
     /**
      * Returns the {@link RelicTemplate} that defines the default behavior of this relic item.
      * <p>
@@ -94,18 +101,18 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Sets the {@link RelicTemplate} for this object.
+     * Associates a {@link RelicTemplate} with this instance.
      *
-     * @param data the new {@link RelicTemplate} to associate with this instance.
+     * @param data the new {@link RelicTemplate} to store for this holder
      */
     default void setRelicTemplate(RelicTemplate data) {
         RelicStorage.RELIC_TEMPLATES.put(this, data);
     }
 
     /**
-     * Returns the {@link RelicTemplate} associated with this object.
+     * Retrieves or constructs the stored {@link RelicTemplate} for this instance, using lazy initialization.
      *
-     * @return the {@link RelicTemplate} linked to this instance.
+     * @return the cached or newly constructed {@link RelicTemplate}
      */
     @ApiStatus.Internal
     default RelicTemplate getDefaultRelicTemplate() {
@@ -113,30 +120,30 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link AbilitiesTemplate} defined in this relic's default template.
-     * <p>
-     * This method bypasses any runtime or context-specific overrides and accesses the base ability configuration associated with the default {@link RelicTemplate}.
-     * </p>
+     * Returns the {@link AbilitiesTemplate} from the default relic template, without context overrides.
      *
-     * @return the default {@link AbilitiesTemplate} of this relic
+     * @return the default {@link AbilitiesTemplate}
      */
     @ApiStatus.Internal
     default AbilitiesTemplate getDefaultAbilitiesTemplate() {
         return getDefaultRelicTemplate().getAbilities();
     }
 
-    // TODO: ???
-    // FIXME: Add API annotations
+    /**
+     * Returns the {@link LootTemplate} from the default relic template, without context overrides.
+     *
+     * @return the default {@link LootTemplate}
+     */
     @ApiStatus.Internal
     default LootTemplate getDefaultLootTemplate() {
         return getDefaultRelicTemplate().getLoot();
     }
 
     /**
-     * Returns the default {@link AbilityTemplate} by its ID from this relic's base template.
+     * Retrieves a specific {@link AbilityTemplate} by its ID from the default abilities template.
      *
      * @param ability the ID of the ability
-     * @return the corresponding {@link AbilityTemplate}, or {@code null} if not present
+     * @return the corresponding {@link AbilityTemplate}, or {@code null} if not found
      */
     @ApiStatus.Internal
     default AbilityTemplate getDefaultAbilityTemplate(String ability) {
@@ -144,10 +151,10 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link ResearchTemplate} associated with a specific ability from the default template.
+     * Retrieves the {@link ResearchTemplate} for a given ability from the default template.
      *
      * @param ability the ID of the ability
-     * @return the corresponding {@link ResearchTemplate}, or {@code null} if not present
+     * @return the corresponding {@link ResearchTemplate}, or {@code null} if not found
      */
     @ApiStatus.Internal
     default ResearchTemplate getDefaultResearchTemplate(String ability) {
@@ -155,11 +162,11 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link StatTemplate} for a specific stat of a specific ability from the default template.
+     * Retrieves the {@link StatTemplate} for a specific stat of a given ability from the default template.
      *
      * @param ability the ID of the ability
      * @param stat    the ID of the stat
-     * @return the matching {@link StatTemplate}, or {@code null} if not found
+     * @return the corresponding {@link StatTemplate}, or {@code null} if not found
      */
     @ApiStatus.Internal
     default StatTemplate getDefaultStatTemplate(String ability, String stat) {
@@ -167,10 +174,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingTemplate} associated with this relic's default template.
-     * <p>
-     * Contains experience curves, thresholds, and leveling behaviors.
-     * </p>
+     * Returns the {@link LevelingTemplate} from the default relic template, without context overrides.
      *
      * @return the default {@link LevelingTemplate}
      */
@@ -180,10 +184,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingSourcesTemplate} from the default leveling configuration.
-     * <p>
-     * Encapsulates all XP gain sources defined in the relic template.
-     * </p>
+     * Returns the {@link LevelingSourcesTemplate} describing XP sources in the default leveling configuration.
      *
      * @return the default {@link LevelingSourcesTemplate}
      */
@@ -193,9 +194,9 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingSourceTemplate} for a specific experience source from the default template.
+     * Retrieves a specific {@link LevelingSourceTemplate} by its ID from the default leveling sources.
      *
-     * @param source the ID of the experience source
+     * @param source the ID of the XP source
      * @return the corresponding {@link LevelingSourceTemplate}, or {@code null} if not found
      */
     @ApiStatus.Internal
@@ -203,11 +204,22 @@ public interface IRelicTemplateHolder {
         return getDefaultLevelingSourcesTemplate().getSources().get(source);
     }
 
+    /**
+     * Returns the {@link StatisticTemplate} from the default relic template, without context overrides.
+     *
+     * @return the default {@link StatisticTemplate}
+     */
     @ApiStatus.Internal
     default StatisticTemplate getDefaultStatisticTemplate() {
         return getDefaultRelicTemplate().getStatistic();
     }
 
+    /**
+     * Retrieves a {@link MetricTemplate} by its ID from the default statistic template.
+     *
+     * @param metric the ID of the metric
+     * @return the corresponding {@link MetricTemplate}, or {@code null} if not found
+     */
     @ApiStatus.Internal
     default MetricTemplate getDefaultMetricTemplate(String metric) {
         return getDefaultStatisticTemplate().getMetrics().get(metric);
@@ -216,7 +228,7 @@ public interface IRelicTemplateHolder {
     /**
      * Returns the {@link RelicTemplate} associated with the given entity and item context.
      * <p>
-     * By default, this method returns the default template. Implementations may override this to provide dynamic behavior based on the context (e.g., data components, player status, etc.).
+     * By default, this returns the static default template. Override to implement dynamic context-based behavior (e.g., scaling with player data or item NBT).
      * </p>
      *
      * @param entity the holder of the item
@@ -228,7 +240,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link AbilitiesTemplate} from the contextual {@link RelicTemplate}.
+     * Returns the {@link AbilitiesTemplate} from the contextual relic template.
      *
      * @param entity the holder of the item
      * @param stack  the item stack instance
@@ -239,7 +251,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link AbilityTemplate} for the given ability ID from the contextual template.
+     * Retrieves a specific {@link AbilityTemplate} by its ID from the contextual template.
      *
      * @param entity  the holder of the item
      * @param stack   the item stack instance
@@ -251,7 +263,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link ResearchTemplate} for the given ability from the contextual template.
+     * Retrieves the {@link ResearchTemplate} for a given ability from the contextual template.
      *
      * @param entity  the holder of the item
      * @param stack   the item stack instance
@@ -263,7 +275,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link StatTemplate} for a given ability and stat ID from the contextual template.
+     * Retrieves the {@link StatTemplate} for a specific stat of a given ability from the contextual template.
      *
      * @param entity  the holder of the item
      * @param stack   the item stack instance
@@ -276,7 +288,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingTemplate} from the contextual {@link RelicTemplate}.
+     * Returns the {@link LevelingTemplate} from the contextual relic template.
      *
      * @param entity the holder of the item
      * @param stack  the item stack instance
@@ -287,7 +299,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingSourcesTemplate} from the contextual leveling configuration.
+     * Returns the {@link LevelingSourcesTemplate} describing XP sources from the contextual leveling configuration.
      *
      * @param entity the holder of the item
      * @param stack  the item stack instance
@@ -298,7 +310,7 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingSourceTemplate} for a specific source from the contextual configuration.
+     * Retrieves a specific {@link LevelingSourceTemplate} by its ID from the contextual leveling configuration.
      *
      * @param entity the holder of the item
      * @param stack  the item stack instance
@@ -309,10 +321,25 @@ public interface IRelicTemplateHolder {
         return getRelicTemplate(entity, stack).getLeveling().getSources().getSources().get(source);
     }
 
+    /**
+     * Returns the {@link StatisticTemplate} from the contextual relic template.
+     *
+     * @param entity the holder of the item
+     * @param stack  the item stack instance
+     * @return the contextual {@link StatisticTemplate}
+     */
     default StatisticTemplate getStatisticTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getStatistic();
     }
 
+    /**
+     * Retrieves a {@link MetricTemplate} by its ID from the contextual statistic template.
+     *
+     * @param entity the holder of the item
+     * @param stack  the item stack instance
+     * @param metric the ID of the metric
+     * @return the contextual {@link MetricTemplate}, or {@code null} if not found
+     */
     default MetricTemplate getMetricTemplate(LivingEntity entity, ItemStack stack, String metric) {
         return getStatisticTemplate(entity, stack).getMetrics().get(metric);
     }
