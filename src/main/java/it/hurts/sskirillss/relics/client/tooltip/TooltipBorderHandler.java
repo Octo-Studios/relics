@@ -24,33 +24,33 @@ import org.lwjgl.opengl.GL11;
 public class TooltipBorderHandler {
     @SubscribeEvent
     public static void onTooltipDisplay(TooltipDisplayEvent event) {
-        LocalPlayer player = Minecraft.getInstance().player;
+        var player = Minecraft.getInstance().player;
 
         if (player == null)
             return;
 
-        ItemStack stack = event.getStack();
+        var stack = event.getStack();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        TooltipData tooltip = relic.getStyleTemplate(player, stack).getTooltip().apply(player, stack);
+        var tooltip = relic.getStyleTemplate(player, stack).getTooltip().apply(player, stack);
 
         if (!tooltip.isTextured())
             return;
 
-        GuiGraphics graphics = event.getGraphics();
-        PoseStack poseStack = graphics.pose();
+        var graphics = event.getGraphics();
+        var poseStack = graphics.pose();
 
-        int width = event.getWidth();
-        int height = event.getHeight();
+        var width = event.getWidth();
+        var height = event.getHeight();
 
-        int x = event.getX();
-        int y = event.getY();
+        var x = event.getX();
+        var y = event.getY();
 
-        String id = tooltip.getIcon().isEmpty() ? BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() : tooltip.getIcon();
+        var id = tooltip.getIcon().isEmpty() ? BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() : tooltip.getIcon();
 
-        ResourceLocation texture = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/tooltip/frame/" + id + "_frame.png");
+        var texture = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/tooltip/frame/" + id + "/frame.png");
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShaderTexture(0, texture);
@@ -63,14 +63,14 @@ public class TooltipBorderHandler {
         if (texHeight == 0 || texWidth == 0)
             return;
 
-        int patternWidth = 160;
-        int patternHeight = 64;
+        var patternWidth = 160;
+        var patternHeight = 64;
 
-        int cornerWidth = 32;
-        int cornerHeight = 32;
+        var cornerWidth = 32;
+        var cornerHeight = 32;
 
-        int middleWidth = 96;
-        int middleHeight = cornerHeight;
+        var middleWidth = 96;
+        var middleHeight = cornerHeight;
 
         poseStack.pushPose();
 
@@ -78,7 +78,9 @@ public class TooltipBorderHandler {
 
         poseStack.translate(0, 0, 410.0);
 
-        int frame = AnimationData.construct(texHeight, patternHeight, 2).getFrameByTime(player.tickCount).getKey();
+        var animation = AnimationData.fromMcmeta(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/tooltip/frame/" + id + "/frame.png.mcmeta"));
+
+        int frame = animation.getFrameByTime(player.tickCount).getKey();
 
         int offset = patternHeight * frame;
 
@@ -91,16 +93,16 @@ public class TooltipBorderHandler {
         graphics.blit(texture, x + (width - middleWidth) / 2, y - middleHeight + 1, cornerWidth, offset, middleWidth, middleHeight, texWidth, texHeight);
         graphics.blit(texture, x + (width - middleWidth) / 2, y + height - 1, cornerWidth, middleHeight + offset, middleWidth, middleHeight, texWidth, texHeight);
 
-        texture = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/tooltip/frame/" + id + "_star.png");
+        texture = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/tooltip/frame/" + id + "/star.png");
 
         RenderSystem.setShaderTexture(0, texture);
 
-        int xOff = 0;
+        var xOff = 0;
 
         for (int i = 1; i < relic.getRelicQuality(player, stack) + 1; i++) {
-            boolean isAliquot = i % 2 == 1;
+            var isAliquot = i % 2 == 1;
 
-            float color = (float) (1F + Math.sin(player.tickCount * i * 0.05F) * 0.1F);
+            var color = (float) (1F + Math.sin(player.tickCount * i * 0.05F) * 0.1F);
 
             RenderSystem.setShaderColor(color, color, color, 1F);
 
