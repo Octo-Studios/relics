@@ -255,6 +255,6 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
 
     @Override
     public int getContentHeight() {
-        return (int) (RelicDescriptionScreen.justifyStyledText(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".description"), 320, minecraft.font).size() * minecraft.font.lineHeight / 2F);
+        return (int) (RelicDescriptionScreen.justifyStyledText(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".ability." + ((AbilityDescriptionScreen) this.getScreen()).getSelectedAbility() + ".description"), 320, minecraft.font).size() * minecraft.font.lineHeight / 2F);
     }
 }

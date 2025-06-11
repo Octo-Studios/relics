@@ -18,7 +18,7 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
     private double scrollPosition = 0.0;
     private double prevScrollPosition = 0.0;
     private double scrollVelocity = 0.0;
-    private static final double FRICTION = 0.35;
+    private static final double FRICTION = 0.5;
 
     private boolean dragging = false;
     private double dragOffsetY = 0.0;
@@ -173,10 +173,13 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
         var contentHeight = container.getContentHeight();
         var containerHeight = container.getContainerHeight();
         var maxScrollPixels = Math.max(1, contentHeight - containerHeight);
-        var wheelScrollPixels = 10;
-        var scrollSpeedNormalized = wheelScrollPixels / (double) maxScrollPixels;
 
-        this.scrollVelocity -= scrollY * scrollSpeedNormalized;
+        var lineHeight = minecraft.font.lineHeight / 2;
+        var stepPixels = lineHeight * 3D;
+
+        var scrollDelta = (stepPixels / (double) maxScrollPixels) * scrollY;
+
+        this.scrollVelocity -= scrollDelta;
 
         return true;
     }
