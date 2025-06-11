@@ -4,10 +4,12 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
+import it.hurts.sskirillss.relics.utils.MathUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import net.minecraft.network.chat.Component;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
@@ -29,7 +31,13 @@ public class RelicTemplate {
     @NoArgsConstructor
     public static class RelicTemplateBuilder {
         private AbilitiesTemplate abilities = AbilitiesTemplate.builder().build();
-        private StatisticTemplate statistic = StatisticTemplate.builder().build();
+        @Deprecated // TODO: Replace with relic data construction event
+        private StatisticTemplate statistic = StatisticTemplate.builder()
+                .metric(MetricTemplate.builder("retention_time")
+                        .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                        .component((entity, stack, optional) -> Component.translatable("tooltip.relics.statistic.relic.retention_time"))
+                        .build())
+                .build();
         private LevelingTemplate leveling = LevelingTemplate.builder().build();
         private StyleTemplate style = StyleTemplate.builder().build();
         private LootTemplate loot = LootTemplate.builder().build();

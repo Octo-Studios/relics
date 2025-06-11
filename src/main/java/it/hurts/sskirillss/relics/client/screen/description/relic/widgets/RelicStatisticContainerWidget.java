@@ -12,6 +12,7 @@ import net.minecraft.util.FormattedCharSequence;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class RelicStatisticContainerWidget extends DescriptionContainerWidget {
     public RelicStatisticContainerWidget(int x, int y, RelicDescriptionScreen screen) {
@@ -71,7 +72,7 @@ public class RelicStatisticContainerWidget extends DescriptionContainerWidget {
         var dotWidth = font.width(dot);
 
         for (var metric : relic.getStatisticTemplate(player, stack).getMetrics().values()) {
-            var prefix = Component.translatable("tooltip.relics." + path + ".statistic." + metric.getId()).append(Component.literal(" "));
+            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, Optional.empty())).append(Component.literal(" "));
             var suffix = Component.literal(metric.getFormatValue().apply(relic.getMetricComponent(player, stack, metric.getId()).getValue())).withStyle(ChatFormatting.BOLD);
 
             var availableWidth = maxWidth - font.width(prefix) - font.width(suffix);

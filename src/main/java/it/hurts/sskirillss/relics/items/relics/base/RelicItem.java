@@ -14,15 +14,12 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.Level;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.type.capability.ICurioItem;
@@ -39,21 +36,6 @@ public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicIt
         super(new Item.Properties()
                 .rarity(Rarity.RARE)
                 .stacksTo(1));
-    }
-
-    @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        super.inventoryTick(stack, level, entity, slotId, isSelected);
-
-        if (!(entity instanceof LivingEntity livingEntity))
-            return;
-
-        if (entity.tickCount % 20 != 0)
-            return;
-
-        for (var entry : getStatisticComponent(livingEntity, stack).getMetrics().entrySet()) {
-            setMetricComponent(livingEntity, stack, entry.getKey(), getMetricComponent(livingEntity, stack, entry.getKey()).toBuilder().value(entry.getValue().getValue() + 1).build());
-        }
     }
 
     @Override

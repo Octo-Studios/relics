@@ -1,8 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
-import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
-import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
@@ -72,11 +70,6 @@ public class ReflectiveNecklaceItem extends RelicItem {
                                 .borderTop(0xff00baff)
                                 .borderBottom(0xff0090a9)
                                 .textured(true)
-                                .build())
-                        .build())
-                .statistic(StatisticTemplate.builder()
-                        .metric(MetricTemplate.builder("use_time")
-                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
                                 .build())
                         .build())
                 .loot(LootTemplate.builder()

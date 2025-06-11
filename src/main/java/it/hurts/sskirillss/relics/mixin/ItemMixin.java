@@ -1,10 +1,10 @@
 package it.hurts.sskirillss.relics.mixin;
 
-import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.init.HotkeyRegistry;
+import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -42,12 +42,15 @@ public class ItemMixin {
         if (level.isClientSide() || !(entity instanceof LivingEntity livingEntity) || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        for (Map.Entry<String, AbilityTemplate> entry : relic.getAbilitiesTemplate(livingEntity, stack).getAbilities().entrySet()) {
+        for (var entry : relic.getAbilitiesTemplate(livingEntity, stack).getAbilities().entrySet()) {
             String ability = entry.getKey();
 
             if (relic.getAbilityCooldown(livingEntity, stack, ability) > 0)
                 relic.addAbilityCooldown(livingEntity, stack, ability, -1);
         }
+
+        if (livingEntity.tickCount % 20 == 0)
+            relic.addMetricValue(livingEntity, stack, "retention_time", 1);
     }
 
     @Inject(method = "appendHoverText", at = @At("HEAD"))

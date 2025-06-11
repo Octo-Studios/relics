@@ -211,14 +211,14 @@ public interface IRelicDataHolder {
     }
 
     default double getMetricValue(LivingEntity entity, ItemStack stack, String metric) {
-        return 0D;
+        return getMetricComponent(entity, stack, metric).getValue();
     }
 
     default void setMetricValue(LivingEntity entity, ItemStack stack, String metric, double value) {
-
+        setMetricComponent(entity, stack, metric, getMetricComponent(entity, stack, metric).toBuilder().value(value).build());
     }
 
     default void addMetricValue(LivingEntity entity, ItemStack stack, String metric, double value) {
-
+        setMetricValue(entity, stack, metric, getMetricValue(entity, stack, metric) + value);
     }
 }
