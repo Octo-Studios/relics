@@ -43,7 +43,7 @@ public class AbilityPageWidget extends AbstractDescriptionWidget {
         if (totalPages <= 0)
             return;
 
-        var newPage = screen.getPage() + step;
+        var newPage = screen.getPageOld() + step;
 
         if (newPage >= totalPages)
             newPage = 0;
@@ -51,7 +51,7 @@ public class AbilityPageWidget extends AbstractDescriptionWidget {
         if (newPage < 0)
             newPage = totalPages - 1;
 
-        screen.setPage(newPage);
+        screen.setPageOld(newPage);
         screen.rebuildWidgets();
     }
 

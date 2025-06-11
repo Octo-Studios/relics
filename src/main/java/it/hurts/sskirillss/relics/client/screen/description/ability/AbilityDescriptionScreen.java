@@ -1,29 +1,26 @@
 package it.hurts.sskirillss.relics.client.screen.description.ability;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
-import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.AbilityBadgeWidget;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
-import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.AbilityDescriptionContainerWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.PageWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.data.AnimationData;
+import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -34,33 +31,33 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.Mth;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
-import java.awt.*;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Pattern;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen {
+public class AbilityDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
     @Getter
     @Setter
-    private int page;
+    private int pageOld;
 
-    public UpgradeAbilityActionWidget upgradeButton;
-    public RerollAbilityActionWidget rerollButton;
-    public ResetAbilityActionWidget resetButton;
+    @Getter
+    @Setter
+    private DescriptionPage page = DescriptionPage.DESCRIPTION;
+
+    @Getter
+    private UpgradeAbilityActionWidget upgradeButton;
+    @Getter
+    private RerollAbilityActionWidget rerollButton;
+    @Getter
+    private ResetAbilityActionWidget resetButton;
 
     public AbilityDescriptionScreen(Player player, int container, int slot, Screen screen) {
         super(player, container, slot, screen);
@@ -70,7 +67,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
                     .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
                     .toList();
 
-            setPage(abilities.indexOf(getSelectedAbility()) / 5);
+            setPageOld(abilities.indexOf(getSelectedAbility()) / 5);
         }
     }
 
@@ -78,7 +75,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         return DescriptionCache.getSelectedAbility(Minecraft.getInstance().player, stack);
     }
 
-    public void setSelectedAbility( String ability) {
+    public void setSelectedAbility(String ability) {
         DescriptionCache.setSelectedAbility(Minecraft.getInstance().player, stack, ability);
     }
 
@@ -89,17 +86,17 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
+        this.updateCache(relic);
+
+        this.addRenderableWidget(new PageWidget(x + 242, y + 35, this, DescriptionPage.DESCRIPTION));
+        this.addRenderableWidget(new PageWidget(x + 261, y + 35, this, DescriptionPage.STATISTIC));
+
         var player = Minecraft.getInstance().player;
         var ability = getSelectedAbility();
 
         if (relic.getAbilityTemplate(player, stack, ability) == null)
             return;
 
-        updateCache(relic);
-
-        var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
-                .filter(entry -> relic.isLevelingSourceEnabled(player, stack, entry))
-                .toList();
         var abilities = relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream()
                 .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
                 .toList();
@@ -111,7 +108,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 186, this, 1));
         }
 
-        int startIndex = page * maxEntries;
+        int startIndex = pageOld * maxEntries;
         int endIndex = Math.min(startIndex + maxEntries, abilities.size());
 
         var paginatedAbilities = (startIndex < abilities.size() && startIndex >= 0) ? abilities.subList(startIndex, endIndex) : new ArrayList<String>();
@@ -125,7 +122,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
                 if (!badge.isVisible(player, stack, ability))
                     continue;
 
-                this.addRenderableWidget(new AbilityBadgeWidget(x + 270 - xOff, y + 63, this, badge, ability));
+                this.addRenderableWidget(new AbilityBadgeWidget(x + 260 - xOff, y + 54, this, badge, ability));
 
                 xOff += 15;
             }
@@ -148,14 +145,24 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             }
         }
 
-        this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 121, this));
-
         if (relic.isAbilityUpgradeEnabled(player, stack, ability))
             this.upgradeButton = this.addRenderableWidget(new UpgradeAbilityActionWidget(x + 288, y + 63, this));
         if (relic.isAbilityRerollEnabled(player, stack, ability))
             this.rerollButton = this.addRenderableWidget(new RerollAbilityActionWidget(x + 288, y + 80, this));
         if (relic.isAbilityResetEnabled(player, stack, ability))
             this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 288, y + 97, this));
+
+        DescriptionContainerWidget container = null;
+
+        switch (this.getPage()) {
+            case DESCRIPTION -> container = new AbilityDescriptionContainerWidget(x + 107, y + 77, this);
+            //case STATISTIC -> container = new RelicStatisticContainerWidget(x + 107, y + 77, this);
+        }
+
+        if (container != null) {
+            this.addRenderableWidget(container);
+            this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
+        }
     }
 
     @Override
@@ -176,51 +183,14 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
     public void renderBackground(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.renderBackground(guiGraphics, pMouseX, pMouseY, pPartialTick);
 
-        LocalPlayer player = Minecraft.getInstance().player;
+        var player = Minecraft.getInstance().player;
 
-        if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
+        if (this.stack == null || !(this.stack.getItem() instanceof IRelicItem relic) || player == null)
             return;
 
-        var ability = getSelectedAbility();
+        var ability = this.getSelectedAbility();
 
-        if (relic.getAbilityTemplate(player, stack, ability) == null)
-            return;
-
-        RelicTemplate relicData = relic.getRelicTemplate(player, stack);
-
-        if (relicData == null)
-            return;
-
-        int level = relic.getAbilityLevel(player, stack, ability);
-
-        PoseStack poseStack = guiGraphics.pose();
-
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShaderTexture(0, DescriptionTextures.SPACE_BACKGROUND);
-
-        int x = (this.width - backgroundWidth) / 2;
-        int y = (this.height - backgroundHeight) / 2;
-
-        int yOff = 0;
-        int xOff = 0;
-
-        var abilities = relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream()
-                .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
-                .toList();
-
-        if (abilities.size() > 5) {
-            poseStack.pushPose();
-
-            GUIRenderer.begin(DescriptionTextures.PAGE_COUNTER, poseStack)
-                    .pos(x + 295, y + 177)
-                    .end();
-
-            var page = Component.literal(String.valueOf(this.page + 1)).withStyle(ChatFormatting.BOLD);
-
-            guiGraphics.drawString(Minecraft.getInstance().font, page, (int) (x + 296 - font.width(page) / 2F), y + 173, 0xffe278, true);
-
-            poseStack.popPose();
-        }
+        var poseStack = guiGraphics.pose();
 
         poseStack.pushPose();
 
@@ -240,124 +210,16 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         } else
             title.withStyle(ChatFormatting.BOLD);
 
-        guiGraphics.drawString(Minecraft.getInstance().font, title, (int) ((x + 113) * 1.33F), (int) ((y + 67) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
+        guiGraphics.drawString(minecraft.font, title.withStyle(ChatFormatting.BOLD), (int) ((x + 114) * 1.33F), (int) ((y + 62) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
 
         poseStack.popPose();
 
         poseStack.pushPose();
 
-        poseStack.scale(0.5F, 0.5F, 1F);
-
-        yOff = 9;
-
-        if (relic.isAbilityUnlocked(player, stack, ability)) {
-            List<MutableComponent> components = new ArrayList<>();
-
-            var wantsUpgrade = upgradeButton != null && upgradeButton.isHovered() && relic.mayUpgrade(player, stack, ability);
-            var wantsReroll = rerollButton != null && rerollButton.isHovered() && relic.mayReroll(player, stack, ability);
-            var wantsReset = resetButton != null && resetButton.isHovered() && relic.mayReset(player, stack, ability);
-
-            int color = DescriptionUtils.TEXT_COLOR;
-
-            for (var stat : relic.getAbilityTemplate(player, stack, ability).getStats().values()) {
-                if (wantsUpgrade)
-                    color = 0x228B22;
-
-                if (wantsReroll)
-                    color = 0xFF8C00;
-
-                if (wantsReset)
-                    color = 0xB22222;
-
-                if (color != DescriptionUtils.TEXT_COLOR) {
-                    var brightness = (float) (0.75F + 0.1F * Math.sin(2 * Math.PI * 0.75F * player.tickCount / 20F));
-
-                    var hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-
-                    hsb[2] = Mth.clamp(brightness, 0F, 1F);
-
-                    color = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-                }
-
-                var value = String.valueOf(stat.getFormatValue().apply(relic.getStatValueForLevel(player, stack, ability, stat.getId(), wantsUpgrade ? level + 1 : wantsReset ? 0 : level)));
-                var component = Component.literal(value.endsWith(".0") ? value.replace(".0", "") : value).withStyle(ChatFormatting.BOLD);
-
-                components.add(component.withColor(color));
-            }
-
-            var pattern = Pattern.compile("([^ .,!?;:]*%(\\d+)\\$s[^ .,!?;:]*)");
-
-            // This is a crutchy workaround to fix issue caused by other unknown mod, that replaces placeholders without replacements to empty string
-            List<String> replacements = new ArrayList<>();
-
-            for (int i = 1; i < 10; i++)
-                replacements.add("%" + i + "$s");
-
-            for (var line : font.getSplitter().splitLines(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description", replacements.toArray()).getString(), 340, Style.EMPTY)) {
-                String unformattedLine = line.getString().replace("%%", "%");
-
-                int currentX = (x + 112) * 2;
-                int currentY = (y + 74) * 2 + yOff;
-
-                var matcher = pattern.matcher(unformattedLine);
-
-                int lastEnd = 0;
-
-                while (matcher.find()) {
-                    String dynamicSegment = matcher.group(1);
-
-                    int index = Integer.parseInt(matcher.group(2)) - 1;
-
-                    String staticText = unformattedLine.substring(lastEnd, matcher.start());
-
-                    if (!staticText.isEmpty()) {
-                        guiGraphics.drawString(font, staticText, currentX, currentY, DescriptionUtils.TEXT_COLOR, false);
-
-                        currentX += font.width(staticText);
-                    }
-
-                    if (index >= 0 && index < components.size()) {
-                        MutableComponent dynamicComponent = components.get(index);
-
-                        var dynamicValue = Component.literal(dynamicSegment.substring(0, dynamicSegment.indexOf('%')) + dynamicComponent.getString() + dynamicSegment.substring(dynamicSegment.lastIndexOf('s') + 1)).withStyle(dynamicComponent.getStyle());
-
-                        guiGraphics.drawString(font, dynamicValue, currentX + 2, currentY + 1, color, false);
-
-                        int frameStartX = currentX - 1;
-                        int frameStartY = currentY - 1;
-                        int frameEndX = currentX + font.width(dynamicValue) + 4;
-                        int frameEndY = currentY + font.lineHeight + 1;
-
-                        guiGraphics.fill(frameStartX, frameStartY, frameEndX, frameStartY + 1, 0xFF000000 + color);
-                        guiGraphics.fill(frameStartX, frameEndY - 1, frameEndX, frameEndY, 0xFF000000 + color);
-                        guiGraphics.fill(frameStartX, frameStartY, frameStartX + 1, frameEndY, 0xFF000000 + color);
-                        guiGraphics.fill(frameEndX - 1, frameStartY, frameEndX, frameEndY, 0xFF000000 + color);
-
-                        currentX += font.width(dynamicValue) + 3;
-
-                        lastEnd = matcher.end();
-                    }
-                }
-
-                if (lastEnd < unformattedLine.length())
-                    guiGraphics.drawString(font, unformattedLine.substring(lastEnd), currentX, currentY, DescriptionUtils.TEXT_COLOR, false);
-
-                yOff += 10;
-            }
-        } else {
-            List<Number> placeholders = new ArrayList<>();
-
-            for (var stat : relic.getAbilityTemplate(player, stack, ability).getStats().values())
-                placeholders.add(stat.getFormatValue().apply(relic.getStatValueForLevel(player, stack, ability, stat.getId(), level)));
-
-            var component = ScreenUtils.stylizeWithReplacement(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description", placeholders.toArray()), 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT), ability.length());
-
-            for (FormattedCharSequence line : font.split(component, 340)) {
-                guiGraphics.drawString(font, line, (x + 112) * 2, (y + 74) * 2 + yOff, 0x662f13, false);
-
-                yOff += 10;
-            }
-        }
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/top_background_delimiter.png"), poseStack)
+                .anchor(SpriteAnchor.TOP_LEFT)
+                .pos(x + 107, y + 70)
+                .end();
 
         poseStack.popPose();
     }

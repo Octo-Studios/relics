@@ -11,6 +11,7 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionText
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BookmarkWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.TabWidget;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -61,6 +62,10 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider, I
 
         initSidebar();
         initTabs();
+
+        // TODO: Spread between categories
+
+        this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 133, this));
     }
 
     @Override

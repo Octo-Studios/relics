@@ -60,7 +60,7 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
     protected void init() {
         super.init();
 
-        if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
+        if (this.stack == null || !(this.stack.getItem() instanceof IRelicItem relic))
             return;
 
         this.updateCache(relic);
@@ -73,15 +73,13 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
         this.addRenderableWidget(new BigRelicCardWidget(x + 59, y + 43, this));
 
         for (RelicBadge badge : BadgeRegistry.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof RelicBadge).map(entry -> (RelicBadge) entry).toList()) {
-//            if (!badge.isVisible(minecraft.player, stack))
-//                continue;
+            if (!badge.isVisible(this.minecraft.player, stack))
+                continue;
 
             this.addRenderableWidget(new RelicBadgeWidget(x + 260 - xOff, y + 54, this, badge));
 
             xOff += 15;
         }
-
-        this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 133, this));
 
         DescriptionContainerWidget container = null;
 
@@ -167,7 +165,7 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
             float wordWidth = splitter.stringWidth(word) + font.width(" ");
             if (lineWidth + wordWidth > maxWidth && !line.isEmpty()) {
                 if (line.size() == 1) {
-                    result.add(Language.getInstance().getVisualOrder(line.get(0)));
+                    result.add(Language.getInstance().getVisualOrder(line.getFirst()));
                 } else {
                     float totalWordsWidth = line.stream().map(splitter::stringWidth).reduce(0f, Float::sum);
                     int gaps = line.size() - 1;

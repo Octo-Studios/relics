@@ -4,7 +4,6 @@ import it.hurts.sskirillss.relics.client.screen.base.IScrollableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
-import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import lombok.Getter;
 import net.minecraft.client.sounds.SoundManager;
 
@@ -16,7 +15,7 @@ public abstract class DescriptionContainerWidget extends AbstractDescriptionWidg
 
     public static final int MAX_LINES = 9;
 
-    public DescriptionContainerWidget(int x, int y, RelicDescriptionScreen screen) {
+    public DescriptionContainerWidget(int x, int y, DescriptionScreen screen) {
         super(x, y, 170, 44);
 
         this.screen = screen;
