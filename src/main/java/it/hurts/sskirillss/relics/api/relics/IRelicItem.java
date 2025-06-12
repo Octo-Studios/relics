@@ -19,7 +19,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -38,6 +37,7 @@ import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRelicUtilities {
@@ -316,14 +316,50 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         setAbilityComponent(entity, stack, ability, getAbilityComponent(entity, stack, ability).toBuilder().mode(mode).build());
     }
 
-    // TODO: Huh?
     @Override
-    @ApiStatus.Internal
-    default LevelingTemplate getLevelingTemplate(LivingEntity entity, ItemStack stack) {
-        var template = IRelicTemplateHolder.super.getLevelingTemplate(entity, stack);
+    default RelicTemplate getRelicTemplate(LivingEntity entity, ItemStack stack) {
+        var base = IRelicTemplateHolder.super.getRelicTemplate(entity, stack);
+        var rank = getRelicRank(entity, stack);
 
-        return template.toBuilder()
-                .maxLevel(template.getMaxLevel() + getRelicLevel(entity, stack))
+        var multiplier = 0.25D;
+
+        var leveling = base.getLeveling();
+        var abilities = base.getAbilities();
+
+        var originalAbilities = abilities.getAbilities();
+
+        var updatedAbilitiesMap = originalAbilities.entrySet().stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        entry -> {
+                            var template = entry.getValue();
+
+                            var updatedMax = IntStream.range(0, rank)
+                                    .reduce(template.getMaxLevel(), (lvl, i) -> lvl + (int) Math.ceil(lvl * multiplier));
+
+                            return template.toBuilder()
+                                    .maxLevel(updatedMax)
+                                    .build();
+                        }
+                ));
+
+        var abilitiesBuilder = abilities.toBuilder();
+
+        updatedAbilitiesMap.forEach((key, tmpl) -> abilitiesBuilder.ability(
+                tmpl.toBuilder()
+                        .maxLevel(tmpl.getMaxLevel())
+                        .build()
+        ));
+
+        var deltaSum = updatedAbilitiesMap.entrySet().stream()
+                .mapToInt(e -> e.getValue().getMaxLevel() - originalAbilities.get(e.getKey()).getMaxLevel())
+                .sum();
+
+        return base.toBuilder()
+                .leveling(leveling.toBuilder()
+                        .maxLevel(leveling.getMaxLevel() + deltaSum)
+                        .build())
+                .abilities(abilitiesBuilder.build())
                 .build();
     }
 
@@ -866,6 +902,25 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
     default boolean mayPlayerReset(Player player, ItemStack stack, String ability) {
         return !getAbilityTemplate(player, stack, ability).getStats().isEmpty() && mayReset(player, stack, ability) && EntityUtils.getPlayerTotalExperience(player) >= getResetPlayerExperienceCost(player, stack, ability);
+    }
+
+    @ApiStatus.Obsolete
+    default boolean mayPlayerRankup(Player player, ItemStack stack) {
+        return getRelicLevel(player, stack) == getLevelingTemplate(player, stack).getMaxLevel();
+    }
+
+    @ApiStatus.Obsolete
+    default boolean rankup(Player player, ItemStack stack) {
+        if (!mayPlayerRankup(player, stack))
+            return false;
+
+        addRelicRank(player, stack, 1);
+        setRelicLevel(player, stack, 0);
+
+        for (var ability : this.getAbilitiesTemplate(player, stack).getAbilities().values())
+            this.setAbilityLevel(player, stack, ability.getId(), 0);
+
+        return true;
     }
 
     default boolean reset(Player player, ItemStack stack, String ability) {

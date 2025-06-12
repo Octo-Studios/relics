@@ -1,8 +1,9 @@
 package it.hurts.sskirillss.relics.network.packets.leveling;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,24 +23,26 @@ import java.util.function.IntFunction;
 
 @Data
 @AllArgsConstructor
-public class PacketRelicTweak implements CustomPacketPayload {
+public class PacketAbilityTweak implements CustomPacketPayload {
     private final int container;
     private final int slot;
+    private final String ability;
     private final Operation operation;
     private final boolean withShift;
 
-    public PacketRelicTweak(int container, int slot, String ability, Operation operation) {
-        this(container, slot, operation, false);
+    public PacketAbilityTweak(int container, int slot, String ability, Operation operation) {
+        this(container, slot, ability, operation, false);
     }
 
-    public static final Type<PacketRelicTweak> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "ability_tweak"));
+    public static final CustomPacketPayload.Type<PacketAbilityTweak> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "relic_tweak"));
 
-    public static final StreamCodec<ByteBuf, PacketRelicTweak> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT, PacketRelicTweak::getContainer,
-            ByteBufCodecs.INT, PacketRelicTweak::getSlot,
-            ByteBufCodecs.idMapper(Operation.BY_ID, Operation::getId), PacketRelicTweak::getOperation,
-            ByteBufCodecs.BOOL, PacketRelicTweak::isWithShift,
-            PacketRelicTweak::new
+    public static final StreamCodec<ByteBuf, PacketAbilityTweak> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT, PacketAbilityTweak::getContainer,
+            ByteBufCodecs.INT, PacketAbilityTweak::getSlot,
+            ByteBufCodecs.STRING_UTF8, PacketAbilityTweak::getAbility,
+            ByteBufCodecs.idMapper(Operation.BY_ID, Operation::getId), PacketAbilityTweak::getOperation,
+            ByteBufCodecs.BOOL, PacketAbilityTweak::isWithShift,
+            PacketAbilityTweak::new
     );
 
     @Override
@@ -65,8 +68,38 @@ public class PacketRelicTweak implements CustomPacketPayload {
                 return;
             }
 
+            AbilityTemplate entry = relic.getAbilityTemplate(player, stack, ability);
+
+            if (entry == null)
+                return;
+
+            // OMG why it works like this D:
             if (!switch (operation) {
-                case RANKUP -> relic.rankup(player, stack);
+                case UPGRADE -> {
+                    boolean result = false;
+
+                    if (withShift)
+                        for (; ; )
+                            if (relic.upgrade(player, stack, ability))
+                                result = true;
+                            else break;
+                    else
+                        result = relic.upgrade(player, stack, ability);
+
+                    yield result;
+                }
+                case REROLL -> {
+                    boolean result = false;
+
+                    if (withShift)
+                        while (relic.getAbilityQuality(player, stack, ability) != relic.getAbilityMaxQuality(player, stack, ability) && relic.reroll(player, stack, ability))
+                            result = true;
+                    else
+                        result = relic.reroll(player, stack, ability);
+
+                    yield result;
+                }
+                case RESET -> relic.reset(player, stack, ability);
             }) return;
 
             try {
@@ -88,7 +121,9 @@ public class PacketRelicTweak implements CustomPacketPayload {
     @Getter
     @AllArgsConstructor
     public enum Operation {
-        RANKUP(0);
+        RESET(0),
+        UPGRADE(1),
+        REROLL(2);
 
         public static final IntFunction<Operation> BY_ID = ByIdMap.continuous(Operation::getId, Operation.values(), ByIdMap.OutOfBoundsStrategy.ZERO);
 

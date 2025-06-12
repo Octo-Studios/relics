@@ -11,7 +11,7 @@ import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.ChatFormatting;
@@ -28,7 +28,7 @@ import java.util.List;
 
 public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
     public RerollAbilityActionWidget(int x, int y, AbilityDescriptionScreen screen) {
-        super(x, y, PacketRelicTweak.Operation.REROLL, screen);
+        super(x, y, PacketAbilityTweak.Operation.REROLL, screen);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         if (hasWarning && !Screen.hasShiftDown())
             return;
 
-        NetworkHandler.sendToServer(new PacketRelicTweak(getScreen().getContainer(), getScreen().getSlot(), getAbility(), PacketRelicTweak.Operation.REROLL, !hasWarning && Screen.hasShiftDown()));
+        NetworkHandler.sendToServer(new PacketAbilityTweak(getScreen().getContainer(), getScreen().getSlot(), getAbility(), PacketAbilityTweak.Operation.REROLL, !hasWarning && Screen.hasShiftDown()));
     }
 
     @Override

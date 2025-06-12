@@ -6,6 +6,7 @@ import it.hurts.sskirillss.relics.badges.base.RelicBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.UpgradeAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
@@ -92,6 +93,8 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
             this.addRenderableWidget(container);
             this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
         }
+
+        this.addRenderableWidget(new RankupRelicActionWidget(x + 289, y + 83, this));
     }
 
     @Override

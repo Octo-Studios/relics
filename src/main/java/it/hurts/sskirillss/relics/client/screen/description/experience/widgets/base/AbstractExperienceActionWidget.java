@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
-import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
@@ -21,11 +21,11 @@ import java.util.Locale;
 
 public abstract class AbstractExperienceActionWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     @Getter
-    private final PacketRelicTweak.Operation operation;
+    private final PacketAbilityTweak.Operation operation;
     @Getter
     private final ExperienceDescriptionScreen screen;
 
-    public AbstractExperienceActionWidget(int x, int y, PacketRelicTweak.Operation operation, ExperienceDescriptionScreen screen) {
+    public AbstractExperienceActionWidget(int x, int y, PacketAbilityTweak.Operation operation, ExperienceDescriptionScreen screen) {
         super(x, y, 14, 13);
 
         this.operation = operation;

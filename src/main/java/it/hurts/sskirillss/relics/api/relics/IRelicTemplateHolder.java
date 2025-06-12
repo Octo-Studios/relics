@@ -246,6 +246,8 @@ public interface IRelicTemplateHolder {
      * @param stack  the item stack instance
      * @return the contextual {@link AbilitiesTemplate}
      */
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
     default AbilitiesTemplate getAbilitiesTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getAbilities();
     }
@@ -258,6 +260,8 @@ public interface IRelicTemplateHolder {
      * @param ability the ID of the ability
      * @return the corresponding {@link AbilityTemplate}, or {@code null} if not present
      */
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
     default AbilityTemplate getAbilityTemplate(LivingEntity entity, ItemStack stack, String ability) {
         return getRelicTemplate(entity, stack).getAbilities().getAbilities().get(ability);
     }
@@ -270,6 +274,8 @@ public interface IRelicTemplateHolder {
      * @param ability the ID of the ability
      * @return the contextual {@link ResearchTemplate}, or {@code null} if not found
      */
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
     default ResearchTemplate getResearchTemplate(LivingEntity entity, ItemStack stack, String ability) {
         return getRelicTemplate(entity, stack).getAbilities().getAbilities().get(ability).getResearchTemplate();
     }
@@ -283,6 +289,8 @@ public interface IRelicTemplateHolder {
      * @param stat    the ID of the stat
      * @return the contextual {@link StatTemplate}, or {@code null} if not found
      */
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
     default StatTemplate getStatTemplate(LivingEntity entity, ItemStack stack, String ability, String stat) {
         return getRelicTemplate(entity, stack).getAbilities().getAbilities().get(ability).getStats().get(stat);
     }
@@ -294,6 +302,8 @@ public interface IRelicTemplateHolder {
      * @param stack  the item stack instance
      * @return the contextual {@link LevelingTemplate}
      */
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
     default LevelingTemplate getLevelingTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getLeveling();
     }
@@ -305,6 +315,8 @@ public interface IRelicTemplateHolder {
      * @param stack  the item stack instance
      * @return the contextual {@link LevelingSourcesTemplate}
      */
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
     default LevelingSourcesTemplate getLevelingSourcesTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getLeveling().getSources();
     }
@@ -317,6 +329,8 @@ public interface IRelicTemplateHolder {
      * @param source the ID of the leveling source
      * @return the contextual {@link LevelingSourceTemplate}, or {@code null} if not found
      */
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
     default LevelingSourceTemplate getLevelingSourceTemplate(LivingEntity entity, ItemStack stack, String source) {
         return getRelicTemplate(entity, stack).getLeveling().getSources().getSources().get(source);
     }
@@ -328,6 +342,8 @@ public interface IRelicTemplateHolder {
      * @param stack  the item stack instance
      * @return the contextual {@link StatisticTemplate}
      */
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
     default StatisticTemplate getStatisticTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getStatistic();
     }
@@ -340,6 +356,8 @@ public interface IRelicTemplateHolder {
      * @param metric the ID of the metric
      * @return the contextual {@link MetricTemplate}, or {@code null} if not found
      */
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
     default MetricTemplate getMetricTemplate(LivingEntity entity, ItemStack stack, String metric) {
         return getStatisticTemplate(entity, stack).getMetrics().get(metric);
     }

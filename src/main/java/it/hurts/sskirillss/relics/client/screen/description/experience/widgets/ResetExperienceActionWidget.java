@@ -6,7 +6,7 @@ import it.hurts.sskirillss.relics.client.screen.description.experience.Experienc
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.base.AbstractExperienceActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
@@ -17,7 +17,7 @@ import java.util.List;
 
 public class ResetExperienceActionWidget extends AbstractExperienceActionWidget {
     public ResetExperienceActionWidget(int x, int y, ExperienceDescriptionScreen screen) {
-        super(x, y, PacketRelicTweak.Operation.RESET, screen);
+        super(x, y, PacketAbilityTweak.Operation.RESET, screen);
     }
 
     @Override

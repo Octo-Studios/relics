@@ -10,7 +10,7 @@ import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.ChatFormatting;
@@ -27,7 +27,7 @@ import java.util.List;
 
 public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
     public UpgradeAbilityActionWidget(int x, int y, AbilityDescriptionScreen screen) {
-        super(x, y, PacketRelicTweak.Operation.UPGRADE, screen);
+        super(x, y, PacketAbilityTweak.Operation.UPGRADE, screen);
     }
 
     @Override

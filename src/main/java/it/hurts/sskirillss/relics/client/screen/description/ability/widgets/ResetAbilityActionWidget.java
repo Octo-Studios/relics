@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtil
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -22,7 +22,7 @@ import java.util.List;
 
 public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
     public ResetAbilityActionWidget(int x, int y, AbilityDescriptionScreen screen) {
-        super(x, y, PacketRelicTweak.Operation.RESET, screen);
+        super(x, y, PacketAbilityTweak.Operation.RESET, screen);
     }
 
     @Override
