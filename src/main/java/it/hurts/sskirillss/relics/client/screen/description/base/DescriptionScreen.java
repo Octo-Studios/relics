@@ -89,7 +89,6 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider, I
         this.addRenderableWidget(new RankPlateWidget(this.x + 313, this.y + 77, this));
         this.addRenderableWidget(new PointsPlateWidget(this.x + 313, this.y + 102, this));
         this.addRenderableWidget(new PlayerExperiencePlateWidget(this.x + 313, this.y + 127, this));
-        this.addRenderableWidget(new LuckPlateWidget(this.x + 313, this.y + 152, this));
     }
 
     protected void initTabs() {

@@ -465,26 +465,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return getRelicTemplate(entity, stack).getStyle();
     }
 
-    default int getMaxLuck(LivingEntity entity, ItemStack stack) {
-        return 100;
-    }
-
-    default double getLuckModifier(LivingEntity entity, ItemStack stack) {
-        return 1.15D;
-    }
-
-    default int getRelicLuck(LivingEntity entity, ItemStack stack) {
-        return getLevelingData(entity, stack).getLuck();
-    }
-
-    default void setRelicLuck(LivingEntity entity, ItemStack stack, int amount) {
-        setLevelingData(entity, stack, getLevelingData(entity, stack).toBuilder().luck(Mth.clamp(amount, 0, getMaxLuck(entity, stack))).build());
-    }
-
-    default void addRelicLuck(LivingEntity entity, ItemStack stack, int amount) {
-        setRelicLuck(entity, stack, getRelicLuck(entity, stack) + amount);
-    }
-
     default void spreadRelicExperience(@Nullable LivingEntity entity, ItemStack stack, int experience) {
         spreadRelicExperience(entity, stack, experience, 0.25D);
     }
@@ -697,7 +677,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         setAbilityLevel(entity, stack, ability, getAbilityLevel(entity, stack, ability) + points);
     }
 
-    default AbilityComponent randomizeAbilityStats(LivingEntity entity, ItemStack stack, String ability, int luck) {
+    default AbilityComponent randomizeAbilityStats(LivingEntity entity, ItemStack stack, String ability) {
         Map<String, StatTemplate> stats = getAbilityTemplate(entity, stack, ability).getStats();
 
         Random random = new Random();
@@ -706,16 +686,16 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
         do {
             int maxQuality = getAbilityMaxQuality(entity, stack, ability);
-            int maxLuck = getMaxLuck(entity, stack);
+            int maxLuck = 10;
 
             // Random value in the [-1, 1] range
             double randomValue = (random.nextDouble() * 2D) - 1D;
 
             // Luck effect modifier. Lower value = lower chance to get 5 stars
-            double modifier = getLuckModifier(entity, stack);
+            double modifier = 5D;
 
             // Bias based on luck (ranging from -0.5 to 0.5), multiplied by the modifier
-            double bias = ((luck - (maxLuck / 2D)) / maxLuck) * modifier;
+            double bias = ((5 - (maxLuck / 2D)) / maxLuck) * modifier;
 
             // Apply the bias to randomValue and limit the result within the range [-1, 1]
             double biasedValue = Math.tanh(randomValue + bias);
@@ -854,7 +834,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     }
 
     default int getRerollPlayerExperienceCost(LivingEntity entity, ItemStack stack, String ability) {
-        return (getRelicLuck(entity, stack) * 5) + 50;
+        return 50;
     }
 
     default boolean mayReroll(LivingEntity entity, ItemStack stack, String ability) {
@@ -871,14 +851,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
         player.giveExperiencePoints(-getRerollPlayerExperienceCost(player, stack, ability));
 
-        int prevQuality = getAbilityQuality(player, stack, ability);
-
-        randomizeAbilityStats(player, stack, ability, getRelicLuck(player, stack));
-
-        int newQuality = getAbilityQuality(player, stack, ability);
-
-        if (newQuality < prevQuality)
-            addRelicLuck(player, stack, (int) (Math.ceil((prevQuality - newQuality) / 2D)));
+        randomizeAbilityStats(player, stack, ability);
 
         return true;
     }

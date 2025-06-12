@@ -14,17 +14,15 @@ public final class LevelingComponent {
     private final int level;
     private final double experience;
     private final int points;
-    private final int luck;
 
-    public static final LevelingComponent EMPTY = new LevelingComponent(0, 0, 0, 0, 0);
+    public static final LevelingComponent EMPTY = new LevelingComponent(0, 0, 0, 0);
 
     public static final Codec<LevelingComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.INT.optionalFieldOf("rank", 0).forGetter(LevelingComponent::getRank),
                     Codec.INT.optionalFieldOf("level", 0).forGetter(LevelingComponent::getLevel),
                     Codec.DOUBLE.optionalFieldOf("experience", 0D).forGetter(LevelingComponent::getExperience),
-                    Codec.INT.optionalFieldOf("points", 0).forGetter(LevelingComponent::getPoints),
-                    Codec.INT.optionalFieldOf("luck", 0).forGetter(LevelingComponent::getLuck)
+                    Codec.INT.optionalFieldOf("points", 0).forGetter(LevelingComponent::getPoints)
             ).apply(instance, LevelingComponent::new)
     );
 }

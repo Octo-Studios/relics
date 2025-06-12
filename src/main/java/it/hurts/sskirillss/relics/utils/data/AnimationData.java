@@ -1,7 +1,5 @@
 package it.hurts.sskirillss.relics.utils.data;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonParser;
 import lombok.Data;
 import net.minecraft.client.Minecraft;

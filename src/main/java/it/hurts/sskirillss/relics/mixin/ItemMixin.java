@@ -84,7 +84,7 @@ public class ItemMixin {
             String abilityId = abilityData.getId();
 
             if (relic.getAbilityComponent(null, stack, abilityId) == null)
-                relic.randomizeAbilityStats(null, stack, abilityId, 0);
+                relic.randomizeAbilityStats(null, stack, abilityId);
             else {
                 for (StatTemplate statData : relic.getDefaultAbilityTemplate(abilityId).getStats().values()) {
                     String statId = statData.getId();
