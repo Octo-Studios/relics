@@ -1,6 +1,8 @@
 package it.hurts.sskirillss.relics.api.relics.abilities;
 
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
 import io.netty.util.internal.UnstableApi;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
@@ -35,6 +37,7 @@ public class AbilityTemplate {
     private final ResearchTemplate researchTemplate;
     private final StatisticTemplate statistic;
     private final List<String> modes;
+    private final Multimap<Integer, String> rankModifiers;
 
     public static AbilityTemplateBuilder builder(String id) {
         return new AbilityTemplateBuilder(id);
@@ -60,6 +63,7 @@ public class AbilityTemplate {
         private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
         private StatisticTemplate statistic = StatisticTemplate.builder().build();
         private List<String> modes = new ArrayList<>();
+        private Multimap<Integer, String> rankModifiers = LinkedHashMultimap.create();
 
         public AbilityTemplateBuilder(String id) {
             this.id = id;
@@ -75,6 +79,8 @@ public class AbilityTemplate {
             this.requiredPoints = base.getRequiredPoints();
             this.castData = base.getCastData();
             this.researchTemplate = base.getResearchTemplate();
+            this.modes = base.getModes();
+            this.rankModifiers = base.getRankModifiers();
         }
 
         public AbilityTemplateBuilder icon(Function3<Player, ItemStack, String, String> icon) {
@@ -139,8 +145,14 @@ public class AbilityTemplate {
             return this;
         }
 
+        public AbilityTemplateBuilder rankModifier(int rank, String modifier) {
+            this.rankModifiers.put(rank, modifier);
+
+            return this;
+        }
+
         public AbilityTemplate build() {
-            return new AbilityTemplate(id, icon, stats, maxLevel, requiredLevel, requiredPoints, castData, researchTemplate, statistic, modes);
+            return new AbilityTemplate(this.id, this.icon, this.stats, this.maxLevel, this.requiredLevel, this.requiredPoints, this.castData, this.researchTemplate, this.statistic, this.modes, this.rankModifiers);
         }
     }
 }

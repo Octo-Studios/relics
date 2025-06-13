@@ -2,11 +2,8 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.RerollAbilityActionWidget;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.ResetAbilityActionWidget;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.UpgradeAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
@@ -17,16 +14,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 
-import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class AbilityDescriptionContainerWidget extends DescriptionContainerWidget {
@@ -55,206 +47,251 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        List<MutableComponent> components = new ArrayList<>();
-
-        var hoveredUpgrade = screen.getUpgradeButton() != null && screen.getUpgradeButton().isHovered();
-        var hoveredReroll = screen.getRerollButton() != null && screen.getRerollButton().isHovered();
-        var hoveredReset = screen.getResetButton() != null && screen.getResetButton().isHovered();
-
-        var wantsUpgrade = hoveredUpgrade && relic.mayUpgrade(player, stack, ability);
-        var wantsReroll = hoveredReroll && relic.mayReroll(player, stack, ability);
-        var wantsReset = hoveredReset && relic.mayReset(player, stack, ability);
-
-        int color = DescriptionUtils.TEXT_COLOR;
-
-        for (var stat : relic.getAbilityTemplate(player, stack, ability).getStats().values()) {
-            if (wantsUpgrade)
-                color = 0x228B22;
-
-            if (wantsReroll)
-                color = 0xFF8C00;
-
-            if (wantsReset)
-                color = 0xB22222;
-
-            if (color != DescriptionUtils.TEXT_COLOR) {
-                var brightness = (float) (0.75F + 0.1F * Math.sin(2 * Math.PI * 0.75F * player.tickCount / 20F));
-
-                var hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-
-                hsb[2] = Mth.clamp(brightness, 0F, 1F);
-
-                color = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-            }
-
-            var resultComponent = Component.literal(String.valueOf(stat.getFormatValue().apply(relic.getStatValueForLevel(player, stack, ability, stat.getId(), wantsUpgrade ? abilityLevel + 1 : wantsReset ? 0 : abilityLevel))));
-
-            components.add(resultComponent.withStyle(ChatFormatting.BOLD).withColor(color));
-        }
-
+        var data = constructDescriptionData();
+        var layout = layoutJustifiedLines(minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
         var lineOffset = 10;
-        var lines = RelicDescriptionScreen.justifyStyledText(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".description", components.toArray()), 320, minecraft.font);
 
         var scroll = getScrollbar();
 
         if (scroll != null) {
             var offset = scroll.getScrollPosition(partialTick);
 
-            poseStack.translate(0, -(offset * ((lines.size() - DescriptionContainerWidget.MAX_LINES) * (lineOffset))), 0);
+            poseStack.translate(0, -(offset * ((layout.size() - DescriptionContainerWidget.MAX_LINES) * (lineOffset))), 0);
         }
 
-        renderJustifiedDescriptionWithStatBoxes(guiGraphics, (this.getX() + 7) * 2, (this.getY() * 2), 320, minecraft.font, player, stack, relic, ability, abilityLevel, screen.getUpgradeButton(), screen.getRerollButton(), screen.getResetButton());
+        renderJustifiedDescriptionWithStatBoxes(guiGraphics, (this.getX() + 7) * 2, (this.getY() * 2), 320, minecraft.font, layout);
 
         poseStack.popPose();
 
         GUIScissors.end();
     }
 
-    private void renderJustifiedDescriptionWithStatBoxes(GuiGraphics guiGraphics, int x, int y, int maxWidth, Font font, Player player, ItemStack stack, IRelicItem relic, String ability, int level, UpgradeAbilityActionWidget upgradeButton, RerollAbilityActionWidget rerollButton, ResetAbilityActionWidget resetButton) {
-        List<MutableComponent> dynamicComponents = new ArrayList<>();
-        for (var stat : relic.getAbilityTemplate(player, stack, ability).getStats().values()) {
-            boolean wantsUpgrade = upgradeButton != null && upgradeButton.isHovered() && relic.mayUpgrade(player, stack, ability);
-            boolean wantsReroll = rerollButton != null && rerollButton.isHovered() && relic.mayReroll(player, stack, ability);
-            boolean wantsReset = resetButton != null && resetButton.isHovered() && relic.mayReset(player, stack, ability);
+    private static class Word {
+        final MutableComponent component;
+        final boolean isDynamic;
 
-            int color = DescriptionUtils.TEXT_COLOR;
-            if (wantsUpgrade) color = 0x228B22;
-            if (wantsReroll) color = 0xFF8C00;
-            if (wantsReset) color = 0xB22222;
-            if (color != DescriptionUtils.TEXT_COLOR) {
-                float brightness = 0.75F + 0.1F * (float) Math.sin(2 * Math.PI * 0.75F * player.tickCount / 20F);
-                var hsb = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
-                hsb[2] = Mth.clamp(brightness, 0F, 1F);
-                color = Color.HSBtoRGB(hsb[0], hsb[1], hsb[2]);
-            }
-            double rawValue = relic.getStatValueForLevel(player, stack, ability, stat.getId(),
-                    wantsUpgrade ? level + 1 : wantsReset ? 0 : level);
-            String valStr = String.valueOf(stat.getFormatValue().apply(rawValue));
-            if (valStr.endsWith(".0")) valStr = valStr.replace(".0", "");
-            dynamicComponents.add(Component.literal(valStr).withStyle(ChatFormatting.BOLD).withColor(color));
-        }
-
-        List<String> placeholders = IntStream.rangeClosed(1, dynamicComponents.size())
-                .mapToObj(i -> "%" + i + "$s")
-                .collect(Collectors.toList());
-
-        String rawDescription = Component.translatable(
-                "tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() +
-                        ".ability." + ability + ".description",
-                placeholders.toArray()
-        ).getString().replace("%%", "%");
-
-        Pattern placeholderPattern = Pattern.compile("([^\\s]*%(\\d+)\\$s[^\\s]*)");
-        List<Word> words = new ArrayList<>();
-        Matcher m = placeholderPattern.matcher(rawDescription);
-        int lastEnd = 0;
-        while (m.find()) {
-            if (m.start() > lastEnd) {
-                for (String part : rawDescription.substring(lastEnd, m.start()).split(" ")) {
-                    if (!part.isEmpty()) words.add(new Word(part, false, -1));
-                }
-            }
-            String dynamicSegment = m.group(1);
-            int idx = Integer.parseInt(m.group(2)) - 1;
-            String prefix = dynamicSegment.substring(0, dynamicSegment.indexOf('%'));
-            String suffix = dynamicSegment.substring(dynamicSegment.lastIndexOf('s') + 1);
-            String replacementText = prefix + dynamicComponents.get(idx).getString() + suffix;
-            words.add(new Word(replacementText, true, idx));
-            lastEnd = m.end();
-        }
-        if (lastEnd < rawDescription.length()) {
-            for (String part : rawDescription.substring(lastEnd).split(" ")) {
-                if (!part.isEmpty()) words.add(new Word(part, false, -1));
-            }
-        }
-
-        var splitter = font.getSplitter();
-        int spaceWidth = (int) Math.ceil(splitter.stringWidth(FormattedText.of(" ", Style.EMPTY)));
-        List<List<Word>> lines = new ArrayList<>();
-        List<Word> currentLine = new ArrayList<>();
-        int lineUsed = 0;
-
-        for (Word w : words) {
-            FormattedText ft = w.dynamic
-                    ? FormattedText.of(w.text, dynamicComponents.get(w.index).getStyle())
-                    : FormattedText.of(w.text, Style.EMPTY);
-            int textWidth = (int) Math.ceil(splitter.stringWidth(ft));
-            int wWidth = textWidth + (w.dynamic ? 4 : 0);
-            if (!currentLine.isEmpty() && lineUsed + wWidth + spaceWidth > maxWidth) {
-                lines.add(new ArrayList<>(currentLine));
-                currentLine.clear();
-                lineUsed = 0;
-            }
-            currentLine.add(w);
-            lineUsed += wWidth + spaceWidth;
-        }
-        if (!currentLine.isEmpty()) lines.add(currentLine);
-
-        int yOff = 0;
-        for (List<Word> line : lines) {
-            int wordsWidth = 0;
-            for (Word w : line) {
-                FormattedText ft = w.dynamic
-                        ? FormattedText.of(w.text, dynamicComponents.get(w.index).getStyle())
-                        : FormattedText.of(w.text, Style.EMPTY);
-                int textWidth = (int) Math.ceil(splitter.stringWidth(ft));
-                wordsWidth += textWidth + (w.dynamic ? 4 : 0);
-            }
-            int gaps = Math.max(1, line.size() - 1);
-            int totalSpace = maxWidth - wordsWidth;
-            int base = totalSpace / gaps;
-            int extra = totalSpace % gaps;
-
-            int currX = x;
-            int currY = y + yOff;
-
-            for (int i = 0; i < line.size(); i++) {
-                Word w = line.get(i);
-                FormattedText ft = w.dynamic
-                        ? FormattedText.of(w.text, dynamicComponents.get(w.index).getStyle())
-                        : FormattedText.of(w.text, Style.EMPTY);
-                int textWidth = (int) Math.ceil(splitter.stringWidth(ft));
-                if (w.dynamic) {
-                    int tw = textWidth;
-                    int fh = font.lineHeight;
-                    int col = dynamicComponents.get(w.index).getStyle().getColor().getValue();
-                    int frameStartX = currX - 1;
-                    int frameStartY = currY - 1;
-                    int frameEndX = currX + tw + 4;
-                    int frameEndY = currY + fh + 1;
-                    int borderColor = 0xFF000000 | col;
-                    guiGraphics.fill(frameStartX, frameStartY, frameEndX, frameStartY + 1, borderColor);
-                    guiGraphics.fill(frameStartX, frameEndY - 1, frameEndX, frameEndY, borderColor);
-                    guiGraphics.fill(frameStartX, frameStartY, frameStartX + 1, frameEndY, borderColor);
-                    guiGraphics.fill(frameEndX - 1, frameStartY, frameEndX, frameEndY, borderColor);
-                    guiGraphics.drawString(font, Language.getInstance().getVisualOrder(ft), currX + 2, currY + 1, dynamicComponents.get(w.index).getStyle().getColor().getValue(), false);
-                    currX += tw + 5;
-                } else {
-                    guiGraphics.drawString(font, Language.getInstance().getVisualOrder(ft), currX, currY, DescriptionUtils.TEXT_COLOR, false);
-                    currX += textWidth;
-                }
-                if (i < line.size() - 1) {
-                    currX += base + (i < extra ? 1 : 0);
-                }
-            }
-            yOff += font.lineHeight + 1;
+        Word(MutableComponent component, boolean isDynamic) {
+            this.component = component;
+            this.isDynamic = isDynamic;
         }
     }
 
-    private static class Word {
-        final String text;
-        final boolean dynamic;
-        final int index;
+    private record LineEntry(Component rawLine, boolean justify) {
+    }
 
-        Word(String t, boolean dyn, int idx) {
-            text = t;
-            dynamic = dyn;
-            index = idx;
+    public record LayoutLine(List<Word> words, boolean justify) {
+    }
+
+    public record DescriptionData(List<LineEntry> rawLines, List<MutableComponent> dynamicComponents) {
+    }
+
+    public DescriptionData constructDescriptionData() {
+        var player = minecraft.player;
+        var screen = (AbilityDescriptionScreen) getScreen();
+        var stack = screen.getStack();
+        var abilityKey = screen.getSelectedAbility();
+
+        if (player == null || stack == null || !(stack.getItem() instanceof IRelicItem relic))
+            return new DescriptionData(List.of(), List.of());
+
+        var template = relic.getAbilityTemplate(player, stack, abilityKey);
+        var level = relic.getAbilityLevel(player, stack, abilityKey);
+
+        var wantsUpgrade = screen.getUpgradeButton() != null && screen.getUpgradeButton().isHovered() && relic.mayUpgrade(player, stack, abilityKey);
+        var wantsReroll = screen.getRerollButton() != null && screen.getRerollButton().isHovered() && relic.mayReroll(player, stack, abilityKey);
+        var wantsReset = screen.getResetButton() != null && screen.getResetButton().isHovered() && relic.mayReset(player, stack, abilityKey);
+
+        var dynamicComponents = template.getStats().values().stream().map(stat -> {
+            var rawValue = relic.getStatValueForLevel(player, stack, abilityKey, stat.getId(), wantsUpgrade ? level + 1 : wantsReset ? 0 : level);
+            var txt = stat.getFormatValue().apply(rawValue).toString();
+
+            if (txt.endsWith(".0"))
+                txt = txt.substring(0, txt.length() - 2);
+
+            return Component.literal(txt)
+                    .withStyle(ChatFormatting.BOLD)
+                    .withColor(wantsUpgrade ? DescriptionUtils.POSITIVE_COLOR(true) : wantsReroll ? DescriptionUtils.NEUTRAL_COLOR(true) : wantsReset ? DescriptionUtils.NEGATIVE_COLOR(true) : DescriptionUtils.TEXT_COLOR);
+        }).toList();
+
+        var itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
+        var key = "tooltip.relics." + itemId + ".ability." + abilityKey + ".description";
+        var tokens = IntStream.rangeClosed(1, dynamicComponents.size()).mapToObj(i -> "%" + i + "$s").toArray(String[]::new);
+        var descriptionComponent = Component.translatable(key, (Object[]) tokens);
+
+        var rawLines = new ArrayList<LineEntry>();
+
+        rawLines.add(new LineEntry(descriptionComponent, true));
+
+        for (var entry : template.getRankModifiers().entries()) {
+            rawLines.add(new LineEntry(Component.literal(""), false));
+            rawLines.add(new LineEntry(Component.translatable("tooltip.relics.description.ability.rank_modifier", entry.getKey())
+                    .withStyle(ChatFormatting.BOLD), false));
+
+            var title = Component.translatable("tooltip.relics." + itemId + ".ability." + abilityKey + ".rank_modifier." + entry.getValue(), (Object[]) tokens);
+
+            if (relic.getRelicRank(player, stack) < entry.getKey())
+                title = ScreenUtils.randomizeAllCharacters(title, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.CUSTOM_COLOR(0x851b1b)));
+
+            rawLines.add(new LineEntry(title, true));
+        }
+
+        return new DescriptionData(rawLines, dynamicComponents);
+    }
+
+    public List<LayoutLine> layoutJustifiedLines(Font font, List<LineEntry> rawLineEntries, List<MutableComponent> dynamicComponents, int maximumLineWidth) {
+        var splitter = font.getSplitter();
+        int spaceWidth = (int) Math.ceil(splitter.stringWidth(FormattedText.of(" ", Style.EMPTY)));
+        var placeholderPattern = Pattern.compile("(\\S*%(\\d+)\\$s\\S*)");
+        var result = new ArrayList<LayoutLine>();
+
+        for (var entry : rawLineEntries) {
+            var rawText = entry.rawLine().getString();
+
+            if (rawText.isEmpty()) {
+                result.add(new LayoutLine(List.of(), false));
+
+                continue;
+            }
+
+            var words = new ArrayList<Word>();
+            var matcher = placeholderPattern.matcher(rawText);
+            int lastEnd = 0;
+
+            while (matcher.find()) {
+                if (matcher.start() > lastEnd) {
+                    var before = rawText.substring(lastEnd, matcher.start());
+
+                    Arrays.stream(before.split(" "))
+                            .filter(tok -> !tok.isEmpty())
+                            .forEach(tok -> words.add(new Word(Component.literal(tok).withStyle(entry.rawLine().getStyle()), false)));
+                }
+
+                var segment = matcher.group(1);
+                var index = Integer.parseInt(matcher.group(2)) - 1;
+                var dynamicComponent = dynamicComponents.get(index).copy();
+
+                var style = dynamicComponent.getStyle();
+
+                var prefix = segment.substring(0, segment.indexOf('%'));
+                var suffix = segment.substring(segment.lastIndexOf('s') + 1);
+
+                if (!prefix.isEmpty())
+                    dynamicComponent = Component.literal(prefix).withStyle(style).append(dynamicComponent);
+
+                if (!suffix.isEmpty())
+                    dynamicComponent.append(Component.literal(suffix).withStyle(style));
+
+                words.add(new Word(dynamicComponent, true));
+
+                lastEnd = matcher.end();
+            }
+
+            if (lastEnd < rawText.length()) {
+                var after = rawText.substring(lastEnd);
+
+                Arrays.stream(after.split(" "))
+                        .filter(tok -> !tok.isEmpty())
+                        .forEach(tok -> words.add(new Word(
+                                Component.literal(tok).withStyle(entry.rawLine().getStyle()),
+                                false
+                        )));
+            }
+
+            var lines = new ArrayList<List<Word>>();
+            var current = new ArrayList<Word>();
+            int used = 0;
+
+            for (var word : words) {
+                int wordWidth = (int) Math.ceil(splitter.stringWidth(FormattedText.of(word.component.getString(), word.component.getStyle()))) + (word.isDynamic ? 4 : 0);
+
+                if (!current.isEmpty() && used + wordWidth + spaceWidth > maximumLineWidth) {
+                    lines.add(current);
+
+                    current = new ArrayList<>();
+
+                    used = 0;
+                }
+
+                current.add(word);
+
+                used += wordWidth + spaceWidth;
+            }
+
+            if (!current.isEmpty())
+                lines.add(current);
+
+            for (int i = 0; i < lines.size(); i++) {
+                boolean justifyLine = entry.justify() && i < lines.size() - 1;
+
+                result.add(new LayoutLine(lines.get(i), justifyLine));
+            }
+        }
+
+        return result;
+    }
+
+    public void renderJustifiedDescriptionWithStatBoxes(GuiGraphics graphics, int startX, int startY, int maximumLineWidth, Font font, List<LayoutLine> layoutLines) {
+        var splitter = font.getSplitter();
+        var spaceWidth = (int) Math.ceil(splitter.stringWidth(FormattedText.of(" ", Style.EMPTY)));
+
+        int y = startY, lineHeight = font.lineHeight;
+
+        for (var line : layoutLines) {
+            var words = line.words();
+
+            if (words.isEmpty()) {
+                y += lineHeight + 1;
+
+                continue;
+            }
+
+            boolean justify = line.justify();
+
+            int totalW = words.stream()
+                    .mapToInt(w -> (int) Math.ceil(splitter.stringWidth(w.component)) + (w.isDynamic ? 4 : 0))
+                    .sum();
+
+            int gaps = Math.max(1, words.size() - 1);
+            int extra = justify ? maximumLineWidth - totalW : spaceWidth * gaps;
+            int base = extra / gaps, rem = extra % gaps;
+
+            int x = startX;
+
+            for (int i = 0; i < words.size(); i++) {
+                var word = words.get(i);
+                var component = word.component;
+                var textWidth = (int) Math.ceil(splitter.stringWidth(component));
+                var style = component.getStyle();
+                var color = style.getColor() != null ? style.getColor().getValue() : DescriptionUtils.TEXT_COLOR;
+
+                if (word.isDynamic) {
+                    graphics.fill(x - 1, y - 1, x + textWidth + 4, y, 0xFF000000 | color);
+                    graphics.fill(x - 1, y + lineHeight, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
+                    graphics.fill(x - 1, y - 1, x, y + lineHeight + 1, 0xFF000000 | color);
+                    graphics.fill(x + textWidth + 3, y - 1, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
+
+                    graphics.drawString(font, Language.getInstance().getVisualOrder(component), x + 2, y + 1, color, false);
+
+                    x += textWidth + 5;
+                } else {
+                    graphics.drawString(font, Language.getInstance().getVisualOrder(component), x, y, color, false);
+
+                    x += textWidth;
+                }
+
+                if (i < words.size() - 1)
+                    x += base + (i < rem ? 1 : 0);
+            }
+
+            y += lineHeight + 1;
         }
     }
 
     @Override
     public int getContentHeight() {
-        return (int) (RelicDescriptionScreen.justifyStyledText(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".ability." + ((AbilityDescriptionScreen) this.getScreen()).getSelectedAbility() + ".description"), 320, minecraft.font).size() * minecraft.font.lineHeight / 2F);
+        var data = constructDescriptionData();
+        var lines = layoutJustifiedLines(minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
+
+        return (int) (lines.size() * minecraft.font.lineHeight / 2F);
     }
 }

@@ -1,21 +1,58 @@
 package it.hurts.sskirillss.relics.client.screen.description.misc;
 
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import java.awt.*;
+
 public class DescriptionUtils {
     public static final int TEXT_COLOR = 0x732f20;
+
+    public static int POSITIVE_COLOR(boolean flicker) {
+        var color = 0x228B22;
+
+        return flicker ? DescriptionUtils.CUSTOM_COLOR(color) : color;
+    }
+
+    public static int NEUTRAL_COLOR(boolean flicker) {
+        var color = 0xFF8C00;
+
+        return flicker ? DescriptionUtils.CUSTOM_COLOR(color) : color;
+    }
+
+    public static int NEGATIVE_COLOR(boolean flicker) {
+        var color = 0xB22222;
+
+        return flicker ? DescriptionUtils.CUSTOM_COLOR(color) : color;
+    }
+
+    public static int CUSTOM_COLOR(int color) {
+        return DescriptionUtils.CUSTOM_COLOR(color, 0.001D, 0.75D);
+    }
+
+    public static int CUSTOM_COLOR(int color, double animationSpeed, double oscillationFrequency) {
+        float oscillation = 0.1F * (float) Math.sin(2 * Math.PI * oscillationFrequency * System.currentTimeMillis() * animationSpeed);
+        float brightnessLevel = (float) oscillationFrequency + oscillation;
+
+        float[] hsbValues = Color.RGBtoHSB((color >> 16) & 0xFF, (color >> 8) & 0xFF, color & 0xFF, null);
+
+        hsbValues[2] = Mth.clamp(brightnessLevel, 0F, 1F);
+
+        return Color.HSBtoRGB(hsbValues[0], hsbValues[1], hsbValues[2]);
+    }
+
     private static final ResourceLocation TOOLTIP = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tooltip.png");
 
     @OnlyIn(Dist.CLIENT)

@@ -104,6 +104,24 @@ public class ScreenUtils {
         }).collect(Component::empty, MutableComponent::append, MutableComponent::append);
     }
 
+    public static MutableComponent randomizeAllCharacters(MutableComponent input, long seed) {
+        var random = RandomSource.create(seed);
+        var text = input.getString();
+        var englishLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz".chars()
+                .mapToObj(c -> (char) c)
+                .toList();
+
+        return IntStream.range(0, text.length())
+                .mapToObj(i -> {
+                    char c = text.charAt(i);
+                    char out = Character.isSpaceChar(c)
+                            ? c
+                            : englishLetters.get(random.nextInt(englishLetters.size()));
+                    return Component.literal(String.valueOf(out));
+                })
+                .collect(Component::empty, MutableComponent::append, MutableComponent::append);
+    }
+
     public static MutableComponent stylize(MutableComponent input, double percentage, Style style, long seed) {
         RandomSource random = RandomSource.create(seed);
 
