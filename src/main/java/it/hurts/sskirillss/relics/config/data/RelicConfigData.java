@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.config.data;
 
-import it.hurts.octostudios.octolib.modules.config.annotations.IgnoreProp;
-import it.hurts.octostudios.octolib.modules.config.impl.OctoConfig;
+import it.hurts.octostudios.octolib.module.config.annotation.IgnoreProp;
+import it.hurts.octostudios.octolib.module.config.impl.OctoConfig;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.level.RelicLootModifier;

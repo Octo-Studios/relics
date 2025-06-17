@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.octostudios.octolib.modules.particles.OctoRenderManager;
-import it.hurts.octostudios.octolib.modules.particles.trail.TrailProvider;
+import it.hurts.octostudios.octolib.module.particle.OctoRenderManager;
+import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
@@ -26,12 +26,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 import java.util.List;
 
-public class SporeEntity extends ThrowableProjectile implements ITargetableEntity, TrailProvider {
+public class SporeEntity extends ThrowableProjectile implements ITargetableEntity {
     private static final EntityDataAccessor<ItemStack> RELIC_STACK = SynchedEntityData.defineId(SporeEntity.class, EntityDataSerializers.ITEM_STACK);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(SporeEntity.class, EntityDataSerializers.FLOAT);
 
@@ -104,13 +106,6 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
         return EntityUtils.gatherPotentialTargets(this, LivingEntity.class, 32)
                 .filter(entity -> (!(this.getOwner() instanceof Player player) || !EntityUtils.isAlliedTo(player, entity)))
                 .toList();
-    }
-
-    @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-
-        OctoRenderManager.registerProvider(this);
     }
 
     @Override
@@ -188,43 +183,50 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
         this.target = targetPos;
     }
 
-    @Override
-    public Vec3 getTrailPosition(float partialTicks) {
-        return getPosition(partialTicks).add(getDeltaMovement().scale(-1));
-    }
+    @OnlyIn(Dist.CLIENT)
+    public static class TrailProvider extends EntityTrailProvider<SporeEntity> {
+        public TrailProvider(SporeEntity entity) {
+            super(entity);
+        }
 
-    @Override
-    public int getTrailUpdateFrequency() {
-        return 1;
-    }
+        @Override
+        public Vec3 getTrailPosition(float partialTicks) {
+            return this.entity.getPosition(partialTicks).add(this.entity.getDeltaMovement().scale(-1));
+        }
 
-    @Override
-    public boolean isTrailAlive() {
-        return isAlive();
-    }
+        @Override
+        public int getTrailUpdateFrequency() {
+            return 1;
+        }
 
-    @Override
-    public boolean isTrailGrowing() {
-        return tickCount > 2;
-    }
+        @Override
+        public boolean isTrailAlive() {
+            return this.entity.isAlive();
+        }
 
-    @Override
-    public int getTrailMaxLength() {
-        return 3;
-    }
+        @Override
+        public boolean isTrailGrowing() {
+            return this.entity.tickCount > 2;
+        }
 
-    @Override
-    public int getTrailFadeInColor() {
-        return 0xFF55FF00;
-    }
+        @Override
+        public int getTrailMaxLength() {
+            return 3;
+        }
 
-    @Override
-    public int getTrailFadeOutColor() {
-        return 0x8080FF00;
-    }
+        @Override
+        public int getTrailFadeInColor() {
+            return 0xFF55FF00;
+        }
 
-    @Override
-    public double getTrailScale() {
-        return 0.075F;
+        @Override
+        public int getTrailFadeOutColor() {
+            return 0x8080FF00;
+        }
+
+        @Override
+        public double getTrailScale() {
+            return 0.075F;
+        }
     }
 }

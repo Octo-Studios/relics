@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.config;
 
-import it.hurts.octostudios.octolib.modules.config.impl.OctoConfig;
+import it.hurts.octostudios.octolib.module.config.impl.OctoConfig;
 import lombok.Data;
 
 @Data

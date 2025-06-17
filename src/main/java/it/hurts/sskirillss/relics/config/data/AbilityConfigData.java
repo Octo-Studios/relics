@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.config.data;
 
-import it.hurts.octostudios.octolib.modules.config.annotations.Prop;
+import it.hurts.octostudios.octolib.module.config.annotation.Prop;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import lombok.AllArgsConstructor;

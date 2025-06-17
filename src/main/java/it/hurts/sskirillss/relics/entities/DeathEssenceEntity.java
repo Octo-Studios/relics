@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.octostudios.octolib.modules.particles.OctoRenderManager;
-import it.hurts.octostudios.octolib.modules.particles.trail.TrailProvider;
+import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CEntityTargetPacket;
@@ -16,11 +15,13 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
 
-public class DeathEssenceEntity extends ThrowableProjectile implements ITargetableEntity, TrailProvider {
+public class DeathEssenceEntity extends ThrowableProjectile implements ITargetableEntity {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(DeathEssenceEntity.class, EntityDataSerializers.FLOAT);
 
     public void setDamage(float heal) {
@@ -97,13 +98,6 @@ public class DeathEssenceEntity extends ThrowableProjectile implements ITargetab
         return false;
     }
 
-    @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-
-        OctoRenderManager.registerProvider(this);
-    }
-
     @Nullable
     @Override
     public LivingEntity getTargetPos() {
@@ -118,43 +112,50 @@ public class DeathEssenceEntity extends ThrowableProjectile implements ITargetab
             NetworkHandler.sendToClientsTrackingEntity(new S2CEntityTargetPacket(this.getId(), targetPos.getId()), this);
     }
 
-    @Override
-    public Vec3 getTrailPosition(float partialTicks) {
-        return getPosition(partialTicks).add(getDeltaMovement().scale(-1));
-    }
+    @OnlyIn(Dist.CLIENT)
+    public static class TrailProvider extends EntityTrailProvider<DeathEssenceEntity> {
+        public TrailProvider(DeathEssenceEntity entity) {
+            super(entity);
+        }
 
-    @Override
-    public int getTrailUpdateFrequency() {
-        return 1;
-    }
+        @Override
+        public Vec3 getTrailPosition(float partialTicks) {
+            return this.entity.getPosition(partialTicks).add(this.entity.getDeltaMovement().scale(-1));
+        }
 
-    @Override
-    public boolean isTrailAlive() {
-        return isAlive();
-    }
+        @Override
+        public int getTrailUpdateFrequency() {
+            return 1;
+        }
 
-    @Override
-    public boolean isTrailGrowing() {
-        return tickCount > 2;
-    }
+        @Override
+        public boolean isTrailAlive() {
+            return this.entity.isAlive();
+        }
 
-    @Override
-    public int getTrailMaxLength() {
-        return 5;
-    }
+        @Override
+        public boolean isTrailGrowing() {
+            return this.entity.tickCount > 2;
+        }
 
-    @Override
-    public int getTrailFadeInColor() {
-        return 0xFF00FFFF;
-    }
+        @Override
+        public int getTrailMaxLength() {
+            return 5;
+        }
 
-    @Override
-    public int getTrailFadeOutColor() {
-        return 0x80FF00FF;
-    }
+        @Override
+        public int getTrailFadeInColor() {
+            return 0xFF00FFFF;
+        }
 
-    @Override
-    public double getTrailScale() {
-        return 0.025F;
+        @Override
+        public int getTrailFadeOutColor() {
+            return 0x80FF00FF;
+        }
+
+        @Override
+        public double getTrailScale() {
+            return 0.025F;
+        }
     }
 }

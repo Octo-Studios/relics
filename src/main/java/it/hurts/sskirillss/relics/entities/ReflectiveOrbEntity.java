@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.octostudios.octolib.modules.particles.OctoRenderManager;
-import it.hurts.octostudios.octolib.modules.particles.trail.TrailProvider;
+import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import lombok.Getter;
@@ -17,6 +16,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -24,7 +25,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailProvider {
+public class ReflectiveOrbEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> TARGETED = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> DELAY = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.INT);
@@ -170,13 +171,6 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
     }
 
     @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-
-        OctoRenderManager.registerProvider(this);
-    }
-
-    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DAMAGE, 1F);
         builder.define(TARGETED, false);
@@ -211,43 +205,50 @@ public class ReflectiveOrbEntity extends ThrowableProjectile implements TrailPro
         return 0D;
     }
 
-    @Override
-    public Vec3 getTrailPosition(float partialTicks) {
-        return this.getPosition(partialTicks).add(0D, this.getBbHeight() / 2D, 0D);
-    }
+    @OnlyIn(Dist.CLIENT)
+    public static class TrailProvider extends EntityTrailProvider<ReflectiveOrbEntity> {
+        public TrailProvider(ReflectiveOrbEntity entity) {
+            super(entity);
+        }
 
-    @Override
-    public int getTrailUpdateFrequency() {
-        return 1;
-    }
+        @Override
+        public Vec3 getTrailPosition(float partialTicks) {
+            return this.entity.getPosition(partialTicks).add(0D, this.entity.getBbHeight() / 2D, 0D);
+        }
 
-    @Override
-    public boolean isTrailAlive() {
-        return isAlive();
-    }
+        @Override
+        public int getTrailUpdateFrequency() {
+            return 1;
+        }
 
-    @Override
-    public boolean isTrailGrowing() {
-        return this.tickCount > 0;
-    }
+        @Override
+        public boolean isTrailAlive() {
+            return this.entity.isAlive();
+        }
 
-    @Override
-    public int getTrailMaxLength() {
-        return 7;
-    }
+        @Override
+        public boolean isTrailGrowing() {
+            return this.entity.tickCount > 0;
+        }
 
-    @Override
-    public int getTrailFadeInColor() {
-        return 0xFF8000FF;
-    }
+        @Override
+        public int getTrailMaxLength() {
+            return 7;
+        }
 
-    @Override
-    public int getTrailFadeOutColor() {
-        return 0x800000FF;
-    }
+        @Override
+        public int getTrailFadeInColor() {
+            return 0xFF8000FF;
+        }
 
-    @Override
-    public double getTrailScale() {
-        return 0.15F;
+        @Override
+        public int getTrailFadeOutColor() {
+            return 0x800000FF;
+        }
+
+        @Override
+        public double getTrailScale() {
+            return 0.15F;
+        }
     }
 }

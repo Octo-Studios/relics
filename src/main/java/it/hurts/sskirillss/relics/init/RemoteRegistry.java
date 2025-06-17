@@ -1,5 +1,7 @@
 package it.hurts.sskirillss.relics.init;
 
+import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailRegistry;
+import it.hurts.octostudios.octolib.module.particle.trail.TestArrowTrail;
 import it.hurts.sskirillss.relics.client.gui.layers.ActiveAbilitiesLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.InfoTileLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.LeafyRingHideLayer;
@@ -11,6 +13,7 @@ import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.ReflectiveNecklaceRenderer;
 import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
 import it.hurts.sskirillss.relics.client.renderer.tiles.ResearchingTableRenderer;
+import it.hurts.sskirillss.relics.entities.*;
 import it.hurts.sskirillss.relics.items.relics.InfiniteHamItem;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
@@ -29,6 +32,7 @@ import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -117,6 +121,12 @@ public class RemoteRegistry {
 
             CuriosRendererRegistry.register(item, CurioRenderer::new);
         }
+
+        EntityTrailRegistry.registerProvider(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.REFLECTIVE_ORB.get(), ReflectiveOrbEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.SPORE.get(), SporeEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.DEATH_ESSENCE.get(), DeathEssenceEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.LIFE_ESSENCE.get(), LifeEssenceEntity.TrailProvider::new);
     }
 
     @SubscribeEvent
