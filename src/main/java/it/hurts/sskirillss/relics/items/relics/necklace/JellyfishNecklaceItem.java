@@ -13,6 +13,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -48,6 +50,13 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
+                                .build())
+                        .build())
+                .style(StyleTemplate.builder()
+                        .tooltip(TooltipData.builder()
+                                .borderTop(0xff00baff)
+                                .borderBottom(0xff0090a9)
+                                .textured(true)
                                 .build())
                         .build())
                 .leveling(LevelingTemplate.builder()
