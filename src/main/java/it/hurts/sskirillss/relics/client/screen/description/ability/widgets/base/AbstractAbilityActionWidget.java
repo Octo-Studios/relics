@@ -14,10 +14,13 @@ import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public abstract class AbstractAbilityActionWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
@@ -72,5 +75,9 @@ public abstract class AbstractAbilityActionWidget extends AbstractDescriptionWid
                 new Color(200 + random.nextInt(50), 150 + random.nextInt(100), 0),
                 getX() + random.nextInt(width), getY() + random.nextInt(height / 4),
                 1F + (random.nextFloat() * 0.25F), 50 + random.nextInt(50)));
+    }
+
+    public List<MutableComponent> buildDescription() {
+        return new ArrayList<>();
     }
 }

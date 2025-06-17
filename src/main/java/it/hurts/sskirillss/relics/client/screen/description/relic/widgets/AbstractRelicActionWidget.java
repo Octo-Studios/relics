@@ -3,23 +3,24 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
 import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public abstract class AbstractRelicActionWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
@@ -70,5 +71,9 @@ public abstract class AbstractRelicActionWidget extends AbstractDescriptionWidge
                 new Color(200 + random.nextInt(50), 150 + random.nextInt(100), 0),
                 getX() + random.nextInt(width), getY() + random.nextInt(height / 4),
                 1F + (random.nextFloat() * 0.25F), 50 + random.nextInt(50)));
+    }
+
+    public List<MutableComponent> buildDescription() {
+        return new ArrayList<>();
     }
 }

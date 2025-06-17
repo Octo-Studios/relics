@@ -1,15 +1,14 @@
 package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
-import com.google.common.collect.Lists;
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -21,9 +20,12 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
@@ -46,6 +48,66 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
             return;
 
         handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_REROLL.get(), 1F));
+    }
+
+    @Override
+    public List<MutableComponent> buildDescription() {
+        var description = super.buildDescription();
+
+        var player = this.minecraft.player;
+        var stack = this.getScreen().getStack();
+        var relic = (IRelicItem) stack.getItem();
+
+        var key = HotkeyRegistry.RESEARCH_RELIC.getKey().getValue();
+
+        var hasShiftDown = key != GLFW.GLFW_KEY_UNKNOWN && InputConstants.isKeyDown(minecraft.getWindow().getWindow(), key);
+
+        var newLine = Component.literal(" ");
+
+        var currentExperience = EntityUtils.getPlayerTotalExperience(player);
+        var requiredExperience = relic.getUpgradePlayerExperienceCost(player, stack, getAbility());
+        var hasExperience = requiredExperience <= currentExperience;
+
+        var quality = relic.getRelicQuality(player, stack);
+        var maxQuality = relic.getRelicMaxQuality(player, stack);
+
+        var isMaxQuality = quality >= maxQuality;
+
+        description.add(Component.translatable("relics.description.ability.reroll.title")
+                .withStyle(ChatFormatting.BOLD)
+                .withStyle(ChatFormatting.UNDERLINE));
+
+        description.add(newLine);
+
+        description.add(Component.translatable("relics.description.general.cost.title")
+                .append(Component.literal(":"))
+                .withStyle(ChatFormatting.BOLD)
+                .withStyle(ChatFormatting.UNDERLINE));
+
+        var relativeLevelCost = hasExperience ? EntityUtils.calculateExperienceLevelLoss(player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience);
+
+        description.add(Component.literal("   ● ")
+                .append(Component.translatable("relics.description.ability.reroll.cost.entry_1", !isMaxQuality && hasShiftDown ? (requiredExperience + "+") : requiredExperience, !isMaxQuality && hasShiftDown ? (relativeLevelCost + "+") : relativeLevelCost)
+                        .withColor(hasExperience ? DescriptionUtils.POSITIVE_COLOR(true) : DescriptionUtils.NEGATIVE_COLOR(true))));
+
+        description.add(newLine);
+
+        if (isMaxQuality)
+            description.add(Component.translatable("relics.description.ability.reroll.max_quality", HotkeyRegistry.RESEARCH_RELIC.getKey().getDisplayName().getString())
+                    .withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
+        else
+            description.add(Component.translatable("relics.description.ability.reroll.auto", HotkeyRegistry.RESEARCH_RELIC.getKey().getDisplayName().getString())
+                    .withColor(DescriptionUtils.NEUTRAL_COLOR(true)));
+
+        description.add(newLine);
+
+        if (hasShiftDown)
+            description.add(Component.translatable("relics.description.ability.reroll.description")
+                    .withStyle(ChatFormatting.ITALIC));
+        else
+            description.add(Component.translatable("relics.general.hold_shift", HotkeyRegistry.RESEARCH_RELIC.getKey().getDisplayName().getString()));
+
+        return description;
     }
 
     @Override
@@ -79,7 +141,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
         RenderSystem.setShaderColor(color, color, color, 1F);
 
-        guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/reroll_button" + (isLocked() ? "_inactive" : "_active" + (isWarning ? "_warning" : isQuick ? "_quick" : "")) + ".png"), getX(), getY(), 0, 0, width, height, width, height);
+        guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/reroll_button_" + (isLocked() ? "inactive" : "active" + (isWarning ? "_warning" : isQuick ? "_quick" : "")) + ".png"), getX(), getY(), 0, 0, width, height, width, height);
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
@@ -89,52 +151,15 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        var player = minecraft.player;
-        var stack = getScreen().getStack();
+        List<FormattedCharSequence> tooltip = new ArrayList<>();
 
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(player, stack, getAbility()))
-            return;
+        var poseStack = guiGraphics.pose();
 
-        AbilityTemplate data = relic.getAbilityTemplate(player, stack, getAbility());
-
-        if (data.getStats().isEmpty())
-            return;
-
-        PoseStack poseStack = guiGraphics.pose();
-
-        List<FormattedCharSequence> tooltip = Lists.newArrayList();
-
-        int maxWidth = 120;
+        int maxWidth = 150;
         int renderWidth = 0;
 
-        int requiredExperience = relic.getRerollPlayerExperienceCost(player, stack, getAbility());
-        long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
-
-        MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
-        MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
-        MutableComponent unknownStatus = Component.translatable("tooltip.relics.relic.status.unknown");
-
-        boolean isQuick = relic.mayPlayerReroll(minecraft.player, getScreen().getStack(), getAbility()) && relic.getAbilityQuality(player, stack, getAbility()) != relic.getAbilityMaxQuality(player, stack, getAbility());
-        boolean hasExperience = requiredExperience <= experience;
-
-        List<MutableComponent> entries = Lists.newArrayList(
-                Component.translatable("tooltip.relics.relic.reroll.description").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
-                Component.literal(" "),
-                Component.translatable("tooltip.relics.relic.reroll.cost", isQuick && Screen.hasShiftDown() ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : requiredExperience,
-                        isQuick && Screen.hasShiftDown() ? Component.literal("XXX").withStyle(ChatFormatting.OBFUSCATED) : hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
-                        hasExperience ? isQuick && Screen.hasShiftDown() ? unknownStatus : positiveStatus : negativeStatus)
-        );
-
-        if (relic.getAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility())) {
-            entries.add(Component.literal(" "));
-            entries.add(Component.literal("▶ ").append(Component.translatable("tooltip.relics.relic.reroll.warning")));
-        } else if (relic.mayPlayerReroll(minecraft.player, getScreen().getStack(), getAbility())) {
-            entries.add(Component.literal(" "));
-            entries.add(Component.literal("▶ ").append(Component.translatable("tooltip.relics.relic.reroll.quick")));
-        }
-
-        for (MutableComponent entry : entries) {
-            int entryWidth = (minecraft.font.width(entry) + 4) / 2;
+        for (var entry : this.buildDescription()) {
+            var entryWidth = (minecraft.font.width(entry) + 4) / 2;
 
             if (entryWidth > renderWidth)
                 renderWidth = Math.min(entryWidth, maxWidth);
@@ -142,14 +167,14 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
             tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
         }
 
-        int height = Math.round(tooltip.size() * 5F);
+        var height = Math.round(tooltip.size() * 5F);
 
-        int renderX = getX() + width + 1;
-        int renderY = mouseY - (height / 2) - 9;
+        var renderX = getX() + width + 1;
+        var renderY = mouseY - (height / 2) - 9;
 
         DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, height, renderX, renderY);
 
-        int yOff = 0;
+        var yOff = 0;
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 

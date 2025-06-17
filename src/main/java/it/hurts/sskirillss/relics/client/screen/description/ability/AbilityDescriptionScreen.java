@@ -146,11 +146,11 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         }
 
         if (relic.isAbilityUpgradeEnabled(player, stack, ability))
-            this.upgradeButton = this.addRenderableWidget(new UpgradeAbilityActionWidget(x + 288, y + 63, this));
+            this.upgradeButton = this.addRenderableWidget(new UpgradeAbilityActionWidget(x + 289, y + 63, this));
         if (relic.isAbilityRerollEnabled(player, stack, ability))
-            this.rerollButton = this.addRenderableWidget(new RerollAbilityActionWidget(x + 288, y + 80, this));
+            this.rerollButton = this.addRenderableWidget(new RerollAbilityActionWidget(x + 289, y + 84, this));
         if (relic.isAbilityResetEnabled(player, stack, ability))
-            this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 288, y + 97, this));
+            this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 289, y + 105, this));
 
         DescriptionContainerWidget container = null;
 

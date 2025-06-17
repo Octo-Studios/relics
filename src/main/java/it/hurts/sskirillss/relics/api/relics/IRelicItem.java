@@ -531,40 +531,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
             relic.addRelicExperience(entity, relicStack, toSpread);
     }
 
-    @Deprecated(forRemoval = true)
-    default boolean isSomethingWrongWithLevelingPoints(LivingEntity entity, ItemStack stack) {
-        int current = getRelicLevelingPoints(entity, stack);
-
-        for (var data : getAbilitiesTemplate(entity, stack).getAbilities().values())
-            current += getAbilityComponent(entity, stack, data.getId()).getPoints() * data.getRequiredPoints();
-
-        return current != getRelicLevel(entity, stack);
-    }
-
-    default boolean isRelicMaxLevel(LivingEntity entity, ItemStack stack) {
-        return getRelicLevel(entity, stack) >= getLevelingTemplate(entity, stack).getMaxLevel();
-    }
-
-    default boolean isRelicMaxQuality(LivingEntity entity, ItemStack stack) {
-        return getRelicQuality(entity, stack) >= getRelicMaxQuality(entity, stack);
-    }
-
-    default boolean isRelicFlawless(LivingEntity entity, ItemStack stack) {
-        return isRelicMaxLevel(entity, stack) && getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().filter(ability -> isAbilityEnabled(entity, stack, ability)).allMatch(ability -> isAbilityFlawless(entity, stack, ability));
-    }
-
-    default boolean isAbilityMaxLevel(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityLevel(entity, stack, ability) >= getAbilityTemplate(entity, stack, ability).getMaxLevel();
-    }
-
-    default boolean isAbilityMaxQuality(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityQuality(entity, stack, ability) >= getAbilityMaxQuality(entity, stack, ability);
-    }
-
-    default boolean isAbilityFlawless(LivingEntity entity, ItemStack stack, String ability) {
-        return isAbilityUnlocked(entity, stack, ability) && isAbilityMaxQuality(entity, stack, ability);
-    }
-
     default CastData getAbilityCastData(LivingEntity entity, ItemStack stack, String ability) {
         return getAbilityTemplate(entity, stack, ability).getCastData();
     }

@@ -1,13 +1,12 @@
 package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
-import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.platform.InputConstants;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.ChatFormatting;
@@ -17,7 +16,9 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
+import org.lwjgl.glfw.GLFW;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
@@ -37,46 +38,70 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
     }
 
     @Override
+    public List<MutableComponent> buildDescription() {
+        var description = super.buildDescription();
+
+        var screen = this.getScreen();
+
+        var player = this.minecraft.player;
+        var stack = this.getScreen().getStack();
+        var relic = (IRelicItem) stack.getItem();
+        var ability = screen.getSelectedAbility();
+
+        var key = HotkeyRegistry.RESEARCH_RELIC.getKey().getValue();
+
+        var hasShiftDown = key != GLFW.GLFW_KEY_UNKNOWN && InputConstants.isKeyDown(minecraft.getWindow().getWindow(), key);
+
+        var newLine = Component.literal(" ");
+
+        var currentExperience = EntityUtils.getPlayerTotalExperience(player);
+        var requiredExperience = relic.getResetPlayerExperienceCost(player, stack, getAbility());
+        var hasExperience = requiredExperience <= currentExperience;
+
+        var level = relic.getAbilityLevel(player, stack, ability);
+        var isMinLevel = level <= 0;
+
+        description.add(Component.translatable("relics.description.ability.reset.title")
+                .append(Component.literal(":"))
+                .withStyle(ChatFormatting.BOLD)
+                .withStyle(ChatFormatting.UNDERLINE));
+
+        description.add(newLine);
+
+        if (isMinLevel)
+            description.add(Component.translatable("relics.description.ability.reset.min_level")
+                    .withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
+        else {
+            description.add(Component.translatable("relics.description.general.cost.title")
+                    .withStyle(ChatFormatting.BOLD)
+                    .append(Component.literal(" ")));
+
+            description.add(Component.literal("   ● ")
+                    .append(Component.translatable("relics.description.ability.reset.cost.entry_1", requiredExperience, (hasExperience ? EntityUtils.calculateExperienceLevelLoss(player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience)))
+                            .withColor(hasExperience ? DescriptionUtils.POSITIVE_COLOR(true) : DescriptionUtils.NEGATIVE_COLOR(true))));
+        }
+        description.add(newLine);
+
+        if (hasShiftDown)
+            description.add(Component.translatable("relics.description.ability.reset.description")
+                    .withStyle(ChatFormatting.ITALIC));
+        else
+            description.add(Component.translatable("relics.general.hold_shift", HotkeyRegistry.RESEARCH_RELIC.getKey().getDisplayName().getString()));
+
+        return description;
+    }
+
+    @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        var player = minecraft.player;
-        var stack = getScreen().getStack();
+        List<FormattedCharSequence> tooltip = new ArrayList<>();
 
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(player, stack, getAbility()))
-            return;
+        var poseStack = guiGraphics.pose();
 
-        AbilityTemplate data = relic.getAbilityTemplate(player, stack, getAbility());
-
-        if (data.getStats().isEmpty())
-            return;
-
-        PoseStack poseStack = guiGraphics.pose();
-
-        List<FormattedCharSequence> tooltip = Lists.newArrayList();
-
-        int maxWidth = 120;
+        int maxWidth = 150;
         int renderWidth = 0;
 
-        int requiredExperience = relic.getResetPlayerExperienceCost(player, stack, getAbility());
-        long experience = EntityUtils.getPlayerTotalExperience(player);
-
-        boolean hasExperience = requiredExperience <= experience;
-
-        MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
-        MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
-
-        List<MutableComponent> entries = Lists.newArrayList(
-                Component.translatable("tooltip.relics.relic.reset.description").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
-                Component.literal(" "));
-
-        if (relic.getAbilityLevel(player, stack, getAbility()) > 0)
-            entries.add(Component.translatable("tooltip.relics.relic.reset.cost", requiredExperience,
-                    hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
-                    hasExperience ? positiveStatus : negativeStatus));
-        else
-            entries.add(Component.translatable("tooltip.relics.relic.reset.locked"));
-
-        for (MutableComponent entry : entries) {
-            int entryWidth = (minecraft.font.width(entry) + 4) / 2;
+        for (var entry : this.buildDescription()) {
+            var entryWidth = (minecraft.font.width(entry) + 4) / 2;
 
             if (entryWidth > renderWidth)
                 renderWidth = Math.min(entryWidth, maxWidth);
@@ -84,14 +109,14 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
             tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
         }
 
-        int height = Math.round(tooltip.size() * 5F);
+        var height = Math.round(tooltip.size() * 5F);
 
-        int renderX = getX() + width + 1;
-        int renderY = mouseY - (height / 2) - 9;
+        var renderX = getX() + width + 1;
+        var renderY = mouseY - (height / 2) - 9;
 
         DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, height, renderX, renderY);
 
-        int yOff = 0;
+        var yOff = 0;
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 

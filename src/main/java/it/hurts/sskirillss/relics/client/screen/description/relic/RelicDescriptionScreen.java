@@ -94,7 +94,7 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
             this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
         }
 
-        this.addRenderableWidget(new RankupRelicActionWidget(x + 289, y + 83, this));
+        this.addRenderableWidget(new RankupRelicActionWidget(x + 289, y + 84, this));
     }
 
     @Override

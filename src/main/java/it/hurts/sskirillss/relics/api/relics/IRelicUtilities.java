@@ -130,4 +130,60 @@ public interface IRelicUtilities {
 
         return getRelativeStatValue(entity, stack, ability, stat, getOrCalculateStatValue(entity, stack, ability, stat), level);
     }
+
+    @Deprecated(forRemoval = true)
+    default boolean isSomethingWrongWithLevelingPoints(LivingEntity entity, ItemStack stack) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        int current = relic.getRelicLevelingPoints(entity, stack);
+
+        for (var data : relic.getAbilitiesTemplate(entity, stack).getAbilities().values())
+            current += relic.getAbilityComponent(entity, stack, data.getId()).getPoints() * data.getRequiredPoints();
+
+        return current != relic.getRelicLevel(entity, stack);
+    }
+
+    default boolean isRelicMaxLevel(LivingEntity entity, ItemStack stack) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        return relic.getRelicLevel(entity, stack) >= relic.getLevelingTemplate(entity, stack).getMaxLevel();
+    }
+
+    default boolean isRelicMaxQuality(LivingEntity entity, ItemStack stack) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        return relic.getRelicQuality(entity, stack) >= relic.getRelicMaxQuality(entity, stack);
+    }
+
+    default boolean isRelicFlawless(LivingEntity entity, ItemStack stack) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        return isRelicMaxLevel(entity, stack) && relic.getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().filter(ability -> relic.isAbilityEnabled(entity, stack, ability)).allMatch(ability -> isAbilityFlawless(entity, stack, ability));
+    }
+
+    default boolean isAbilityMaxLevel(LivingEntity entity, ItemStack stack, String ability) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        return relic.getAbilityLevel(entity, stack, ability) >= relic.getAbilityTemplate(entity, stack, ability).getMaxLevel();
+    }
+
+    default boolean isAbilityMaxQuality(LivingEntity entity, ItemStack stack, String ability) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        return relic.getAbilityQuality(entity, stack, ability) >= relic.getAbilityMaxQuality(entity, stack, ability);
+    }
+
+    default boolean isAbilityFlawless(LivingEntity entity, ItemStack stack, String ability) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        return relic.isAbilityUnlocked(entity, stack, ability) && isAbilityMaxQuality(entity, stack, ability);
+    }
+
 }
