@@ -1,8 +1,6 @@
 package it.hurts.sskirillss.relics.api.relics;
 
-import com.google.common.collect.LinkedHashMultimap;
-import com.google.common.collect.Multimap;
-import com.google.common.collect.MultimapBuilder;
+import com.google.common.collect.*;
 import io.netty.util.internal.UnstableApi;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
@@ -314,6 +312,14 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     @ApiStatus.Experimental
     default void setAbilityMode(LivingEntity entity, ItemStack stack, String ability, String mode) {
         setAbilityComponent(entity, stack, ability, getAbilityComponent(entity, stack, ability).toBuilder().mode(mode).build());
+    }
+
+    @UnstableApi
+    @ApiStatus.Experimental
+    default boolean isAbilityRankModifierUnlocked(LivingEntity entity, ItemStack stack, String ability, String rankModifier) {
+        var modifiers = Multimaps.invertFrom(this.getAbilityTemplate(entity, stack, ability).getRankModifiers(), HashMultimap.create());
+
+        return this.getRelicRank(entity, stack) >= Collections.max(modifiers.get(rankModifier));
     }
 
     @Override
@@ -872,7 +878,9 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
     @ApiStatus.Obsolete
     default boolean mayPlayerRankup(Player player, ItemStack stack) {
-        return getRelicLevel(player, stack) == getLevelingTemplate(player, stack).getMaxLevel();
+        var levelingTemplate = this.getLevelingTemplate(player, stack);
+
+        return this.getRelicLevel(player, stack) == levelingTemplate.getMaxLevel() && this.getRelicRank(player, stack) < levelingTemplate.getMaxRank();
     }
 
     @ApiStatus.Obsolete

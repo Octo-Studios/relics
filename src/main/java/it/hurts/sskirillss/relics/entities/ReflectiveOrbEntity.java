@@ -1,14 +1,15 @@
 package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
+import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
@@ -20,7 +21,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
-import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,26 +28,26 @@ import java.util.List;
 public class ReflectiveOrbEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> TARGETED = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Integer> DELAY = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Vector3f> MOTION = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Vector3f> TARGET = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Integer> LIFETIME = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> PIERCINGS = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> STUN = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> BOUNCES = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.INT);
 
-    @Getter
-    @Setter
-    @Nullable
-    private LivingEntity target;
+    private boolean bounced = false;
+    private boolean takeBounces = false;
+    private boolean spawnBounceParticles = false;
 
-    @Getter
     private List<String> impactedEntities = new ArrayList<>();
 
-    public void setMotion(Vec3 motion) {
-        this.getEntityData().set(MOTION, motion.toVector3f());
+    public void setTarget(Vec3 target) {
+        this.getEntityData().set(TARGET, target.toVector3f());
     }
 
-    public Vec3 getMotion() {
-        var motion = this.getEntityData().get(MOTION);
+    public Vec3 getTarget() {
+        var target = this.getEntityData().get(TARGET);
 
-        return new Vec3(motion.x(), motion.y(), motion.z());
+        return new Vec3(target.x(), target.y(), target.z());
     }
 
     public void setLifetime(int lifetime) {
@@ -56,14 +56,6 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
 
     public int getLifetime() {
         return this.getEntityData().get(LIFETIME);
-    }
-
-    public void setDelay(int delay) {
-        this.getEntityData().set(DELAY, delay);
-    }
-
-    public int getDelay() {
-        return this.getEntityData().get(DELAY);
     }
 
     public void setTargeted(boolean targeted) {
@@ -82,6 +74,30 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
         return this.getEntityData().get(DAMAGE);
     }
 
+    public void setPiercings(int remainingPierces) {
+        this.getEntityData().set(PIERCINGS, remainingPierces);
+    }
+
+    public int getPiercings() {
+        return this.getEntityData().get(PIERCINGS);
+    }
+
+    public void setStun(float stun) {
+        this.getEntityData().set(STUN, stun);
+    }
+
+    public float getStun() {
+        return this.getEntityData().get(STUN);
+    }
+
+    public void setBounces(int bounces) {
+        this.getEntityData().set(BOUNCES, bounces);
+    }
+
+    public int getBounces() {
+        return this.getEntityData().get(BOUNCES);
+    }
+
     private static final int ARC_DURATION = 10;
 
     public ReflectiveOrbEntity(EntityType<? extends ThrowableProjectile> type, Level level) {
@@ -94,49 +110,43 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
 
         super.tick();
 
-        this.noPhysics = true;
+        this.noPhysics = this.tickCount <= ARC_DURATION;
 
         var level = this.level();
         var isTargeted = this.isTargeted();
+        var target = this.getTarget();
+        var position = this.position();
+        var semiTarget = this.getOwner() == null ? target : this.getOwner().position();
 
-        if (tickCount >= (this.getLifetime() + (isTargeted ? 100 : 0))) {
+        var maxDistance = ReflectiveNecklaceItem.ORB_SEARCH_RADIUS;
+        var normal = position.subtract(semiTarget).normalize();
+        var origin = semiTarget.add(normal.scale(maxDistance));
+
+        if (this.tickCount >= (this.getLifetime() + (isTargeted ? 100 : 0))) {
             this.discard();
 
             return;
         }
 
-        var motion = Vec3.ZERO;
+        if (target.equals(Vec3.ZERO)) {
+            if (this.tickCount < ARC_DURATION) {
+                var damp = 1D - this.tickCount / (double) ARC_DURATION;
 
-        if (tickCount < ARC_DURATION) {
-            var damp = 1D - tickCount / (double) ARC_DURATION;
+                this.setDeltaMovement(new Vec3(cachedMotion.x() * damp, 0.25D + this.random.nextFloat() * 0.25D, cachedMotion.z() * damp));
+            } else
+                this.setDeltaMovement(this.getDeltaMovement().scale(0.9F));
+        } else if (!isTargeted) {
+            this.setTargeted(true);
 
-            motion = new Vec3(cachedMotion.x() * damp, 0.25D + random.nextFloat() * 0.25D, cachedMotion.z() * damp);
-        } else if (isTargeted) {
-            if (!level.isClientSide() && target != null && target.isDeadOrDying()) {
-                setTargeted(false);
-                setTarget(null);
-                setDelay(0);
+            this.setDeltaMovement(target.subtract(position).normalize().scale(1.5F));
+        } else {
+            if (!bounced)
+                this.setDeltaMovement(cachedMotion);
 
-                return;
-            }
-
-            var delay = this.getDelay();
-            var target = this.getTarget();
-
-            if (delay > 0) {
-                this.setDelay(--delay);
-            } else {
-                if (!level.isClientSide() && target != null) {
-                    this.setMotion(target.position().add(0D, target.getBbHeight() / 2D, 0D).subtract(this.position()).normalize());
-
-                    this.setTarget(null);
-                }
-
-                motion = this.getMotion();
-            }
+            if (position.distanceTo(semiTarget) >= maxDistance)
+                if (this.bounce(normal, origin))
+                    this.spawnBounceParticles = true;
         }
-
-        this.setDeltaMovement(motion);
 
         if (level.isClientSide()) {
             var random = level.getRandom();
@@ -144,6 +154,55 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
             level.addParticle(ParticleUtils.constructSimpleSpark(new Color(random.nextInt(100), 0, 255), 0.1F + (random.nextFloat() * 0.15F), 15, 0.9F), this.getX(), this.getY() + this.getBbHeight() / 2F, this.getZ(),
                     MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F);
         }
+
+        if (this.takeBounces && position.distanceTo(semiTarget) < maxDistance) {
+            this.setBounces(this.getBounces() - 1);
+
+            this.takeBounces = false;
+
+            if (this.spawnBounceParticles) {
+                var up = Math.abs(normal.y) < 0.99 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
+
+                var axis1 = normal.cross(up).normalize();
+                var axis2 = normal.cross(axis1).normalize();
+
+                var segments = 6;
+                var radius = 1D;
+
+                var directions = new Vec3[segments];
+
+                for (var i = 0; i < segments; i++) {
+                    var angle = 2 * Math.PI * i / segments;
+
+                    directions[i] = axis1.scale(Math.cos(angle) * radius).add(axis2.scale(Math.sin(angle) * radius));
+                }
+
+                var fillStep = 0.25;
+                var shatterSpeed = 0.075F;
+
+                for (var i = 0; i < segments; i++) {
+                    var edge1 = directions[i];
+                    var edge2 = directions[(i + 1) % segments];
+
+                    for (var t = 0.0; t <= 1.0; t += fillStep) {
+                        for (var u = 0.0; u <= 1.0 - t; u += fillStep) {
+                            var point = origin.add(edge1.scale(t)).add(edge2.scale(u));
+                            var shardDir = point.subtract(origin).normalize();
+
+                            var vx = (float) (shardDir.x * shatterSpeed);
+                            var vy = (float) (shardDir.y * shatterSpeed);
+                            var vz = (float) (shardDir.z * shatterSpeed);
+
+                            this.level().addParticle(ParticleUtils.constructSimpleSpark(new Color(50 + random.nextInt(100), random.nextInt(100), 255), 0.35F, 40, 0.9F), true, point.x, point.y, point.z, vx, vy, vz);
+                        }
+                    }
+                }
+
+                this.spawnBounceParticles = false;
+            }
+        }
+
+        this.bounced = false;
     }
 
     @Override
@@ -151,48 +210,97 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
         var pos = result.getBlockPos();
         var level = this.level();
 
-        if (!level.getBlockState(pos).blocksMotion() || this.tickCount < ARC_DURATION)
+        if (level.isClientSide() || this.noPhysics || bounced || !level.getBlockState(pos).blocksMotion())
             return;
 
-        this.discard();
+        var faceNormal = Vec3.atLowerCornerOf(result.getDirection().getNormal()).normalize();
+        var hitLocation = result.getLocation();
+
+        this.bounce(faceNormal, hitLocation);
+    }
+
+    public boolean bounce(Vec3 normal, Vec3 origin) {
+        var bounces = this.getBounces();
+
+        if (bounces <= 0) {
+            this.discard();
+
+            return false;
+        }
+
+        var motion = this.getDeltaMovement();
+        var reflected = motion.subtract(normal.scale(2 * motion.dot(normal)));
+
+        var halfWidth = this.getBbWidth() * 0.5D;
+        var halfHeight = this.getBbHeight() * 0.5D;
+
+        var eps = 1e-3;
+
+        var pushDist = Math.abs(normal.x) * halfWidth + Math.abs(normal.y) * halfHeight + Math.abs(normal.z) * halfWidth + eps;
+
+        var newPos = origin.add(normal.scale(pushDist));
+
+        this.setPos(newPos.x, newPos.y, newPos.z);
+        this.setDeltaMovement(reflected);
+
+        this.bounced = true;
+        this.takeBounces = true;
+
+        return true;
     }
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        if (this.tickCount < ARC_DURATION || !(result.getEntity() instanceof LivingEntity entity) || impactedEntities.contains(entity.getStringUUID())
+        if (this.tickCount < ARC_DURATION || !(result.getEntity() instanceof LivingEntity entity) || this.impactedEntities.contains(entity.getStringUUID())
                 || (!(this.getOwner() instanceof LivingEntity owner) || entity.getStringUUID().equals(owner.getStringUUID())))
             return;
 
         entity.invulnerableTime = 0;
 
-        entity.hurt(this.level().damageSources().thrown(owner, this), this.getDamage());
+        if (entity.hurt(this.level().damageSources().thrown(owner, this), this.getDamage())) {
+            var stun = this.getStun();
 
-        impactedEntities.add(entity.getStringUUID());
+            if (stun > 0)
+                entity.addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) (stun * 20), 0, false, false));
+        }
+
+        this.impactedEntities.add(entity.getStringUUID());
+
+        var remainingPierces = this.getPiercings();
+
+        if (remainingPierces <= 0)
+            this.discard();
+        else
+            this.setPiercings(remainingPierces - 1);
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DAMAGE, 1F);
         builder.define(TARGETED, false);
-        builder.define(DELAY, 0);
-        builder.define(MOTION, Vec3.ZERO.toVector3f());
+        builder.define(TARGET, Vec3.ZERO.toVector3f());
         builder.define(LIFETIME, 0);
+        builder.define(PIERCINGS, 0);
+        builder.define(STUN, 0F);
+        builder.define(BOUNCES, 0);
     }
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {
-        setDamage(compound.getFloat("damage"));
-        setTargeted(compound.getBoolean("targeted"));
-        setDelay(compound.getInt("delay"));
-        setLifetime(compound.getInt("lifetime"));
+        this.setDamage(compound.getFloat("damage"));
+        this.setTargeted(compound.getBoolean("targeted"));
+        this.setLifetime(compound.getInt("lifetime"));
+        this.setPiercings(compound.getInt("piercings"));
+        this.setBounces(compound.getInt("bounces"));
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag compound) {
         compound.putFloat("damage", this.getDamage());
         compound.putBoolean("targeted", this.isTargeted());
-        compound.putInt("delay", this.getDelay());
         compound.putInt("lifetime", this.getLifetime());
+        compound.putInt("piercings", this.getPiercings());
+        compound.putInt("bounces", this.getBounces());
     }
 
     @Override

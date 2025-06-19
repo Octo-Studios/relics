@@ -17,6 +17,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.utils.Scheduler;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -25,17 +26,17 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import java.util.Comparator;
 
 public class ReflectiveNecklaceItem extends RelicItem {
+    public static final int ORB_SEARCH_RADIUS = 16;
+
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("reflection")
                                 .maxLevel(10)
-                                .rankModifier(1, "piercing")
-                                .rankModifier(2, "stunning")
-                                .rankModifier(3, "ricochet")
-                                .rankModifier(4, "homing")
-                                .rankModifier(5, "fragmentation")
+                                .rankModifier(1, "stun")
+                                .rankModifier(3, "piercing")
+                                .rankModifier(5, "bounce")
                                 .stat(StatTemplate.builder("chance")
                                         .initialValue(0.1D, 0.2D)
                                         .thresholdValue(0D, 1D)
@@ -44,48 +45,31 @@ public class ReflectiveNecklaceItem extends RelicItem {
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("lifetime")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("target_radius")
-                                        .initialValue(7.5D, 15D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
-                                        .build())
-                                .stat(StatTemplate.builder("interval")
-                                        .initialValue(1D, 0.75D)
+                                .stat(StatTemplate.builder("piercings")
+                                        .initialValue(1D, 3D)
                                         .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.09D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
-                                        .build())
-                                .stat(StatTemplate.builder("targets")
-                                        .initialValue(1D, 0.75D)
-                                        .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.09D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("stun")
-                                        .initialValue(1D, 0.75D)
+                                        .initialValue(0.25D, 0.5D)
                                         .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.09D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("ricochets")
-                                        .initialValue(1D, 0.75D)
+                                .stat(StatTemplate.builder("bounces")
+                                        .initialValue(1D, 2D)
                                         .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.09D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
-                                        .build())
-                                .stat(StatTemplate.builder("fragmentation_radius")
-                                        .initialValue(1D, 0.75D)
-                                        .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.09D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .build())
                         .build())
@@ -111,9 +95,10 @@ public class ReflectiveNecklaceItem extends RelicItem {
     public static class CommonEvents {
         @SubscribeEvent
         public static void onEntityHurt(LivingDamageEvent.Pre event) {
-            var damage = event.getOriginalDamage();
             var source = event.getSource().getEntity();
+            var damage = event.getOriginalDamage();
             var entity = event.getEntity();
+
             var level = entity.level();
             var random = level.getRandom();
 
@@ -126,6 +111,9 @@ public class ReflectiveNecklaceItem extends RelicItem {
 
                     var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
 
+                    orb.setPiercings(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "piercing") ? (int) relic.getStatValue(entity, stack, "reflection", "piercings") : 0);
+                    orb.setBounces(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "bounce") ? (int) relic.getStatValue(entity, stack, "reflection", "bounces") : 0);
+                    orb.setStun(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "stun") ? (int) relic.getStatValue(entity, stack, "reflection", "stun") : 0);
                     orb.setDamage(Math.clamp((float) (damage * relic.getStatValue(entity, stack, "reflection", "damage")), Float.MIN_VALUE, Float.MAX_VALUE));
                     orb.setLifetime((int) (relic.getStatValue(entity, stack, "reflection", "lifetime") * 20));
                     orb.setPos(entity.getEyePosition());
@@ -140,21 +128,20 @@ public class ReflectiveNecklaceItem extends RelicItem {
                 }
             }
 
-            var stack = EntityUtils.findEquippedCurio(source, RelicsItems.REFLECTIVE_NECKLACE.get());
+            if (!(event.getSource().getEntity() instanceof LivingEntity livingSource))
+                return;
 
-            var step = 0;
+            var stack = EntityUtils.findEquippedCurio(livingSource, RelicsItems.REFLECTIVE_NECKLACE.get());
 
-            if (source != null && !stack.isEmpty()) {
-                var relic = (ReflectiveNecklaceItem) stack.getItem();
+            if (!stack.isEmpty()) {
+                var step = 0;
 
-                for (var orb : level.getEntitiesOfClass(ReflectiveOrbEntity.class, source.getBoundingBox().inflate(relic.getStatValue(entity, stack, "reflection", "target_radius"))).stream()
-                        .filter(orb -> !orb.isTargeted() && orb.getOwner() instanceof LivingEntity owner && owner.getStringUUID().equals(source.getStringUUID()))
+                for (var orb : level.getEntitiesOfClass(ReflectiveOrbEntity.class, livingSource.getBoundingBox().inflate(ORB_SEARCH_RADIUS)).stream()
+                        .filter(orb -> !orb.isTargeted() && orb.getOwner() instanceof LivingEntity owner && owner.getStringUUID().equals(livingSource.getStringUUID()))
                         .sorted(Comparator.comparingInt(orb -> (int) orb.position().distanceTo(entity.position())))
                         .toList()) {
-                    orb.setTarget(entity);
-                    orb.setTargeted(true);
-                    orb.setDelay((int) (step++ * (relic.getStatValue(entity, stack, "reflection", "interval")) * 20));
-                    orb.setMotion(entity.position().add(0D, entity.getBbHeight() / 2D, 0D).subtract(orb.position()).scale(1.25D).normalize());
+
+                    Scheduler.schedule(step++ * 2, () -> orb.setTarget(entity.position().add(0D, entity.getBbHeight(), 0D).add(entity.getKnownMovement())));
                 }
             }
         }

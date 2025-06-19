@@ -108,9 +108,14 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
             if (txt.endsWith(".0"))
                 txt = txt.substring(0, txt.length() - 2);
 
-            return Component.literal(txt)
+            var result = Component.literal(txt)
                     .withStyle(ChatFormatting.BOLD)
                     .withColor(wantsUpgrade ? DescriptionUtils.POSITIVE_COLOR(true) : wantsReroll ? DescriptionUtils.NEUTRAL_COLOR(true) : wantsReset ? DescriptionUtils.NEGATIVE_COLOR(true) : DescriptionUtils.TEXT_COLOR);
+
+            if (wantsReroll)
+                result = result.withStyle(ChatFormatting.OBFUSCATED);
+
+            return result;
         }).toList();
 
         var itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
@@ -127,12 +132,12 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
             rawLines.add(new LineEntry(Component.translatable("tooltip.relics.description.ability.rank_modifier", entry.getKey())
                     .withStyle(ChatFormatting.BOLD), false));
 
-            var title = Component.translatable("tooltip.relics." + itemId + ".ability." + abilityKey + ".rank_modifier." + entry.getValue(), (Object[]) tokens);
+            var description = Component.literal("● ").append(Component.translatable("tooltip.relics." + itemId + ".ability." + abilityKey + ".rank_modifier." + entry.getValue(), (Object[]) tokens));
 
             if (relic.getRelicRank(player, stack) < entry.getKey())
-                title = ScreenUtils.randomizeAllCharacters(title, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.CUSTOM_COLOR(0x851b1b)));
+                description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.CUSTOM_COLOR(0x851b1b)));
 
-            rawLines.add(new LineEntry(title, true));
+            rawLines.add(new LineEntry(description, true));
         }
 
         return new DescriptionData(rawLines, dynamicComponents);
