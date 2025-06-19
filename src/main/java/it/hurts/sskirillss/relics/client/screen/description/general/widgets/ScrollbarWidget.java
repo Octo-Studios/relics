@@ -175,7 +175,7 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
         var maxScrollPixels = Math.max(1, contentHeight - containerHeight);
 
         var lineHeight = minecraft.font.lineHeight / 2;
-        var stepPixels = lineHeight * 3D;
+        var stepPixels = lineHeight * 2D;
 
         var scrollDelta = (stepPixels / (double) maxScrollPixels) * scrollY;
 
