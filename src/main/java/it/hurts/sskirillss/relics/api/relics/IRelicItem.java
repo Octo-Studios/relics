@@ -890,6 +890,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
         addRelicRank(player, stack, 1);
         setRelicLevel(player, stack, 0);
+        setRelicLevelingPoints(player, stack, 0);
 
         for (var ability : this.getAbilitiesTemplate(player, stack).getAbilities().values())
             this.setAbilityLevel(player, stack, ability.getId(), 0);
