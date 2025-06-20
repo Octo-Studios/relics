@@ -287,20 +287,26 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
 
     @Override
     protected void readAdditionalSaveData(CompoundTag compound) {
+        super.readAdditionalSaveData(compound);
+
         this.setDamage(compound.getFloat("damage"));
         this.setTargeted(compound.getBoolean("targeted"));
         this.setLifetime(compound.getInt("lifetime"));
         this.setPiercings(compound.getInt("piercings"));
         this.setBounces(compound.getInt("bounces"));
+        this.setStun(compound.getFloat("stun"));
     }
 
     @Override
     protected void addAdditionalSaveData(CompoundTag compound) {
+        super.addAdditionalSaveData(compound);
+
         compound.putFloat("damage", this.getDamage());
         compound.putBoolean("targeted", this.isTargeted());
         compound.putInt("lifetime", this.getLifetime());
         compound.putInt("piercings", this.getPiercings());
         compound.putInt("bounces", this.getBounces());
+        compound.putFloat("stun", this.getStun());
     }
 
     @Override
