@@ -132,29 +132,29 @@ public class EntityUtils {
         return ResourceLocation.fromNamespaceAndPath(Reference.MODID, BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute).getPath());
     }
 
+    public static boolean hasAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder) {
+        var attribute = attributeHolder.value();
+        var id = getAttributeId(stack, attribute);
+        var instance = entity.getAttribute(attributeHolder);
+
+        return instance != null && instance.hasModifier(id);
+    }
+
     public static void applyAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
-        Attribute attribute = attributeHolder.value();
+        var id = getAttributeId(stack, attributeHolder.value());
+        var instance = entity.getAttribute(attributeHolder);
 
-        ResourceLocation id = getAttributeId(stack, attribute);
-        AttributeInstance instance = entity.getAttribute(attributeHolder);
-
-        if (instance == null || instance.hasModifier(id))
+        if (hasAttribute(entity, stack, attributeHolder))
             return;
 
         instance.addTransientModifier(new AttributeModifier(id, value, operation));
     }
 
     public static void removeAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, AttributeModifier.Operation operation) {
-        Attribute attribute = attributeHolder.value();
+        var id = getAttributeId(stack, attributeHolder.value());
+        var instance = entity.getAttribute(attributeHolder);
 
-        ResourceLocation id = getAttributeId(stack, attribute);
-
-        AttributeInstance instance = entity.getAttribute(attributeHolder);
-
-        if (instance == null)
-            return;
-
-        if (!instance.hasModifier(id))
+        if (!hasAttribute(entity, stack, attributeHolder))
             return;
 
         instance.removeModifier(new AttributeModifier(id, instance.getValue(), operation));

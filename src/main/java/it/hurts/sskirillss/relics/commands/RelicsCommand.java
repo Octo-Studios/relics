@@ -29,13 +29,14 @@ public class RelicsCommand {
 
                             var relicData = relic.getRelicTemplate(player, stack);
 
+                            relic.setRelicRank(player, stack, relicData.getLeveling().getMaxRank());
                             relic.setRelicLevel(player, stack, relicData.getLeveling().getMaxLevel());
 
                             for (var abilityEntry : relicData.getAbilities().getAbilities().entrySet()) {
                                 var abilityId = abilityEntry.getKey();
                                 var abilityData = abilityEntry.getValue();
 
-                                relic.setAbilityLevel(player, stack, abilityId, relic.getAbilityTemplate(player, stack, abilityId).getMaxLevel());
+                                relic.setAbilityLevel(player, stack, abilityId, relicData.getAbilities().getAbilities().get(abilityId).getMaxLevel());
                                 relic.setLockUnlocks(player, stack, abilityId, relic.getMaxLockUnlocks());
                                 relic.setAbilityResearched(player, stack, abilityId, true);
 

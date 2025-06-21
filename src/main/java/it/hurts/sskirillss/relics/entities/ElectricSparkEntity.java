@@ -2,11 +2,9 @@ package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
-import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
-import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -30,6 +28,8 @@ import java.util.stream.Collectors;
 public class ElectricSparkEntity extends ThrowableProjectile implements ITargetableEntity {
     private static final EntityDataAccessor<Integer> BOUNCES = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> DISTANCE = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> DAMAGE_MODIFIER = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.FLOAT);
 
     private Set<String> bouncedTargets = new HashSet<>();
 
@@ -60,8 +60,25 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
         return this.getEntityData().get(DAMAGE);
     }
 
-    public List<LivingEntity> locateNearestTargets(double radius) {
-        return EntityUtils.gatherPotentialTargets(this, LivingEntity.class, radius)
+    public void setDistance(float distance) {
+        this.getEntityData().set(DISTANCE, distance);
+    }
+
+    public float getDistance() {
+        return this.getEntityData().get(DISTANCE);
+    }
+
+    public void setDamageModifier(float damage) {
+        this.getEntityData().set(DAMAGE_MODIFIER, damage);
+    }
+
+    public float getDamageModifier() {
+        return this.getEntityData().get(DAMAGE_MODIFIER);
+    }
+
+
+    public List<LivingEntity> locateNearestTargets() {
+        return EntityUtils.gatherPotentialTargets(this, LivingEntity.class, this.getDistance())
                 .filter(entity -> (lastTarget == null || !lastTarget.getStringUUID().equals(entity.getStringUUID()))
                         && (!(this.getOwner() instanceof Player player) || !EntityUtils.isAlliedTo(player, entity)))
                 .collect(Collectors.toList());
@@ -73,15 +90,15 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
         var level = this.getCommandSenderWorld();
         var currentTarget = this.getTarget();
-        var radius = 16D;
+        var distance = this.getDistance();
 
-        if (currentTarget != null && (this.position().distanceTo(currentTarget.position()) >= radius || currentTarget.isDeadOrDying()))
+        if (currentTarget != null && (this.position().distanceTo(currentTarget.position()) >= distance || currentTarget.isDeadOrDying()))
             currentTarget = null;
 
         if (!level.isClientSide()) {
             LivingEntity potentialTarget = null;
 
-            var candidateEntities = this.locateNearestTargets(radius);
+            var candidateEntities = this.locateNearestTargets();
 
             candidateEntities.removeIf(entity -> this.blacklistedTargets.contains(entity.getStringUUID()));
 
@@ -118,7 +135,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
         if (this.getEyePosition().distanceTo(currentTarget.getEyePosition()) <= 1.5F) {
             currentTarget.invulnerableTime = 0;
 
-            if (currentTarget.hurt(level.damageSources().thrown(this, getOwner()), getDamage())) {
+            if (currentTarget.hurt(level.damageSources().thrown(this, this.getOwner()), this.getDamage() + (this.getDamage() * this.getDamageModifier()))) {
                 this.bouncedTargets.add(currentTarget.getStringUUID());
                 this.lastTarget = currentTarget;
 
@@ -138,6 +155,8 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(BOUNCES, 0);
         builder.define(DAMAGE, 1F);
+        builder.define(DISTANCE, 1F);
+        builder.define(DAMAGE_MODIFIER, 0F);
     }
 
     @Override
@@ -146,6 +165,8 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
         tag.putInt("bounces", this.getBounces());
         tag.putFloat("damage", this.getDamage());
+        tag.putFloat("distance", this.getDistance());
+        tag.putFloat("damage_modifier", this.getDamageModifier());
     }
 
     @Override
@@ -154,6 +175,8 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
         this.setBounces(tag.getInt("bounces"));
         this.setDamage(tag.getFloat("damage"));
+        this.setDistance(tag.getFloat("distance"));
+        this.setDamageModifier(tag.getFloat("damage_modifier"));
     }
 
     @Override
