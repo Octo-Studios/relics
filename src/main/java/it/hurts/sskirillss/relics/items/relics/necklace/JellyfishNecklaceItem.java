@@ -254,6 +254,8 @@ public class JellyfishNecklaceItem extends RelicItem {
                     level.addFreshEntity(spark);
                 }
 
+                this.addRings(stack, -1);
+
                 if (this.isAbilityRankModifierUnlocked(entity, stack, "shock", "charge")) {
                     var maxDuration = (int) this.getStatValue(entity, stack, "shock", "duration");
 
