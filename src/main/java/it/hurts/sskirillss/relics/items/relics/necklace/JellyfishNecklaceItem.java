@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
+import com.google.common.collect.Lists;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
@@ -58,7 +59,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                                 .stat(StatTemplate.builder("cooldown")
                                         .initialValue(60D, 30D)
                                         .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.05D)
+                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), -5.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("radius")
@@ -168,7 +169,7 @@ public class JellyfishNecklaceItem extends RelicItem {
     public void addTargets(ItemStack stack, String... targets) {
         var list = this.getTargets(stack);
 
-        list.addAll(Arrays.asList(targets));
+        list.addAll(Lists.newArrayList(targets));
 
         this.setTargets(stack, list);
     }
@@ -176,7 +177,7 @@ public class JellyfishNecklaceItem extends RelicItem {
     public void removeTargets(ItemStack stack, String... targets) {
         var list = this.getTargets(stack);
 
-        list.removeAll(Arrays.asList(targets));
+        list.removeAll(Lists.newArrayList(targets));
 
         this.setTargets(stack, list);
     }
@@ -247,7 +248,8 @@ public class JellyfishNecklaceItem extends RelicItem {
                     spark.setDistance((float) this.getStatValue(entity, stack, "shock", "distance"));
                     spark.setBounces((int) this.getStatValue(entity, stack, "shock", "bounces"));
                     spark.setDamage((float) this.getStatValue(entity, stack, "shock", "damage"));
-                    spark.setPos(target.getEyePosition());
+                    spark.setPos(entity.position().add(0F, entity.getBbHeight() / 2F, 0D));
+                    spark.setTarget(target);
                     spark.setOwner(entity);
 
                     level.addFreshEntity(spark);
@@ -307,7 +309,7 @@ public class JellyfishNecklaceItem extends RelicItem {
 
         @SubscribeEvent
         public static void onLivingHurt(LivingDamageEvent.Pre event) {
-            if (!(event.getSource().getEntity() instanceof LivingEntity entity))
+            if (!(event.getSource().getDirectEntity() instanceof LivingEntity entity))
                 return;
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {

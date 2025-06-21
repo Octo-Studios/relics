@@ -147,7 +147,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
                 this.setTarget(null);
             }
         } else {
-            this.setDeltaMovement(currentTarget.getEyePosition().subtract(this.getEyePosition()).normalize().scale(2F));
+            this.setDeltaMovement(currentTarget.getEyePosition().subtract(this.getEyePosition()).normalize().scale(1.75F));
         }
     }
 
@@ -196,7 +196,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
     @Override
     public void setTarget(LivingEntity target) {
-        if (target != null)
+        if (target != null && !target.level().isClientSide())
             NetworkHandler.sendToClientsTrackingEntity(new S2CSyncEntityTargetPacket(this.getId(), target.getId()), this);
 
         this.currentTarget = target;
