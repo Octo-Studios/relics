@@ -135,7 +135,9 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
         if (this.getEyePosition().distanceTo(currentTarget.getEyePosition()) <= 1.5F) {
             currentTarget.invulnerableTime = 0;
 
-            if (currentTarget.hurt(level.damageSources().thrown(this, this.getOwner()), this.getDamage() + (this.getDamage() * this.getDamageModifier()))) {
+            var damage = this.getDamage();
+
+            if (currentTarget.hurt(level.damageSources().thrown(this, this.getOwner()), damage + (currentTarget.isInLiquid() ? (damage * this.getDamageModifier()) : 0F))) {
                 this.bouncedTargets.add(currentTarget.getStringUUID());
                 this.lastTarget = currentTarget;
 
@@ -177,6 +179,11 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
         this.setDamage(tag.getFloat("damage"));
         this.setDistance(tag.getFloat("distance"));
         this.setDamageModifier(tag.getFloat("damage_modifier"));
+    }
+
+    @Override
+    public boolean isOnFire() {
+        return false;
     }
 
     @Override
