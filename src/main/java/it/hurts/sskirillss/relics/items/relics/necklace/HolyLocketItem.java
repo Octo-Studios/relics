@@ -263,7 +263,7 @@ public class HolyLocketItem extends RelicItem {
 
                     essence.setHeal(heal);
                     essence.setOwner(player);
-                    essence.setTargetPos(player);
+                    essence.setTarget(player);
                     essence.setPos(entity.getEyePosition());
                     essence.setDeltaMovement(MathUtils.randomFloat(random), random.nextFloat(), MathUtils.randomFloat(random));
 
@@ -294,7 +294,7 @@ public class HolyLocketItem extends RelicItem {
                         var essence = new DeathEssenceEntity(RelicsEntities.DEATH_ESSENCE.get(), level);
 
                         essence.setOwner(player);
-                        essence.setTargetPos(target);
+                        essence.setTarget(target);
                         essence.setPos(player.getEyePosition());
                         essence.setDamage((float) (event.getAmount() * relic.getStatValue(entity, stack, "faith", "damage")));
                         essence.setDeltaMovement(MathUtils.randomFloat(random), random.nextFloat(), MathUtils.randomFloat(random));

@@ -6,7 +6,7 @@ import javax.annotation.Nullable;
 
 public interface ITargetableEntity {
     @Nullable
-    LivingEntity getTargetPos();
+    LivingEntity getTarget();
 
-    void setTargetPos(LivingEntity targetPos);
+    void setTarget(LivingEntity target);
 }

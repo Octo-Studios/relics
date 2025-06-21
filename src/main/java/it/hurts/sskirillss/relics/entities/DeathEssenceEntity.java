@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.entities;
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.sync.S2CEntityTargetPacket;
+import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import net.minecraft.nbt.CompoundTag;
@@ -100,16 +100,16 @@ public class DeathEssenceEntity extends ThrowableProjectile implements ITargetab
 
     @Nullable
     @Override
-    public LivingEntity getTargetPos() {
+    public LivingEntity getTarget() {
         return target;
     }
 
     @Override
-    public void setTargetPos(LivingEntity targetPos) {
-        this.target = targetPos;
+    public void setTarget(LivingEntity target) {
+        this.target = target;
 
-        if (!level().isClientSide() && targetPos != null)
-            NetworkHandler.sendToClientsTrackingEntity(new S2CEntityTargetPacket(this.getId(), targetPos.getId()), this);
+        if (!level().isClientSide() && target != null)
+            NetworkHandler.sendToClientsTrackingEntity(new S2CSyncEntityTargetPacket(this.getId(), target.getId()), this);
     }
 
     @OnlyIn(Dist.CLIENT)

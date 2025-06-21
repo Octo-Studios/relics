@@ -1,12 +1,14 @@
 package it.hurts.sskirillss.relics.init;
 
 import com.mojang.serialization.Codec;
-import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.WorldPosition;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -14,6 +16,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.ModifyDefaultComponentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class DataComponentRegistry {
@@ -46,6 +50,12 @@ public class DataComponentRegistry {
     );
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COOLDOWN = DATA_COMPONENTS.register("cooldown",
+            () -> DataComponentType.<Integer>builder()
+                    .persistent(Codec.INT)
+                    .build()
+    );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> DURATION = DATA_COMPONENTS.register("duration",
             () -> DataComponentType.<Integer>builder()
                     .persistent(Codec.INT)
                     .build()
@@ -110,6 +120,16 @@ public class DataComponentRegistry {
                     .persistent(Codec.INT)
                     .build()
     );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_COOLDOWN = DataComponentRegistry.construct("jellyfish_necklace/cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_DURATION = DataComponentRegistry.construct("jellyfish_necklace/duration", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_RINGS = DataComponentRegistry.construct("jellyfish_necklace/rings", Codec.INT);
+
+    public static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> construct(String name, Codec<T> codec) {
+        return DATA_COMPONENTS.register(name, () -> DataComponentType.<T>builder()
+                .persistent(codec)
+                .build());
+    }
 
     public static void register(IEventBus bus) {
         DATA_COMPONENTS.register(bus);

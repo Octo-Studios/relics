@@ -12,7 +12,7 @@ import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.network.packets.lock.PacketAbilityUnlock;
 import it.hurts.sskirillss.relics.network.packets.research.PacketManageLink;
 import it.hurts.sskirillss.relics.network.packets.research.PacketResearchHint;
-import it.hurts.sskirillss.relics.network.packets.sync.S2CEntityTargetPacket;
+import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
@@ -37,7 +37,7 @@ public class NetworkHandler {
         registrar.playToClient(PacketSyncEntityEffects.TYPE, PacketSyncEntityEffects.STREAM_CODEC, PacketSyncEntityEffects::handle);
         registrar.playToClient(CapabilitySyncPacket.TYPE, CapabilitySyncPacket.STREAM_CODEC, CapabilitySyncPacket::handle);
         registrar.playToServer(SpellCastPacket.TYPE, SpellCastPacket.STREAM_CODEC, SpellCastPacket::handle);
-        registrar.playToClient(S2CEntityTargetPacket.TYPE, S2CEntityTargetPacket.STREAM_CODEC, S2CEntityTargetPacket::handle);
+        registrar.playToClient(S2CSyncEntityTargetPacket.TYPE, S2CSyncEntityTargetPacket.STREAM_CODEC, S2CSyncEntityTargetPacket::handle);
         registrar.playToServer(PacketAbilityUnlock.TYPE, PacketAbilityUnlock.STREAM_CODEC, PacketAbilityUnlock::handle);
         registrar.playToServer(PacketManageLink.TYPE, PacketManageLink.STREAM_CODEC, PacketManageLink::handle);
         registrar.playToServer(PacketResearchHint.TYPE, PacketResearchHint.STREAM_CODEC, PacketResearchHint::handle);

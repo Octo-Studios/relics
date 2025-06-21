@@ -28,9 +28,9 @@ public class Relics {
         ParticleRegistry.register(bus);
         LootCodecRegistry.register(bus);
         CreativeTabRegistry.register(bus);
+        ScalingModelRegistry.register(bus);
         DataComponentRegistry.register(bus);
         RelicContainerRegistry.register(bus);
-        ScalingModelRegistry.register(bus);
     }
 
     private void setupCommon(final FMLCommonSetupEvent event) {

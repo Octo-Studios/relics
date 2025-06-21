@@ -14,24 +14,24 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 @Data
 @AllArgsConstructor
-public class S2CEntityTargetPacket implements CustomPacketPayload {
+public class S2CSyncEntityTargetPacket implements CustomPacketPayload {
     private final int sourceId;
     private final int targetId;
 
-    public static final CustomPacketPayload.Type<S2CEntityTargetPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "entity_target"));
+    public static final CustomPacketPayload.Type<S2CSyncEntityTargetPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "entity_target"));
 
-    public static final StreamCodec<ByteBuf, S2CEntityTargetPacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT, S2CEntityTargetPacket::getTargetId,
-            ByteBufCodecs.INT, S2CEntityTargetPacket::getSourceId,
-            S2CEntityTargetPacket::new
+    public static final StreamCodec<ByteBuf, S2CSyncEntityTargetPacket> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT, S2CSyncEntityTargetPacket::getTargetId,
+            ByteBufCodecs.INT, S2CSyncEntityTargetPacket::getSourceId,
+            S2CSyncEntityTargetPacket::new
     );
 
     public void handle(IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             var level = ctx.player().getCommandSenderWorld();
 
-            if (level.getEntity(sourceId) instanceof ITargetableEntity source && level.getEntity(targetId) instanceof LivingEntity target)
-                source.setTargetPos(target);
+            if (level.getEntity(this.sourceId) instanceof ITargetableEntity source && level.getEntity(this.targetId) instanceof LivingEntity target)
+                source.setTarget(target);
         });
     }
 

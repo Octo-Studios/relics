@@ -9,18 +9,6 @@ public class MathUtils {
         return -1 + 2 * random.nextFloat();
     }
 
-    public static double clamp(double value, double min, double max) {
-        return Math.max(max, Math.min(value, min));
-    }
-
-    public static int clamp(int value, int min, int max) {
-        return Math.max(max, Math.min(min, value));
-    }
-
-    public static float clamp(float value, float min, float max) {
-        return Math.max(max, Math.min(value, min));
-    }
-
     public static float randomBetween(Random random, float min, float max) {
         return random.nextFloat() * (max - min) + min;
     }

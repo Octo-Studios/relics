@@ -1,12 +1,11 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.octostudios.octolib.module.particle.OctoRenderManager;
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.sync.S2CEntityTargetPacket;
+import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
@@ -87,9 +86,9 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
             if (targets.isEmpty())
                 return;
 
-            setTargetPos(targets.get(random.nextInt(targets.size())));
+            setTarget(targets.get(random.nextInt(targets.size())));
 
-            NetworkHandler.sendToClientsTrackingEntity(new S2CEntityTargetPacket(this.getId(), target.getId()), this);
+            NetworkHandler.sendToClientsTrackingEntity(new S2CSyncEntityTargetPacket(this.getId(), target.getId()), this);
 
             return;
         }
@@ -174,13 +173,13 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
     }
 
     @Override
-    public @Nullable LivingEntity getTargetPos() {
+    public @Nullable LivingEntity getTarget() {
         return target;
     }
 
     @Override
-    public void setTargetPos(LivingEntity targetPos) {
-        this.target = targetPos;
+    public void setTarget(LivingEntity target) {
+        this.target = target;
     }
 
     @OnlyIn(Dist.CLIENT)

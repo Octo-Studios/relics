@@ -12,6 +12,12 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class RelicsEntities {
     private static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, Reference.MODID);
 
+    public static final DeferredHolder<EntityType<?>, EntityType<ElectricSparkEntity>> ELECTRIC_SPARK = ENTITIES.register("electric_spark", () ->
+            EntityType.Builder.<ElectricSparkEntity>of(ElectricSparkEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build("electric_spark")
+    );
+
     public static final DeferredHolder<EntityType<?>, EntityType<ReflectiveOrbEntity>> REFLECTIVE_ORB = ENTITIES.register("reflective_orb", () ->
             EntityType.Builder.<ReflectiveOrbEntity>of(ReflectiveOrbEntity::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)

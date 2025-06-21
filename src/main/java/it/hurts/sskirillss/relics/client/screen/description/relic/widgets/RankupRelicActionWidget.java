@@ -1,9 +1,12 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import it.hurts.octostudios.octolib.client.particle.GalacticUIParticle;
+import it.hurts.octostudios.octolib.client.particle.UIParticle;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
@@ -33,6 +36,15 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
     public void playDownSound(SoundManager handler) {
         if (!isLocked())
             handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_REROLL.get(), 1F));
+    }
+
+    @Override
+    public void onTick() {
+        super.onTick();
+
+        var uiParticle = new PixelUIParticle(20f, 1, this.getX(), this.getY(), UIParticle.Layer.SCREEN, 1f);
+        uiParticle.setScreen(this.getScreen());
+        uiParticle.instantiate();
     }
 
     @Override
