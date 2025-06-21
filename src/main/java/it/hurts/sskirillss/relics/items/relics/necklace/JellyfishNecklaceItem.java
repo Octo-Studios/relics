@@ -281,7 +281,7 @@ public class JellyfishNecklaceItem extends RelicItem {
 
         var entity = slotContext.entity();
 
-        EntityUtils.removeAttribute(entity, stack, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        EntityUtils.removeAttribute(entity, stack, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE);
         EntityUtils.removeAttribute(entity, stack, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
