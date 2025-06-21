@@ -9,6 +9,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -275,6 +277,24 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
     }
 
     @Override
+    public boolean hurt(DamageSource source, float amount) {
+        if (this.level().isClientSide())
+            return false;
+
+        var owner = this.getOwner();
+        var attacker = source.getEntity();
+
+        if (owner != null && attacker != null && owner.getStringUUID().equals(attacker.getStringUUID()))
+            return false;
+
+        this.playSound(SoundEvents.SHULKER_BULLET_HURT, 1F, 1F);
+
+        this.discard();
+
+        return true;
+    }
+
+    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DAMAGE, 1F);
         builder.define(TARGETED, false);
@@ -307,6 +327,16 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
         compound.putInt("piercings", this.getPiercings());
         compound.putInt("bounces", this.getBounces());
         compound.putFloat("stun", this.getStun());
+    }
+
+    @Override
+    public boolean isPickable() {
+        return true;
+    }
+
+    @Override
+    public boolean isOnFire() {
+        return false;
     }
 
     @Override

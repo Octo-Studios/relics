@@ -43,7 +43,7 @@ public class ReflectiveOrbRenderer extends EntityRenderer<ReflectiveOrbEntity> {
 
         poseStack.pushPose();
 
-        poseStack.translate(0, 0.125, 0);
+        poseStack.translate(0, 0.2, 0);
 
         var dx = velocity.x;
         var dy = velocity.y;

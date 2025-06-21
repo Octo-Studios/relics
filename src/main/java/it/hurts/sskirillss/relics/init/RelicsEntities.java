@@ -20,7 +20,7 @@ public class RelicsEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<ReflectiveOrbEntity>> REFLECTIVE_ORB = ENTITIES.register("reflective_orb", () ->
             EntityType.Builder.<ReflectiveOrbEntity>of(ReflectiveOrbEntity::new, MobCategory.MISC)
-                    .sized(0.25F, 0.25F)
+                    .sized(0.4F, 0.4F)
                     .build("reflective_orb")
     );
 
