@@ -230,9 +230,8 @@ public class JellyfishNecklaceItem extends RelicItem {
             }
 
             Predicate<LivingEntity> predicate = entry -> !entry.getStringUUID().equals(entity.getStringUUID());
-            var collisions = level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox(), predicate);
 
-            if (!collisions.isEmpty()) {
+            if (!level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox(), predicate).isEmpty()) {
                 var radius = this.getStatValue(entity, stack, "shock", "radius");
 
                 for (var target : level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(radius), predicate)) {
