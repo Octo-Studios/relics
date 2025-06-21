@@ -122,7 +122,7 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public int getCooldown(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_COOLDOWN.get(), 0);
+        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_COOLDOWN, 0);
     }
 
     public void setCooldown(ItemStack stack, int cooldown) {
@@ -134,7 +134,7 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public int getDuration(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_DURATION.get(), 0);
+        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_DURATION, 0);
     }
 
     public void setDuration(ItemStack stack, int duration) {
