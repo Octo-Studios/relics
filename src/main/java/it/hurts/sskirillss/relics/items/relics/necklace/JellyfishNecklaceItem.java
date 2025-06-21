@@ -122,7 +122,7 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public int getCooldown(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_COOLDOWN.get(), 0);
+        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_COOLDOWN, 0);
     }
 
     public void setCooldown(ItemStack stack, int cooldown) {
@@ -134,7 +134,7 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public int getDuration(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_DURATION.get(), 0);
+        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_DURATION, 0);
     }
 
     public void setDuration(ItemStack stack, int duration) {
@@ -230,9 +230,8 @@ public class JellyfishNecklaceItem extends RelicItem {
             }
 
             Predicate<LivingEntity> predicate = entry -> !entry.getStringUUID().equals(entity.getStringUUID());
-            var collisions = level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox(), predicate);
 
-            if (!collisions.isEmpty()) {
+            if (!level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox(), predicate).isEmpty()) {
                 var radius = this.getStatValue(entity, stack, "shock", "radius");
 
                 for (var target : level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(radius), predicate)) {
@@ -283,7 +282,7 @@ public class JellyfishNecklaceItem extends RelicItem {
 
         var entity = slotContext.entity();
 
-        EntityUtils.removeAttribute(entity, stack, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        EntityUtils.removeAttribute(entity, stack, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE);
         EntityUtils.removeAttribute(entity, stack, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
