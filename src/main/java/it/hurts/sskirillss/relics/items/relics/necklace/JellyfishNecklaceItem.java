@@ -77,15 +77,15 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("bounces")
-                                        .initialValue(1D, 3D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
-                                        .build())
                                 .stat(StatTemplate.builder("distance")
                                         .initialValue(2.5D, 5D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.05D)
                                         .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("bounces")
+                                        .initialValue(1D, 3D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.5D, 2.5D)
@@ -244,7 +244,7 @@ public class JellyfishNecklaceItem extends RelicItem {
 
                     var spark = new ElectricSparkEntity(RelicsEntities.ELECTRIC_SPARK.get(), level);
 
-                    spark.setDamageModifier(this.isAbilityRankModifierUnlocked(entity, stack, "shock", "conductor") ? (float) this.getStatValue(entity, stack, "shock", "damage") : 0F);
+                    spark.setDamageModifier(this.isAbilityRankModifierUnlocked(entity, stack, "shock", "conductor") ? (float) this.getStatValue(entity, stack, "shock", "damage_modifier") : 0F);
                     spark.setDistance((float) this.getStatValue(entity, stack, "shock", "distance"));
                     spark.setBounces((int) this.getStatValue(entity, stack, "shock", "bounces"));
                     spark.setDamage((float) this.getStatValue(entity, stack, "shock", "damage"));
