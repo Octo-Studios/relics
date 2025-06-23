@@ -2,6 +2,8 @@ package it.hurts.sskirillss.relics.client.screen.description.ability;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
@@ -9,10 +11,8 @@ import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.AbilityBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
-import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.AbilityDescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
@@ -50,6 +50,10 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
     @Getter
     @Setter
+    private String selectedAbility;
+
+    @Getter
+    @Setter
     private DescriptionPage page = DescriptionPage.DESCRIPTION;
 
     @Getter
@@ -67,26 +71,18 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
                     .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
                     .toList();
 
-            setPageOld(abilities.indexOf(getSelectedAbility()) / 5);
+            this.setPageOld(abilities.indexOf(getSelectedAbility()) / 5);
         }
-    }
-
-    public String getSelectedAbility() {
-        return DescriptionCache.getSelectedAbility(Minecraft.getInstance().player, stack);
-    }
-
-    public void setSelectedAbility(String ability) {
-        DescriptionCache.setSelectedAbility(Minecraft.getInstance().player, stack, ability);
     }
 
     @Override
     protected void init() {
         super.init();
 
+        System.out.println(slot + " " + container);
+
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
-
-        this.updateCache(relic);
 
         this.addRenderableWidget(new PageWidget(x + 242, y + 35, this, DescriptionPage.DESCRIPTION));
         this.addRenderableWidget(new PageWidget(x + 261, y + 35, this, DescriptionPage.STATISTIC));
@@ -262,7 +258,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
     }
 
     @Override
-    public DescriptionTab getTab() {
-        return DescriptionTab.ABILITY;
+    public DescriptionCategory getCategory() {
+        return DescriptionCategories.getCategory("ability");
     }
 }

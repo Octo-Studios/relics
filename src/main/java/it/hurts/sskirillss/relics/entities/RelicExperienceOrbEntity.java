@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.sskirillss.relics.init.RegistryRegistry;
+import it.hurts.sskirillss.relics.init.RelicsRegistries;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
 import net.minecraft.core.BlockPos;
@@ -49,7 +49,7 @@ public class RelicExperienceOrbEntity extends Entity {
     private List<ItemStack> getUpgradeableRelics(Player player) {
         List<ItemStack> relics = new ArrayList<>();
 
-        for (RelicContainer source : RegistryRegistry.RELIC_CONTAINER_REGISTRY.entrySet().stream().map(Map.Entry::getValue).toList())
+        for (RelicContainer source : RelicsRegistries.RELIC_CONTAINER_REGISTRY.entrySet().stream().map(Map.Entry::getValue).toList())
             relics.addAll(source.gatherRelics().apply(player).stream().filter(entry -> !((IRelicItem) entry.getItem()).isRelicMaxLevel(player, entry)).toList());
 
         return relics;

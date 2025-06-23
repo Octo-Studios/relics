@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.config.data;
 import it.hurts.octostudios.octolib.module.config.annotation.Prop;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
-import it.hurts.sskirillss.relics.init.RegistryRegistry;
+import it.hurts.sskirillss.relics.init.RelicsRegistries;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,7 +32,7 @@ public class StatConfigData {
         return relic.getDefaultStatTemplate(ability, stat).toBuilder()
                 .initialValue(minInitialValue, maxInitialValue)
                 .thresholdValue(minThresholdValue, maxThresholdValue)
-                .upgradeModifier(RegistryRegistry.SCALING_MODEL_REGISTRY.get(ResourceLocation.parse(upgradeOperation)), upgradeModifier)
+                .upgradeModifier(RelicsRegistries.SCALING_MODEL_REGISTRY.get(ResourceLocation.parse(upgradeOperation)), upgradeModifier)
                 .build();
     }
 }

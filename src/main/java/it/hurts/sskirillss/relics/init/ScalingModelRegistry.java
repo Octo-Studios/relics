@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 public class ScalingModelRegistry {
-    public static final DeferredRegister<ScalingModel> UPGRADE_OPERATIONS = DeferredRegister.create(RegistryRegistry.SCALING_MODEL_REGISTRY, Reference.MODID);
+    public static final DeferredRegister<ScalingModel> UPGRADE_OPERATIONS = DeferredRegister.create(RelicsRegistries.SCALING_MODEL_REGISTRY, Reference.MODID);
 
     /**
      * Adds a constant value per upgrade point: value + (modifier * points). Growth is linear and consistent across all levels. Best for simple, predictable upgrades that scale evenly.

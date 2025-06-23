@@ -13,7 +13,7 @@ import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegistryBuilder;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
-public class RegistryRegistry {
+public class RelicsRegistries {
     public static final ResourceKey<Registry<RelicContainer>> RELIC_CONTAINER_REGISTRY_KEY = ResourceKey.createRegistryKey(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "relic_containers"));
     public static final Registry<RelicContainer> RELIC_CONTAINER_REGISTRY = new RegistryBuilder<>(RELIC_CONTAINER_REGISTRY_KEY).create();
 

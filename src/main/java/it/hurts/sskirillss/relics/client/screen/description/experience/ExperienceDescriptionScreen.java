@@ -4,6 +4,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.ExperienceSourcePageWidget;
@@ -12,8 +14,6 @@ import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.B
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ExperienceGemWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.ResetExperienceActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.widgets.UpgradeExperienceActionWidget;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
-import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionCache;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
@@ -51,6 +51,10 @@ public class ExperienceDescriptionScreen extends DescriptionScreen implements IT
     @Setter
     private int page;
 
+    @Getter
+    @Setter
+    private String selectedSource;
+
     public UpgradeExperienceActionWidget upgradeButton;
     public ResetExperienceActionWidget resetButton;
 
@@ -66,14 +70,6 @@ public class ExperienceDescriptionScreen extends DescriptionScreen implements IT
         }
     }
 
-    public String getSelectedSource() {
-        return DescriptionCache.getSelectedExperienceSource(Minecraft.getInstance().player, stack);
-    }
-
-    public void setSelectedSource(String source) {
-        DescriptionCache.setSelectedExperienceSource(Minecraft.getInstance().player, stack, source);
-    }
-
     @Override
     protected void init() {
         super.init();
@@ -86,8 +82,6 @@ public class ExperienceDescriptionScreen extends DescriptionScreen implements IT
 
         if (relic.getLevelingSourceTemplate(player, stack, source) == null)
             return;
-
-        updateCache(relic);
 
         var sources = relic.getLevelingSourcesTemplate(player, stack).getSources().keySet().stream()
                 .filter(entry -> relic.isLevelingSourceEnabled(player, stack, entry))
@@ -369,7 +363,7 @@ public class ExperienceDescriptionScreen extends DescriptionScreen implements IT
     }
 
     @Override
-    public DescriptionTab getTab() {
-        return DescriptionTab.SYNERGY;
+    public DescriptionCategory getCategory() {
+        return DescriptionCategories.getCategory("synergy");
     }
 }

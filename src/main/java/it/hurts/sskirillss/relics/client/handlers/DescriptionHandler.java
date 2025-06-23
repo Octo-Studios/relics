@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.handlers;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import net.minecraft.ChatFormatting;
@@ -95,7 +96,7 @@ public class DescriptionHandler {
         ticksCount++;
 
         if (ticksCountOld >= REQUIRED_TIME) {
-            DescriptionUtils.openCachedScreen(relic, player, id, screen);
+            Minecraft.getInstance().setScreen(new RelicDescriptionScreen(player, player.containerMenu.containerId, id, screen));
 
             ticksCount = 0;
             ticksCountOld = 0;

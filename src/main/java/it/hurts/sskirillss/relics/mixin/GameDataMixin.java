@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.mixin;
 
-import it.hurts.sskirillss.relics.init.RegistryRegistry;
+import it.hurts.sskirillss.relics.init.RelicsRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.GameData;
 import org.spongepowered.asm.mixin.Mixin;
@@ -17,9 +17,9 @@ public class GameDataMixin {
     private static void onGetRegistrationOrder(CallbackInfoReturnable<Set<ResourceLocation>> cir) {
         Set<ResourceLocation> order = new LinkedHashSet<>();
 
-        order.add(RegistryRegistry.SCALING_MODEL_REGISTRY_KEY.location());
-        order.add(RegistryRegistry.RELIC_CONTAINER_REGISTRY_KEY.location());
-        order.add(RegistryRegistry.BADGE_REGISTRY_KEY.location());
+        order.add(RelicsRegistries.SCALING_MODEL_REGISTRY_KEY.location());
+        order.add(RelicsRegistries.RELIC_CONTAINER_REGISTRY_KEY.location());
+        order.add(RelicsRegistries.BADGE_REGISTRY_KEY.location());
 
         order.addAll(cir.getReturnValue());
 

@@ -10,7 +10,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 public class RelicContainerRegistry {
-    public static final DeferredRegister<RelicContainer> RELIC_CONTAINERS = DeferredRegister.create(RegistryRegistry.RELIC_CONTAINER_REGISTRY, Reference.MODID);
+    public static final DeferredRegister<RelicContainer> RELIC_CONTAINERS = DeferredRegister.create(RelicsRegistries.RELIC_CONTAINER_REGISTRY, Reference.MODID);
 
     public static final Supplier<RelicContainer> CURIOS = RELIC_CONTAINERS.register("curios", CuriosRelicContainer::new);
     public static final Supplier<RelicContainer> INVENTORY = RELIC_CONTAINERS.register("inventory", InventoryRelicContainer::new);

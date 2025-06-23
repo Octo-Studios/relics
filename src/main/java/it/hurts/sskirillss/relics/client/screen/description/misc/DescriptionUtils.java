@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.misc;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
@@ -82,24 +83,11 @@ public class DescriptionUtils {
         if (!player.containerMenu.isValidSlotIndex(slot))
             return ItemStack.EMPTY;
 
-        ItemStack stack = player.containerMenu.getSlot(slot).getItem();
+        var stack = player.containerMenu.getSlot(slot).getItem();
 
         if (!(stack.getItem() instanceof IRelicItem))
             return ItemStack.EMPTY;
 
         return stack;
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public static void openCachedScreen(IRelicItem relic, Player player, int slot, Screen screen) {
-        Screen descriptionScreen;
-
-        switch (DescriptionCache.getEntry(relic).getSelectedPage()) {
-            case ABILITY -> descriptionScreen = new AbilityDescriptionScreen(player, player.containerMenu.containerId, slot, screen);
-            case SYNERGY -> descriptionScreen = new ExperienceDescriptionScreen(player, player.containerMenu.containerId, slot, screen);
-            default -> descriptionScreen = new RelicDescriptionScreen(player, player.containerMenu.containerId, slot, screen);
-        }
-
-        Minecraft.getInstance().setScreen(descriptionScreen);
     }
 }

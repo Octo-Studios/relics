@@ -1,16 +1,14 @@
 package it.hurts.sskirillss.relics.client.screen.description.base;
 
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.LogoWidget;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.PlayerExperiencePlateWidget;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.PointsPlateWidget;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RankPlateWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BookmarkWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.TabWidget;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
@@ -24,6 +22,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+
+import java.util.Comparator;
 
 // TODO: Get rid of IRelicScreenProvider, use DescriptionScreen instead
 @OnlyIn(Dist.CLIENT)
@@ -92,23 +92,17 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider, I
     }
 
     protected void initTabs() {
-        var player = this.minecraft.player;
-        var stack = this.getStack();
-        var relic = ((IRelicItem) stack.getItem());
+        var player = minecraft.player;
 
-        int xOff = 19;
+        int xOff = 0;
 
-        this.addRenderableWidget(new TabWidget(x + 81, y + 134, this, DescriptionTab.RELIC, new RelicDescriptionScreen(player, this.container, this.slot, this.screen)));
-
-        if (!relic.getAbilitiesTemplate(player, stack).getAbilities().isEmpty()) {
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 134, this, DescriptionTab.ABILITY, new AbilityDescriptionScreen(player, this.container, this.slot, this.screen)));
+        for (var category : DescriptionCategories.getCategories().values().stream()
+                .filter(category -> category.shouldAppear(player, stack))
+                .sorted(Comparator.comparingInt(category -> category.getOrder(player, stack))).toList()) {
+            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 134, this, category));
 
             xOff += 19;
         }
-
-        // FIXME: Should not be empty, don't blame me
-        if (relic.getAbilitiesTemplate(player, stack).getSynergies().isEmpty())
-            this.addRenderableWidget(new TabWidget(x + 81 + xOff, y + 134, this, DescriptionTab.SYNERGY, new ExperienceDescriptionScreen(player, this.container, this.slot, this.screen)));
     }
 
     protected void renderSpaceBackground(GuiGraphics guiGraphics) {

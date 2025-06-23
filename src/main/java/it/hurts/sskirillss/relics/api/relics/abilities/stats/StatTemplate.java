@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.api.relics.abilities.stats;
 
 import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.config.data.StatConfigData;
-import it.hurts.sskirillss.relics.init.RegistryRegistry;
+import it.hurts.sskirillss.relics.init.RelicsRegistries;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -30,7 +30,7 @@ public class StatTemplate {
     }
 
     public StatConfigData toConfigData() {
-        return new StatConfigData(initialValue.getKey(), initialValue.getValue(), thresholdValue.getKey(), thresholdValue.getValue(), RegistryRegistry.SCALING_MODEL_REGISTRY.getKey(upgradeModifier.getKey()).toString(), upgradeModifier.getValue());
+        return new StatConfigData(initialValue.getKey(), initialValue.getValue(), thresholdValue.getKey(), thresholdValue.getValue(), RelicsRegistries.SCALING_MODEL_REGISTRY.getKey(upgradeModifier.getKey()).toString(), upgradeModifier.getValue());
     }
 
     public static class StatTemplateBuilder {

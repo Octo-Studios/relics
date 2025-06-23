@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.init;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailRegistry;
 import it.hurts.octostudios.octolib.module.particle.trail.TestArrowTrail;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.client.gui.layers.ActiveAbilitiesLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.InfoTileLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.LeafyRingHideLayer;
@@ -13,6 +14,9 @@ import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.ReflectiveNecklaceRenderer;
 import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
 import it.hurts.sskirillss.relics.client.renderer.tiles.ResearchingTableRenderer;
+import it.hurts.sskirillss.relics.description_categories.AbilityDescriptionCategory;
+import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategory;
+import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCategory;
 import it.hurts.sskirillss.relics.entities.*;
 import it.hurts.sskirillss.relics.items.relics.InfiniteHamItem;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
@@ -128,6 +132,10 @@ public class RemoteRegistry {
         EntityTrailRegistry.registerProvider(RelicsEntities.SPORE.get(), SporeEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.DEATH_ESSENCE.get(), DeathEssenceEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.LIFE_ESSENCE.get(), LifeEssenceEntity.TrailProvider::new);
+
+        DescriptionCategories.registerCategory(RelicDescriptionCategory::new);
+        DescriptionCategories.registerCategory(AbilityDescriptionCategory::new);
+        DescriptionCategories.registerCategory(SynergyDescriptionCategory::new);
     }
 
     @SubscribeEvent

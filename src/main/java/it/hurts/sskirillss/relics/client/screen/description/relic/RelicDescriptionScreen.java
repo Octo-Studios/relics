@@ -2,14 +2,14 @@ package it.hurts.sskirillss.relics.client.screen.description.relic;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
 import it.hurts.sskirillss.relics.badges.base.RelicBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.UpgradeAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionTab;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RelicBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.*;
@@ -63,8 +63,6 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
 
         if (this.stack == null || !(this.stack.getItem() instanceof IRelicItem relic))
             return;
-
-        this.updateCache(relic);
 
         this.addRenderableWidget(new PageWidget(x + 242, y + 35, this, DescriptionPage.DESCRIPTION));
         this.addRenderableWidget(new PageWidget(x + 261, y + 35, this, DescriptionPage.STATISTIC));
@@ -243,7 +241,7 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
     }
 
     @Override
-    public DescriptionTab getTab() {
-        return DescriptionTab.RELIC;
+    public DescriptionCategory getCategory() {
+        return DescriptionCategories.getCategory("relic");
     }
 }

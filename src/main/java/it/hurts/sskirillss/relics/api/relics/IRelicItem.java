@@ -10,7 +10,7 @@ import it.hurts.sskirillss.relics.api.relics.events.RelicExperienceChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelingPointsChangeEvent;
 import it.hurts.sskirillss.relics.config.data.RelicConfigData;
-import it.hurts.sskirillss.relics.init.RegistryRegistry;
+import it.hurts.sskirillss.relics.init.RelicsRegistries;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
@@ -522,7 +522,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         if (toSpread <= 0 || entity == null)
             return;
 
-        var relics = RegistryRegistry.RELIC_CONTAINER_REGISTRY.entrySet().stream()
+        var relics = RelicsRegistries.RELIC_CONTAINER_REGISTRY.entrySet().stream()
                 .map(Map.Entry::getValue)
                 .flatMap(source -> source.gatherRelics().apply(entity).stream())
                 .filter(entry -> entry.getItem() instanceof IRelicItem relic && !relic.isRelicMaxLevel(entity, entry) && !stack.equals(entry))
