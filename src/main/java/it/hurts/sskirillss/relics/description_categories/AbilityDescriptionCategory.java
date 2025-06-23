@@ -20,7 +20,7 @@ public class AbilityDescriptionCategory extends DescriptionCategory {
 
     @Override
     public DescriptionScreen getScreen(DescriptionScreen source) {
-        return new AbilityDescriptionScreen(Minecraft.getInstance().player, source.container, source.container, source);
+        return new AbilityDescriptionScreen(Minecraft.getInstance().player, source.container, source.slot, source);
     }
 
     @Override
