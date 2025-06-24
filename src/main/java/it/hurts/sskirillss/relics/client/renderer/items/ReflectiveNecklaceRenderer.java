@@ -37,18 +37,18 @@ public class ReflectiveNecklaceRenderer implements ICurioRenderer {
         model.prepareMobModel(player, limbSwing, limbSwingAmount, partialTicks);
         model.setupAnim(player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 
-        ICurioRenderer.translateIfSneaking(poseStack, player);
-        ICurioRenderer.rotateIfSneaking(poseStack, player);
-
         ICurioRenderer.followBodyRotations(player, model);
+
+        model.bodyPart.translateAndRotate(poseStack);
 
         poseStack.translate(0, 1, 0.015F);
 
         var vertexConsumer = ItemRenderer.getArmorFoilBuffer(buf, RenderType.armorCutoutNoCull(TEXTURE), stack.hasFoil());
 
         var pendant = model.bodyPart.getChild("pendant");
+        var neck = model.bodyPart.getChild("neck");
 
-        model.bodyPart.getChild("neck").render(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+        neck.render(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
 
         var deltaX = Mth.lerp(partialTicks, player.xCloakO, player.xCloak) - Mth.lerp(partialTicks, player.xo, player.getX());
         var deltaY = Mth.lerp(partialTicks, player.yCloakO, player.yCloak) - Mth.lerp(partialTicks, player.yo, player.getY());
@@ -89,9 +89,9 @@ public class ReflectiveNecklaceRenderer implements ICurioRenderer {
         var swingProgress = player.getAttackAnim(partialTicks);
 
         if (swingProgress > 0F) {
-            var swingOffset = Mth.sin(swingProgress * (float) Math.PI) * 0.5F;
+            var swingOffset = Mth.sin(swingProgress * (float) Math.PI) * 0.35F;
 
-            pendant.yRot += swingOffset;
+            pendant.yRot -= swingOffset;
         }
 
         pendant.render(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
