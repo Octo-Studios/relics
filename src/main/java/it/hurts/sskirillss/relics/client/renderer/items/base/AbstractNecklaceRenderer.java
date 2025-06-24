@@ -24,71 +24,105 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
 
     protected AbstractNecklaceRenderer(Supplier<M> modelSupplier, ResourceLocation texture) {
         this.model = modelSupplier.get();
-
         this.texture = texture;
     }
 
     @Override
     @SuppressWarnings("unchecked")
-    public <E extends LivingEntity, EM extends EntityModel<E>> void render(ItemStack stack, SlotContext slotContext, PoseStack poseStack, RenderLayerParent<E, EM> parent, MultiBufferSource buf, int light, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public <E extends LivingEntity, EM extends EntityModel<E>> void render(ItemStack stack, SlotContext slotContext, PoseStack poseStack, RenderLayerParent<E, EM> parent, MultiBufferSource bufferSource, int light, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (!(slotContext.entity() instanceof Player player))
             return;
 
         poseStack.pushPose();
 
-        model.prepareMobModel((T) player, limbSwing, limbSwingAmount, partialTicks);
-        model.setupAnim((T) player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+        this.model.prepareMobModel((T) player, limbSwing, limbSwingAmount, partialTicks);
+        this.model.setupAnim((T) player, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
 
-        ICurioRenderer.followBodyRotations(player, (HumanoidModel<LivingEntity>) model);
+        ICurioRenderer.followBodyRotations(player, (HumanoidModel<LivingEntity>) this.model);
 
-        model.getBodyPart().translateAndRotate(poseStack);
+        this.model.getBodyPart().translateAndRotate(poseStack);
 
-        poseStack.translate(0, 1, 0.015F);
+        poseStack.translate(0.0F, 1.0F, 0.015F);
 
-        var vc = ItemRenderer.getArmorFoilBuffer(buf, RenderType.entityTranslucentCull(texture), stack.hasFoil());
+        var vertexConsumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.entityTranslucentCull(texture), stack.hasFoil());
 
-        var neck = model.getBodyPart().getChild("neck");
-        var pendant = model.getBodyPart().getChild("pendant");
+        this.model.getBodyPart().getChild("neck").render(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
 
-        neck.render(poseStack, vc, light, OverlayTexture.NO_OVERLAY);
+        var deltaX = Mth.lerp(partialTicks, player.xCloakO, player.xCloak) - Mth.lerp(partialTicks, player.xo, player.getX());
+        var deltaY = Mth.lerp(partialTicks, player.yCloakO, player.yCloak) - Mth.lerp(partialTicks, player.yo, player.getY());
+        var deltaZ = Mth.lerp(partialTicks, player.zCloakO, player.zCloak) - Mth.lerp(partialTicks, player.zo, player.getZ());
 
-        var dx = Mth.lerp(partialTicks, player.xCloakO, player.xCloak) - Mth.lerp(partialTicks, player.xo, player.getX());
-        var dy = Mth.lerp(partialTicks, player.yCloakO, player.yCloak) - Mth.lerp(partialTicks, player.yo, player.getY());
-        var dz = Mth.lerp(partialTicks, player.zCloakO, player.zCloak) - Mth.lerp(partialTicks, player.zo, player.getZ());
+        var verticalMotion = Mth.clamp(deltaY * 10F, -6F, 32F);
+        var bodyYaw = Mth.rotLerp(partialTicks, player.yBodyRotO, player.yBodyRot) * ((float) Math.PI / 180F);
 
-        var bodyYaw = Mth.rotLerp(partialTicks, player.yBodyRotO, player.yBodyRot);
-        var sinYaw = Math.sin(bodyYaw * (Math.PI / 180D));
-        var cosYaw = -Math.cos(bodyYaw * (Math.PI / 180D));
+        var sin = (float) Math.sin(bodyYaw);
+        var cos = (float) -Math.cos(bodyYaw);
 
-        var forwardMotion = Mth.clamp((float) (dx * sinYaw + dz * cosYaw) * 100F, -80F, 80F);
-        var verticalMotion = Mth.clamp((float) dy * 10F, -6F, 32F);
-        var sideMotion = Mth.clamp((float) (dx * cosYaw - dz * sinYaw) * 100F, -20F, 20F);
-        var pressMotion = forwardMotion > 0 ? forwardMotion * 0.1F : forwardMotion * 0.3F;
-        var liftMotion = verticalMotion > 0 ? -verticalMotion * 2F : -verticalMotion * 0.05F;
+        var forwardMotion = Mth.clamp((deltaX * sin + deltaZ * cos) * 100F, -80F, 80F);
+        var sideMotion = Mth.clamp((deltaX * cos - deltaZ * sin) * 100F, -20F, 20F);
 
-        var rawDegX = pressMotion + liftMotion;
-        var rawDegY = sideMotion * 0.7F;
-        var nlDegX = Math.signum(rawDegX) * (float) Math.pow(Math.abs(rawDegX), 1.2F);
-        var nlDegY = Math.signum(rawDegY) * (float) Math.pow(Math.abs(rawDegY), 1.2F);
-        var radX = nlDegX * ((float) Math.PI / 180F);
-        var radY = nlDegY * ((float) Math.PI / 180F);
+        var pressTilt = forwardMotion > 0 ? forwardMotion * 0.1F : forwardMotion * 0.3F;
+        var liftTilt = verticalMotion > 0 ? -verticalMotion * 2F : -verticalMotion * 0.05F;
 
-        pendant.xRot = radX;
-        pendant.yRot = radY;
+        var rawX = pressTilt + liftTilt;
+        var rawY = sideMotion * 0.7F;
+
+        var nlX = (float) Math.signum(rawX) * (float) Math.pow(Math.abs(rawX), 1.2F);
+        var nlY = (float) Math.signum(rawY) * (float) Math.pow(Math.abs(rawY), 1.2F);
+
+        var rotX = nlX * ((float) Math.PI / 180F);
+        var rotY = nlY * ((float) Math.PI / 180F);
+
+        var pendant = this.model.getBodyPart().getChild("pendant");
+
+        poseStack.pushPose();
+
+        var px = pendant.x / 16F;
+        var py = pendant.y / 16F;
+        var pz = pendant.z / 16F;
+
+        poseStack.translate(px, py, pz);
+
+        var rawJ = Mth.clamp(verticalMotion * 0.035F, -0.3F, 0.3F);
+        var jelly = (float) (-rawJ * this.getJellyIntensity());
+
+        poseStack.scale(1F - jelly * (jelly < 0 ? 3F : 1), 1F + jelly * 3F, 1F - jelly * (jelly < 0 ? 3F : 1));
+
+        poseStack.translate(-px, -py, -pz);
+
+        var mi = this.getMovementSwingIntensity();
+
+        pendant.xRot = rotX * mi;
+        pendant.yRot = rotY * mi;
         pendant.zRot = 0F;
 
         var t = ageInTicks + partialTicks;
+        var idleI = this.getIdleSwingIntensity();
 
-        pendant.xRot += (Mth.sin(t * 0.1F) + Mth.sin(t * 0.3F)) * 0.02F;
-        pendant.yRot += (Mth.cos(t * 0.1F) + Mth.cos(t * 0.3F)) * 0.02F;
+        pendant.xRot += (Mth.sin(t * 0.1F) + Mth.sin(t * 0.3F)) * idleI;
+        pendant.yRot += (Mth.cos(t * 0.1F) + Mth.cos(t * 0.3F)) * idleI;
 
-        var swing = player.getAttackAnim(partialTicks);
+        var atk = player.getAttackAnim(partialTicks);
 
-        if (swing > 0F)
-            pendant.yRot -= Mth.sin(swing * (float) Math.PI) * 0.35F;
+        if (atk > 0F)
+            pendant.yRot -= Mth.sin(atk * (float) Math.PI) * 0.35F;
 
-        pendant.render(poseStack, vc, light, OverlayTexture.NO_OVERLAY);
+        pendant.render(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
+
+        poseStack.popPose();
+    }
+
+    protected float getJellyIntensity() {
+        return 0F;
+    }
+
+    protected float getMovementSwingIntensity() {
+        return 0.9F;
+    }
+
+    protected float getIdleSwingIntensity() {
+        return 0.05F;
     }
 }

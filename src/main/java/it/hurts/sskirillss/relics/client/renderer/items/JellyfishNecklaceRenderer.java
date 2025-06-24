@@ -13,4 +13,14 @@ public class JellyfishNecklaceRenderer extends AbstractNecklaceRenderer<LivingEn
     public JellyfishNecklaceRenderer() {
         super(() -> new JellyfishNecklaceModel(Minecraft.getInstance().getEntityModels().bakeLayer(JellyfishNecklaceModel.LAYER)), TEXTURE);
     }
+
+    @Override
+    protected float getJellyIntensity() {
+        return 0.5F;
+    }
+
+    @Override
+    protected float getMovementSwingIntensity() {
+        return 0.35F;
+    }
 }
