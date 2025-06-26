@@ -14,7 +14,7 @@ public class RelicDescriptionCategory extends DescriptionCategory {
 
     @Override
     public DescriptionScreen getScreen(DescriptionScreen source) {
-        return new RelicDescriptionScreen(Minecraft.getInstance().player, source.container, source.slot, source);
+        return new RelicDescriptionScreen(Minecraft.getInstance().player, source.container, source.slot, source.screen);
     }
 
     @Override

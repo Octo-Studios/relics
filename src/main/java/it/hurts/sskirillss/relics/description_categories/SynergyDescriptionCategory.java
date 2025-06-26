@@ -20,7 +20,7 @@ public class SynergyDescriptionCategory extends DescriptionCategory {
 
     @Override
     public DescriptionScreen getScreen(DescriptionScreen source) {
-        return new ExperienceDescriptionScreen(Minecraft.getInstance().player, source.container, source.slot, source);
+        return new ExperienceDescriptionScreen(Minecraft.getInstance().player, source.container, source.slot, source.screen);
     }
 
     @Override
