@@ -22,6 +22,8 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 public class AbilityDescriptionContainerWidget extends DescriptionContainerWidget {
+    private static final int VERTICAL_PADDING = 1;
+
     public AbilityDescriptionContainerWidget(int x, int y, AbilityDescriptionScreen screen) {
         super(x, y, screen);
     }
@@ -32,34 +34,40 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         var screen = ((AbilityDescriptionScreen) this.getScreen());
         var stack = screen.getStack();
 
-        var ability = screen.getSelectedAbility();
-
-        if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
+        if (stack == null || !(stack.getItem() instanceof IRelicItem) || player == null)
             return;
-
-        int abilityLevel = relic.getAbilityLevel(player, stack, ability);
 
         var poseStack = guiGraphics.pose();
 
-        GUIScissors.begin(getX(), getY(), getWidth(), getHeight());
+        GUIScissors.begin(this.getX(), this.getY(), this.getWidth(), this.getHeight());
 
         poseStack.pushPose();
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        var data = constructDescriptionData();
-        var layout = layoutJustifiedLines(minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
-        var lineOffset = 10;
+        var data = this.constructDescriptionData();
+        var layout = this.layoutJustifiedLines(this.minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
 
-        var scroll = getScrollbar();
+        var scroll = this.getScrollbar();
 
         if (scroll != null) {
-            var offset = scroll.getScrollPosition(partialTick);
+            var rawLineHeight = this.minecraft.font.lineHeight;
+            var rawSpacing = 1;
+            var localLineOffset = rawLineHeight + rawSpacing;
 
-            poseStack.translate(0, -(offset * ((layout.size() - DescriptionContainerWidget.MAX_LINES) * (lineOffset))), 0);
+            var contentHeightLocal = layout.size() * localLineOffset + 2 * VERTICAL_PADDING;
+
+            var windowHeightLocal = DescriptionContainerWidget.MAX_LINES * localLineOffset;
+
+            var scrollRangeLocal = contentHeightLocal - windowHeightLocal;
+
+            var offset = scroll.getScrollPosition(partialTick);
+            var shiftY = offset * scrollRangeLocal;
+
+            poseStack.translate(0, -(shiftY - VERTICAL_PADDING), 0);
         }
 
-        renderJustifiedDescriptionWithStatBoxes(guiGraphics, (this.getX() + 7) * 2, (this.getY() * 2), 320, minecraft.font, layout);
+        this.renderJustifiedDescriptionWithStatBoxes(guiGraphics, (this.getX() + 7) * 2, (this.getY() * 2), 320, this.minecraft.font, layout);
 
         poseStack.popPose();
 
@@ -297,6 +305,6 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         var data = constructDescriptionData();
         var lines = layoutJustifiedLines(minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
 
-        return (int) (lines.size() * minecraft.font.lineHeight / 2F);
+        return (int) (lines.size() * minecraft.font.lineHeight / 2F + VERTICAL_PADDING);
     }
 }
