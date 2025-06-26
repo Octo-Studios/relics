@@ -84,7 +84,8 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         var player = minecraft.player;
 
-        this.setSelectedAbility(relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream().findFirst().get());
+        if (this.selectedAbility == null)
+            this.setSelectedAbility(relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream().findFirst().get());
 
         this.addRenderableWidget(new PageWidget(x + 242, y + 35, this, DescriptionPage.DESCRIPTION));
         this.addRenderableWidget(new PageWidget(x + 261, y + 35, this, DescriptionPage.STATISTIC));
