@@ -154,7 +154,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
     public List<LayoutLine> layoutJustifiedLines(Font font, List<LineEntry> rawLineEntries, List<MutableComponent> dynamicComponents, int maximumLineWidth) {
         var splitter = font.getSplitter();
         int spaceWidth = (int) Math.ceil(splitter.stringWidth(FormattedText.of(" ", Style.EMPTY)));
-        var placeholderPattern = Pattern.compile("(\\S*%(\\d+)\\$s\\S*)");
+        var placeholderPattern = Pattern.compile("([()%]*%(\\d+)\\$s[()%]*)");
         var result = new ArrayList<LayoutLine>();
 
         for (var entry : rawLineEntries) {
