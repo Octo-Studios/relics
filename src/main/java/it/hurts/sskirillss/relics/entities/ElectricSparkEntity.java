@@ -80,7 +80,9 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
     public List<LivingEntity> locateNearestTargets() {
         return EntityUtils.gatherPotentialTargets(this, LivingEntity.class, this.getDistance())
                 .filter(entity -> (lastTarget == null || !lastTarget.getStringUUID().equals(entity.getStringUUID()))
-                        && (!(this.getOwner() instanceof Player player) || !EntityUtils.isAlliedTo(player, entity)))
+                        && (!(this.getOwner() instanceof Player player) || !EntityUtils.isAlliedTo(player, entity))
+                        && !this.blacklistedTargets.contains(entity.getStringUUID())
+                        && !this.bouncedTargets.contains(entity.getStringUUID()))
                 .collect(Collectors.toList());
     }
 
@@ -92,36 +94,50 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
         var currentTarget = this.getTarget();
         var distance = this.getDistance();
 
-        if (currentTarget != null && (this.position().distanceTo(currentTarget.position()) >= distance || currentTarget.isDeadOrDying()))
-            currentTarget = null;
+        if (currentTarget != null) {
+            if (this.position().distanceTo(currentTarget.position()) >= distance || currentTarget.isDeadOrDying())
+                currentTarget = null;
+        } else if (!level.isClientSide()) {
+            var selectedTarget = (LivingEntity) null;
+            var nearbyTargets = this.locateNearestTargets();
 
-        if (!level.isClientSide()) {
-            LivingEntity potentialTarget = null;
-
-            var candidateEntities = this.locateNearestTargets();
-
-            candidateEntities.removeIf(entity -> this.blacklistedTargets.contains(entity.getStringUUID()));
-
-            var targetEntities = candidateEntities.stream()
-                    .filter(entity -> {
-                        var uuid = entity.getStringUUID();
-
-                        return !this.bouncedTargets.contains(uuid) && !this.blacklistedTargets.contains(uuid);
-                    })
-                    .toList();
-
-            if (!targetEntities.isEmpty())
-                potentialTarget = targetEntities.getFirst();
-            else if (!candidateEntities.isEmpty()) {
+            if (nearbyTargets.isEmpty()) {
                 this.bouncedTargets.clear();
 
-                potentialTarget = candidateEntities.getFirst();
+                nearbyTargets = this.locateNearestTargets();
             }
 
-            if (potentialTarget != null && (currentTarget == null || !currentTarget.getStringUUID().equals(potentialTarget.getStringUUID()))) {
-                this.setTarget(potentialTarget);
+            if (!nearbyTargets.isEmpty()) {
+                var totalWeight = 0.0;
+                var weightList = new ArrayList<Double>();
 
-                currentTarget = potentialTarget;
+                for (var targetCandidate : nearbyTargets) {
+                    var distanceToCandidate = this.position().distanceTo(targetCandidate.position());
+                    var candidateWeight = distance - distanceToCandidate;
+
+                    weightList.add(candidateWeight);
+
+                    totalWeight += candidateWeight;
+                }
+
+                var randomPoint = this.random.nextDouble() * totalWeight;
+                var cumulativeWeight = 0.0;
+
+                for (var i = 0; i < nearbyTargets.size(); i++) {
+                    cumulativeWeight += weightList.get(i);
+
+                    if (randomPoint <= cumulativeWeight) {
+                        selectedTarget = nearbyTargets.get(i);
+
+                        break;
+                    }
+                }
+            }
+
+            if (selectedTarget != null) {
+                this.setTarget(selectedTarget);
+
+                currentTarget = selectedTarget;
             }
         }
 
@@ -137,7 +153,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
             var damage = this.getDamage();
 
-            if (currentTarget.hurt(level.damageSources().thrown(this, this.getOwner()), damage + (currentTarget.isInLiquid() ? (damage * this.getDamageModifier()) : 0F))) {
+            if (currentTarget.hurt(level.damageSources().thrown(this, this.getOwner()), damage + (currentTarget.isInLiquid() ? damage * this.getDamageModifier() : 0F))) {
                 this.bouncedTargets.add(currentTarget.getStringUUID());
                 this.lastTarget = currentTarget;
 
@@ -148,9 +164,8 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
                 this.setTarget(null);
             }
-        } else {
+        } else
             this.setDeltaMovement(currentTarget.getEyePosition().subtract(this.getEyePosition()).normalize().scale(1.75F));
-        }
     }
 
     @Override
