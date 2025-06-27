@@ -16,6 +16,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -27,9 +28,9 @@ import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class JellyfishNecklaceItem extends RelicItem {
     public static final int MAX_RINGS = 5;
@@ -134,6 +135,30 @@ public class JellyfishNecklaceItem extends RelicItem {
         this.setCooldown(stack, this.getCooldown(stack) + cooldown);
     }
 
+    public List<String> getDamagedEntities(ItemStack stack) {
+        return new ArrayList<>(stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_TARGETS, new ArrayList<>()));
+    }
+
+    public void setDamagedEntities(ItemStack stack, List<String> targets) {
+        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_TARGETS, targets);
+    }
+
+    public void addDamagedEntities(ItemStack stack, String... targets) {
+        var list = this.getDamagedEntities(stack);
+
+        list.addAll(Lists.newArrayList(targets));
+
+        this.setDamagedEntities(stack, list);
+    }
+
+    public void removeDamagedEntities(ItemStack stack, String... targets) {
+        var list = this.getDamagedEntities(stack);
+
+        list.removeAll(Lists.newArrayList(targets));
+
+        this.setDamagedEntities(stack, list);
+    }
+
     public int getDuration(ItemStack stack) {
         return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_DURATION, 0);
     }
@@ -158,28 +183,28 @@ public class JellyfishNecklaceItem extends RelicItem {
         this.setRings(stack, this.getRings(stack) + rings);
     }
 
-    public List<String> getTargets(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_TARGETS, new ArrayList<>());
+    public List<String> getAffectedEntities(ItemStack stack) {
+        return new ArrayList<>(stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_TARGETS, new ArrayList<>()));
     }
 
-    public void setTargets(ItemStack stack, List<String> targets) {
+    public void setAffectedEntities(ItemStack stack, List<String> targets) {
         stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_TARGETS, targets);
     }
 
-    public void addTargets(ItemStack stack, String... targets) {
-        var list = this.getTargets(stack);
+    public void addAffectedEntities(ItemStack stack, String... targets) {
+        var list = this.getAffectedEntities(stack);
 
         list.addAll(Lists.newArrayList(targets));
 
-        this.setTargets(stack, list);
+        this.setAffectedEntities(stack, list);
     }
 
-    public void removeTargets(ItemStack stack, String... targets) {
-        var list = this.getTargets(stack);
+    public void removeAffectedEntities(ItemStack stack, String... targets) {
+        var list = this.getAffectedEntities(stack);
 
         list.removeAll(Lists.newArrayList(targets));
 
-        this.setTargets(stack, list);
+        this.setAffectedEntities(stack, list);
     }
 
     @Override
@@ -230,9 +255,17 @@ public class JellyfishNecklaceItem extends RelicItem {
                 }
             }
 
-            Predicate<LivingEntity> predicate = entry -> !entry.getStringUUID().equals(entity.getStringUUID());
+            var affectedEntities = this.getAffectedEntities(stack);
 
-            if (!level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox(), predicate).isEmpty()) {
+            Predicate<LivingEntity> predicate = entry -> {
+                var uuid = entry.getStringUUID();
+
+                return !uuid.equals(entity.getStringUUID()) && !affectedEntities.contains(uuid);
+            };
+
+            var collidedEntities = level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox(), predicate);
+
+            if (rings > 0 && !collidedEntities.isEmpty()) {
                 var radius = this.getStatValue(entity, stack, "shock", "radius");
 
                 for (var target : level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(radius), predicate)) {
@@ -253,6 +286,8 @@ public class JellyfishNecklaceItem extends RelicItem {
                     spark.setOwner(entity);
 
                     level.addFreshEntity(spark);
+
+                    this.addAffectedEntities(stack, target.getStringUUID());
                 }
 
                 this.addRings(stack, -1);
@@ -264,13 +299,20 @@ public class JellyfishNecklaceItem extends RelicItem {
                 }
             }
 
+            if (!affectedEntities.isEmpty())
+                this.removeAffectedEntities(stack, affectedEntities.stream()
+                        .filter(Predicate.not(collidedEntities.stream()
+                                .map(Entity::getStringUUID)
+                                .collect(Collectors.toSet())::contains))
+                        .toArray(String[]::new));
+
             if (this.isAbilityRankModifierUnlocked(entity, stack, "shock", "charge")) {
                 var duration = this.getDuration(stack);
 
                 if (duration > 0)
                     this.addDuration(stack, -1);
                 else
-                    this.setTargets(stack, new ArrayList<>());
+                    this.setDamagedEntities(stack, new ArrayList<>());
             }
         }
     }
@@ -323,14 +365,14 @@ public class JellyfishNecklaceItem extends RelicItem {
                 if (duration <= 0)
                     continue;
 
-                var targets = relic.getTargets(stack);
+                var targets = relic.getDamagedEntities(stack);
                 var target = event.getEntity();
                 var uuid = target.getStringUUID();
 
                 if (!targets.contains(uuid)) {
                     target.addEffect(new MobEffectInstance(EffectRegistry.PARALYSIS, (int) (relic.getStatValue(entity, stack, "shock", "paralysis") * 20), 0, false, false));
 
-                    relic.addTargets(stack, uuid);
+                    relic.addDamagedEntities(stack, uuid);
                 }
             }
         }
