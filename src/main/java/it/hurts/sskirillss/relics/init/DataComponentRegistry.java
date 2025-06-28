@@ -6,9 +6,7 @@ import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.WorldPosition;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -18,7 +16,6 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.List;
-import java.util.function.Supplier;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class DataComponentRegistry {
@@ -122,7 +119,8 @@ public class DataComponentRegistry {
                     .build()
     );
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_TARGETS = DataComponentRegistry.construct("jellyfish_necklace/targets", Codec.list(Codec.STRING));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_AFFECTED_ENTITIES = DataComponentRegistry.construct("jellyfish_necklace/affected_entities", Codec.list(Codec.STRING));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_DAMAGED_ENTITIES = DataComponentRegistry.construct("jellyfish_necklace/damaged_entities", Codec.list(Codec.STRING));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_COOLDOWN = DataComponentRegistry.construct("jellyfish_necklace/cooldown", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_DURATION = DataComponentRegistry.construct("jellyfish_necklace/duration", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_RINGS = DataComponentRegistry.construct("jellyfish_necklace/rings", Codec.INT);

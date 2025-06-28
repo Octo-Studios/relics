@@ -33,7 +33,6 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class JellyfishNecklaceItem extends RelicItem {
-    public static final int MAX_RINGS = 5;
 
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
@@ -62,6 +61,12 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .thresholdValue(0, Double.MAX_VALUE)
                                         .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), -5.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("rings")
+                                        .initialValue(1D, 2D)
+                                        .thresholdValue(0, Double.MAX_VALUE)
+                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 0.33D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("radius")
                                         .initialValue(0.25D, 0.5D)
@@ -99,9 +104,9 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("duration")
-                                        .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .initialValue(1D, 2.5D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.15D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
                         .build())
@@ -136,11 +141,11 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public List<String> getDamagedEntities(ItemStack stack) {
-        return new ArrayList<>(stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_TARGETS, new ArrayList<>()));
+        return new ArrayList<>(stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_DAMAGED_ENTITIES, new ArrayList<>()));
     }
 
     public void setDamagedEntities(ItemStack stack, List<String> targets) {
-        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_TARGETS, targets);
+        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_DAMAGED_ENTITIES, targets);
     }
 
     public void addDamagedEntities(ItemStack stack, String... targets) {
@@ -184,11 +189,11 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public List<String> getAffectedEntities(ItemStack stack) {
-        return new ArrayList<>(stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_TARGETS, new ArrayList<>()));
+        return new ArrayList<>(stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_AFFECTED_ENTITIES, new ArrayList<>()));
     }
 
     public void setAffectedEntities(ItemStack stack, List<String> targets) {
-        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_TARGETS, targets);
+        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_AFFECTED_ENTITIES, targets);
     }
 
     public void addAffectedEntities(ItemStack stack, String... targets) {
@@ -244,7 +249,7 @@ public class JellyfishNecklaceItem extends RelicItem {
             var cooldown = this.getCooldown(stack);
             var rings = this.getRings(stack);
 
-            if (rings < MAX_RINGS) {
+            if (rings < this.getStatValue(entity, stack, "shock", "rings")) {
                 var maxCooldown = (int) this.getStatValue(entity, stack, "shock", "cooldown");
 
                 if (cooldown > 0)
@@ -273,7 +278,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                     var knockback = 0.5D * this.getStatValue(entity, stack, "shock", "knockback");
 
                     target.addEffect(new MobEffectInstance(EffectRegistry.PARALYSIS, (int) (this.getStatValue(entity, stack, "shock", "paralysis") * 20), 0, false, true));
-                    target.setDeltaMovement(diff.normalize().scale(knockback));
+                    target.setDeltaMovement(diff.normalize().multiply(knockback, knockback / 2F, knockback));
 
                     var spark = new ElectricSparkEntity(RelicsEntities.ELECTRIC_SPARK.get(), level);
 
