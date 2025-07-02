@@ -1,8 +1,10 @@
 package it.hurts.sskirillss.relics.client.renderer.items.base;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
@@ -19,12 +21,10 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 import java.util.function.Supplier;
 
 public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends EntityModel<?> & INecklaceModel<T>> implements ICurioRenderer {
-    private final ResourceLocation texture;
     private final M model;
 
-    protected AbstractNecklaceRenderer(Supplier<M> modelSupplier, ResourceLocation texture) {
+    protected AbstractNecklaceRenderer(Supplier<M> modelSupplier) {
         this.model = modelSupplier.get();
-        this.texture = texture;
     }
 
     @Override
@@ -32,6 +32,10 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
     public <E extends LivingEntity, EM extends EntityModel<E>> void render(ItemStack stack, SlotContext slotContext, PoseStack poseStack, RenderLayerParent<E, EM> parent, MultiBufferSource bufferSource, int light, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         if (!(slotContext.entity() instanceof Player player))
             return;
+
+        var relic = (IRelicItem) stack.getItem();
+
+        var isFlawless = relic.isRelicFlawless(player, stack);
 
         poseStack.pushPose();
 
@@ -44,9 +48,9 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
 
         poseStack.translate(0.0F, 1.0F, 0.015F);
 
-        var vertexConsumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.entityTranslucentCull(texture), stack.hasFoil());
+        var vertexConsumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.entityTranslucentCull(isFlawless ? this.getFlawlessTexture(stack, slotContext) : this.getDefaultTexture(stack, slotContext)), stack.hasFoil());
 
-        this.model.getBodyPart().getChild("neck").render(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+        this.model.getBodyPart().getChild("neck").render(poseStack, vertexConsumer, relic.isRelicFlawless(player, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         var deltaX = Mth.lerp(partialTicks, player.xCloakO, player.xCloak) - Mth.lerp(partialTicks, player.xo, player.getX());
         var deltaY = Mth.lerp(partialTicks, player.yCloakO, player.yCloak) - Mth.lerp(partialTicks, player.yo, player.getY());
@@ -107,11 +111,17 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
         if (atk > 0F)
             pendant.yRot -= Mth.sin(atk * (float) Math.PI) * 0.35F;
 
-        pendant.render(poseStack, vertexConsumer, light, OverlayTexture.NO_OVERLAY);
+        pendant.render(poseStack, vertexConsumer, isFlawless ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
 
         poseStack.popPose();
+    }
+
+    public abstract ResourceLocation getDefaultTexture(ItemStack stack, SlotContext slotContext);
+
+    public ResourceLocation getFlawlessTexture(ItemStack stack, SlotContext slotContext) {
+        return ResourceLocation.parse(this.getDefaultTexture(stack, slotContext).toString().replaceFirst("\\.png$", "_flawless.png"));
     }
 
     protected float getJellyIntensity() {

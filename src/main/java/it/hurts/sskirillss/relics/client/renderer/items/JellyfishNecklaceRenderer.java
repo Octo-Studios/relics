@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.renderer.items;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceModel;
 import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceRingModel;
 import it.hurts.sskirillss.relics.client.renderer.items.base.AbstractNecklaceRenderer;
@@ -21,10 +22,8 @@ import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 public class JellyfishNecklaceRenderer extends AbstractNecklaceRenderer<LivingEntity, JellyfishNecklaceModel> {
-    private static final ResourceLocation NECKLACE_TEXTURE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/jellyfish_necklace.png");
-
     public JellyfishNecklaceRenderer() {
-        super(() -> new JellyfishNecklaceModel(Minecraft.getInstance().getEntityModels().bakeLayer(JellyfishNecklaceModel.LAYER)), NECKLACE_TEXTURE);
+        super(() -> new JellyfishNecklaceModel(Minecraft.getInstance().getEntityModels().bakeLayer(JellyfishNecklaceModel.LAYER)));
     }
 
     @Override
@@ -61,10 +60,15 @@ public class JellyfishNecklaceRenderer extends AbstractNecklaceRenderer<LivingEn
 
             poseStack.scale(scale, scale, scale);
 
-            new JellyfishNecklaceRingModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/jellyfish_necklace_arc_" + ((int) (time % 4) + 1) + ".png"))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+            new JellyfishNecklaceRingModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/jellyfish_necklace_arc_" + ((int) (time % 4) + 1) + (relic.isRelicFlawless(entity, stack) ? "_flawless" : "") + ".png"))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
             poseStack.popPose();
         }
+    }
+
+    @Override
+    public ResourceLocation getDefaultTexture(ItemStack stack, SlotContext slotContext) {
+        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/jellyfish_necklace.png");
     }
 
     @Override
