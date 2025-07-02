@@ -30,6 +30,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DISTANCE = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DAMAGE_MODIFIER = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.BOOLEAN);
 
     private Set<String> bouncedTargets = new HashSet<>();
 
@@ -76,6 +77,13 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
         return this.getEntityData().get(DAMAGE_MODIFIER);
     }
 
+    public void setFlawless(boolean flawless) {
+        this.getEntityData().set(FLAWLESS, flawless);
+    }
+
+    public boolean isFlawless() {
+        return this.getEntityData().get(FLAWLESS);
+    }
 
     public List<LivingEntity> locateNearestTargets() {
         return EntityUtils.gatherPotentialTargets(this, LivingEntity.class, this.getDistance())
@@ -174,6 +182,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
         builder.define(DAMAGE, 1F);
         builder.define(DISTANCE, 1F);
         builder.define(DAMAGE_MODIFIER, 0F);
+        builder.define(FLAWLESS, false);
     }
 
     @Override
@@ -184,6 +193,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
         tag.putFloat("damage", this.getDamage());
         tag.putFloat("distance", this.getDistance());
         tag.putFloat("damage_modifier", this.getDamageModifier());
+        tag.putBoolean("flawless", this.isFlawless());
     }
 
     @Override
@@ -194,6 +204,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
         this.setDamage(tag.getFloat("damage"));
         this.setDistance(tag.getFloat("distance"));
         this.setDamageModifier(tag.getFloat("damage_modifier"));
+        this.setFlawless(tag.getBoolean("flawless"));
     }
 
     @Override
@@ -257,12 +268,12 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
         @Override
         public int getTrailFadeInColor() {
-            return 0xFF00FFFF;
+            return entity.isFlawless() ? 0xFFFFFF00 : 0xFF00FFFF;
         }
 
         @Override
         public int getTrailFadeOutColor() {
-            return 0x800000FF;
+            return entity.isFlawless() ? 0x00FF0000 : 0x800000FF;
         }
 
         @Override

@@ -287,6 +287,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                     spark.setBounces((int) this.getStatValue(entity, stack, "shock", "bounces"));
                     spark.setDamage((float) this.getStatValue(entity, stack, "shock", "damage"));
                     spark.setPos(entity.position().add(0F, entity.getBbHeight() / 2F, 0D));
+                    spark.setFlawless(this.isRelicFlawless(entity, stack));
                     spark.setTarget(target);
                     spark.setOwner(entity);
 
