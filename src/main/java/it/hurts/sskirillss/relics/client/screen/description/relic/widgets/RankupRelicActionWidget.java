@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import it.hurts.octostudios.octolib.client.particle.GalacticUIParticle;
 import it.hurts.octostudios.octolib.client.particle.UIParticle;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -17,10 +16,12 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
+import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class RankupRelicActionWidget extends AbstractRelicActionWidget {
     public RankupRelicActionWidget(int x, int y, RelicDescriptionScreen screen) {
@@ -41,10 +42,6 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
     @Override
     public void onTick() {
         super.onTick();
-
-        var uiParticle = new PixelUIParticle(20f, 1, this.getX(), this.getY(), UIParticle.Layer.SCREEN, 1f);
-        uiParticle.setScreen(this.getScreen());
-        uiParticle.instantiate();
     }
 
     @Override

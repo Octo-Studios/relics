@@ -12,10 +12,8 @@ import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScre
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RelicBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
-import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.*;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
 import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -29,20 +27,17 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -107,20 +102,6 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
         super.tick();
 
         stack = DescriptionUtils.gatherRelicStack(minecraft.player, slot);
-
-        LocalPlayer player = minecraft.player;
-
-        if (player == null || stack == null || !(stack.getItem() instanceof IRelicItem))
-            return;
-
-        RandomSource random = player.getRandom();
-
-        if (player.tickCount % 3 == 0) {
-            ParticleStorage.addParticle(this, new ExperienceParticleData(
-                    new Color(140, random.nextInt(50), 255),
-                    x + 73 + random.nextInt(20), y + 73 + random.nextInt(20),
-                    1.5F + (random.nextFloat() * 0.5F), 100 + random.nextInt(50)));
-        }
     }
 
     @Override

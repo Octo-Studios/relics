@@ -3,14 +3,18 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.octostudios.octolib.client.particle.UIParticle;
+import it.hurts.octostudios.octolib.util.OctoColor;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
+import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -25,6 +29,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.RandomSource;
+import org.joml.Vector2f;
 
 import java.awt.*;
 import java.util.List;
@@ -32,9 +37,9 @@ import java.util.List;
 public class RelicExperienceWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     private static final int FILLER_WIDTH = 125;
 
-    private final IRelicScreenProvider screen;
+    private final DescriptionScreen screen;
 
-    public RelicExperienceWidget(int x, int y, IRelicScreenProvider screen) {
+    public RelicExperienceWidget(int x, int y, DescriptionScreen screen) {
         super(x, y, 139, 15);
 
         this.screen = screen;
@@ -42,16 +47,16 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        LocalPlayer player = Minecraft.getInstance().player;
+        var player = Minecraft.getInstance().player;
 
         if (player == null || !(screen.getStack().getItem() instanceof IRelicItem relic))
             return;
 
-        PoseStack poseStack = guiGraphics.pose();
+        var poseStack = guiGraphics.pose();
 
         poseStack.pushPose();
 
-        float color = (float) (1.025F + (Math.sin(player.tickCount * 0.5F) * 0.05F));
+        var color = (float) (1.025F + (Math.sin(player.tickCount * 0.5F) * 0.05F));
 
         GUIRenderer.begin(DescriptionTextures.RELIC_EXPERIENCE_BACKGROUND, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
@@ -78,7 +83,7 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        MutableComponent percentage = Component.literal(relic.isRelicMaxLevel(minecraft.player, screen.getStack()) ? "MAX" : MathUtils.round(calculateFillerPercentage(relic), 1) + "%").withStyle(ChatFormatting.BOLD);
+        var percentage = Component.literal(relic.isRelicMaxLevel(minecraft.player, screen.getStack()) ? "MAX" : MathUtils.round(calculateFillerPercentage(relic), 1) + "%").withStyle(ChatFormatting.BOLD);
 
         guiGraphics.drawString(minecraft.font, percentage, (getX() + 67) * 2 - (minecraft.font.width(percentage) / 2), (getY() + 6) * 2, DescriptionUtils.TEXT_COLOR, false);
 
@@ -87,17 +92,31 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
 
     @Override
     public void onTick() {
-        if (!(screen.getStack().getItem() instanceof IRelicItem relic) || minecraft.player == null)
+        var player = minecraft.player;
+
+        if (!(screen.getStack().getItem() instanceof IRelicItem relic) || player == null)
             return;
 
-        RandomSource random = minecraft.player.getRandom();
+        var random = player.getRandom();
 
-        int fillerWidth = calculateFillerWidth(relic);
+        int fillerWidth = this.calculateFillerWidth(relic);
 
-        if (minecraft.player.tickCount % 5 == 0) {
-            for (float i = 0; i < fillerWidth / 40F; i++) {
-                ParticleStorage.addParticle((Screen) screen, new ExperienceParticleData(new Color(200, 255, 0),
-                        getX() + 5 + random.nextInt(fillerWidth), getY() + random.nextInt(2), 1F + (random.nextFloat() * 0.25F), 50 + random.nextInt(50)));
+        if (player.tickCount % 5 == 0) {
+            for (float i = 0; i < fillerWidth / 30F; i++) {
+                var particle = new PixelUIParticle(0.4f, random.nextInt(20, 40), this.getX() + 5 + random.nextInt(fillerWidth), this.getY() + random.nextInt(2), UIParticle.Layer.SCREEN, 10);
+
+                float size = (random.nextFloat() * 0.5F) + 0.75F;
+
+                particle.setColors(new OctoColor((random.nextFloat() * 0.25F) + 0.75F, random.nextFloat() * 0.25F, 1F, 1F), OctoColor.WHITE, new OctoColor(1F, random.nextFloat() * 0.25F, (random.nextFloat() * 0.5F) + 0.25F, 0F));
+                particle.setDirection(MathUtils.randomFloat(random) * 0.75F, random.nextFloat() * -0.5F);
+                particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
+                particle.getTransform().setSize(new Vector2f(size, size));
+                particle.setGravityDirection(0, -1);
+                particle.setScreen(this.screen);
+                particle.setFriction(0.025F);
+                particle.setGravity(0.02F);
+
+                particle.instantiate();
             }
         }
     }
@@ -107,14 +126,14 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
         if (!(screen.getStack().getItem() instanceof IRelicItem relic))
             return;
 
-        PoseStack poseStack = guiGraphics.pose();
+        var poseStack = guiGraphics.pose();
 
         List<FormattedCharSequence> tooltip = Lists.newArrayList();
 
         int maxWidth = 150;
         int renderWidth = 0;
 
-        int level = relic.getRelicLevel(minecraft.player, screen.getStack());
+        var level = relic.getRelicLevel(minecraft.player, screen.getStack());
 
         var experience = String.valueOf(MathUtils.round(relic.getRelicExperience(minecraft.player, screen.getStack()), 1));
 
@@ -130,7 +149,7 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
             entries.add(Component.translatable("tooltip.relics.researching.general.extra_info"));
 
         for (MutableComponent entry : entries) {
-            int entryWidth = (minecraft.font.width(entry) / 2);
+            var entryWidth = (minecraft.font.width(entry) / 2);
 
             if (entryWidth > renderWidth)
                 renderWidth = Math.min(entryWidth + 2, maxWidth);
@@ -146,7 +165,7 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        int yOff = 0;
+        var yOff = 0;
 
         for (FormattedCharSequence entry : tooltip) {
             guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
@@ -163,7 +182,7 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
     }
 
     private float calculateFillerPercentage(IRelicItem relic) {
-        int level = relic.getRelicLevel(minecraft.player, screen.getStack());
+        var level = relic.getRelicLevel(minecraft.player, screen.getStack());
 
         return (float) (relic.getRelicExperience(minecraft.player, screen.getStack()) / (relic.getTotalRelicExperienceBetweenLevels(minecraft.player, screen.getStack(), level, level + 1) / 100D));
     }

@@ -120,7 +120,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         float scale = 1.75F;
 
-        poseStack.translate(getX() + 10 + 8 * scale, getY() + 31 + Math.sin((player.tickCount + pPartialTick) * 0.1F) * 2F + 8 * scale, 0);
+        poseStack.translate(getX() + 11 + 8 * scale, getY() + 31 + Math.sin((player.tickCount + pPartialTick) * 0.1F) * 2F + 8 * scale, 0);
 
         poseStack.mulPose(Axis.ZP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.05F) * 5F));
         poseStack.mulPose(Axis.YP.rotationDegrees((float) Math.cos((player.tickCount + pPartialTick) * 0.075F) * 25F));
