@@ -4,7 +4,7 @@
         "layer0": "relics:item/jellyfish_necklace"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/jellyfish_necklace_broken" }
+        { "predicate": { "relics:flawless": 1 }, "model": "relics:item/jellyfish_necklace_flawless" }
     ]
 }
 

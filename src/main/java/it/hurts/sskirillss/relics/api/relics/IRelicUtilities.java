@@ -155,14 +155,14 @@ public interface IRelicUtilities {
         if (!(this instanceof IRelicItem relic))
             return false;
 
-        return relic.getRelicQuality(entity, stack) >= relic.getRelicMaxQuality(entity, stack);
+        return relic.calculateRelicQuality(entity, stack) >= relic.getRelicMaxQuality(entity, stack);
     }
 
     default boolean isRelicFlawless(LivingEntity entity, ItemStack stack) {
         if (!(this instanceof IRelicItem relic))
             return false;
 
-        return isRelicMaxLevel(entity, stack) && relic.getAbilitiesTemplate(entity, stack).getAbilities().keySet().stream().filter(ability -> relic.isAbilityEnabled(entity, stack, ability)).allMatch(ability -> isAbilityFlawless(entity, stack, ability));
+        return relic.calculateRelicProgress(entity, stack) >= 1F;
     }
 
     default boolean isAbilityMaxLevel(LivingEntity entity, ItemStack stack, String ability) {
@@ -176,14 +176,6 @@ public interface IRelicUtilities {
         if (!(this instanceof IRelicItem relic))
             return false;
 
-        return relic.getAbilityQuality(entity, stack, ability) >= relic.getAbilityMaxQuality(entity, stack, ability);
+        return relic.calculateAbilityQuality(entity, stack, ability) >= relic.getAbilityMaxQuality(entity, stack, ability);
     }
-
-    default boolean isAbilityFlawless(LivingEntity entity, ItemStack stack, String ability) {
-        if (!(this instanceof IRelicItem relic))
-            return false;
-
-        return relic.isAbilityUnlocked(entity, stack, ability) && isAbilityMaxQuality(entity, stack, ability);
-    }
-
 }

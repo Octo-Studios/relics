@@ -92,7 +92,7 @@ public class PacketAbilityTweak implements CustomPacketPayload {
                     boolean result = false;
 
                     if (withShift)
-                        while (relic.getAbilityQuality(player, stack, ability) != relic.getAbilityMaxQuality(player, stack, ability) && relic.reroll(player, stack, ability))
+                        while (relic.calculateAbilityQuality(player, stack, ability) != relic.getAbilityMaxQuality(player, stack, ability) && relic.reroll(player, stack, ability))
                             result = true;
                     else
                         result = relic.reroll(player, stack, ability);

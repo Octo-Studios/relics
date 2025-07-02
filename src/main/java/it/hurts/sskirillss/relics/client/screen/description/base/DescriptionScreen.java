@@ -3,10 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.base;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.LogoWidget;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.PlayerExperiencePlateWidget;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.PointsPlateWidget;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RankPlateWidget;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
@@ -86,9 +83,10 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider, I
 //        if (relic.isSomethingWrongWithLevelingPoints(minecraft.player, stack))
 //            this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
-        this.addRenderableWidget(new RankPlateWidget(this.x + 313, this.y + 77, this));
-        this.addRenderableWidget(new PointsPlateWidget(this.x + 313, this.y + 102, this));
-        this.addRenderableWidget(new PlayerExperiencePlateWidget(this.x + 313, this.y + 127, this));
+        this.addRenderableWidget(new ProgressPlateWidget(this.x + 313, this.y + 77, this));
+        this.addRenderableWidget(new RankPlateWidget(this.x + 313, this.y + 102, this));
+        this.addRenderableWidget(new PointsPlateWidget(this.x + 313, this.y + 127, this));
+        this.addRenderableWidget(new PlayerExperiencePlateWidget(this.x + 313, this.y + 152, this));
     }
 
     protected void initTabs() {

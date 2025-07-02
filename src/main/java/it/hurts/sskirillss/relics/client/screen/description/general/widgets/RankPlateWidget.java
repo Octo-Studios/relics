@@ -1,14 +1,14 @@
 package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractPlateWidget;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractPlateWidget;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.item.ItemStack;
 
 public class RankPlateWidget extends AbstractPlateWidget {
-    public RankPlateWidget(int x, int y, IRelicScreenProvider provider) {
-        super(x, y, provider, "rank");
+    public RankPlateWidget(int x, int y, DescriptionScreen screen) {
+        super(x, y, screen, "rank");
     }
 
     @Override

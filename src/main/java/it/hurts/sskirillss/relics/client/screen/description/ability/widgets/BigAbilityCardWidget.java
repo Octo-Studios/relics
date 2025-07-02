@@ -84,7 +84,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
             xOff = 0;
 
-            var quality = relic.getAbilityQuality(player, stack, ability);
+            var quality = relic.calculateAbilityQuality(player, stack, ability);
             var isAliquot = quality % 2 == 1;
 
             for (int i = 0; i < Math.floor(quality / 2D); i++) {
@@ -144,7 +144,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         List<MutableComponent> entries = Lists.newArrayList(
                 Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getAbilityLevel(player, stack, ability) + "/" + relic.getAbilityTemplate(player, stack, ability).getMaxLevel()),
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getAbilityQuality(player, stack, ability) / 2F, 1) + "/" + relic.getAbilityMaxQuality(player, stack, ability) / 2),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.calculateAbilityQuality(player, stack, ability) / 2F, 1) + "/" + relic.getAbilityMaxQuality(player, stack, ability) / 2),
                 Component.literal(" ")
         );
 

@@ -2,15 +2,12 @@ package it.hurts.sskirillss.relics.client.tooltip;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.api.events.common.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -99,7 +96,7 @@ public class TooltipBorderHandler {
 
         var xOff = 0;
 
-        for (int i = 1; i < relic.getRelicQuality(player, stack) + 1; i++) {
+        for (int i = 1; i < relic.calculateRelicQuality(player, stack) + 1; i++) {
             var isAliquot = i % 2 == 1;
 
             var color = (float) (1F + Math.sin(player.tickCount * i * 0.05F) * 0.1F);

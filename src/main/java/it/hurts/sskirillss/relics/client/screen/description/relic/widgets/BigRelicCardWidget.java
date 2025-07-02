@@ -95,7 +95,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
             xOff = 0;
 
-            var quality = relic.getRelicQuality(player, stack);
+            var quality = relic.calculateRelicQuality(player, stack);
             var isAliquot = quality % 2 == 1;
 
             for (int i = 0; i < Math.floor(quality / 2D); i++) {
@@ -249,7 +249,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         List<MutableComponent> entries = Lists.newArrayList(
                 Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevel(minecraft.player, stack) + "/" + relic.getLevelingTemplate(minecraft.player, stack).getMaxLevel()),
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getRelicQuality(minecraft.player, stack) / 2F, 1) + "/" + relic.getRelicMaxQuality(minecraft.player, stack) / 2),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.calculateRelicQuality(minecraft.player, stack) / 2F, 1) + "/" + relic.getRelicMaxQuality(minecraft.player, stack) / 2),
                 Component.literal(" ")
         );
 

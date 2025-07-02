@@ -1,7 +1,0 @@
-{
-  "parent": "item/generated",
-    "textures": {
-        "layer0": "relics:item/jellyfish_necklace_broken"
-    }
-}
-

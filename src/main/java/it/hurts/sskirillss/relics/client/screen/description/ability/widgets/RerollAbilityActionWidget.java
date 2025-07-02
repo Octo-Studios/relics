@@ -20,7 +20,6 @@ import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import org.lwjgl.glfw.GLFW;
@@ -44,7 +43,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         var stack = getScreen().getStack();
 
         if (isLocked() || !(stack.getItem() instanceof IRelicItem relic)
-                || (relic.getAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility()) && !Screen.hasShiftDown()))
+                || (relic.calculateAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility()) && !Screen.hasShiftDown()))
             return;
 
         handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_REROLL.get(), 1F));
@@ -68,7 +67,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         var requiredExperience = relic.getUpgradePlayerExperienceCost(player, stack, getAbility());
         var hasExperience = requiredExperience <= currentExperience;
 
-        var quality = relic.getRelicQuality(player, stack);
+        var quality = relic.calculateRelicQuality(player, stack);
         var maxQuality = relic.getRelicMaxQuality(player, stack);
 
         var isMaxQuality = quality >= maxQuality;
@@ -118,7 +117,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         if (isLocked() || !(getScreen().getStack().getItem() instanceof IRelicItem relic))
             return;
 
-        boolean hasWarning = relic.getAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility());
+        boolean hasWarning = relic.calculateAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility());
 
         if (hasWarning && !Screen.hasShiftDown())
             return;
@@ -134,7 +133,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
             return;
 
-        boolean isWarning = relic.getAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility());
+        boolean isWarning = relic.calculateAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility());
         boolean isQuick = Screen.hasShiftDown() && relic.mayPlayerReroll(player, getScreen().getStack(), getAbility());
 
         float color = (isWarning && Screen.hasShiftDown()) || isQuick ? (float) (1.05F + (Math.sin((player.tickCount + (getAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;

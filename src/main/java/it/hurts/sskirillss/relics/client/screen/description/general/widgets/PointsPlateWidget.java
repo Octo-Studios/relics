@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractPlateWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
@@ -17,13 +18,13 @@ import net.minecraft.world.item.ItemStack;
 import java.util.List;
 
 public class PointsPlateWidget extends AbstractPlateWidget {
-    public PointsPlateWidget(int x, int y, IRelicScreenProvider provider) {
-        super(x, y, provider, "leveling_point");
+    public PointsPlateWidget(int x, int y, DescriptionScreen screen) {
+        super(x, y, screen, "leveling_point");
     }
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        ItemStack stack = getProvider().getStack();
+        ItemStack stack = getScreen().getStack();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;

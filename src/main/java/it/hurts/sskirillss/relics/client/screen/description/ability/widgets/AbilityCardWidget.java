@@ -3,7 +3,6 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
@@ -13,7 +12,6 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ChainParticleData;
-import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.SparkParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.research.AbilityResearchScreen;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
@@ -37,7 +35,6 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec2;
 
@@ -260,7 +257,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                 xOff = 0;
 
-                int quality = relic.getAbilityQuality(player, stack, ability);
+                int quality = relic.calculateAbilityQuality(player, stack, ability);
                 boolean isAliquot = quality % 2 == 1;
 
                 for (int i = 0; i < Math.floor(quality / 2D); i++) {

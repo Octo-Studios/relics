@@ -391,19 +391,19 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return 10;
     }
 
-    default int getAbilityQuality(LivingEntity entity, ItemStack stack, String ability) {
-        var stats = getAbilityTemplate(entity, stack, ability).getStats();
+    default int calculateAbilityQuality(LivingEntity entity, ItemStack stack, String ability) {
+        var stats = this.getAbilityTemplate(entity, stack, ability).getStats();
 
         if (stats.isEmpty())
-            return getAbilityMaxQuality(entity, stack, ability);
+            return this.getAbilityMaxQuality(entity, stack, ability);
 
         var avg = stats.keySet().stream()
-                .mapToInt(stat -> getOrCalculateStatQuality(entity, stack, ability, stat))
+                .mapToInt(stat -> this.getOrCalculateStatQuality(entity, stack, ability, stat))
                 .average()
                 .orElse(0);
 
         var min = 0;
-        var max = getAbilityMaxQuality(entity, stack, ability);
+        var max = this.getAbilityMaxQuality(entity, stack, ability);
 
         if (avg == min)
             return min;
@@ -418,15 +418,15 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return 10;
     }
 
-    default int getRelicQuality(LivingEntity entity, ItemStack stack) {
-        var abilities = getAbilitiesTemplate(entity, stack).getAbilities();
+    default int calculateRelicQuality(LivingEntity entity, ItemStack stack) {
+        var abilities = this.getAbilitiesTemplate(entity, stack).getAbilities();
 
         if (abilities.isEmpty())
             return 0;
 
         var filtered = abilities.keySet().stream()
-                .filter(abilityTemplate -> canBeUpgraded(entity, stack, abilityTemplate) && isAbilityUnlocked(entity, stack, abilityTemplate))
-                .mapToInt(abilityTemplate -> getAbilityQuality(entity, stack, abilityTemplate))
+                .filter(abilityTemplate -> this.canBeUpgraded(entity, stack, abilityTemplate) && isAbilityUnlocked(entity, stack, abilityTemplate))
+                .mapToInt(abilityTemplate -> this.calculateAbilityQuality(entity, stack, abilityTemplate))
                 .toArray();
 
         if (filtered.length == 0)
@@ -435,7 +435,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         var avg = Arrays.stream(filtered).average().orElse(0);
 
         var min = 0;
-        var max = getRelicMaxQuality(entity, stack);
+        var max = this.getRelicMaxQuality(entity, stack);
 
         if (avg == min)
             return min;
@@ -444,6 +444,31 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
             return max;
 
         return (int) Mth.clamp(Math.floor(avg), min + 1, max - 1);
+    }
+
+    default double calculateRelicProgress(LivingEntity entity, ItemStack stack) {
+        var unspentPoints = this.getRelicLevelingPoints(entity, stack);
+        var template = this.getLevelingTemplate(entity, stack);
+        var rank = this.getRelicRank(entity, stack);
+        var maxRank = template.getMaxRank();
+        var level = this.getRelicLevel(entity, stack);
+        var maxLevel = template.getMaxLevel();
+        var quality = this.calculateRelicQuality(entity, stack);
+        var maxQuality = this.getRelicMaxQuality(entity, stack);
+
+        var adjustedUnits = Math.max(0.0, Math.min(level - (unspentPoints * 0.5), maxLevel));
+
+        var levelFraction = (maxLevel > 0) ? (adjustedUnits / maxLevel) : 0.0;
+        var totalSegments = Math.max(1, maxRank + 1);
+        var completedSegments = Math.max(0, Math.min(rank, maxRank));
+
+        var baseProgress = (completedSegments + levelFraction) / totalSegments;
+        var qualityRatio = (maxQuality > 0) ? (quality / (double) maxQuality) : 0.0;
+        var maxQualityWeight = 0.2;
+        var qualityContribution = qualityRatio * maxQualityWeight * (1 - baseProgress);
+
+        var progress = baseProgress + qualityContribution;
+        return Math.min(1.0, Math.max(0.0, progress));
     }
 
     default void castActiveAbility(Player player, ItemStack stack, String ability, CastType type, CastStage stage) {
@@ -712,7 +737,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
             // Clamping the value to avoid overflow
             targetQuality = Mth.clamp(weightedRandom, 0, maxQuality);
-        } while (targetQuality == getAbilityQuality(entity, stack, ability));
+        } while (targetQuality == calculateAbilityQuality(entity, stack, ability));
 
         double sumQuality = 0;
 

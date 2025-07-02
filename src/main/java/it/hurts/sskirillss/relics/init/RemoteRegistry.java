@@ -115,6 +115,14 @@ public class RemoteRegistry {
 
                         return mode.equals("full_moon") ? 1 : 0;
                     });
+
+            for (var item : BuiltInRegistries.ITEM.stream().toList()) {
+                if (!(item instanceof IRelicItem relic))
+                    continue;
+
+                ItemProperties.register(item, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "flawless"),
+                        (stack, level, entity, id) -> relic.isRelicFlawless(entity, stack) ? 1 : 0);
+            }
         });
 
         CuriosRendererRegistry.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
