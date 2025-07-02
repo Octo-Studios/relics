@@ -87,7 +87,7 @@ public class IceBreakerItem extends RelicItem {
     }
 
     @Override
-    public void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
+    public void castActiveAbility(Player player, ItemStack stack, String ability, CastType type, CastStage stage) {
         if (ability.equals("impact"))
             stack.set(WORLD_POSITION, new WorldPosition(player));
     }

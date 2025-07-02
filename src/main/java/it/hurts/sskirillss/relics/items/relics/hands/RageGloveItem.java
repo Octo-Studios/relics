@@ -149,7 +149,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
     }
 
     @Override
-    public void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
+    public void castActiveAbility(Player player, ItemStack stack, String ability, CastType type, CastStage stage) {
         Level level = player.getCommandSenderWorld();
         RandomSource random = level.getRandom();
 

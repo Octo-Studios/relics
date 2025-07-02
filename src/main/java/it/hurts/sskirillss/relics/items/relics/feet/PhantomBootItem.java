@@ -98,7 +98,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
     }
 
     @Override
-    public void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
+    public void castActiveAbility(Player player, ItemStack stack, String ability, CastType type, CastStage stage) {
         if (ability.equals("bridge") && stage == CastStage.START && isToggled(stack)) {
             var motion = player.getDeltaMovement();
 

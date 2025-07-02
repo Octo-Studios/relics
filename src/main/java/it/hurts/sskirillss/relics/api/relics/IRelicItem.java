@@ -446,8 +446,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return (int) Mth.clamp(Math.floor(avg), min + 1, max - 1);
     }
 
-    // TODO: Switch places of ItemStack and Player
-    default void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
+    default void castActiveAbility(Player player, ItemStack stack, String ability, CastType type, CastStage stage) {
 
     }
 

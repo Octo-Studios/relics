@@ -493,26 +493,26 @@ public class HUDRenderHandler {
                 case INSTANTANEOUS -> {
                     NetworkHandler.sendToServer(new SpellCastPacket(CastType.INSTANTANEOUS, CastStage.END, ability.serializeNBT()));
 
-                    relic.castActiveAbility(stack, player, ability.getId(), type, CastStage.END);
+                    relic.castActiveAbility(player, stack, ability.getId(), type, CastStage.END);
                 }
                 case CYCLICAL -> {
                     NetworkHandler.sendToServer(new SpellCastPacket(CastType.CYCLICAL, CastStage.START, ability.serializeNBT()));
 
-                    relic.castActiveAbility(stack, player, ability.getId(), type, CastStage.START);
+                    relic.castActiveAbility(player, stack, ability.getId(), type, CastStage.START);
                 }
                 case INTERRUPTIBLE -> {
                     CastStage stage = isTicking ? CastStage.END : CastStage.START;
 
                     NetworkHandler.sendToServer(new SpellCastPacket(CastType.INTERRUPTIBLE, stage, ability.serializeNBT()));
 
-                    relic.castActiveAbility(stack, player, ability.getId(), type, stage);
+                    relic.castActiveAbility(player, stack, ability.getId(), type, stage);
                 }
                 case TOGGLEABLE -> {
                     CastStage stage = isTicking ? CastStage.END : CastStage.START;
 
                     NetworkHandler.sendToServer(new SpellCastPacket(CastType.TOGGLEABLE, stage, ability.serializeNBT()));
 
-                    relic.castActiveAbility(stack, player, ability.getId(), type, stage);
+                    relic.castActiveAbility(player, stack, ability.getId(), type, stage);
                 }
             }
 
@@ -554,11 +554,11 @@ public class HUDRenderHandler {
                         if (isCasting) {
                             NetworkHandler.sendToServer(new SpellCastPacket(CastType.CYCLICAL, CastStage.TICK, ability.serializeNBT()));
 
-                            relic.castActiveAbility(stack, player, ability.getId(), type, CastStage.TICK);
+                            relic.castActiveAbility(player, stack, ability.getId(), type, CastStage.TICK);
                         } else {
                             NetworkHandler.sendToServer(new SpellCastPacket(CastType.CYCLICAL, CastStage.END, ability.serializeNBT()));
 
-                            relic.castActiveAbility(stack, player, ability.getId(), type, CastStage.END);
+                            relic.castActiveAbility(player, stack, ability.getId(), type, CastStage.END);
                         }
                     }
                 }
@@ -566,14 +566,14 @@ public class HUDRenderHandler {
                     if (isTicking) {
                         NetworkHandler.sendToServer(new SpellCastPacket(CastType.INTERRUPTIBLE, CastStage.TICK, ability.serializeNBT()));
 
-                        relic.castActiveAbility(stack, player, ability.getId(), type, CastStage.TICK);
+                        relic.castActiveAbility(player, stack, ability.getId(), type, CastStage.TICK);
                     }
                 }
                 case TOGGLEABLE -> {
                     if (isTicking) {
                         NetworkHandler.sendToServer(new SpellCastPacket(CastType.TOGGLEABLE, CastStage.TICK, ability.serializeNBT()));
 
-                        relic.castActiveAbility(stack, player, ability.getId(), type, CastStage.TICK);
+                        relic.castActiveAbility(player, stack, ability.getId(), type, CastStage.TICK);
                     }
                 }
             }

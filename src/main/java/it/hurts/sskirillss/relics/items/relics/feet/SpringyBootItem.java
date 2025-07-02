@@ -86,7 +86,7 @@ public class SpringyBootItem extends RelicItem implements IRenderableCurio {
     }
 
     @Override
-    public void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
+    public void castActiveAbility(Player player, ItemStack stack, String ability, CastType type, CastStage stage) {
         var level = player.level();
 
         if (ability.equals("bounce") && stage == CastStage.START && player.onGround()) {

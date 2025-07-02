@@ -51,7 +51,7 @@ public class SpellCastPacket implements CustomPacketPayload {
                 if (relic.isAbilityTicking(player, stack, reference.getId())) {
                     relic.setAbilityTicking(player, stack, reference.getId(), false);
 
-                    relic.castActiveAbility(stack, player, reference.getId(), type, CastStage.END);
+                    relic.castActiveAbility(player, stack, reference.getId(), type, CastStage.END);
                 }
 
                 return;
@@ -66,7 +66,7 @@ public class SpellCastPacket implements CustomPacketPayload {
                 }
             }
 
-            relic.castActiveAbility(stack, player, reference.getId(), type, stage);
+            relic.castActiveAbility(player, stack, reference.getId(), type, stage);
         });
     }
 }

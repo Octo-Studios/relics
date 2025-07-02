@@ -1,5 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
@@ -9,19 +11,18 @@ import it.hurts.sskirillss.relics.init.EffectRegistry;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.*;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourceTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourcesTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.BeamsData;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -146,15 +147,6 @@ public class HolyLocketItem extends RelicItem {
                                 .textured(true)
                                 .icon("holy_locket_wickedness")
                                 .build())
-                        .beams((player, stack) -> getMode(stack) == Mode.HOLINESS
-                                ? BeamsData.builder()
-                                .startColor(0xFFFFFF00)
-                                .endColor(0x00FF0000)
-                                .build()
-                                : BeamsData.builder()
-                                .startColor(0xFF00FFFF)
-                                .endColor(0x000000FF)
-                                .build())
                         .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.DESERT)
@@ -175,7 +167,7 @@ public class HolyLocketItem extends RelicItem {
     }
 
     @Override
-    public void castActiveAbility(ItemStack stack, Player player, String ability, CastType type, CastStage stage) {
+    public void castActiveAbility(Player player, ItemStack stack, String ability, CastType type, CastStage stage) {
         if (ability.equals("faith") && stage == CastStage.END)
             cycleMode(stack, 1);
     }
