@@ -35,6 +35,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Integer> PIERCINGS = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> STUN = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> BOUNCES = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.BOOLEAN);
 
     private boolean bounced = false;
     private boolean takeBounces = false;
@@ -100,6 +101,14 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
         return this.getEntityData().get(BOUNCES);
     }
 
+    public void setFlawless(boolean flawless) {
+        this.getEntityData().set(FLAWLESS, flawless);
+    }
+
+    public boolean isFlawless() {
+        return this.getEntityData().get(FLAWLESS);
+    }
+
     private static final int ARC_DURATION = 10;
 
     public ReflectiveOrbEntity(EntityType<? extends ThrowableProjectile> type, Level level) {
@@ -153,8 +162,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
         if (level.isClientSide()) {
             var random = level.getRandom();
 
-            level.addParticle(ParticleUtils.constructSimpleSpark(new Color(random.nextInt(100), 0, 255), 0.1F + (random.nextFloat() * 0.15F), 15, 0.9F), this.getX(), this.getY() + this.getBbHeight() / 2F, this.getZ(),
-                    MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F);
+            level.addParticle(ParticleUtils.constructSimpleSpark(this.isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(50 + random.nextInt(100), random.nextInt(100), 255), 0.1F + (random.nextFloat() * 0.15F), 15, 0.9F), this.getX(), this.getY() + this.getBbHeight() / 2F, this.getZ(), MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F, MathUtils.randomFloat(random) * 0.05F);
         }
 
         if (this.takeBounces && position.distanceTo(semiTarget) < maxDistance) {
@@ -195,7 +203,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
                             var vy = (float) (shardDir.y * shatterSpeed);
                             var vz = (float) (shardDir.z * shatterSpeed);
 
-                            this.level().addParticle(ParticleUtils.constructSimpleSpark(new Color(50 + random.nextInt(100), random.nextInt(100), 255), 0.35F, 40, 0.9F), true, point.x, point.y, point.z, vx, vy, vz);
+                            this.level().addParticle(ParticleUtils.constructSimpleSpark(this.isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(50 + random.nextInt(100), random.nextInt(100), 255), 0.35F, 40, 0.9F), true, point.x, point.y, point.z, vx, vy, vz);
                         }
                     }
                 }
@@ -303,30 +311,33 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
         builder.define(PIERCINGS, 0);
         builder.define(STUN, 0F);
         builder.define(BOUNCES, 0);
+        builder.define(FLAWLESS, false);
     }
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
+    protected void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
 
-        this.setDamage(compound.getFloat("damage"));
-        this.setTargeted(compound.getBoolean("targeted"));
-        this.setLifetime(compound.getInt("lifetime"));
-        this.setPiercings(compound.getInt("piercings"));
-        this.setBounces(compound.getInt("bounces"));
-        this.setStun(compound.getFloat("stun"));
+        tag.putFloat("damage", this.getDamage());
+        tag.putBoolean("targeted", this.isTargeted());
+        tag.putInt("lifetime", this.getLifetime());
+        tag.putInt("piercings", this.getPiercings());
+        tag.putInt("bounces", this.getBounces());
+        tag.putFloat("stun", this.getStun());
+        tag.putBoolean("flawless", this.isFlawless());
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
+    protected void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
 
-        compound.putFloat("damage", this.getDamage());
-        compound.putBoolean("targeted", this.isTargeted());
-        compound.putInt("lifetime", this.getLifetime());
-        compound.putInt("piercings", this.getPiercings());
-        compound.putInt("bounces", this.getBounces());
-        compound.putFloat("stun", this.getStun());
+        this.setDamage(tag.getFloat("damage"));
+        this.setTargeted(tag.getBoolean("targeted"));
+        this.setLifetime(tag.getInt("lifetime"));
+        this.setPiercings(tag.getInt("piercings"));
+        this.setBounces(tag.getInt("bounces"));
+        this.setStun(tag.getFloat("stun"));
+        this.setFlawless(tag.getBoolean("flawless"));
     }
 
     @Override
@@ -382,12 +393,12 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
 
         @Override
         public int getTrailFadeInColor() {
-            return 0xFF8000FF;
+            return entity.isFlawless() ? 0xFFFFFF00 : 0xFF8000FF;
         }
 
         @Override
         public int getTrailFadeOutColor() {
-            return 0x800000FF;
+            return entity.isFlawless() ? 0x00FF0000 : 0x800000FF;
         }
 
         @Override

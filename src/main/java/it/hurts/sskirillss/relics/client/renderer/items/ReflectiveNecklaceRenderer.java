@@ -16,6 +16,6 @@ public class ReflectiveNecklaceRenderer extends AbstractNecklaceRenderer<LivingE
 
     @Override
     public ResourceLocation getDefaultTexture(ItemStack stack, SlotContext slotContext) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/reflection_necklace.png");
+        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/reflective_necklace.png");
     }
 }

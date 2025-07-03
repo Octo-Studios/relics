@@ -116,6 +116,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
                     orb.setStun(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "stun") ? (int) relic.getStatValue(entity, stack, "reflection", "stun") : 0);
                     orb.setDamage(Math.clamp((float) (damage * relic.getStatValue(entity, stack, "reflection", "damage")), Float.MIN_VALUE, Float.MAX_VALUE));
                     orb.setLifetime((int) (relic.getStatValue(entity, stack, "reflection", "lifetime") * 20));
+                    orb.setFlawless(relic.isRelicFlawless(entity, stack));
                     orb.setPos(entity.getEyePosition());
                     orb.setOwner(entity);
 

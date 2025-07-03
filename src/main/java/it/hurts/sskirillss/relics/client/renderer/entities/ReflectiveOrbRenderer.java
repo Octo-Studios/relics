@@ -77,6 +77,6 @@ public class ReflectiveOrbRenderer extends EntityRenderer<ReflectiveOrbEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(ReflectiveOrbEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/entities/reflective_orb.png");
+        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/entities/reflective_orb" + (entity.isFlawless() ? "_flawless" : "") + ".png");
     }
 }

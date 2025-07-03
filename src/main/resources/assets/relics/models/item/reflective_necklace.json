@@ -2,6 +2,9 @@
   "parent": "item/generated",
     "textures": {
         "layer0": "relics:item/reflective_necklace"
-    }
+    },
+    "overrides": [
+        { "predicate": { "relics:flawless": 1 }, "model": "relics:item/reflective_necklace_flawless" }
+    ]
 }
 
