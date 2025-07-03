@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.base.SidedCurioModel;
-import it.hurts.sskirillss.relics.init.BlockRegistry;
+import it.hurts.sskirillss.relics.init.RelicsBlocks;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -105,7 +105,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
             if (motion.y <= -0.5D) {
                 player.setDeltaMovement(motion.x, -(motion.y / 1.5D), motion.z);
 
-                var state = BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState();
+                var state = RelicsBlocks.PHANTOM_BLOCK.get().defaultBlockState();
 
                 state.getBlock().fallOn(player.level(), state, player.blockPosition(), player, player.fallDistance);
             }
@@ -122,7 +122,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
         if (level.isClientSide())
             return;
 
-        var block = BlockRegistry.PHANTOM_BLOCK.get();
+        var block = RelicsBlocks.PHANTOM_BLOCK.get();
 
         var onBridge = level.getBlockState(player.blockPosition().atY((int) Math.floor(WorldUtils.getGroundHeight(player, player.position(), 8)))).getBlock() == block
                 || player.isColliding(player.blockPosition(), block.defaultBlockState());
@@ -171,7 +171,7 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
 
                     var blockPos = new BlockPos((int) Math.floor(worldX), baseY, (int) Math.floor(worldZ));
 
-                    if (level.isEmptyBlock(blockPos) && level.setBlockAndUpdate(blockPos, BlockRegistry.PHANTOM_BLOCK.get().defaultBlockState()) && level.getRandom().nextInt(10) == 0)
+                    if (level.isEmptyBlock(blockPos) && level.setBlockAndUpdate(blockPos, RelicsBlocks.PHANTOM_BLOCK.get().defaultBlockState()) && level.getRandom().nextInt(10) == 0)
                         spreadRelicExperience(player, stack, 1);
                 });
             }

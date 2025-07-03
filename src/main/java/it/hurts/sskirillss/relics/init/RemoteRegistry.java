@@ -15,7 +15,6 @@ import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.JellyfishNecklaceRenderer;
 import it.hurts.sskirillss.relics.client.renderer.items.ReflectiveNecklaceRenderer;
 import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
-import it.hurts.sskirillss.relics.client.renderer.tiles.ResearchingTableRenderer;
 import it.hurts.sskirillss.relics.description_categories.AbilityDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCategory;
@@ -27,8 +26,6 @@ import it.hurts.sskirillss.relics.items.relics.necklace.HolyLocketItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -56,8 +53,6 @@ import static it.hurts.sskirillss.relics.init.DataComponentRegistry.WORLD_POSITI
 public class RemoteRegistry {
     @SubscribeEvent
     public static void setupClient(final FMLClientSetupEvent event) {
-        ItemBlockRenderTypes.setRenderLayer(BlockRegistry.RESEARCHING_TABLE.get(), RenderType.cutout());
-
         event.enqueueWork(() -> {
             ItemProperties.register(RelicsItems.INFINITY_HAM.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "pieces"),
                     (stack, world, entity, id) -> ((InfiniteHamItem) stack.getItem()).getPieces(stack));
@@ -187,8 +182,6 @@ public class RemoteRegistry {
         event.registerEntityRenderer(RelicsEntities.RELIC_EXPERIENCE_ORB.get(), RelicExperienceOrbRenderer::new);
         event.registerEntityRenderer(RelicsEntities.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(RelicsEntities.CHAIR.get(), NullRenderer::new);
-
-        event.registerBlockEntityRenderer(TileRegistry.RESEARCHING_TABLE.get(), ResearchingTableRenderer::new);
     }
 
     @SubscribeEvent

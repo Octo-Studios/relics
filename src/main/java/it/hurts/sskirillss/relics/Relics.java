@@ -19,7 +19,7 @@ public class Relics {
 
         RelicsItems.register(bus);
         TileRegistry.register(bus);
-        BlockRegistry.register(bus);
+        RelicsBlocks.register(bus);
         SoundRegistry.register(bus);
         BadgeRegistry.register(bus);
         RelicsEntities.register(bus);
