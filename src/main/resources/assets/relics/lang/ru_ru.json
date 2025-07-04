@@ -193,6 +193,16 @@
   "tooltip.relics.jellyfish_necklace.ability.shock.rank_modifier.conductor":  "Урон электрической цепи по целям, находящимся в жидкости, увеличивается на %9$s%%.",
   "tooltip.relics.jellyfish_necklace.ability.shock.rank_modifier.charge":  "При срабатывании способности носитель реликвии получает на %10$s секунд возможность парализовать цели своими атаками на %5$s секунд. Паралич работает только на те цели, которые еще не были парализованы этой механикой в пределах текущего срабатывания способности.",
 
+  "item.relics.kinetic_belt": "Кинетический пояс",
+  "tooltip.relics.kinetic_belt.description": "",
+  "tooltip.relics.kinetic_belt.ability.slots": "Расширение арсенала",
+  "tooltip.relics.kinetic_belt.ability.slots.description": "Увеличивает максимальный объём экипируемых амулетов на %1$s единиц.",
+  "tooltip.relics.kinetic_belt.ability.gliding": "Антигравитационное планирование",
+  "tooltip.relics.kinetic_belt.ability.gliding.description": "При зажатии клавиши прыжка снижает гравитацию и сопротивление воздуха носителя реликвии, а также повышает инерцию его движения на %1$s%%. Урон от падения при использовании способности также снижается, однако его эффективность обратно пропорциональна вертикальной скорости передвижения носителя реликвии.",
+  "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.momentum":  "Использование способности перед падением подавит весь потенциальный урон от падения и сохранит инерцию для следующего прыжка.",
+  "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.strike":  "При совершении атаки во время использования способности увеличивает наносимый урон на %2$s%%.",
+  "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.resistance":  "Снижает входящий урон на %3$s%% во время использования способности.",
+
   "item.relics.spore_sack": "Мешок со спорами",
   "tooltip.relics.spore_sack.description": "Самый обыкновенный холщевый мешок, доверху набитый смертельными миазмами.",
   "tooltip.relics.spore_sack.ability.spore_mist": "Споровый туман",

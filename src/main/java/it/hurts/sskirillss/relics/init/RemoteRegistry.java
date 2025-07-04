@@ -8,11 +8,13 @@ import it.hurts.sskirillss.relics.client.gui.layers.InfoTileLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.LeafyRingHideLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.PhantomBootBridgeLayer;
 import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceModel;
+import it.hurts.sskirillss.relics.client.models.items.KineticBeltModel;
 import it.hurts.sskirillss.relics.client.models.items.ReflectiveNecklaceModel;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.JellyfishNecklaceRenderer;
+import it.hurts.sskirillss.relics.client.renderer.items.KineticBeltRenderer;
 import it.hurts.sskirillss.relics.client.renderer.items.ReflectiveNecklaceRenderer;
 import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
 import it.hurts.sskirillss.relics.description_categories.AbilityDescriptionCategory;
@@ -122,6 +124,7 @@ public class RemoteRegistry {
 
         CuriosRendererRegistry.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
         CuriosRendererRegistry.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
+        CuriosRendererRegistry.register(RelicsItems.KINETIC_BELT.get(), KineticBeltRenderer::new);
 
         for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
             if (!(item instanceof IRenderableCurio))
@@ -146,6 +149,7 @@ public class RemoteRegistry {
     public static void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(ReflectiveNecklaceModel.LAYER, ReflectiveNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(JellyfishNecklaceModel.LAYER, JellyfishNecklaceModel::constructLayerDefinition);
+        event.registerLayerDefinition(KineticBeltModel.LAYER, KineticBeltModel::constructLayerDefinition);
 
         for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
             if (!(item instanceof IRenderableCurio renderable))

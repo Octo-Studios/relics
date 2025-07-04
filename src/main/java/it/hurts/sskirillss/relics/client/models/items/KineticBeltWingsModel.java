@@ -8,14 +8,18 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.world.entity.Entity;
 
-public class JellyfishNecklaceRingModel<T extends Entity> extends EntityModel<T> {
-    private final ModelPart part;
+public class KineticBeltWingsModel<T extends Entity> extends EntityModel<T> {
+    public ModelPart part;
 
-    public JellyfishNecklaceRingModel() {
+    public KineticBeltWingsModel() {
         MeshDefinition meshDefinition = new MeshDefinition();
         PartDefinition partDefinition = meshDefinition.getRoot();
 
-        PartDefinition model = partDefinition.addOrReplaceChild("arc", CubeListBuilder.create().texOffs(0, 3).addBox(-16.0F, -12.0F, 0.0F, 16.0F, 27.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 9.0F, 0.0F));
+        PartDefinition body = partDefinition.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.offset(2.5F, 9.5F, -3.875F));
+
+        PartDefinition cube_r1 = body.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(0, 10).mirror().addBox(5.0F, -4.5F, 0.875F, 7.0F, 10.0F, 0.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, -0.7854F, 0.0F));
+
+        PartDefinition cube_r2 = body.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(0, 10).addBox(-12.0F, -4.5F, 0.875F, 7.0F, 10.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-5.0F, 0.0F, 0.0F, 0.0F, 0.7854F, 0.0F));
 
         this.part = LayerDefinition.create(meshDefinition, 32, 32).bakeRoot();
     }

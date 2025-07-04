@@ -8,6 +8,7 @@ import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.belt.DrownedBeltItem;
 import it.hurts.sskirillss.relics.items.relics.belt.HunterBeltItem;
+import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
 import it.hurts.sskirillss.relics.items.relics.belt.LeatherBeltItem;
 import it.hurts.sskirillss.relics.items.relics.feet.*;
 import it.hurts.sskirillss.relics.items.relics.hands.EnderHandItem;
@@ -66,6 +67,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> LEAFY_RING = ITEMS.register("leafy_ring", LeafyRingItem::new);
     public static final DeferredHolder<Item, RelicItem> PHANTOM_BOOT = ITEMS.register("phantom_boot", PhantomBootItem::new);
     public static final DeferredHolder<Item, RelicItem> SPRINGY_BOOT = ITEMS.register("springy_boot", SpringyBootItem::new);
+    public static final DeferredHolder<Item, RelicItem> KINETIC_BELT = ITEMS.register("kinetic_belt", KineticBeltItem::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);

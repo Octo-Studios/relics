@@ -119,6 +119,9 @@ public class DataComponentRegistry {
                     .build()
     );
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_ACTIVE = DataComponentRegistry.construct("kinetic_belt/active", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_LANDED = DataComponentRegistry.construct("kinetic_belt/landed", Codec.BOOL);
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_AFFECTED_ENTITIES = DataComponentRegistry.construct("jellyfish_necklace/affected_entities", Codec.list(Codec.STRING));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_DAMAGED_ENTITIES = DataComponentRegistry.construct("jellyfish_necklace/damaged_entities", Codec.list(Codec.STRING));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_COOLDOWN = DataComponentRegistry.construct("jellyfish_necklace/cooldown", Codec.INT);

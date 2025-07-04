@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.network;
 import it.hurts.sskirillss.relics.network.packets.PacketItemActivation;
 import it.hurts.sskirillss.relics.network.packets.PacketPlayerMotion;
 import it.hurts.sskirillss.relics.network.packets.PacketSyncEntityEffects;
+import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CEntityMotionPacket;
 import it.hurts.sskirillss.relics.network.packets.abilities.SpellCastPacket;
@@ -45,6 +46,8 @@ public class NetworkHandler {
         registrar.playToServer(PacketRelicTweak.TYPE, PacketRelicTweak.STREAM_CODEC, PacketRelicTweak::handle);
 
         registrar.playToClient(S2CEntityMotionPacket.TYPE, S2CEntityMotionPacket.STREAM_CODEC, S2CEntityMotionPacket::handle);
+
+        registrar.playToServer(C2SSetActive.TYPE, C2SSetActive.STREAM_CODEC, C2SSetActive::handle);
     }
 
     public static <MSG extends CustomPacketPayload> void sendToServer(MSG message) {

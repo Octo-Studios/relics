@@ -20,11 +20,13 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 import java.util.function.Supplier;
 
-public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends EntityModel<?> & INecklaceModel<T>> implements ICurioRenderer {
+public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends EntityModel<?> & INecklaceModel<T>> implements ICurioRenderer, IRelicRenderer {
     private final M model;
+    private final ResourceLocation texture;
 
-    protected AbstractNecklaceRenderer(Supplier<M> modelSupplier) {
+    protected AbstractNecklaceRenderer(Supplier<M> modelSupplier, ResourceLocation texture) {
         this.model = modelSupplier.get();
+        this.texture = texture;
     }
 
     @Override
@@ -34,8 +36,6 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
             return;
 
         var relic = (IRelicItem) stack.getItem();
-
-        var isFlawless = relic.isRelicFlawless(player, stack);
 
         poseStack.pushPose();
 
@@ -48,7 +48,7 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
 
         poseStack.translate(0.0F, 1.0F, 0.015F);
 
-        var vertexConsumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.entityTranslucentCull(isFlawless ? this.getFlawlessTexture(stack, slotContext) : this.getDefaultTexture(stack, slotContext)), stack.hasFoil());
+        var vertexConsumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.entityTranslucentCull(this.getFlawlessOrDefaultTexture(player, stack, texture)), stack.hasFoil());
 
         this.model.getBodyPart().getChild("neck").render(poseStack, vertexConsumer, relic.isRelicFlawless(player, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
@@ -111,17 +111,11 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
         if (atk > 0F)
             pendant.yRot -= Mth.sin(atk * (float) Math.PI) * 0.35F;
 
-        pendant.render(poseStack, vertexConsumer, isFlawless ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+        pendant.render(poseStack, vertexConsumer, relic.isRelicFlawless(player, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
 
         poseStack.popPose();
-    }
-
-    public abstract ResourceLocation getDefaultTexture(ItemStack stack, SlotContext slotContext);
-
-    public ResourceLocation getFlawlessTexture(ItemStack stack, SlotContext slotContext) {
-        return ResourceLocation.parse(this.getDefaultTexture(stack, slotContext).toString().replaceFirst("\\.png$", "_flawless.png"));
     }
 
     protected float getJellyIntensity() {
