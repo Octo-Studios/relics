@@ -20,12 +20,10 @@ import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -61,9 +59,9 @@ public class KineticBeltItem extends RelicItem {
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
-                                        .initialValue(0.05D, 0.1D)
+                                        .initialValue(0.1D, 0.25D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
-                                        .formatValue(value -> MathUtils.round(value * 100, 1))
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("resistance")
                                         .initialValue(0.05D, 0.15D)
@@ -126,9 +124,6 @@ public class KineticBeltItem extends RelicItem {
         var level = entity.level();
         var random = level.getRandom();
 
-        if (entity instanceof Player player && !level.isClientSide())
-            player.displayClientMessage(Component.literal("" + entity.fallDistance), true);
-
         var isActive = this.isActive(stack);
         var isLanded = this.isLanded(stack);
 
@@ -158,25 +153,20 @@ public class KineticBeltItem extends RelicItem {
             if (!hasAttribute)
                 EntityUtils.applyAttribute(entity, stack, Attributes.GRAVITY, (float) -Math.min(this.getStatValue(entity, stack, "gliding", "efficiency"), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
-            if (this.isAbilityRankModifierUnlocked(entity, stack, "gliding", "momentum")) {
-                var vel = entity.getDeltaMovement();
-                var vy = (float) -vel.y;
+            var motion = entity.getDeltaMovement();
+            var verticalMotion = (float) -motion.y;
 
-                var minVy = 0.2f;
-                var maxVy = 5.0f;
-                var t = (maxVy - vy) / (maxVy - minVy);
-                t = Math.max(0f, Math.min(1f, t));
+            var minVy = 0.25F;
+            var maxVy = 7.5F;
+            var baseSlowFactor = Math.clamp((maxVy - verticalMotion) / (maxVy - minVy), 0F, 1F);
 
-                var slowFactor = (float)Math.sqrt(t);
+            var slowFactor = (float) Math.sqrt(baseSlowFactor);
 
-                var maxReductionPerTick = 0.5f;
+            var maxReductionPerTick = 1F;
 
-                var efficiency = (float) this.getStatValue(entity, stack, "gliding", "efficiency");
+            var reduction = maxReductionPerTick * slowFactor;
 
-                var reduction = maxReductionPerTick * slowFactor * efficiency;
-
-                entity.fallDistance = Math.max(0F, entity.fallDistance - reduction);
-            }
+            entity.fallDistance = Math.max(0F, entity.fallDistance - reduction);
 
             var prevPosition = new Vec3(entity.xOld, entity.yOld, entity.zOld);
             var position = entity.getPosition(0.25F);
@@ -240,7 +230,7 @@ public class KineticBeltItem extends RelicItem {
 
             var original = event.getNewDamage();
 
-            if (event.getSource().getEntity() instanceof LivingEntity source) {
+            if (event.getSource().getDirectEntity() instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity source) {
                 for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.KINETIC_BELT.get())) {
                     var relic = (KineticBeltItem) stack.getItem();
 
@@ -257,7 +247,7 @@ public class KineticBeltItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "gliding") || !relic.isAbilityRankModifierUnlocked(entity, stack, "gliding", "resistance") || !relic.isActive(stack))
                     continue;
 
-                event.setNewDamage((float) (original * relic.getStatValue(entity, stack, "gliding", "resistance")));
+                event.setNewDamage((float) (original - (original * relic.getStatValue(entity, stack, "gliding", "resistance"))));
             }
         }
     }

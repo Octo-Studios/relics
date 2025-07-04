@@ -200,8 +200,8 @@
   "tooltip.relics.kinetic_belt.ability.gliding": "Антигравитационное планирование",
   "tooltip.relics.kinetic_belt.ability.gliding.description": "При зажатии клавиши прыжка снижает гравитацию и сопротивление воздуха носителя реликвии, а также повышает инерцию его движения на %1$s%%. Урон от падения при использовании способности также снижается, однако его эффективность обратно пропорциональна вертикальной скорости передвижения носителя реликвии.",
   "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.momentum":  "Использование способности перед падением подавит весь потенциальный урон от падения и сохранит инерцию для следующего прыжка.",
-  "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.strike":  "При совершении атаки во время использования способности увеличивает наносимый урон на %2$s%%.",
-  "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.resistance":  "Снижает входящий урон на %3$s%% во время использования способности.",
+  "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.strike":  "При использовании способности увеличивает наносимый снарядами носителя реликвии урон на %2$s%%.",
+  "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.resistance":  "Снижает входящий по носителю реликвии урон на %3$s%% во время использования способности.",
 
   "item.relics.spore_sack": "Мешок со спорами",
   "tooltip.relics.spore_sack.description": "Самый обыкновенный холщевый мешок, доверху набитый смертельными миазмами.",
