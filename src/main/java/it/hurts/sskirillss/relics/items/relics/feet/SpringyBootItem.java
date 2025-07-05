@@ -66,6 +66,18 @@ public class SpringyBootItem extends RelicItem {
         stack.set(DataComponentRegistry.SPRINGY_BOOT_LEAPED, leaped);
     }
 
+    public int getLeaps(ItemStack stack) {
+        return stack.getOrDefault(DataComponentRegistry.SPRINGY_BOOT_LEAPS, 0);
+    }
+
+    public void setLeaps(ItemStack stack, int leaps) {
+        stack.set(DataComponentRegistry.SPRINGY_BOOT_LEAPS, Math.max(0, leaps));
+    }
+
+    public void addLeaps(ItemStack stack, int leaps) {
+        this.setLeaps(stack, this.getLeaps(stack) + leaps);
+    }
+
     @EventBusSubscriber
     public static class CommonEvents {
         @SubscribeEvent
@@ -84,7 +96,7 @@ public class SpringyBootItem extends RelicItem {
                 if (angle.y() < 0F)
                     angle = new Vec3(angle.x(), 0F, angle.z());
 
-                entity.setDeltaMovement(entity.getDeltaMovement().add(angle.add(0F, 0.25F, 0F).normalize().scale(relic.getStatValue(entity, stack, "bounce", "power"))));
+                entity.setDeltaMovement(entity.getDeltaMovement().add(angle.multiply(-1F, 1F, -1F).add(0F, 0.5F, 0F).normalize().scale(relic.getStatValue(entity, stack, "bounce", "power"))));
 
                 relic.setLeaped(stack, true);
 

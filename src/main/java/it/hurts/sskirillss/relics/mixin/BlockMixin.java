@@ -65,12 +65,11 @@ public class BlockMixin {
             return;
 
         var level = livingEntity.getCommandSenderWorld();
+        var random = level.getRandom();
 
         speed = Math.abs(speed);
 
         livingEntity.setDeltaMovement(motion.multiply(1D, -1D, 1D));
-
-        var random = level.getRandom();
 
         level.playSound(livingEntity, livingEntity.blockPosition(), SoundRegistry.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.min(2F, 0.25F + speed * 0.5F), (float) Math.max(0.1F, 2F - speed * 0.75F));
 
