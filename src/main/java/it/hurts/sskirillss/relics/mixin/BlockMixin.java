@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -23,58 +23,59 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class BlockMixin {
     @Inject(method = "fallOn", at = @At("HEAD"), cancellable = true)
     public void onEntityFall(Level level, BlockState state, BlockPos pos, Entity entity, float fallDistance, CallbackInfo ci) {
-        if (!(entity instanceof Player player))
+        if (!(entity instanceof LivingEntity livingEntity))
             return;
 
-        var stack = EntityUtils.findEquippedCurio(player, RelicsItems.SPRINGY_BOOT.get());
+        var stack = EntityUtils.findEquippedCurio(livingEntity, RelicsItems.SPRINGY_BOOT.get());
 
-        if (!(stack.getItem() instanceof SpringyBootItem relic) || !relic.isAbilityTicking(player, stack, "bounce"))
+        if (!(stack.getItem() instanceof SpringyBootItem relic))
             return;
 
-        var motion = player.getKnownMovement();
-        var speed = motion.multiply(0F, 1F, 0F).y();
+        var isOnShift = entity.isShiftKeyDown();
+        var leaped = relic.isLeaped(stack);
 
-        if (speed > -0.5D)
-            return;
+        if (((!leaped || !isOnShift) && livingEntity.getKnownMovement().y() > -0.75D) || isOnShift)
+            relic.setLeaped(stack, false);
 
-        player.causeFallDamage(fallDistance, 0F, level.damageSources().fall());
+        livingEntity.causeFallDamage(fallDistance, 0F, level.damageSources().fall());
 
         ci.cancel();
     }
 
     @Inject(method = "updateEntityAfterFallOn", at = @At("HEAD"), cancellable = true)
     public void onEntityFall(BlockGetter getter, Entity entity, CallbackInfo ci) {
-        if (!(entity instanceof Player player))
+        if (!(entity instanceof LivingEntity livingEntity))
             return;
 
-        var stack = EntityUtils.findEquippedCurio(player, RelicsItems.SPRINGY_BOOT.get());
+        var stack = EntityUtils.findEquippedCurio(livingEntity, RelicsItems.SPRINGY_BOOT.get());
 
-        if (!(stack.getItem() instanceof SpringyBootItem relic) || !relic.isAbilityTicking(player, stack, "bounce"))
+        if (!(stack.getItem() instanceof SpringyBootItem relic) || !relic.isLeaped(stack))
             return;
 
-        var motion = player.getKnownMovement();
+        if (entity.isShiftKeyDown()) {
+            ci.cancel();
+
+            return;
+        }
+
+        var motion = livingEntity.getKnownMovement();
         var speed = motion.multiply(0F, 1F, 0F).y();
 
-        if (speed > -0.5D)
+        if (speed > -0.75D)
             return;
 
-        var level = player.getCommandSenderWorld();
-
-        if (!level.isClientSide())
-            relic.spreadRelicExperience(player, stack, 1);
+        var level = livingEntity.getCommandSenderWorld();
 
         speed = Math.abs(speed);
 
-        var power = relic.getStatValue(player, stack, "bounce", "power");
-
-        player.setDeltaMovement(motion.multiply(1D, -power, 1D));
+        livingEntity.setDeltaMovement(motion.multiply(1D, -1D, 1D));
 
         var random = level.getRandom();
 
-        level.playSound(player, player.blockPosition(), SoundRegistry.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.min(2F, 0.25F + speed * 0.5F), (float) Math.max(0.1F, 2F - speed * 0.75F));
+        level.playSound(livingEntity, livingEntity.blockPosition(), SoundRegistry.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.min(2F, 0.25F + speed * 0.5F), (float) Math.max(0.1F, 2F - speed * 0.75F));
 
         for (float i = 0; i < speed * 3F; i += 0.1F)
-            level.addParticle(ParticleTypes.CLOUD, player.getX(), player.getY(), player.getZ(), MathUtils.randomFloat(random) * speed * 0.15F, 0F, MathUtils.randomFloat(random) * speed * 0.15F);
+            level.addParticle(ParticleTypes.CLOUD, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), MathUtils.randomFloat(random) * speed * 0.15F, 0F, MathUtils.randomFloat(random) * speed * 0.15F);
 
         ci.cancel();
     }

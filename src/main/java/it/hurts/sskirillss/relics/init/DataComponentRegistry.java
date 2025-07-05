@@ -119,6 +119,8 @@ public class DataComponentRegistry {
                     .build()
     );
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SPRINGY_BOOT_LEAPED = DataComponentRegistry.construct("springy_boot/leaped", Codec.BOOL);
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_ACTIVE = DataComponentRegistry.construct("kinetic_belt/active", Codec.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_LANDED = DataComponentRegistry.construct("kinetic_belt/landed", Codec.BOOL);
 
