@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.effects;
 
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -20,7 +20,7 @@ public class AntiHealEffect extends MobEffect {
         public static void onLivingHeal(LivingHealEvent event) {
             LivingEntity entity = event.getEntity();
 
-            if (entity.hasEffect(EffectRegistry.ANTI_HEAL))
+            if (entity.hasEffect(RelicsMobEffects.ANTI_HEAL))
                 event.setCanceled(true);
         }
     }

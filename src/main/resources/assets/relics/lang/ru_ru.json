@@ -203,6 +203,14 @@
   "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.strike":  "При использовании способности увеличивает наносимый снарядами носителя реликвии урон на %2$s%%.",
   "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.resistance":  "Снижает входящий по носителю реликвии урон на %3$s%% во время использования способности.",
 
+  "item.relics.springy_boot": "Пружинный ботинок",
+  "tooltip.relics.springy_boot.description": "",
+  "tooltip.relics.springy_boot.ability.bounce": "Пружинный рывок",
+  "tooltip.relics.springy_boot.ability.bounce.description": "Прыжок из приседа устремляет носителя реликвии в противоположную направлению взгляда сторону с силой в %1$s%%. Последующие приземления вплоть до полной остановки будут отбрасывать носителя реликвии от горизонтальных поверхностей, полностью подавляя урон от падения. Для вынужденной остановки действия способности достаточно удерживать клавишу бега или приседа перед приземлением.",
+  "tooltip.relics.springy_boot.ability.bounce.rank_modifier.disappearance": "Использование способности накладывает эффект полного исчезновения вплоть до следующего приземления.",
+  "tooltip.relics.springy_boot.ability.bounce.rank_modifier.strike": "Увеличивает наносимый урон на %2$s%% за каждый отскок от поверхностей в пределах одного использования способности.",
+  "tooltip.relics.springy_boot.ability.bounce.rank_modifier.shockwave": "При приседе во время приземления создается ударная волна с радиусом в %3$s блоков, наносящая %4$s единиц урона и оглушающая на %5$s секунд за единицу вертикальной скорости носителя реликвии в момент приземления.",
+
   "item.relics.spore_sack": "Мешок со спорами",
   "tooltip.relics.spore_sack.description": "Самый обыкновенный холщевый мешок, доверху набитый смертельными миазмами.",
   "tooltip.relics.spore_sack.ability.spore_mist": "Споровый туман",
@@ -312,13 +320,6 @@
   "tooltip.relics.phantom_boot.ability.bridge.description": "Создаёт под ногами игрока временный фантомный мост, по которому может перемещаться любой владелец реликвии. Если игрок будет стоять на мосту неподвижно более %1$s секунд, он провалится сквозь него и не сможет подняться обратно, пока не окажется на твёрдой поверхности. При перемещении крадучись игрок принудительно проваливается сквозь блоки фантомного моста.",
   "tooltip.relics.phantom_boot.leveling_source.bridge.title": "Фантомный мост",
   "tooltip.relics.phantom_boot.leveling_source.bridge.description": "+%1$s единиц опыта с вероятностью 10%% при каждом создании моста от способности %2$s.",
-
-  "item.relics.springy_boot": "Пружинный ботинок",
-  "tooltip.relics.springy_boot.description": "Наделяет владельца реликвии особой упругостью, позволяющей ему отпрыгивать от любых твёрдых поверхностей.",
-  "tooltip.relics.springy_boot.ability.bounce": "Упругость",
-  "tooltip.relics.springy_boot.ability.bounce.description": "Повышает упругость всех блоков на %1$s%% относительно блока слизи, позволяя игроку отпрыгивать от них при падении. При активации на земле подбрасывает игрока в воздух.",
-  "tooltip.relics.springy_boot.leveling_source.bounce.title": "Упругость",
-  "tooltip.relics.springy_boot.leveling_source.bounce.description": "+%1$s единиц опыта за каждый совершённый отскок от поверхности при помощи способности %2$s.",
 
   "tooltip.relics.leveling_source.generic.spreading.title": "Распределение опыта",
   "tooltip.relics.leveling_source.generic.spreading.description": "Каждый раз, когда любая реликвия в инвентаре получает опыт вне зависимости от способа, %1$s%% от этого опыта также получает и эта реликвия.",

@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.PacketPlayerMotion;
+import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import lombok.Getter;
@@ -203,13 +203,13 @@ public class DissectionEntity extends Entity {
                 Vec3 motion = this.position().add(0, this.getBbHeight() / 2, 0).subtract(target.position()).normalize().multiply(mul, mul, mul);
 
                 if (target instanceof ServerPlayer player)
-                    NetworkHandler.sendToClient(new PacketPlayerMotion(motion.x(), motion.y(), motion.z()), player);
+                    NetworkHandler.sendToClient(new S2CSetEntityMotion(target.getId(), motion.toVector3f()), player);
                 else
                     target.setDeltaMovement(motion);
 
                 target.fallDistance = 0F;
 
-                ((LivingEntity) target).addEffect(new MobEffectInstance(EffectRegistry.VANISHING, 5, 0, false, false));
+                ((LivingEntity) target).addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
 
                 serverLevel.sendParticles(ParticleUtils.constructSimpleSpark(new Color(150 + random.nextInt(100), 100, 0), 0.2F, 20, 0.9F),
                         target.getX(), target.getY() + 1.25F, target.getZ(), Math.round(target.getBbHeight() * 3), 0.1F, 0.1F, 0.1F, 0.05F);

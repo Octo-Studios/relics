@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
@@ -97,7 +97,7 @@ public class SolidSnowballEntity extends ThrowableProjectile {
             }
 
             if (mayContinue)
-                entity.addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) Math.round(getSize() * relic.getStatValue(entity, stack, "mold", "stun")) * 20, 0, true, false));
+                entity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) Math.round(getSize() * relic.getStatValue(entity, stack, "mold", "stun")) * 20, 0, true, false));
         }
 
         this.discard();

@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
@@ -72,10 +72,10 @@ public class LivingEntityMixin {
     protected void onAiStep(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
 
-        if (entity.hasEffect(EffectRegistry.STUN))
+        if (entity.hasEffect(RelicsMobEffects.STUN))
             cir.setReturnValue(true);
 
-        if (entity.hasEffect(EffectRegistry.PARALYSIS))
+        if (entity.hasEffect(RelicsMobEffects.PARALYSIS))
             cir.setReturnValue(true);
     }
 
@@ -116,7 +116,7 @@ public class LivingEntityMixin {
     protected void canBeSeenByAnyone(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity entity = (LivingEntity) (Object) this;
 
-        if (entity.hasEffect(EffectRegistry.VANISHING))
+        if (entity.hasEffect(RelicsMobEffects.VANISHING))
             cir.setReturnValue(false);
     }
 }

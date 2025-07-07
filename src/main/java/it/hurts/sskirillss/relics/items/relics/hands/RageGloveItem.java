@@ -11,7 +11,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.base.SidedCurioModel;
 import it.hurts.sskirillss.relics.client.models.items.base.SidedFPRCurioModel;
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
@@ -24,7 +24,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.PacketPlayerMotion;
+import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
@@ -177,7 +177,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
             player.teleportTo(target.x, target.y, target.z);
 
             if (!level.isClientSide()) {
-                NetworkHandler.sendToClient(new PacketPlayerMotion(motion.x, motion.y, motion.z), (ServerPlayer) player);
+                NetworkHandler.sendToClient(new S2CSetEntityMotion(player.getId(), motion.toVector3f()), (ServerPlayer) player);
 
                 setAbilityCooldown(player, stack, "spurt", (int) Math.round(getStatValue(player, stack, "spurt", "cooldown") * 20));
             }
@@ -228,7 +228,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
 
                     spreadRelicExperience(player, stack, 1);
 
-                    entity.addEffect(new MobEffectInstance(EffectRegistry.BLEEDING, 100, 0));
+                    entity.addEffect(new MobEffectInstance(RelicsMobEffects.BLEEDING, 100, 0));
                     entity.setRemainingFireTicks(5 * 20);
                 }
 

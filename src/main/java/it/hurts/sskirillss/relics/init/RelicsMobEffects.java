@@ -8,7 +8,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class EffectRegistry {
+public class RelicsMobEffects {
     public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, Reference.MODID);
 
     public static final DeferredHolder<MobEffect, MobEffect> IMMORTALITY = EFFECTS.register("immortality", ImmortalityEffect::new);

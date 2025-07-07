@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.effects;
 
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.effect.MobEffect;
@@ -20,13 +20,13 @@ public class VanishingEffect extends MobEffect {
     public static class ClientEvents {
         @SubscribeEvent
         public static void onEntityRender(RenderLivingEvent.Pre<?, ?> event) {
-            if (event.getEntity().hasEffect(EffectRegistry.VANISHING))
+            if (event.getEntity().hasEffect(RelicsMobEffects.VANISHING))
                 event.setCanceled(true);
         }
 
         @SubscribeEvent
         public static void onHandRender(RenderHandEvent event) {
-            if (Minecraft.getInstance().player.hasEffect(EffectRegistry.VANISHING) && event.getItemStack().isEmpty())
+            if (Minecraft.getInstance().player.hasEffect(RelicsMobEffects.VANISHING) && event.getItemStack().isEmpty())
                 event.setCanceled(true);
         }
     }

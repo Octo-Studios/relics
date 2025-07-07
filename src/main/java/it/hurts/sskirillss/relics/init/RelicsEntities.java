@@ -30,16 +30,10 @@ public class RelicsEntities {
                     .build("shadow_glaive")
     );
 
-    public static final DeferredHolder<EntityType<?>, EntityType<BlockSimulationEntity>> BLOCK_SIMULATION = ENTITIES.register("block_simulation", () ->
-            EntityType.Builder.<BlockSimulationEntity>of(BlockSimulationEntity::new, MobCategory.MISC)
+    public static final DeferredHolder<EntityType<?>, EntityType<ShockwaveBlockEntity>> SHOCKWAVE_BLOCK = ENTITIES.register("shockwave_block", () ->
+            EntityType.Builder.<ShockwaveBlockEntity>of(ShockwaveBlockEntity::new, MobCategory.MISC)
                     .sized(1F, 1F)
-                    .build("block_simulation")
-    );
-
-    public static final DeferredHolder<EntityType<?>, EntityType<ShockwaveEntity>> SHOCKWAVE = ENTITIES.register("shockwave", () ->
-            EntityType.Builder.<ShockwaveEntity>of(ShockwaveEntity::new, MobCategory.MISC)
-                    .sized(1F, 0.1F)
-                    .build("shockwave")
+                    .build("shockwave_block")
     );
 
     public static final DeferredHolder<EntityType<?>, EntityType<LifeEssenceEntity>> LIFE_ESSENCE = ENTITIES.register("life_essence", () ->

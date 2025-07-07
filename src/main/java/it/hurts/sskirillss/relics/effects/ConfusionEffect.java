@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.effects;
 
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.player.Input;
 import net.minecraft.world.effect.MobEffect;
@@ -22,7 +22,7 @@ public class ConfusionEffect extends MobEffect {
         public static void onMovementInput(MovementInputUpdateEvent event) {
             Player player = event.getEntity();
 
-            if (player.hasEffect(EffectRegistry.CONFUSION)) {
+            if (player.hasEffect(RelicsMobEffects.CONFUSION)) {
                 Input input = event.getInput();
 
                 input.leftImpulse *= -1;

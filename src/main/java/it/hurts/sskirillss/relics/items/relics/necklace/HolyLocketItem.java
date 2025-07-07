@@ -7,7 +7,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.DeathEssenceEntity;
 import it.hurts.sskirillss.relics.entities.LifeEssenceEntity;
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
@@ -210,14 +210,14 @@ public class HolyLocketItem extends RelicItem {
                 if (!(stack.getItem() instanceof IRelicItem relic) || !relic.canPlayerUseAbility(player, stack, "ascension"))
                     continue;
 
-                var effect = player.getEffect(EffectRegistry.IMMORTALITY);
+                var effect = player.getEffect(RelicsMobEffects.IMMORTALITY);
                 var duration = effect == null ? 0 : effect.getDuration();
                 var maxDuration = (int) (relic.getStatValue(player, stack, "ascension", "max_duration") * 20);
 
                 if (duration >= maxDuration)
                     continue;
 
-                player.addEffect(new MobEffectInstance(EffectRegistry.IMMORTALITY, (int) Math.min((relic.getStatValue(player, stack, "ascension", "duration") * 20) + duration, maxDuration)));
+                player.addEffect(new MobEffectInstance(RelicsMobEffects.IMMORTALITY, (int) Math.min((relic.getStatValue(player, stack, "ascension", "duration") * 20) + duration, maxDuration)));
 
                 relic.spreadRelicExperience(player, stack, 1);
             }

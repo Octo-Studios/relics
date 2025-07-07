@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
@@ -138,7 +138,7 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
                 if (this.isOnFire())
                     entity.igniteForTicks(this.getRemainingFireTicks());
 
-                entity.addEffect(new MobEffectInstance(EffectRegistry.ANTI_HEAL, 0, 20 * 5, false, false), player);
+                entity.addEffect(new MobEffectInstance(RelicsMobEffects.ANTI_HEAL, 0, 20 * 5, false, false), player);
             }
         }
 

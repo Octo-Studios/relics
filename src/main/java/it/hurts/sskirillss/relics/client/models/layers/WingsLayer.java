@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.client.models.layers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.client.models.parts.HaloModel;
 import it.hurts.sskirillss.relics.client.models.parts.WingsModel;
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LightTexture;
@@ -30,7 +30,7 @@ public class WingsLayer<T extends LivingEntity, M extends EntityModel<T>> extend
     public void render(PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, T pLivingEntity, float pLimbSwing, float pLimbSwingAmount, float pPartialTicks, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
         var player = Minecraft.getInstance().player;
 
-        if (player == null || !player.hasEffect(EffectRegistry.IMMORTALITY))
+        if (player == null || !player.hasEffect(RelicsMobEffects.IMMORTALITY))
             return;
 
         pPoseStack.pushPose();

@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.effects;
 
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -16,7 +16,7 @@ public class ImmortalityEffect extends MobEffect {
     public static class Events {
         @SubscribeEvent
         public static void onLivingIncomingDamage(LivingIncomingDamageEvent event) {
-            if (event.getEntity().hasEffect(EffectRegistry.IMMORTALITY))
+            if (event.getEntity().hasEffect(RelicsMobEffects.IMMORTALITY))
                 event.setCanceled(true);
         }
     }

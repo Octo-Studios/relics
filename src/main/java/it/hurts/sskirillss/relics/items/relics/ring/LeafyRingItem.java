@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.ring;
 
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -69,7 +69,7 @@ public class LeafyRingItem extends RelicItem {
                 if (progress < getMaxProgress())
                     addCurrentProgress(stack, 1);
 
-                player.addEffect(new MobEffectInstance(EffectRegistry.VANISHING, 5, 0, false, false));
+                player.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
             } else {
                 if (hiding)
                     setHiding(stack, false);

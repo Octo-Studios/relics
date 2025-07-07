@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
@@ -271,7 +271,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
             var stun = this.getStun();
 
             if (stun > 0)
-                entity.addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) (stun * 20), 0, false, false));
+                entity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (stun * 20), 0, false, false));
         }
 
         this.impactedEntities.add(entity.getStringUUID());

@@ -23,7 +23,7 @@ public class Relics {
         SoundRegistry.register(bus);
         BadgeRegistry.register(bus);
         RelicsEntities.register(bus);
-        EffectRegistry.register(bus);
+        RelicsMobEffects.register(bus);
         CommandRegistry.register(bus);
         ParticleRegistry.register(bus);
         LootCodecRegistry.register(bus);

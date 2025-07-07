@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.mixin;
 
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import net.minecraft.client.KeyboardHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
@@ -16,7 +16,7 @@ public class KeyboardHandlerMixin {
     public void onKeyPress(long windowPointer, int key, int scanCode, int action, int modifiers, CallbackInfo ci) {
         Player player = Minecraft.getInstance().player;
 
-        if (key != GLFW.GLFW_KEY_ESCAPE && player != null && player.hasEffect(EffectRegistry.STUN))
+        if (key != GLFW.GLFW_KEY_ESCAPE && player != null && player.hasEffect(RelicsMobEffects.STUN))
             ci.cancel();
     }
 }

@@ -50,7 +50,6 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> ENDER_HAND = ITEMS.register("enders_hand", EnderHandItem::new);
     public static final DeferredHolder<Item, RelicItem> ELYTRA_BOOSTER = ITEMS.register("elytra_booster", ElytraBoosterItem::new);
     public static final DeferredHolder<Item, RelicItem> MAGIC_MIRROR = ITEMS.register("magic_mirror", MagicMirrorItem::new);
-    public static final DeferredHolder<Item, RelicItem> ICE_BREAKER = ITEMS.register("ice_breaker", IceBreakerItem::new);
     public static final DeferredHolder<Item, RelicItem> BLAZING_FLASK = ITEMS.register("blazing_flask", BlazingFlaskItem::new);
     public static final DeferredHolder<Item, RelicItem> SPORE_SACK = ITEMS.register("spore_sack", SporeSackItem::new);
     public static final DeferredHolder<Item, RelicItem> SHADOW_GLAIVE = ITEMS.register("shadow_glaive", ShadowGlaiveItem::new);

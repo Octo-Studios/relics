@@ -277,7 +277,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                     var diff = target.position().add(0, target.getBbHeight() / 2D, 0).subtract(entity.position());
                     var knockback = 0.5D * this.getStatValue(entity, stack, "shock", "knockback");
 
-                    target.addEffect(new MobEffectInstance(EffectRegistry.PARALYSIS, (int) (this.getStatValue(entity, stack, "shock", "paralysis") * 20), 0, false, true));
+                    target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (this.getStatValue(entity, stack, "shock", "paralysis") * 20), 0, false, true));
                     target.setDeltaMovement(diff.normalize().multiply(knockback, knockback / 2F, knockback));
 
                     var spark = new ElectricSparkEntity(RelicsEntities.ELECTRIC_SPARK.get(), level);
@@ -376,7 +376,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                 var uuid = target.getStringUUID();
 
                 if (!targets.contains(uuid)) {
-                    target.addEffect(new MobEffectInstance(EffectRegistry.PARALYSIS, (int) (relic.getStatValue(entity, stack, "shock", "paralysis") * 20), 0, false, false));
+                    target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (relic.getStatValue(entity, stack, "shock", "paralysis") * 20), 0, false, false));
 
                     relic.addDamagedEntities(stack, uuid);
                 }

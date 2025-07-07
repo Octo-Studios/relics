@@ -5,7 +5,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.init.CreativeTabRegistry;
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -347,7 +347,7 @@ public class InfiniteHamItem extends RelicItem {
                 relic.spreadRelicExperience(player, stack, charge);
 
             event.setAmount((float) (event.getAmount() + (relic.getStatValue(player, stack, "meat_bat", "damage") * charge)));
-            event.getEntity().addEffect(new MobEffectInstance(EffectRegistry.STUN, (int) Math.round(relic.getStatValue(player, stack, "meat_bat", "stun") * charge * 20), 0));
+            event.getEntity().addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) Math.round(relic.getStatValue(player, stack, "meat_bat", "stun") * charge * 20), 0));
 
             relic.setPieces(stack, 0);
         }

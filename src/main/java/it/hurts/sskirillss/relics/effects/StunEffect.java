@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.effects;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.client.models.effects.StunStarModel;
-import it.hurts.sskirillss.relics.init.EffectRegistry;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
@@ -31,7 +31,7 @@ public class StunEffect extends MobEffect {
         public static void onMouseInput(InputEvent.InteractionKeyMappingTriggered event) {
             Player player = Minecraft.getInstance().player;
 
-            if (player != null && player.hasEffect(EffectRegistry.STUN)) {
+            if (player != null && player.hasEffect(RelicsMobEffects.STUN)) {
                 event.setSwingHand(false);
 
                 event.setCanceled(true);
@@ -42,7 +42,7 @@ public class StunEffect extends MobEffect {
         public static void onBlockHighlight(RenderHighlightEvent.Block event) {
             Player player = Minecraft.getInstance().player;
 
-            if (player != null && player.hasEffect(EffectRegistry.STUN))
+            if (player != null && player.hasEffect(RelicsMobEffects.STUN))
                 event.setCanceled(true);
         }
 
@@ -50,7 +50,7 @@ public class StunEffect extends MobEffect {
         public static void onEntityRender(RenderLivingEvent.Pre<?, ?> event) {
             LivingEntity entity = event.getEntity();
 
-            if (!entity.hasEffect(EffectRegistry.STUN) || entity.isDeadOrDying())
+            if (!entity.hasEffect(RelicsMobEffects.STUN) || entity.isDeadOrDying())
                 return;
 
             PoseStack poseStack = event.getPoseStack();
