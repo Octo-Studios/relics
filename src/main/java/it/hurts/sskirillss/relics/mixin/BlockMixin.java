@@ -6,9 +6,9 @@ import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
+import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
+import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
-import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.Scheduler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -19,6 +19,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -39,104 +40,86 @@ public class BlockMixin {
         if (!(stack.getItem() instanceof SpringyBootItem relic))
             return;
 
+        if (entity.level().isClientSide())
+            return;
+
         if (relic.isLeaped(stack)) {
             var motion = livingEntity.getKnownMovement();
             var speed = motion.y();
-
-            motion = motion.multiply(1D, -1D, 1D);
 
             if (speed > -0.75D) {
                 relic.setLeaped(stack, false);
                 relic.setLeaps(stack, 0);
             } else {
-                var random = level.getRandom();
+                speed = Math.abs(speed);
+
+                level.playSound(null, entity.blockPosition(), SoundRegistry.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.clamp(0.5F + speed * 0.5F, 0.5F, 2F), (float) Math.max(0.1F, 2F - speed * 0.75F));
 
                 relic.addLeaps(stack, 1);
 
-                speed = Math.abs(speed);
+                if (!livingEntity.isShiftKeyDown())
+                    NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(livingEntity.getId(), motion.multiply(1F, -1F, 1F).toVector3f()), livingEntity);
+                else {
+                    relic.setLeaped(stack, false);
 
-                if (!livingEntity.isShiftKeyDown()) {
-                    if (!level.isClientSide())
-                        NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CSetEntityMotion(livingEntity.getId(), motion.toVector3f()), livingEntity);
-                }
+                    if (relic.isAbilityRankModifierUnlocked(livingEntity, stack, "bounce", "shockwave")) {
+                        var verticalSpeed = Math.abs(livingEntity.getKnownMovement().y());
 
-                level.playSound(livingEntity, livingEntity.blockPosition(), SoundRegistry.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.clamp(0.5F + speed * 0.5F, 0.5F, 2F), (float) Math.max(0.1F, 2F - speed * 0.75F));
+                        var center = livingEntity.blockPosition();
+                        var radius = (int) Math.min(25, Math.round((1 + relic.getStatValue(livingEntity, stack, "bounce", "radius")) * verticalSpeed));
 
-                for (float i = 0; i < speed * 5F; i += 0.1F) {
-                    var angle = random.nextFloat() * Math.PI * 2;
-                    var radius = Math.sqrt(random.nextFloat()) * speed * 0.15F;
+                        var poses = new ArrayList<BlockPos>();
 
-                    var dx = Math.cos(angle) * radius;
-                    var dz = Math.sin(angle) * radius;
+                        for (var i = -radius; i <= radius; i++) {
+                            var r1 = (int) Mth.sqrt(radius * radius - i * i);
 
-                    level.addParticle(ParticleTypes.CLOUD, livingEntity.getX(), livingEntity.getY(), livingEntity.getZ(), dx, random.nextFloat() * 0.15F, dz);
-                }
+                            for (var j = -r1; j <= r1; j++)
+                                poses.add(center.offset(i, 0, j));
+                        }
 
-                if (!livingEntity.isShiftKeyDown()) {
-                    for (int i = 0; i < 50 * speed; i += 1) {
-                        var particleMotion = motion.normalize().scale(random.nextFloat());
+                        for (var step = 0; step <= radius; step++) {
+                            int finalStep = step;
 
-                        level.addParticle(ParticleTypes.CLOUD, entity.getX() + MathUtils.randomFloat(random) * 0.5F, entity.getY(), entity.getZ() + MathUtils.randomFloat(random) * 0.5F, particleMotion.x(), particleMotion.y(), particleMotion.z());
-                    }
-                }
+                            Scheduler.schedule(finalStep, () -> {
+                                var height = 0.15F;
 
-                if (relic.isAbilityRankModifierUnlocked(livingEntity, stack, "bounce", "shockwave") && livingEntity.isShiftKeyDown()) {
-                    var verticalSpeed = Math.abs(livingEntity.getKnownMovement().y());
+                                var localRandom = new Random();
 
-                    var center = livingEntity.blockPosition();
-                    var radius = (int) Math.min(25, Math.round((1 + relic.getStatValue(livingEntity, stack, "bounce", "radius")) * verticalSpeed));
+                                poses.stream().filter(p -> {
+                                    var dx = p.getX() - center.getX();
+                                    var dz = p.getZ() - center.getZ();
+                                    var dist = Math.hypot(dx, dz);
 
-                    var poses = new ArrayList<BlockPos>();
+                                    return dist >= finalStep && dist < finalStep + 1;
+                                }).forEach(entryPos -> {
+                                    var shockwave = new ShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
 
-                    for (var i = -radius; i <= radius; i++) {
-                        var r1 = (int) Mth.sqrt(radius * radius - i * i);
+                                    shockwave.setDamage((float) relic.getStatValue(livingEntity, stack, "bounce", "damage"));
+                                    shockwave.setStun((int) relic.getStatValue(livingEntity, stack, "bounce", "stun") * 20);
+                                    shockwave.setPos(entryPos.getX() + 0.5F, entryPos.getY(), entryPos.getZ() + 0.5F);
+                                    shockwave.setBlockState(level.getBlockState(entryPos.below()));
+                                    shockwave.setDeltaMovement(0, height, 0);
+                                    shockwave.setCenter(entity.blockPosition());
+                                    shockwave.setOwner(livingEntity);
 
-                        for (var j = -r1; j <= r1; j++)
-                            poses.add(center.offset(i, 0, j));
-                    }
+                                    level.addFreshEntity(shockwave);
 
-                    for (var step = 0; step <= radius; step++) {
-                        int finalStep = step;
+                                    var angle = localRandom.nextFloat() * Math.PI * 2;
 
-                        Scheduler.schedule(finalStep, () -> {
-                            var height = 0.15F;
+                                    var rad = (finalStep + 0.5F + (localRandom.nextFloat() - 0.5F) * 0.3F);
 
-                            var localRandom = new Random();
+                                    var px = (float) (center.getX() + Math.cos(angle) * rad + 0.5F);
+                                    var py = entryPos.getY() + 0.5F + localRandom.nextFloat() * 0.2F;
+                                    var pz = (float) (center.getZ() + Math.sin(angle) * rad + 0.5F);
 
-                            poses.stream().filter(p -> {
-                                var dx = p.getX() - center.getX();
-                                var dz = p.getZ() - center.getZ();
-                                var dist = Math.hypot(dx, dz);
+                                    var vx = (float) Math.cos(angle) * 0.2F;
+                                    var vy = 0.025F + localRandom.nextFloat() * 0.05F;
+                                    var vz = (float) Math.sin(angle) * 0.2F;
 
-                                return dist >= finalStep && dist < finalStep + 1;
-                            }).forEach(entryPos -> {
-                                var shockwave = new ShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
-
-                                shockwave.setDamage((float) relic.getStatValue(livingEntity, stack, "bounce", "damage"));
-                                shockwave.setStun((int) relic.getStatValue(livingEntity, stack, "bounce", "stun") * 20);
-                                shockwave.setPos(entryPos.getX() + 0.5F, entryPos.getY(), entryPos.getZ() + 0.5F);
-                                shockwave.setBlockState(level.getBlockState(entryPos.below()));
-                                shockwave.setDeltaMovement(0, height, 0);
-                                shockwave.setCenter(entity.blockPosition());
-                                shockwave.setOwner(livingEntity);
-
-                                level.addFreshEntity(shockwave);
-
-                                var angle = localRandom.nextFloat() * Math.PI * 2;
-
-                                var rad = (finalStep + 0.5F + (localRandom.nextFloat() - 0.5F) * 0.3F);
-
-                                var px = center.getX() + Math.cos(angle) * rad + 0.5F;
-                                var py = entryPos.getY() + 0.5F + localRandom.nextFloat() * 0.2F;
-                                var pz = center.getZ() + Math.sin(angle) * rad + 0.5F;
-
-                                var vx = Math.cos(angle) * 0.1F;
-                                var vy = 0.025F + localRandom.nextFloat() * 0.05F;
-                                var vz = Math.sin(angle) * 0.1F;
-
-                                level.addParticle(ParticleTypes.CLOUD, px, py, pz, vx, vy, vz);
+                                    NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CSpawnParticle(ParticleTypes.CLOUD, new Vector3f(px, py, pz), new Vector3f(vx, vy, vz)), livingEntity);
+                                });
                             });
-                        });
+                        }
                     }
                 }
             }

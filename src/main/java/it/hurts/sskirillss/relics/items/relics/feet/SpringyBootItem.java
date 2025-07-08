@@ -51,7 +51,7 @@ public class SpringyBootItem extends RelicItem {
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.0857D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1429D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("stun")

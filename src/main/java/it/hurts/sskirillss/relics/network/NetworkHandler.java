@@ -3,7 +3,9 @@ package it.hurts.sskirillss.relics.network;
 import it.hurts.sskirillss.relics.network.packets.PacketItemActivation;
 import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.network.packets.PacketSyncEntityEffects;
+import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
+import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
 import it.hurts.sskirillss.relics.network.packets.abilities.SpellCastPacket;
 import it.hurts.sskirillss.relics.network.packets.capability.CapabilitySyncPacket;
@@ -32,6 +34,7 @@ public class NetworkHandler {
                 .optional();
 
         registrar.playToClient(S2CSetEntityMotion.TYPE, S2CSetEntityMotion.STREAM_CODEC, S2CSetEntityMotion::handle);
+        registrar.playToClient(S2CSpawnParticle.TYPE, S2CSpawnParticle.STREAM_CODEC, S2CSpawnParticle::handle);
         registrar.playToClient(PacketItemActivation.TYPE, PacketItemActivation.STREAM_CODEC, PacketItemActivation::handle);
         registrar.playToServer(PacketAbilityTweak.TYPE, PacketAbilityTweak.STREAM_CODEC, PacketAbilityTweak::handle);
         registrar.playToClient(PacketSyncEntityEffects.TYPE, PacketSyncEntityEffects.STREAM_CODEC, PacketSyncEntityEffects::handle);
@@ -45,6 +48,8 @@ public class NetworkHandler {
         registrar.playToServer(PacketRelicTweak.TYPE, PacketRelicTweak.STREAM_CODEC, PacketRelicTweak::handle);
 
         registrar.playToServer(C2SSetActive.TYPE, C2SSetActive.STREAM_CODEC, C2SSetActive::handle);
+
+        registrar.playToClient(S2CBounceFromSurface.TYPE, S2CBounceFromSurface.STREAM_CODEC, S2CBounceFromSurface::handle);
     }
 
     public static <MSG extends CustomPacketPayload> void sendToServer(MSG message) {

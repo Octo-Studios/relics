@@ -36,7 +36,7 @@ public class S2CSetEntityMotion implements CustomPacketPayload {
             var entity = ctx.player().level().getEntity(this.getId());
 
             if (entity != null)
-                entity.setDeltaMovement(new Vec3(this.getMotion().x(), this.getMotion().y(), this.getMotion().z()));
+                entity.setDeltaMovement(new Vec3(this.getMotion()));
         });
     }
 }
