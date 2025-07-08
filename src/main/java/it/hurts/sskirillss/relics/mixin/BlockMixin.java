@@ -20,6 +20,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.Heightmap;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -119,12 +120,24 @@ public class BlockMixin {
 
                                             return dist >= finalStep && dist < finalStep + 1;
                                         }).forEach(entryPos -> {
+                                            var groundY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, entryPos.getX(), entryPos.getZ());
+
+                                            var centerY = center.getY();
+
+                                            var minAllowedY = Math.max(level.getMinBuildHeight(), centerY - 8);
+                                            var maxAllowedY = Math.min(level.getMaxBuildHeight(), centerY + 8);
+
+                                            if (groundY < minAllowedY || groundY > maxAllowedY)
+                                                return;
+
+                                            var surfacePos = new BlockPos(entryPos.getX(), groundY, entryPos.getZ());
+
                                             var shockwave = new ShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
 
                                             shockwave.setDamage((float) relic.getStatValue(livingEntity, stack, "bounce", "damage"));
                                             shockwave.setStun((int) relic.getStatValue(livingEntity, stack, "bounce", "stun") * 20);
-                                            shockwave.setPos(entryPos.getX() + 0.5F, entryPos.getY(), entryPos.getZ() + 0.5F);
-                                            shockwave.setBlockState(level.getBlockState(entryPos.below()));
+                                            shockwave.setPos(surfacePos.getX() + 0.5F, surfacePos.getY(), surfacePos.getZ() + 0.5F);
+                                            shockwave.setBlockState(level.getBlockState(surfacePos.below()));
                                             shockwave.setDeltaMovement(0, height, 0);
                                             shockwave.setCenter(livingEntity.blockPosition());
                                             shockwave.setOwner(livingEntity);
