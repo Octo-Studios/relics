@@ -11,12 +11,14 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
+import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -79,6 +81,19 @@ public class SpringyBootItem extends RelicItem {
                 .build();
     }
 
+    public int getBounceCooldown(ItemStack stack) {
+        return stack.getOrDefault(DataComponentRegistry.SPRINGY_BOOT_BOUNCE_COOLDOWN, 0);
+    }
+
+    public void setBounceCooldown(ItemStack stack, int cooldown) {
+        stack.set(DataComponentRegistry.SPRINGY_BOOT_BOUNCE_COOLDOWN, Math.max(0, cooldown));
+    }
+
+    public void addBounceCooldown(ItemStack stack, int cooldown) {
+        this.setBounceCooldown(stack, this.getBounceCooldown(stack) + cooldown);
+    }
+
+
     public boolean isLeaped(ItemStack stack) {
         return stack.getOrDefault(DataComponentRegistry.SPRINGY_BOOT_LEAPED, false);
     }
@@ -104,12 +119,27 @@ public class SpringyBootItem extends RelicItem {
         super.curioTick(slotContext, stack);
 
         var entity = slotContext.entity();
+        var level = entity.level();
 
+        if (level.isClientSide())
+            return;
+
+        var cooldown = this.getBounceCooldown(stack);
         var leaped = this.isLeaped(stack);
         var leaps = this.getLeaps(stack);
 
-        if (this.isAbilityRankModifierUnlocked(entity, stack, "bounce", "disappearance") && leaped && leaps <= 0)
-            entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
+        if (cooldown > 0)
+            this.addBounceCooldown(stack, -1);
+
+        if (leaped) {
+            if (entity.isInLiquid() || entity.isFallFlying() || (entity instanceof Player player && player.getAbilities().flying)) {
+                this.setLeaped(stack, false);
+                this.setLeaps(stack, 0);
+            }
+
+            if (this.isAbilityRankModifierUnlocked(entity, stack, "bounce", "disappearance") && leaps <= 0)
+                entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
+        }
     }
 
     @EventBusSubscriber
@@ -118,12 +148,14 @@ public class SpringyBootItem extends RelicItem {
         public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
             var entity = event.getEntity();
             var level = entity.level();
-            var random = entity.getRandom();
+
+            if (level.isClientSide())
+                return;
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
                 var relic = (SpringyBootItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "bounce") || relic.isLeaped(stack) || !entity.isShiftKeyDown())
+                if (!relic.canPlayerUseAbility(entity, stack, "bounce") || relic.isLeaped(stack) || relic.getBounceCooldown(stack) > 0 || !entity.isShiftKeyDown())
                     continue;
 
                 var lookAngle = entity.getLookAngle();
@@ -131,29 +163,14 @@ public class SpringyBootItem extends RelicItem {
                 if (lookAngle.y() < 0F)
                     lookAngle = new Vec3(lookAngle.x(), 0F, lookAngle.z());
 
-                var motion = entity.getDeltaMovement().add(lookAngle.multiply(-1F, 1F, -1F).add(0F, 0.5F, 0F).normalize().scale(relic.getStatValue(entity, stack, "bounce", "power")));
+                var motion = lookAngle.multiply(-1F, 1F, -1F).add(0F, 0.5F, 0F).normalize().scale(relic.getStatValue(entity, stack, "bounce", "power"));
 
-                entity.setDeltaMovement(motion);
+                NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(entity.getId(), motion.toVector3f()), entity);
 
                 relic.setLeaped(stack, true);
+                relic.addBounceCooldown(stack, 5);
 
                 level.playSound(null, entity.blockPosition(), SoundRegistry.SPRING_BOING.get(), SoundSource.MASTER, 5F, 0.5F);
-
-                for (int i = 0; i < 100; i += 1) {
-                    var angle = random.nextFloat() * Math.PI * 2;
-                    var radius = Math.sqrt(random.nextFloat()) * 0.35F;
-
-                    var dx = Math.cos(angle) * radius;
-                    var dz = Math.sin(angle) * radius;
-
-                    level.addParticle(ParticleTypes.CLOUD, entity.getX(), entity.getY(), entity.getZ(), dx, random.nextFloat() * 0.25F, dz);
-                }
-
-                for (int i = 0; i < 50; i += 1) {
-                    var particleMotion = motion.normalize().scale(random.nextFloat());
-
-                    level.addParticle(ParticleTypes.CLOUD, entity.getX() + MathUtils.randomFloat(random) * 0.5F, entity.getY(), entity.getZ() + MathUtils.randomFloat(random) * 0.5F, particleMotion.x(), particleMotion.y(), particleMotion.z());
-                }
             }
         }
 

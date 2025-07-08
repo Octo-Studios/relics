@@ -119,6 +119,7 @@ public class DataComponentRegistry {
                     .build()
     );
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SPRINGY_BOOT_BOUNCE_COOLDOWN = DataComponentRegistry.construct("springy_boot/bounce_cooldown", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SPRINGY_BOOT_LEAPED = DataComponentRegistry.construct("springy_boot/leaped", Codec.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SPRINGY_BOOT_LEAPS = DataComponentRegistry.construct("springy_boot/leaps", Codec.INT);
 

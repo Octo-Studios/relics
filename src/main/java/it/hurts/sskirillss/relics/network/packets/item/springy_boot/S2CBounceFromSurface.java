@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.network.packets.item.springy_boot;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
@@ -11,7 +10,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.joml.Vector3f;
@@ -60,12 +58,10 @@ public class S2CBounceFromSurface implements CustomPacketPayload {
                 level.addParticle(ParticleTypes.CLOUD, entity.getX(), entity.getY(), entity.getZ(), dx, random.nextFloat() * 0.15F, dz);
             }
 
-            if (!entity.isShiftKeyDown()) {
-                for (int i = 0; i < 50 * speed; i += 1) {
-                    var particleMotion = motion.normalize().scale(random.nextFloat());
+            for (int i = 0; i < 50 * speed; i += 1) {
+                var particleMotion = motion.normalize().scale(random.nextFloat());
 
-                    level.addParticle(ParticleTypes.CLOUD, entity.getX() + MathUtils.randomFloat(random) * 0.5F, entity.getY(), entity.getZ() + MathUtils.randomFloat(random) * 0.5F, particleMotion.x(), particleMotion.y(), particleMotion.z());
-                }
+                level.addParticle(ParticleTypes.CLOUD, entity.getX() + MathUtils.randomFloat(random) * 0.5F, entity.getY(), entity.getZ() + MathUtils.randomFloat(random) * 0.5F, particleMotion.x(), particleMotion.y(), particleMotion.z());
             }
         });
     }
