@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.client.models.items;
 
 import com.google.common.collect.ImmutableList;
-import it.hurts.sskirillss.relics.client.renderer.items.base.INecklaceModel;
 import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -11,7 +10,7 @@ import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 
-public class KineticBeltModel extends HumanoidModel<LivingEntity> implements INecklaceModel<LivingEntity> {
+public class KineticBeltModel extends HumanoidModel<LivingEntity> {
     public static final ModelLayerLocation LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "kinetic_belt"), "kinetic_belt");
 
     public ModelPart bodyPart;
@@ -43,10 +42,5 @@ public class KineticBeltModel extends HumanoidModel<LivingEntity> implements INe
     @Override
     protected Iterable<ModelPart> bodyParts() {
         return ImmutableList.of();
-    }
-
-    @Override
-    public ModelPart getBodyPart() {
-        return bodyPart;
     }
 }

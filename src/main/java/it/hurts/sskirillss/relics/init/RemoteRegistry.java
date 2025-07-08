@@ -10,12 +10,14 @@ import it.hurts.sskirillss.relics.client.gui.layers.PhantomBootBridgeLayer;
 import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceModel;
 import it.hurts.sskirillss.relics.client.models.items.KineticBeltModel;
 import it.hurts.sskirillss.relics.client.models.items.ReflectiveNecklaceModel;
+import it.hurts.sskirillss.relics.client.models.items.SpringyBootModel;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.JellyfishNecklaceRenderer;
 import it.hurts.sskirillss.relics.client.renderer.items.KineticBeltRenderer;
 import it.hurts.sskirillss.relics.client.renderer.items.ReflectiveNecklaceRenderer;
+import it.hurts.sskirillss.relics.client.renderer.items.SpringyBootRenderer;
 import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
 import it.hurts.sskirillss.relics.description_categories.AbilityDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategory;
@@ -125,6 +127,7 @@ public class RemoteRegistry {
         CuriosRendererRegistry.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
         CuriosRendererRegistry.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
         CuriosRendererRegistry.register(RelicsItems.KINETIC_BELT.get(), KineticBeltRenderer::new);
+        CuriosRendererRegistry.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
 
         for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
             if (!(item instanceof IRenderableCurio))
@@ -150,6 +153,7 @@ public class RemoteRegistry {
         event.registerLayerDefinition(ReflectiveNecklaceModel.LAYER, ReflectiveNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(JellyfishNecklaceModel.LAYER, JellyfishNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(KineticBeltModel.LAYER, KineticBeltModel::constructLayerDefinition);
+        event.registerLayerDefinition(SpringyBootModel.LAYER, SpringyBootModel::constructLayerDefinition);
 
         for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
             if (!(item instanceof IRenderableCurio renderable))

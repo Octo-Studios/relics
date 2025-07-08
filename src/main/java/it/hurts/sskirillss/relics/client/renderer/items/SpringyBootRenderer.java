@@ -1,0 +1,56 @@
+package it.hurts.sskirillss.relics.client.renderer.items;
+
+import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.client.models.items.SpringyBootModel;
+import it.hurts.sskirillss.relics.client.renderer.items.base.IRelicRenderer;
+import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
+import it.hurts.sskirillss.relics.utils.Reference;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
+import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.api.client.ICurioRenderer;
+
+public class SpringyBootRenderer implements ICurioRenderer, IRelicRenderer {
+    private final SpringyBootModel model;
+
+    public SpringyBootRenderer() {
+        this.model = new SpringyBootModel(Minecraft.getInstance().getEntityModels().bakeLayer(SpringyBootModel.LAYER));
+    }
+
+    @Override
+    public <E extends LivingEntity, EM extends EntityModel<E>> void render(ItemStack stack, SlotContext slotContext, PoseStack poseStack, RenderLayerParent<E, EM> parent, MultiBufferSource bufferSource, int light, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+        var entity = slotContext.entity();
+        var relic = (SpringyBootItem) stack.getItem();
+
+        this.model.prepareMobModel(entity, limbSwing, limbSwingAmount, partialTicks);
+        this.model.setupAnim(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch);
+
+        poseStack.pushPose();
+
+        ICurioRenderer.followBodyRotations(entity, this.model);
+
+        this.model.feetPart.copyFrom(this.model.leftLeg);
+
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/springy_boot.png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+
+        poseStack.popPose();
+
+        poseStack.pushPose();
+
+        ICurioRenderer.followBodyRotations(entity, this.model);
+
+        this.model.feetPart.copyFrom(this.model.rightLeg);
+
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/springy_boot.png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+
+        poseStack.popPose();
+    }
+}
