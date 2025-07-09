@@ -113,9 +113,9 @@ public class BlockMixin {
 
                                         var localRandom = new Random();
 
-                                        poses.stream().filter(p -> {
-                                            var dx = p.getX() - center.getX();
-                                            var dz = p.getZ() - center.getZ();
+                                        poses.stream().filter(pos -> {
+                                            var dx = pos.getX() - center.getX();
+                                            var dz = pos.getZ() - center.getZ();
                                             var dist = Math.hypot(dx, dz);
 
                                             return dist >= finalStep && dist < finalStep + 1;
@@ -139,8 +139,8 @@ public class BlockMixin {
                                             shockwave.setPos(surfacePos.getX() + 0.5F, surfacePos.getY(), surfacePos.getZ() + 0.5F);
                                             shockwave.setBlockState(level.getBlockState(surfacePos.below()));
                                             shockwave.setDeltaMovement(0, height, 0);
-                                            shockwave.setCenter(livingEntity.blockPosition());
                                             shockwave.setOwner(livingEntity);
+                                            shockwave.setCenter(surfacePos);
 
                                             level.addFreshEntity(shockwave);
 
@@ -148,9 +148,9 @@ public class BlockMixin {
 
                                             var rad = (finalStep + 0.5F + (localRandom.nextFloat() - 0.5F) * 0.3F);
 
-                                            var px = (float) (center.getX() + Math.cos(angle) * rad + 0.5F);
-                                            var py = entryPos.getY() + 0.5F + localRandom.nextFloat() * 0.2F;
-                                            var pz = (float) (center.getZ() + Math.sin(angle) * rad + 0.5F);
+                                            var px = (float) (surfacePos.getX() + Math.cos(angle) * rad + 0.5F);
+                                            var py = surfacePos.getY() + 0.5F + localRandom.nextFloat() * 0.2F;
+                                            var pz = (float) (surfacePos.getZ() + Math.sin(angle) * rad + 0.5F);
 
                                             var vx = (float) Math.cos(angle) * 0.2F;
                                             var vy = 0.025F + localRandom.nextFloat() * 0.05F;
