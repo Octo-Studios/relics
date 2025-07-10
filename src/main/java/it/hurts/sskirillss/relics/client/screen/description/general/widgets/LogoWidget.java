@@ -80,15 +80,17 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
 
         var tween = Tween.create().setParallel(true);
 
-        tween.tweenMethod(this::setYSqueeze, this.getYSqueeze(), 1.2F, 0.05D).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUAD);
-        tween.tweenMethod(this::setXSqueeze, this.getXSqueeze(), 1.2F, 0.1D).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUAD);
-        tween.tweenMethod(this::setYSqueeze, this.getYSqueeze(), 1F, 0.1D).setDelay(0.05D).setEaseType(EaseType.EASE_OUT);
-        tween.tweenMethod(this::setXSqueeze, this.getXSqueeze(), 1F, 0.1D).setDelay(0.1D).setEaseType(EaseType.EASE_IN);
+        tween.tweenMethod(this::setYSqueeze, this.getYSqueeze(), 1.2F, 0.2D).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUAD);
+        tween.tweenMethod(this::setXSqueeze, this.getXSqueeze(), 1.2F, 0.2D).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUAD);
+        tween.tweenMethod(this::setYSqueeze, 1.2F, 1F, 0.4D).setDelay(0.2D).setEaseType(EaseType.EASE_OUT);
+        tween.tweenMethod(this::setXSqueeze, 1.2F, 1F, 0.4D).setDelay(0.2D).setEaseType(EaseType.EASE_IN);
+
+        tween.start();
 
         LogoWidget.addClicks(1);
 
-        if (LogoWidget.getRemainingClicks() == 0)
-            screen.rebuildWidgets();
+//        if (LogoWidget.getRemainingClicks() == 0)
+//            screen.rebuildWidgets();
     }
 
     @Override

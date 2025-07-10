@@ -127,7 +127,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         }
 
         if (!paginatedAbilities.isEmpty()) {
-            int objectWidth = 32;
+            int objectWidth = 38;
             int containerWidth = 209;
 
             int count = paginatedAbilities.size();

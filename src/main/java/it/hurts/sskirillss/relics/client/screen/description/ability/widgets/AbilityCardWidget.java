@@ -23,6 +23,7 @@ import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
+import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -35,6 +36,7 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec2;
 
@@ -47,7 +49,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
     private final String ability;
 
     public AbilityCardWidget(int x, int y, AbilityDescriptionScreen screen, String ability) {
-        super(x, y, 32, 49);
+        super(x, y, 38, 49);
 
         this.screen = screen;
         this.ability = ability;
@@ -177,6 +179,11 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         GUIRenderer.begin(canBeUpgraded ? canUse ? DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_INACTIVE : canUse ? DescriptionTextures.SMALL_CARD_FRAME_LOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_LOCKED_INACTIVE, poseStack).end();
 
+        var level = relic.getAbilityLevel(player, stack, ability);
+        var maxLevel = relic.getAbilityTemplate(player, stack, ability).getMaxLevel();
+
+        drawProgressBar(guiGraphics, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/small_card_filler.png"), (-this.width / 2F) + 2, (-this.height / 2F) + 3F, (float) level / maxLevel);
+
         if (isHovered())
             GUIRenderer.begin(DescriptionTextures.SMALL_CARD_FRAME_OUTLINE, poseStack)
                     .end();
@@ -202,7 +209,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     .pos(0, -1)
                     .end();
 
-            MutableComponent level = Component.literal(String.valueOf(relic.getAbilityTemplate(player, stack, ability).getRequiredLevel())).withStyle(ChatFormatting.BOLD);
+            MutableComponent levelComponent = Component.literal(String.valueOf(relic.getAbilityTemplate(player, stack, ability).getRequiredLevel())).withStyle(ChatFormatting.BOLD);
 
             poseStack.pushPose();
 
@@ -211,7 +218,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             poseStack.scale(0.5F, 0.5F, 0.5F);
 
-            guiGraphics.drawString(minecraft.font, level, (-(width / 2) + 16) * 2 - minecraft.font.width(level) / 2, (-(height / 2) + 24) * 2, isEnoughLevel ? 0xFFE278 : 0xB7AED9, true);
+            guiGraphics.drawString(minecraft.font, levelComponent, (-(width / 2) + 16) * 2 - minecraft.font.width(levelComponent) / 2, (-(height / 2) + 24) * 2, isEnoughLevel ? 0xFFE278 : 0xB7AED9, true);
 
             poseStack.popPose();
         }
@@ -247,25 +254,15 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             if (canBeUpgraded && canUse) {
                 int xOff = 0;
 
-                for (int i = 0; i < 5; i++) {
-                    GUIRenderer.begin(DescriptionTextures.SMALL_STAR_HOLE, poseStack)
-                            .pos((int) -(width / 2F) + xOff + 8, (int) -(height / 2F) + 42)
-                            .end();
-
-                    xOff += 4;
-                }
-
-                xOff = 0;
-
                 int quality = relic.calculateAbilityQuality(player, stack, ability);
                 boolean isAliquot = quality % 2 == 1;
 
                 for (int i = 0; i < Math.floor(quality / 2D); i++) {
                     GUIRenderer.begin(DescriptionTextures.SMALL_STAR_ACTIVE, poseStack)
-                            .pos(-(width / 2F) + xOff + 8, -(height / 2F) + 42)
+                            .pos(-(width / 2F) + xOff + 9, -(height / 2F) + 43)
                             .end();
 
-                    xOff += 4;
+                    xOff += 5;
                 }
 
                 if (isAliquot)
@@ -284,13 +281,155 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                 poseStack.scale(textScale, textScale, textScale);
 
-                guiGraphics.drawString(minecraft.font, title, -((width + 1) / 2) - (minecraft.font.width(title) / 2) + 16, (-(height / 2) - 19), canUse ? 0xFFE278 : 0xB7AED9, true);
+                guiGraphics.drawString(minecraft.font, title, -((width + 1) / 2) - (minecraft.font.width(title) / 2) + 19, (-(height / 2) - 19), canUse ? 0xFFE278 : 0xB7AED9, true);
             }
         }
 
         RenderSystem.disableBlend();
 
         poseStack.popPose();
+    }
+
+    public static void drawProgressBar(GuiGraphics gui, ResourceLocation tex, float x, float y, float progress) {
+        var textureWidth = 34;
+        var textureHeight = 44;
+        var cornerSize = 3;
+        var borderThickness = 3;
+        var topStartU = 7;
+        var topEndU = 27;
+        var verticalEdgeLength = textureHeight - 2 * cornerSize;
+        var horizontalEdgeLength = textureWidth - 2 * cornerSize;
+        var segTop = topStartU - cornerSize + 1;
+        var segCornerTopLeft = cornerSize;
+        var segLeftEdge = verticalEdgeLength;
+        var segCornerBotLeft = cornerSize;
+        var segBottom = horizontalEdgeLength;
+        var segCornerBotRight = cornerSize;
+        var segRightEdge = verticalEdgeLength;
+        var segCornerTopRight = cornerSize;
+        var segTopRightPart = textureWidth - cornerSize - topEndU;
+        var totalLength = segTop + segCornerTopLeft + segLeftEdge + segCornerBotLeft + segBottom + segCornerBotRight + segRightEdge + segCornerTopRight + segTopRightPart;
+
+        var remaining = (int) (Mth.clamp(progress, 0f, 1f) * totalLength);
+
+        if (remaining <= 0)
+            return;
+
+        var renderer = GUIRenderer
+                .begin(tex, gui.pose())
+                .texSize(textureWidth, textureHeight)
+                .anchor(SpriteAnchor.TOP_LEFT);
+
+        var drawLen = 0;
+        var moveLen = 0;
+
+        drawLen = Math.min(remaining, segTop);
+
+        var u0 = topStartU - drawLen + 1;
+
+        renderer.pos(x + u0, y)
+                .patternSize(drawLen, borderThickness)
+                .texOff(u0, 0)
+                .end();
+
+        remaining -= drawLen;
+
+        if (remaining > 0) {
+            drawLen = Math.min(remaining, segCornerTopLeft);
+
+            var offsetU1 = cornerSize - drawLen;
+
+            renderer.pos(x + offsetU1, y)
+                    .patternSize(drawLen, borderThickness)
+                    .texOff(offsetU1, 0)
+                    .end();
+
+            remaining -= drawLen;
+        }
+
+        if (remaining > 0) {
+            moveLen = Math.min(remaining, segLeftEdge);
+
+            renderer.pos(x, y + cornerSize)
+                    .patternSize(borderThickness, moveLen)
+                    .texOff(0, cornerSize)
+                    .end();
+
+            remaining -= moveLen;
+        }
+
+        if (remaining > 0) {
+            drawLen = Math.min(remaining, segCornerBotLeft);
+
+            renderer.pos(x, y + textureHeight - borderThickness)
+                    .patternSize(drawLen, borderThickness)
+                    .texOff(0, textureHeight - borderThickness)
+                    .end();
+
+            remaining -= drawLen;
+        }
+
+        if (remaining > 0) {
+            drawLen = Math.min(remaining, segBottom);
+
+            renderer.pos(x + cornerSize, y + textureHeight - borderThickness)
+                    .patternSize(drawLen, borderThickness)
+                    .texOff(cornerSize, textureHeight - borderThickness)
+                    .end();
+
+            remaining -= drawLen;
+        }
+
+        if (remaining > 0) {
+            drawLen = Math.min(remaining, segCornerBotRight);
+
+            var offsetUBot = textureWidth - cornerSize;
+
+            renderer.pos(x + offsetUBot, y + textureHeight - borderThickness)
+                    .patternSize(drawLen, borderThickness)
+                    .texOff(offsetUBot, textureHeight - borderThickness)
+                    .end();
+
+            remaining -= drawLen;
+        }
+
+        if (remaining > 0) {
+            moveLen = Math.min(remaining, segRightEdge);
+
+            var v6 = cornerSize + (verticalEdgeLength - moveLen);
+
+            renderer.pos(x + textureWidth - borderThickness, y + v6)
+                    .patternSize(borderThickness, moveLen)
+                    .texOff(textureWidth - borderThickness, v6)
+                    .end();
+
+            remaining -= moveLen;
+        }
+
+        if (remaining > 0) {
+            drawLen = Math.min(remaining, segCornerTopRight);
+
+            var u7 = textureWidth - borderThickness;
+
+            renderer.pos(x + u7, y)
+                    .patternSize(borderThickness, drawLen)
+                    .texOff(u7, 0)
+                    .end();
+
+            remaining -= drawLen;
+        }
+
+        if (remaining > 0) {
+            drawLen = Math.min(remaining, segTopRightPart);
+
+            var startU8 = textureWidth - cornerSize - 1;
+            var offsetU8 = startU8 - (drawLen - 1);
+
+            renderer.pos(x + offsetU8, y)
+                    .patternSize(drawLen, borderThickness)
+                    .texOff(offsetU8, 0)
+                    .end();
+        }
     }
 
     @Override

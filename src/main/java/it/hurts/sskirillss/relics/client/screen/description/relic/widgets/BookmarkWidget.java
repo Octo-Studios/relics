@@ -151,6 +151,8 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
 
             hoverTween.tweenMethod(this::setSlideProgress, 0D, 1D, 0.075D).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUART);
             hoverTween.tweenMethod(this::setAnimationProgress, 0D, 1D, animationDuration * (1 - animationProgress)).setTransitionType(TransitionType.LINEAR);
+
+            hoverTween.start();
         } else if (!hovered && hasHovered) {
             hasHovered = false;
 
@@ -161,6 +163,8 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
 
             hoverTween.tweenMethod(this::setSlideProgress, 1D, 0D, 0.15D).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUART);
             hoverTween.tweenMethod(this::setAnimationProgress, 1D, 0D, animationDuration * animationProgress).setTransitionType(TransitionType.LINEAR);
+
+            hoverTween.start();
         }
     }
 
