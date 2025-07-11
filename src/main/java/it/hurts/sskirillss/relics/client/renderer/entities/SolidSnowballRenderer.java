@@ -2,9 +2,9 @@ package it.hurts.sskirillss.relics.client.renderer.entities;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.entities.SolidSnowballModel;
 import it.hurts.sskirillss.relics.entities.SolidSnowballEntity;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -38,7 +38,7 @@ public class SolidSnowballRenderer extends EntityRenderer<SolidSnowballEntity> {
 
         matrixStackIn.scale(scale, scale, scale);
 
-        new SolidSnowballModel<>().renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Reference.MODID,
+        new SolidSnowballModel<>().renderToBuffer(matrixStackIn, bufferIn.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID,
                 "textures/entities/solid_snowball.png"))), packedLightIn, OverlayTexture.NO_OVERLAY);
 
         matrixStackIn.popPose();
@@ -46,6 +46,6 @@ public class SolidSnowballRenderer extends EntityRenderer<SolidSnowballEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(SolidSnowballEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/entities/solid_snowball.png");
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/entities/solid_snowball.png");
     }
 }

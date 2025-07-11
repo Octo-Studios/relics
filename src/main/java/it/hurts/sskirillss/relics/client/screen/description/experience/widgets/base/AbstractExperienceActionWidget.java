@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.experience.widgets.base;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
@@ -9,7 +10,6 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionText
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ExperienceParticleData;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
-import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -45,7 +45,7 @@ public abstract class AbstractExperienceActionWidget extends AbstractDescription
 
         String actionId = operation.toString().toLowerCase(Locale.ROOT);
 
-        guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/ability/" + actionId + "_button_" + (isLocked() ? "inactive" : "active") + ".png"), getX(), getY(), 0, 0, width, height, width, height);
+        guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/" + actionId + "_button_" + (isLocked() ? "inactive" : "active") + ".png"), getX(), getY(), 0, 0, width, height, width, height);
 
         if (isHovered)
             guiGraphics.blit(DescriptionTextures.ACTION_BUTTON_OUTLINE, getX(), getY(), 0, 0, width, height, width, height);

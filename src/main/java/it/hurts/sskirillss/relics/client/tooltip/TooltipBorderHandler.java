@@ -2,10 +2,10 @@ package it.hurts.sskirillss.relics.client.tooltip;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,7 +17,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 import org.lwjgl.opengl.GL11;
 
-@EventBusSubscriber(modid = Reference.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class TooltipBorderHandler {
     @SubscribeEvent
     public static void onTooltipDisplay(TooltipDisplayEvent event) {
@@ -47,7 +47,7 @@ public class TooltipBorderHandler {
 
         var id = tooltip.getIcon().isEmpty() ? BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() : tooltip.getIcon();
 
-        var texture = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/tooltip/frame/" + id + "/frame.png");
+        var texture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/tooltip/frame/" + id + "/frame.png");
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShaderTexture(0, texture);
@@ -75,7 +75,7 @@ public class TooltipBorderHandler {
 
         poseStack.translate(0, 0, 410.0);
 
-        var animation = AnimationData.fromMcmeta(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/tooltip/frame/" + id + "/frame.png.mcmeta"));
+        var animation = AnimationData.fromMcmeta(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/tooltip/frame/" + id + "/frame.png.mcmeta"));
 
         int frame = animation.getFrameByTime(player.tickCount).getKey();
 
@@ -90,7 +90,7 @@ public class TooltipBorderHandler {
         graphics.blit(texture, x + (width - middleWidth) / 2, y - middleHeight + 1, cornerWidth, offset, middleWidth, middleHeight, texWidth, texHeight);
         graphics.blit(texture, x + (width - middleWidth) / 2, y + height - 1, cornerWidth, middleHeight + offset, middleWidth, middleHeight, texWidth, texHeight);
 
-        texture = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/tooltip/frame/" + id + "/star.png");
+        texture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/tooltip/frame/" + id + "/star.png");
 
         RenderSystem.setShaderTexture(0, texture);
 

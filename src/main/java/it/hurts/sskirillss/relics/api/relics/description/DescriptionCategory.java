@@ -3,7 +3,6 @@ package it.hurts.sskirillss.relics.api.relics.description;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 

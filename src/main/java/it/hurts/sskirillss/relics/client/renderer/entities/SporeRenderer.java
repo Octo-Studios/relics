@@ -2,9 +2,9 @@ package it.hurts.sskirillss.relics.client.renderer.entities;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.entities.SporeModel;
 import it.hurts.sskirillss.relics.entities.SporeEntity;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -47,6 +47,6 @@ public class SporeRenderer extends EntityRenderer<SporeEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(SporeEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/entities/spore.png");
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/entities/spore.png");
     }
 }

@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.init;
 
 import com.mojang.serialization.Codec;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.WorldPosition;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
@@ -19,7 +19,7 @@ import java.util.List;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class DataComponentRegistry {
-    public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, Reference.MODID);
+    public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, Relics.MODID);
 
     // TODO: Rename to RELIC_DATA or just RELIC instead of DATA
     @Deprecated(since = "1.21", forRemoval = true)

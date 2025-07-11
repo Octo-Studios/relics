@@ -2,11 +2,11 @@ package it.hurts.sskirillss.relics.client.renderer.items;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceModel;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceArcModel;
+import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceModel;
 import it.hurts.sskirillss.relics.client.renderer.items.base.AbstractNecklaceRenderer;
 import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LightTexture;
@@ -22,7 +22,7 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 public class JellyfishNecklaceRenderer extends AbstractNecklaceRenderer<LivingEntity, JellyfishNecklaceModel> {
     public JellyfishNecklaceRenderer() {
-        super(() -> new JellyfishNecklaceModel(Minecraft.getInstance().getEntityModels().bakeLayer(JellyfishNecklaceModel.LAYER)), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/jellyfish_necklace.png"));
+        super(() -> new JellyfishNecklaceModel(Minecraft.getInstance().getEntityModels().bakeLayer(JellyfishNecklaceModel.LAYER)), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/jellyfish_necklace.png"));
     }
 
     @Override
@@ -59,7 +59,7 @@ public class JellyfishNecklaceRenderer extends AbstractNecklaceRenderer<LivingEn
 
             poseStack.scale(scale, scale, scale);
 
-            new JellyfishNecklaceArcModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/jellyfish_necklace_arc_" + ((int) (time % 4) + 1) + ".png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+            new JellyfishNecklaceArcModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/jellyfish_necklace_arc_" + ((int) (time % 4) + 1) + ".png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
             poseStack.popPose();
         }

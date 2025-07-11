@@ -1,10 +1,10 @@
 package it.hurts.sskirillss.relics.network.packets.leveling;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class PacketAbilityTweak implements CustomPacketPayload {
         this(container, slot, ability, operation, false);
     }
 
-    public static final CustomPacketPayload.Type<PacketAbilityTweak> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "relic_tweak"));
+    public static final CustomPacketPayload.Type<PacketAbilityTweak> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "relic_tweak"));
 
     public static final StreamCodec<ByteBuf, PacketAbilityTweak> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, PacketAbilityTweak::getContainer,

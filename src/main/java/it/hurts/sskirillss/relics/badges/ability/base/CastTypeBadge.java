@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.badges.ability.base;
 
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import lombok.Getter;
 import net.minecraft.network.chat.Component;

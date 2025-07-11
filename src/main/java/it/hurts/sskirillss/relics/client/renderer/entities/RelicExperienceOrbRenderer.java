@@ -2,8 +2,8 @@ package it.hurts.sskirillss.relics.client.renderer.entities;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.entities.RelicExperienceOrbEntity;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -65,6 +65,6 @@ public class RelicExperienceOrbRenderer extends EntityRenderer<RelicExperienceOr
 
     @Override
     public ResourceLocation getTextureLocation(RelicExperienceOrbEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/entities/experience/relics/relic_experience_" + entity.getStage() + ".png");
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/entities/experience/relics/relic_experience_" + entity.getStage() + ".png");
     }
 }

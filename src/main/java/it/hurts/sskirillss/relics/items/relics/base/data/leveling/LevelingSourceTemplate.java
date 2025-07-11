@@ -1,12 +1,11 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
-
-import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.Builder;
 import lombok.Data;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -79,7 +78,7 @@ public class LevelingSourceTemplate {
     private GemColor color = GemColor.RED;
 
     public static class LevelingSourceTemplateBuilder {
-        private Function<ItemStack, ResourceLocation> icon = (stack) -> ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/abilities/missing.png");
+        private Function<ItemStack, ResourceLocation> icon = (stack) -> ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/abilities/missing.png");
         private Function<ItemStack, String> translationPath = (stack) -> "";
 
         private Pair<ScalingModel, Integer> upgradeModifier = Pair.of(ScalingModelRegistry.ADDITIVE.get(), 0);
@@ -107,7 +106,7 @@ public class LevelingSourceTemplate {
         }
 
         public LevelingSourceTemplateBuilder genericIcon(String icon) {
-            return manualIcon((stack) -> ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/leveling_source/generic/" + icon + ".png"));
+            return manualIcon((stack) -> ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/leveling_source/generic/" + icon + ".png"));
         }
 
         public LevelingSourceTemplateBuilder abilityIcon(String ability) {

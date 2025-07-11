@@ -1,14 +1,8 @@
 package it.hurts.sskirillss.relics.client.screen.description.misc;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.utils.Reference;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
@@ -54,7 +48,7 @@ public class DescriptionUtils {
         return Color.HSBtoRGB(hsbValues[0], hsbValues[1], hsbValues[2]);
     }
 
-    private static final ResourceLocation TOOLTIP = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/tooltip.png");
+    private static final ResourceLocation TOOLTIP = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/tooltip.png");
 
     @OnlyIn(Dist.CLIENT)
     public static void drawTooltipBackground(GuiGraphics guiGraphics, int width, int height, int x, int y) {

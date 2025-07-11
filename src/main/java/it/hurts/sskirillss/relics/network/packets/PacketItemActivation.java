@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.network.packets;
 
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.client.Minecraft;
@@ -16,7 +16,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 public class PacketItemActivation implements CustomPacketPayload {
     private final ItemStack stack;
 
-    public static final CustomPacketPayload.Type<PacketItemActivation> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "item_activation"));
+    public static final CustomPacketPayload.Type<PacketItemActivation> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "item_activation"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketItemActivation> STREAM_CODEC = StreamCodec.composite(
             ItemStack.STREAM_CODEC, PacketItemActivation::getStack,

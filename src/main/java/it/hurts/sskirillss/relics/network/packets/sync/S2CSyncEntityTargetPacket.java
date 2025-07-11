@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.network.packets.sync;
 
 import io.netty.buffer.ByteBuf;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
-import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -18,7 +18,7 @@ public class S2CSyncEntityTargetPacket implements CustomPacketPayload {
     private final int sourceId;
     private final int targetId;
 
-    public static final CustomPacketPayload.Type<S2CSyncEntityTargetPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "entity_target"));
+    public static final CustomPacketPayload.Type<S2CSyncEntityTargetPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "entity_target"));
 
     public static final StreamCodec<ByteBuf, S2CSyncEntityTargetPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, S2CSyncEntityTargetPacket::getTargetId,

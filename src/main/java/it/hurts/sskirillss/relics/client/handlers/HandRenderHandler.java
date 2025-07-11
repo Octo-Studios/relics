@@ -2,11 +2,11 @@ package it.hurts.sskirillss.relics.client.handlers;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.base.SidedFPRCurioModel;
 import it.hurts.sskirillss.relics.client.models.items.utils.ModelSide;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -20,7 +20,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
-@EventBusSubscriber(modid = Reference.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class HandRenderHandler {
     @SubscribeEvent
     public static void onRenderHand(RenderArmEvent event) {

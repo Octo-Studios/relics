@@ -3,8 +3,8 @@ package it.hurts.sskirillss.relics.client.handlers;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -22,7 +22,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Optional;
 
-@EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
 public class ArmorRenderHandler {
     private static final LoadingCache<Object, Deque<Runnable>> cache = CacheBuilder.newBuilder().weakKeys().build(new CacheLoader<Object, Deque<Runnable>>() {
         @Override

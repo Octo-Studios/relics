@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.client.models.parts;
 import com.google.common.collect.ImmutableList;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -15,7 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import javax.annotation.Nonnull;
 
 public class WingsModel extends HumanoidModel<LivingEntity> {
-    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/parts/wings.png"), "wings");
+    public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/parts/wings.png"), "wings");
 
     public WingsModel(ModelPart root) {
         super(root);

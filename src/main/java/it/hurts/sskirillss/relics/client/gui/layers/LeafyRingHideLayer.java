@@ -3,10 +3,10 @@ package it.hurts.sskirillss.relics.client.gui.layers;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.octostudios.octolib.client.animation.easing.EaseType;
 import it.hurts.octostudios.octolib.client.animation.easing.TransitionType;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.ring.LeafyRingItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import it.hurts.sskirillss.relics.utils.data.SpriteMirror;
@@ -20,7 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.awt.*;
 
 public class LeafyRingHideLayer implements LayeredDraw.Layer {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/leafy_ring_hide.png");
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/leafy_ring_hide.png");
     private static final ResourceLocation VIGNETTE = ResourceLocation.withDefaultNamespace("textures/misc/vignette.png");
 
     @Override

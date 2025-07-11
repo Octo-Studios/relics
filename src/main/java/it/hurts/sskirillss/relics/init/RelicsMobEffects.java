@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.init;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.effects.*;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 import net.neoforged.bus.api.IEventBus;
@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class RelicsMobEffects {
-    public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, Reference.MODID);
+    public static final DeferredRegister<MobEffect> EFFECTS = DeferredRegister.create(BuiltInRegistries.MOB_EFFECT, Relics.MODID);
 
     public static final DeferredHolder<MobEffect, MobEffect> IMMORTALITY = EFFECTS.register("immortality", ImmortalityEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> CONFUSION = EFFECTS.register("confusion", ConfusionEffect::new);

@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.client.models.items;
 
 import com.google.common.collect.ImmutableList;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.renderer.items.base.INecklaceModel;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 
 public class JellyfishNecklaceModel extends HumanoidModel<LivingEntity> implements INecklaceModel<LivingEntity> {
-    public static final ModelLayerLocation LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "jellyfish_necklace"), "jellyfish_necklace");
+    public static final ModelLayerLocation LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "jellyfish_necklace"), "jellyfish_necklace");
 
     public ModelPart bodyPart;
 

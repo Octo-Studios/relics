@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.init;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.entities.*;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -10,7 +10,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class RelicsEntities {
-    private static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, Reference.MODID);
+    private static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, Relics.MODID);
 
     public static final DeferredHolder<EntityType<?>, EntityType<ElectricSparkEntity>> ELECTRIC_SPARK = ENTITIES.register("electric_spark", () ->
             EntityType.Builder.<ElectricSparkEntity>of(ElectricSparkEntity::new, MobCategory.MISC)

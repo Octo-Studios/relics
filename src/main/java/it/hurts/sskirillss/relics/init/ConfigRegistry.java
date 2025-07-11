@@ -1,11 +1,11 @@
 package it.hurts.sskirillss.relics.init;
 
 import it.hurts.octostudios.octolib.module.config.ConfigManager;
+import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.config.LootConfigData;
 import it.hurts.sskirillss.relics.config.RelicsConfigData;
 import it.hurts.sskirillss.relics.config.data.RelicConfigData;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
@@ -17,10 +17,10 @@ public class ConfigRegistry {
     public static final LootConfigData LOOT_CONFIG = new LootConfigData();
 
     public static void register() {
-        ConfigManager.registerConfig(Reference.MODID, RELICS_CONFIG);
+        ConfigManager.registerConfig(Relics.MODID, RELICS_CONFIG);
 
         if (RELICS_CONFIG.isEnabledExtendedConfigs()) {
-            ConfigManager.registerConfig(Reference.MODID + "/loot", LOOT_CONFIG);
+            ConfigManager.registerConfig(Relics.MODID + "/loot", LOOT_CONFIG);
 
             for (Map.Entry<ResourceKey<Item>, Item> entry : BuiltInRegistries.ITEM.entrySet()) {
                 if (!(entry.getValue() instanceof IRelicItem relic))

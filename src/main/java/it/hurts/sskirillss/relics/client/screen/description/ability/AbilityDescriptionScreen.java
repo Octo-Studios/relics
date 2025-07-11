@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.ability;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
@@ -20,7 +21,6 @@ import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.PageWi
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -214,7 +214,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         poseStack.pushPose();
 
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/top_background_delimiter.png"), poseStack)
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/top_background_delimiter.png"), poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(x + 107, y + 70)
                 .end();

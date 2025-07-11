@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.network.packets.capability;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.client.Minecraft;
@@ -20,7 +20,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 public class CapabilitySyncPacket implements CustomPacketPayload {
     private final CompoundTag data;
 
-    public static final CustomPacketPayload.Type<CapabilitySyncPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "capability_sync"));
+    public static final CustomPacketPayload.Type<CapabilitySyncPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "capability_sync"));
 
     public static final StreamCodec<ByteBuf, CapabilitySyncPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.COMPOUND_TAG, CapabilitySyncPacket::getData,

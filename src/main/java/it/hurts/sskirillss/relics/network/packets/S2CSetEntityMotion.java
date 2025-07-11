@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.network.packets;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -18,7 +18,7 @@ public class S2CSetEntityMotion implements CustomPacketPayload {
     private final int id;
     private final Vector3f motion;
 
-    public static final CustomPacketPayload.Type<S2CSetEntityMotion> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "entity_motion"));
+    public static final CustomPacketPayload.Type<S2CSetEntityMotion> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "entity_motion"));
 
     public static final StreamCodec<ByteBuf, S2CSetEntityMotion> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, S2CSetEntityMotion::getId,

@@ -1,10 +1,10 @@
 package it.hurts.sskirillss.relics.network.packets.research;
 
 import io.netty.buffer.ByteBuf;
+import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -36,7 +36,7 @@ public class PacketManageLink implements CustomPacketPayload {
     private final int from;
     private final int to;
 
-    public static final Type<PacketManageLink> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "manage_link"));
+    public static final Type<PacketManageLink> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "manage_link"));
 
     public static final StreamCodec<ByteBuf, PacketManageLink> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, PacketManageLink::getContainer,

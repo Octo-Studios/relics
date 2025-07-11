@@ -2,9 +2,9 @@ package it.hurts.sskirillss.relics.effects;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.effects.StunStarModel;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -25,7 +25,7 @@ public class StunEffect extends MobEffect {
         super(MobEffectCategory.HARMFUL, 0X6836AA);
     }
 
-    @EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
     public static class ClientEvents {
         @SubscribeEvent
         public static void onMouseInput(InputEvent.InteractionKeyMappingTriggered event) {

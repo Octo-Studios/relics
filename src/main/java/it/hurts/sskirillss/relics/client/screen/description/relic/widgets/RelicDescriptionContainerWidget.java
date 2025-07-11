@@ -1,8 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.client.screen.base.IScrollableWidget;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
@@ -10,9 +8,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
-
-import javax.annotation.Nullable;
-import java.util.List;
 
 public class RelicDescriptionContainerWidget extends DescriptionContainerWidget {
     public RelicDescriptionContainerWidget(int x, int y, RelicDescriptionScreen screen) {

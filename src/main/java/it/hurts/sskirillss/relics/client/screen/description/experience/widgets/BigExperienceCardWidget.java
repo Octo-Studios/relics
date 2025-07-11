@@ -1,15 +1,15 @@
 package it.hurts.sskirillss.relics.client.screen.description.experience.widgets;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.research.particles.SmokeParticleData;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.ChatFormatting;
@@ -59,7 +59,7 @@ public class BigExperienceCardWidget extends AbstractDescriptionWidget implement
 
             RenderSystem.enableBlend();
 
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/experience/filters/" + sourceData.getColor().name().toLowerCase(Locale.ROOT) + ".png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/experience/filters/" + sourceData.getColor().name().toLowerCase(Locale.ROOT) + ".png"), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() + 7, getY() + 10)
                     .texSize(34, 49)

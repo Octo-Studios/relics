@@ -2,9 +2,9 @@ package it.hurts.sskirillss.relics.client.renderer.entities;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.entities.ReflectiveOrbModel;
 import it.hurts.sskirillss.relics.entities.ReflectiveOrbEntity;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -77,6 +77,6 @@ public class ReflectiveOrbRenderer extends EntityRenderer<ReflectiveOrbEntity> {
 
     @Override
     public ResourceLocation getTextureLocation(ReflectiveOrbEntity entity) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/entities/reflective_orb" + (entity.isFlawless() ? "_flawless" : "") + ".png");
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/entities/reflective_orb" + (entity.isFlawless() ? "_flawless" : "") + ".png");
     }
 }

@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.network.packets.leveling;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.ChatFormatting;
@@ -23,7 +23,7 @@ public class FixLevelingPoints implements CustomPacketPayload {
     private final int container;
     private final int slot;
 
-    public static final Type<FixLevelingPoints> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "fix_leveling_points"));
+    public static final Type<FixLevelingPoints> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "fix_leveling_points"));
 
     public static final StreamCodec<ByteBuf, FixLevelingPoints> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, FixLevelingPoints::getContainer,

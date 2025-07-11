@@ -1,11 +1,11 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.cast.containers;
 
-import it.hurts.sskirillss.relics.init.RelicContainerRegistry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.init.RelicContainerRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityReference;
 import it.hurts.sskirillss.relics.system.casts.slots.CurioSlotReference;
 import net.minecraft.world.entity.LivingEntity;

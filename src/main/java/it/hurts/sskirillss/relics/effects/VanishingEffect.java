@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.effects;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
@@ -16,7 +16,7 @@ public class VanishingEffect extends MobEffect {
         super(MobEffectCategory.BENEFICIAL, 0X6836AA);
     }
 
-    @EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)
+    @EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
     public static class ClientEvents {
         @SubscribeEvent
         public static void onEntityRender(RenderLivingEvent.Pre<?, ?> event) {

@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.hands;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
@@ -11,8 +12,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.items.base.SidedCurioModel;
 import it.hurts.sskirillss.relics.client.models.items.base.SidedFPRCurioModel;
-import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsItems;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -28,7 +29,6 @@ import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.PartPose;
@@ -337,7 +337,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
         return Lists.newArrayList("right_arm", "left_arm");
     }
 
-    @EventBusSubscriber(modid = Reference.MODID)
+    @EventBusSubscriber(modid = Relics.MODID)
     public static class Events {
         @SubscribeEvent
         public static void onLivingHurt(LivingIncomingDamageEvent event) {

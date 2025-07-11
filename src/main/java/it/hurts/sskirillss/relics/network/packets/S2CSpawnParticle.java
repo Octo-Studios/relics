@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.network.packets;
 
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.core.particles.ParticleOptions;
@@ -20,7 +20,7 @@ public class S2CSpawnParticle implements CustomPacketPayload {
     private final Vector3f pos;
     private final Vector3f motion;
 
-    public static final Type<S2CSpawnParticle> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "spawn_particle"));
+    public static final Type<S2CSpawnParticle> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "spawn_particle"));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, S2CSpawnParticle> STREAM_CODEC = StreamCodec.composite(
             ParticleTypes.STREAM_CODEC, S2CSpawnParticle::getParticle,

@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.base;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.init.CreativeTabRegistry;
 import it.hurts.sskirillss.relics.items.ItemBase;
@@ -9,7 +10,6 @@ import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
 import it.hurts.sskirillss.relics.items.misc.ICreativeTabContent;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -49,7 +49,7 @@ public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicIt
         if (attributes != null)
             attributes.getAttributes().forEach(attribute ->
                     modifiers.put(attribute.getAttribute(), new AttributeModifier(
-                            ResourceLocation.fromNamespaceAndPath(Reference.MODID, BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.getAttribute().value()).getPath() + "_" + slotContext.identifier() + "_" + slotContext.index()),
+                            ResourceLocation.fromNamespaceAndPath(Relics.MODID, BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.getAttribute().value()).getPath() + "_" + slotContext.identifier() + "_" + slotContext.index()),
                             attribute.getMultiplier(), attribute.getOperation())));
 
         if (slots != null)
@@ -85,6 +85,6 @@ public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicIt
 
     @Override
     public String getConfigRoute() {
-        return Reference.MODID;
+        return Relics.MODID;
     }
 }

@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.network.packets;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -26,7 +26,7 @@ public class PacketSyncEntityEffects implements CustomPacketPayload {
     private final Action action;
     private final int entity;
 
-    public static final CustomPacketPayload.Type<PacketSyncEntityEffects> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "sync_entity_effect"));
+    public static final CustomPacketPayload.Type<PacketSyncEntityEffects> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "sync_entity_effect"));
 
     public static final StreamCodec<ByteBuf, PacketSyncEntityEffects> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.COMPOUND_TAG, PacketSyncEntityEffects::getData,

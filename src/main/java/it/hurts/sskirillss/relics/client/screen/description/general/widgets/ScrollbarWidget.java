@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.screen.base.IScrollableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.client.gui.GuiGraphics;
@@ -42,7 +42,7 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
 
         poseStack.pushPose();
 
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/top_scroll_bar.png"), poseStack)
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/top_scroll_bar.png"), poseStack)
                 .pos(this.getX(), this.getY() - 20)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .end();
@@ -60,13 +60,13 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
 
             poseStack.scale((float) (1 - distance), (float) (1 + (distance * 2.5F)), 1);
 
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/scroll_bar_slider.png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/scroll_bar_slider.png"), poseStack)
                     .color(color, color, color, 1F)
                     .anchor(SpriteAnchor.CENTER)
                     .end();
 
             if (isHoveringSlider(mouseX, mouseY)) {
-                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/scroll_bar_slider_selection.png"), poseStack)
+                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/scroll_bar_slider_selection.png"), poseStack)
                         .anchor(SpriteAnchor.CENTER)
                         .end();
             }

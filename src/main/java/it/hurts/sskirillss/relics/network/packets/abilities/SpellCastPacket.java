@@ -1,11 +1,11 @@
 package it.hurts.sskirillss.relics.network.packets.abilities;
 
 import io.netty.buffer.ByteBuf;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityReference;
-import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.nbt.CompoundTag;
@@ -24,7 +24,7 @@ public class SpellCastPacket implements CustomPacketPayload {
     private final CastStage stage;
     private final CompoundTag ability;
 
-    public static final CustomPacketPayload.Type<SpellCastPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "spell_cast"));
+    public static final CustomPacketPayload.Type<SpellCastPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "spell_cast"));
 
     public static final StreamCodec<ByteBuf, SpellCastPacket> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.idMapper(CastType.BY_ID, CastType::getId), SpellCastPacket::getType,

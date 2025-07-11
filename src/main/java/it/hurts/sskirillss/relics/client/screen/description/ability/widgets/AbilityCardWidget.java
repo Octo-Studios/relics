@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
@@ -19,7 +20,6 @@ import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.lock.PacketAbilityUnlock;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -182,7 +182,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var level = relic.getAbilityLevel(player, stack, ability);
         var maxLevel = relic.getAbilityTemplate(player, stack, ability).getMaxLevel();
 
-        drawProgressBar(guiGraphics, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/small_card_filler.png"), (-this.width / 2F) + 2, (-this.height / 2F) + 3F, (float) level / maxLevel);
+        drawProgressBar(guiGraphics, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_filler.png"), (-this.width / 2F) + 2, (-this.height / 2F) + 3F, (float) level / maxLevel);
 
         if (isHovered())
             GUIRenderer.begin(DescriptionTextures.SMALL_CARD_FRAME_OUTLINE, poseStack)
@@ -205,7 +205,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                         .end();
             }
         } else {
-            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/chains_active_" + unlocks + ".png") : DescriptionTextures.CHAINS_INACTIVE, poseStack)
+            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/chains_active_" + unlocks + ".png") : DescriptionTextures.CHAINS_INACTIVE, poseStack)
                     .pos(0, -1)
                     .end();
 
@@ -213,7 +213,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             poseStack.pushPose();
 
-            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/relic/icons/lock_active_" + unlocks + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
+            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/icons/lock_active_" + unlocks + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
                     .end();
 
             poseStack.scale(0.5F, 0.5F, 0.5F);

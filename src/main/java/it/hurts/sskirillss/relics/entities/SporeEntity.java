@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.EntityUtils;

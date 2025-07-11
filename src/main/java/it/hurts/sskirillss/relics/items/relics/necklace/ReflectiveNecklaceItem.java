@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
@@ -16,7 +17,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.Scheduler;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -88,7 +88,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
                 .build();
     }
 
-    @EventBusSubscriber(modid = Reference.MODID)
+    @EventBusSubscriber(modid = Relics.MODID)
     public static class CommonEvents {
         @SubscribeEvent
         public static void onEntityHurt(LivingDamageEvent.Pre event) {

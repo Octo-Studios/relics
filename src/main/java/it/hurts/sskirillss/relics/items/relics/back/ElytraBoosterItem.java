@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.back;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.ContainerSlotClickEvent;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
@@ -20,7 +21,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.PartPose;
@@ -151,7 +151,7 @@ public class ElytraBoosterItem extends RelicItem implements IRenderableCurio {
 
     @Override
     public ResourceLocation getTexture(ItemStack stack) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/elytra_booster_" + (stack.getOrDefault(CHARGE, 0) > 0 ? 1 : 0) + ".png");
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/elytra_booster_" + (stack.getOrDefault(CHARGE, 0) > 0 ? 1 : 0) + ".png");
     }
 
     @Override

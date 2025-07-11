@@ -1,11 +1,9 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import it.hurts.octostudios.octolib.client.particle.UIParticle;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
@@ -16,12 +14,10 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
-import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class RankupRelicActionWidget extends AbstractRelicActionWidget {
     public RankupRelicActionWidget(int x, int y, RelicDescriptionScreen screen) {

@@ -1,15 +1,15 @@
 package it.hurts.sskirillss.relics.init;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.scaling_models.*;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
 public class ScalingModelRegistry {
-    public static final DeferredRegister<ScalingModel> UPGRADE_OPERATIONS = DeferredRegister.create(RelicsRegistries.SCALING_MODEL_REGISTRY, Reference.MODID);
+    public static final DeferredRegister<ScalingModel> UPGRADE_OPERATIONS = DeferredRegister.create(RelicsRegistries.SCALING_MODEL_REGISTRY, Relics.MODID);
 
     /**
      * Adds a constant value per upgrade point: value + (modifier * points). Growth is linear and consistent across all levels. Best for simple, predictable upgrades that scale evenly.

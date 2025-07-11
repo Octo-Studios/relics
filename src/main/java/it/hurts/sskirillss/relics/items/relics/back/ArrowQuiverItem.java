@@ -515,7 +515,7 @@
 //
 //    @OnlyIn(Dist.CLIENT)
 //    public record ClientArrowQuiverTooltip(@Getter ArrowQuiverTooltip tooltip) implements ClientTooltipComponent {
-//        public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/tooltip/arrow_quiver/empty_arrow.png");
+//        public static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/tooltip/arrow_quiver/empty_arrow.png");
 //
 //        @Override
 //        public int getHeight() {

@@ -6,13 +6,13 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.octostudios.octolib.client.animation.Tween;
 import it.hurts.octostudios.octolib.client.animation.easing.EaseType;
 import it.hurts.octostudios.octolib.client.animation.easing.TransitionType;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -71,7 +71,7 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
             var texWidth = 16;
             var patternHeight = 21;
 
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/bookmarks/" + this.getId() + ".png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/bookmarks/" + this.getId() + ".png"), poseStack)
                     .texOff(0, (int) (Math.floor(this.getAnimationSegments() * animationProgress) * patternHeight))
                     .patternSize(texWidth, patternHeight)
                     .anchor(SpriteAnchor.BOTTOM_CENTER)
@@ -169,7 +169,7 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
     }
 
     private int getAnimationSegments() {
-        Minecraft.getInstance().getTextureManager().getTexture(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/bookmarks/" + this.getId() + ".png")).bind();
+        Minecraft.getInstance().getTextureManager().getTexture(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/bookmarks/" + this.getId() + ".png")).bind();
 
         var texHeight = GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
         var patternHeight = 21;

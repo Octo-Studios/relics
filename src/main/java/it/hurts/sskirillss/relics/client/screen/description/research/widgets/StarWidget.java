@@ -3,14 +3,14 @@ package it.hurts.sskirillss.relics.client.screen.description.research.widgets;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.research.AbilityResearchScreen;
 import it.hurts.sskirillss.relics.client.screen.description.research.particles.ResearchParticleData;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.StarData;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import lombok.Getter;
@@ -96,7 +96,7 @@ public class StarWidget extends AbstractDescriptionWidget implements ITickingWid
                 float x = (float) (radius * Math.cos(currentAngle));
                 float y = (float) (radius * Math.sin(currentAngle));
 
-                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/research/dot.png"), poseStack)
+                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/research/dot.png"), poseStack)
                         .pos(x, y)
                         .end();
             }
@@ -118,7 +118,7 @@ public class StarWidget extends AbstractDescriptionWidget implements ITickingWid
             poseStack.translate(getX() + 0.5F + width / 2F, getY() + 0.5F + height / 2F, 0);
             poseStack.mulPose(Axis.ZN.rotationDegrees((time * 0.75F) * (index % 2 == 0 ? 1 : -1)));
 
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/research/star.png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/research/star.png"), poseStack)
                     .texSize(17, 136)
                     .patternSize(17, 17)
                     .scale((float) (1F + (Math.sin(time * 0.5F) * 0.1F)))

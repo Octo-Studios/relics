@@ -6,8 +6,8 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.init.ParticleRegistry;
-import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -174,7 +174,7 @@ public class BasicColoredParticle extends TextureSheetParticle {
 
         @Override
         public String toString() {
-            return Reference.MODID + ":" + "basic_colored_no_depth";
+            return Relics.MODID + ":" + "basic_colored_no_depth";
         }
     };
 

@@ -1,12 +1,12 @@
 package it.hurts.sskirillss.relics.system.casts.handlers;
 
-import it.hurts.sskirillss.relics.init.RelicsRegistries;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.init.RelicsRegistries;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityCache;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityReference;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -19,7 +19,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 
-@EventBusSubscriber(modid = Reference.MODID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
 public class CacheHandler {
     public static final LinkedHashMap<AbilityReference, AbilityCache> REFERENCES = new LinkedHashMap<>();
 

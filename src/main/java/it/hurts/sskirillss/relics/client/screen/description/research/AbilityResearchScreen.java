@@ -6,6 +6,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
@@ -25,7 +26,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.StarData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.research.PacketManageLink;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -462,9 +462,9 @@ public class AbilityResearchScreen extends DescriptionScreen {
 
         poseStack.translate(-(width / 2F), -(height / 2F), 0);
 
-        RenderSystem.setShaderTexture(0, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/research/line.png"));
+        RenderSystem.setShaderTexture(0, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/research/line.png"));
 
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/research/line.png"), poseStack)
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/research/line.png"), poseStack)
                 .pos(0, 0)
                 .texSize(width, height * 6)
                 .patternSize(distance, height)

@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.network.packets.item.springy_boot;
 
 import io.netty.buffer.ByteBuf;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.core.particles.ParticleTypes;
@@ -20,7 +20,7 @@ public class S2CBounceFromSurface implements CustomPacketPayload {
     private final int id;
     private final Vector3f motion;
 
-    public static final Type<S2CBounceFromSurface> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "springy_boot/bounce_from_surface"));
+    public static final Type<S2CBounceFromSurface> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "springy_boot/bounce_from_surface"));
 
     public static final StreamCodec<ByteBuf, S2CBounceFromSurface> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, S2CBounceFromSurface::getId,

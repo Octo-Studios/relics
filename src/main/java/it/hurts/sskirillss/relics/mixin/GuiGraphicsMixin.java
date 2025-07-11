@@ -2,9 +2,9 @@ package it.hurts.sskirillss.relics.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -32,9 +32,9 @@ import java.util.List;
 @Mixin(GuiGraphics.class)
 public class GuiGraphicsMixin {
     @Unique
-    private static final ResourceLocation UPGRADE_TEXTURE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/item_state/upgrade.png");
+    private static final ResourceLocation UPGRADE_TEXTURE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/item_state/upgrade.png");
     @Unique
-    private static final ResourceLocation RESEARCH_TEXTURE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/item_state/research.png");
+    private static final ResourceLocation RESEARCH_TEXTURE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/item_state/research.png");
 
     @Inject(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILSOFT)
     public void onTooltipRender(Font font, List<ClientTooltipComponent> tooltip, int x, int y, ClientTooltipPositioner positioner, CallbackInfo info, RenderTooltipEvent.Pre event, int width, int height, int postWidth, int postHeight, Vector2ic postPos) {

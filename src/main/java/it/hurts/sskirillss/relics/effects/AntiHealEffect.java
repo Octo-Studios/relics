@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.effects;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -14,7 +14,7 @@ public class AntiHealEffect extends MobEffect {
         super(MobEffectCategory.HARMFUL, 0X6836AA);
     }
 
-    @EventBusSubscriber(modid = Reference.MODID)
+    @EventBusSubscriber(modid = Relics.MODID)
     public static class Events {
         @SubscribeEvent
         public static void onLivingHeal(LivingHealEvent event) {

@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.api.relics.description;
 
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.network.chat.Component;
@@ -17,6 +17,6 @@ public abstract class OperationCondition {
     public abstract boolean isMet(LivingEntity entity, ItemStack stack);
 
     public Component getTitle(LivingEntity entity, ItemStack stack) {
-        return Component.translatable(Reference.MODID + ".operation_condition." + this.getType().getCategory().getId() + "." + this.getType().getId() + "." + this.getId());
+        return Component.translatable(Relics.MODID + ".operation_condition." + this.getType().getCategory().getId() + "." + this.getType().getId() + "." + this.getId());
     }
 }

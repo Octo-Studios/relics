@@ -1,11 +1,8 @@
 package it.hurts.sskirillss.relics.client.screen.particle;
 
 import it.hurts.octostudios.octolib.client.particle.ExtendedUIParticle;
-import it.hurts.octostudios.octolib.client.particle.UIParticle;
-import it.hurts.octostudios.octolib.util.OctoColor;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Vector2f;
 
 import java.util.Random;
 
@@ -17,7 +14,7 @@ public class PixelUIParticle extends ExtendedUIParticle {
     }
 
     public PixelUIParticle(float maxSpeed, int maxLifetime, float xStart, float yStart, Layer layer, float zOffset) {
-        super(new Texture2D(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/particle/pixel.png"),
+        super(new Texture2D(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/particle/pixel.png"),
                 0, 0, 1, 1, 1, 1), maxSpeed, maxLifetime, xStart, yStart, layer, zOffset);
     }
 }

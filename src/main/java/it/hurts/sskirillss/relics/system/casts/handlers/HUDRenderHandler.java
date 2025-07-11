@@ -5,18 +5,18 @@ import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.abilities.SpellCastPacket;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityCache;
 import it.hurts.sskirillss.relics.system.casts.abilities.AbilityReference;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import net.minecraft.ChatFormatting;
@@ -49,20 +49,20 @@ import static it.hurts.sskirillss.relics.system.casts.handlers.CacheHandler.REFE
 
 @OnlyIn(value = Dist.CLIENT)
 public class HUDRenderHandler {
-    public static final ResourceLocation CARD_FRAME_ACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/card_frame_active.png");
-    public static final ResourceLocation CARD_FRAME_INACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/card_frame_inactive.png");
+    public static final ResourceLocation CARD_FRAME_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/card_frame_active.png");
+    public static final ResourceLocation CARD_FRAME_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/card_frame_inactive.png");
 
-    public static final ResourceLocation CARD_POINTER_ACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/card_pointer_active.png");
-    public static final ResourceLocation CARD_POINTER_INACTIVE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/card_pointer_inactive.png");
+    public static final ResourceLocation CARD_POINTER_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/card_pointer_active.png");
+    public static final ResourceLocation CARD_POINTER_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/card_pointer_inactive.png");
 
-    public static final ResourceLocation ARROW_RIGHT = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/arrow_right.png");
-    public static final ResourceLocation ARROW_LEFT = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/arrow_left.png");
+    public static final ResourceLocation ARROW_RIGHT = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/arrow_right.png");
+    public static final ResourceLocation ARROW_LEFT = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/arrow_left.png");
 
-    public static final ResourceLocation ARROW_RIGHT_OUTLINE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/arrow_right_outline.png");
-    public static final ResourceLocation ARROW_LEFT_OUTLINE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/arrow_left_outline.png");
+    public static final ResourceLocation ARROW_RIGHT_OUTLINE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/arrow_right_outline.png");
+    public static final ResourceLocation ARROW_LEFT_OUTLINE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/arrow_left_outline.png");
 
-    public static final ResourceLocation STATE_TOGGLEABLE = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/widgets/toggleable.png");
-    public static final ResourceLocation STATE_CYCLICAL = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/widgets/cyclical.png");
+    public static final ResourceLocation STATE_TOGGLEABLE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/widgets/toggleable.png");
+    public static final ResourceLocation STATE_CYCLICAL = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/widgets/cyclical.png");
 
     private static final Minecraft MC = Minecraft.getInstance();
 
@@ -150,7 +150,7 @@ public class HUDRenderHandler {
             String predicateName = entry.getKey();
             boolean isCompleted = entry.getValue();
 
-            RenderSystem.setShaderTexture(0, isCompleted ? ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/icons/completed.png") : ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/icons/" + registryName + "/" + predicateName + ".png"));
+            RenderSystem.setShaderTexture(0, isCompleted ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/icons/completed.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/icons/" + registryName + "/" + predicateName + ".png"));
 
             RenderUtils.renderTextureFromCenter(poseStack, x, y + yOff, 0, 0, 16, 16, 16, 16, 0.5F);
 
@@ -184,7 +184,7 @@ public class HUDRenderHandler {
 
         boolean isLocked = !relic.canPlayerUseAbility(player, stack, ability.getId());
 
-        ResourceLocation card = ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/abilities/" + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "/" + relic.getAbilityTemplate(player, stack, ability.getId()).getIcon().apply(player, stack, ability.getId()) + ".png");
+        ResourceLocation card = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/abilities/" + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "/" + relic.getAbilityTemplate(player, stack, ability.getId()).getIcon().apply(player, stack, ability.getId()) + ".png");
 
         RenderSystem.setShaderTexture(0, card);
 
@@ -258,7 +258,7 @@ public class HUDRenderHandler {
         }
 
         if (cooldown > 0) {
-            RenderSystem.setShaderTexture(0, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/widgets/icons/cooldown.png"));
+            RenderSystem.setShaderTexture(0, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/widgets/icons/cooldown.png"));
 
             RenderSystem.enableBlend();
 
@@ -289,7 +289,7 @@ public class HUDRenderHandler {
             int failedPredicates = infoEntries.size() - successPredicates;
 
             if (failedPredicates > 0) {
-                RenderSystem.setShaderTexture(0, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/hud/abilities/widgets/icons/locked.png"));
+                RenderSystem.setShaderTexture(0, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/abilities/widgets/icons/locked.png"));
 
                 RenderSystem.enableBlend();
 

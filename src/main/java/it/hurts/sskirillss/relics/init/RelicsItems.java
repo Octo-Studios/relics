@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.init;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.items.RelicExperienceBottleItem;
 import it.hurts.sskirillss.relics.items.SolidSnowballItem;
 import it.hurts.sskirillss.relics.items.relics.*;
@@ -10,6 +11,7 @@ import it.hurts.sskirillss.relics.items.relics.belt.DrownedBeltItem;
 import it.hurts.sskirillss.relics.items.relics.belt.HunterBeltItem;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
 import it.hurts.sskirillss.relics.items.relics.belt.LeatherBeltItem;
+import it.hurts.sskirillss.relics.items.relics.charm.SporeSackItem;
 import it.hurts.sskirillss.relics.items.relics.feet.*;
 import it.hurts.sskirillss.relics.items.relics.hands.EnderHandItem;
 import it.hurts.sskirillss.relics.items.relics.hands.RageGloveItem;
@@ -18,10 +20,8 @@ import it.hurts.sskirillss.relics.items.relics.necklace.HolyLocketItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import it.hurts.sskirillss.relics.items.relics.ring.BastionRingItem;
-import it.hurts.sskirillss.relics.items.relics.ring.LeafyRingItem;
 import it.hurts.sskirillss.relics.items.relics.ring.ChorusInhibitorItem;
-import it.hurts.sskirillss.relics.items.relics.charm.SporeSackItem;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.items.relics.ring.LeafyRingItem;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
@@ -29,7 +29,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class RelicsItems {
-    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Reference.MODID);
+    public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Relics.MODID);
 
     public static final DeferredHolder<Item, Item> SOLID_SNOWBALL = ITEMS.register("solid_snowball", SolidSnowballItem::new);
     public static final DeferredHolder<Item, Item> RELIC_EXPERIENCE_BOTTLE = ITEMS.register("relic_experience_bottle", RelicExperienceBottleItem::new);

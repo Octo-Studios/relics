@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.network.packets.item.kinetic_belt;
 
 import io.netty.buffer.ByteBuf;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
-import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -19,7 +19,7 @@ public class C2SSetActive implements CustomPacketPayload {
     private final int index;
     private final boolean active;
 
-    public static final CustomPacketPayload.Type<C2SSetActive> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "kinetic_belt/set_active"));
+    public static final CustomPacketPayload.Type<C2SSetActive> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "kinetic_belt/set_active"));
 
     public static final StreamCodec<ByteBuf, C2SSetActive> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.STRING_UTF8, C2SSetActive::getIdentifier,

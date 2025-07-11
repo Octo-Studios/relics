@@ -2,7 +2,6 @@ package it.hurts.sskirillss.relics.items.relics.base.data;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicTemplateHolder;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 
 import java.util.HashMap;
 import java.util.Map;

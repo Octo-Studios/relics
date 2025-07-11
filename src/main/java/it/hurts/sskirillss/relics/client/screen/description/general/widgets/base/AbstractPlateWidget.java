@@ -1,10 +1,10 @@
 package it.hurts.sskirillss.relics.client.screen.description.general.widgets.base;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
-import it.hurts.sskirillss.relics.utils.Reference;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -46,7 +46,7 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
 
         poseStack.translate(0F, 0F, 10F);
 
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/icons/" + icon + ".png"), poseStack)
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/icons/" + icon + ".png"), poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(3, 3)
                 .end();

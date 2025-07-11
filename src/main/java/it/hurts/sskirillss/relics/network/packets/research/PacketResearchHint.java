@@ -2,11 +2,11 @@ package it.hurts.sskirillss.relics.network.packets.research;
 
 import com.google.common.collect.Multimap;
 import io.netty.buffer.ByteBuf;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.ChatFormatting;
@@ -35,7 +35,7 @@ public class PacketResearchHint implements CustomPacketPayload {
     private final String ability;
     private final int amount;
 
-    public static final Type<PacketResearchHint> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "research_hint"));
+    public static final Type<PacketResearchHint> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "research_hint"));
 
     public static final StreamCodec<ByteBuf, PacketResearchHint> STREAM_CODEC = StreamCodec.composite(
             ByteBufCodecs.INT, PacketResearchHint::getContainer,

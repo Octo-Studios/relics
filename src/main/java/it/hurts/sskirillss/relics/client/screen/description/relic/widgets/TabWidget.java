@@ -3,7 +3,6 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import net.minecraft.client.gui.screens.Screen;
 
 public class TabWidget extends BookmarkWidget {
     private DescriptionCategory category;

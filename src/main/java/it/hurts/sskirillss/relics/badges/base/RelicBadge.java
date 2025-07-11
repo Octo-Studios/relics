@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.badges.base;
 
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -34,11 +34,11 @@ public abstract non-sealed class RelicBadge extends AbstractBadge {
 
     @Override
     public final ResourceLocation getIconTexture(LivingEntity entity, ItemStack stack) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/badges/relic/" + getId() + ".png");
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/badges/relic/" + getId() + ".png");
     }
 
     @Override
     public final ResourceLocation getOutlineTexture(LivingEntity entity, ItemStack stack) {
-        return ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/gui/description/general/badges/relic/" + getId() + "_outline.png");
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/badges/relic/" + getId() + "_outline.png");
     }
 }

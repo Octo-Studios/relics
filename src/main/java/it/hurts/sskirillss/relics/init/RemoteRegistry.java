@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.init;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailRegistry;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.client.gui.layers.ActiveAbilitiesLayer;
@@ -28,7 +29,6 @@ import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.necklace.HolyLocketItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -53,16 +53,16 @@ import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 import static it.hurts.sskirillss.relics.init.DataComponentRegistry.CHARGE;
 import static it.hurts.sskirillss.relics.init.DataComponentRegistry.WORLD_POSITION;
 
-@EventBusSubscriber(modid = Reference.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class RemoteRegistry {
     @SubscribeEvent
     public static void setupClient(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> {
-            ItemProperties.register(RelicsItems.INFINITY_HAM.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "pieces"),
+            ItemProperties.register(RelicsItems.INFINITY_HAM.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "pieces"),
                     (stack, world, entity, id) -> ((InfiniteHamItem) stack.getItem()).getPieces(stack));
-            ItemProperties.register(RelicsItems.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "charges"),
+            ItemProperties.register(RelicsItems.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "charges"),
                     (stack, world, entity, id) -> Math.min(8, stack.getOrDefault(CHARGE, 0)));
-            ItemProperties.register(RelicsItems.MAGIC_MIRROR.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "world"),
+            ItemProperties.register(RelicsItems.MAGIC_MIRROR.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "world"),
                     (stack, world, entity, id) -> {
                         Entity e = Minecraft.getInstance().getCameraEntity();
 
@@ -76,22 +76,22 @@ public class RemoteRegistry {
                             default -> 0;
                         };
                     });
-            ItemProperties.register(RelicsItems.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "charges"),
+            ItemProperties.register(RelicsItems.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "charges"),
                     (stack, world, entity, id) -> Math.min(8, stack.getOrDefault(CHARGE, 0)));
-            ItemProperties.register(RelicsItems.MAGMA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "heat"),
+            ItemProperties.register(RelicsItems.MAGMA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "heat"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(entity, stack, "pace", "time") ? 1 : 0);
-            ItemProperties.register(RelicsItems.AQUA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "drench"),
+            ItemProperties.register(RelicsItems.AQUA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "drench"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(entity, stack, "walking", "time") ? 1 : 0);
-//            ItemProperties.register(ItemRegistry.ARROW_QUIVER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "fullness"),
+//            ItemProperties.register(ItemRegistry.ARROW_QUIVER.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "fullness"),
 //                    (stack, world, entity, id) -> {
 //                        int maxAmount = ((ArrowQuiverItem) stack.getItem()).getSlotsAmount(stack);
 //                        int amount = getArrows(world.registryAccess(), stack).size();
 //
 //                        return amount > 0 ? (int) Math.floor(amount / (maxAmount / 2F)) + 1 : 0;
 //                    });
-            ItemProperties.register(RelicsItems.ELYTRA_BOOSTER.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "fuel"),
+            ItemProperties.register(RelicsItems.ELYTRA_BOOSTER.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "fuel"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) > 0 ? 1 : 0);
-            ItemProperties.register(RelicsItems.SOLID_SNOWBALL.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "snow"),
+            ItemProperties.register(RelicsItems.SOLID_SNOWBALL.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "snow"),
                     (stack, world, entity, id) -> {
                         ItemStack relic = EntityUtils.findEquippedCurio(entity, RelicsItems.WOOL_MITTEN.get());
 
@@ -100,14 +100,14 @@ public class RemoteRegistry {
 
                         return (int) Math.floor(stack.getOrDefault(CHARGE, 0) / (((IRelicItem) relic.getItem()).getStatValue(entity, relic, "mold", "size") / 3F));
                     });
-            ItemProperties.register(RelicsItems.ROLLER_SKATES.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "active"),
+            ItemProperties.register(RelicsItems.ROLLER_SKATES.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "active"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) > 0 ? 1 : 0);
 
-            ItemProperties.register(RelicsItems.BLAZING_FLASK.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "active"),
+            ItemProperties.register(RelicsItems.BLAZING_FLASK.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "active"),
                     (stack, world, entity, id) -> stack.get(WORLD_POSITION) == null ? 0 : 1);
-            ItemProperties.register(RelicsItems.HOLY_LOCKET.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "mode"),
+            ItemProperties.register(RelicsItems.HOLY_LOCKET.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "mode"),
                     (stack, world, entity, id) -> ((HolyLocketItem) stack.getItem()).getMode(stack).getIndex());
-            ItemProperties.register(RelicsItems.MIDNIGHT_MANTLE.get(), ResourceLocation.fromNamespaceAndPath(Reference.MODID, "mode"),
+            ItemProperties.register(RelicsItems.MIDNIGHT_MANTLE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "mode"),
                     (stack, world, entity, id) -> {
                         var relic = (MidnightMantleItem) stack.getItem();
                         var mode = relic.getAbilityMode(entity, stack, "phase");
@@ -119,7 +119,7 @@ public class RemoteRegistry {
                 if (!(item instanceof IRelicItem relic))
                     continue;
 
-                ItemProperties.register(item, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "flawless"),
+                ItemProperties.register(item, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "flawless"),
                         (stack, level, entity, id) -> relic.isRelicFlawless(entity, stack) ? 1 : 0);
             }
         });
@@ -199,9 +199,9 @@ public class RemoteRegistry {
 
     @SubscribeEvent
     public static void onOverlayRegistry(RegisterGuiLayersEvent event) {
-        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "info_tile"), new InfoTileLayer());
-        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "active_abilities"), new ActiveAbilitiesLayer());
-        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "leafy_ring_hide"), new LeafyRingHideLayer());
-        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "phantom_boot_bridge"), new PhantomBootBridgeLayer());
+        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "info_tile"), new InfoTileLayer());
+        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "active_abilities"), new ActiveAbilitiesLayer());
+        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "leafy_ring_hide"), new LeafyRingHideLayer());
+        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "phantom_boot_bridge"), new PhantomBootBridgeLayer());
     }
 }

@@ -1,11 +1,11 @@
 package it.hurts.sskirillss.relics.client.renderer.items;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.items.KineticBeltModel;
 import it.hurts.sskirillss.relics.client.models.items.KineticBeltWingsModel;
 import it.hurts.sskirillss.relics.client.renderer.items.base.IRelicRenderer;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
-import it.hurts.sskirillss.relics.utils.Reference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LightTexture;
@@ -41,7 +41,7 @@ public class KineticBeltRenderer implements ICurioRenderer, IRelicRenderer {
 
         ICurioRenderer.followBodyRotations(entity, this.model);
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/kinetic_belt.png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt.png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         if (relic.isActive(stack)) {
             var time = entity.tickCount + partialTicks;
@@ -52,7 +52,7 @@ public class KineticBeltRenderer implements ICurioRenderer, IRelicRenderer {
 
             poseStack.translate(shakeX, shakeY, shakeZ);
 
-            new KineticBeltWingsModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityTranslucentCull(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/item/model/kinetic_belt_wings.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, new Color(1F,1F,1F,0.9F + Mth.sin(time * 2F) * 0.1F).getRGB());
+            new KineticBeltWingsModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityTranslucentCull(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt_wings.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, new Color(1F,1F,1F,0.9F + Mth.sin(time * 2F) * 0.1F).getRGB());
         }
 
         poseStack.popPose();

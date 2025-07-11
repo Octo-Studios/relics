@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.client.models.effects;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import it.hurts.sskirillss.relics.utils.Reference;
+import it.hurts.sskirillss.relics.Relics;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
@@ -12,7 +12,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 
 public class StunStarModel extends HumanoidModel<LivingEntity> {
-    public static final ModelLayerLocation TEXTURE = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Reference.MODID, "textures/mob_effect/effects/stun_star.png"), "star");
+    public static final ModelLayerLocation TEXTURE = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/mob_effect/effects/stun_star.png"), "star");
 
     private final ModelPart star;
 
