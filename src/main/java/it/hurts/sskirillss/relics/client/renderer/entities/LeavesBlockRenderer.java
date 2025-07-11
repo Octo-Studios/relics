@@ -26,7 +26,7 @@ public class LeavesBlockRenderer extends EntityRenderer<LeavesBlockEntity> {
     public void render(LeavesBlockEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
 
-        var state = Blocks.OAK_LEAVES.defaultBlockState();//entity.getBlockState();
+        var state = entity.getBlockState();
 
         if (state.getRenderShape() != RenderShape.MODEL)
             return;

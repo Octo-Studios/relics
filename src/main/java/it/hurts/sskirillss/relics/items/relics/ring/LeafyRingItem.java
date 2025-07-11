@@ -266,6 +266,7 @@ public class LeafyRingItem extends RelicItem {
                         leaves.setParalysis((float) relic.getStatValue(entity, stack, "revival", "paralysis"));
                         leaves.setDeltaMovement(perpendicular.scale(0.5F + random.nextFloat()));
                         leaves.setPos(posVec.x(), posVec.y(), posVec.z());
+                        leaves.setBlockState(level.getBlockState(pos));
                         leaves.setTarget(entity);
                         leaves.setOwner(entity);
                         leaves.setDamage(heal);
