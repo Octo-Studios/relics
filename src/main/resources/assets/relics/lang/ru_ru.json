@@ -211,6 +211,16 @@
   "tooltip.relics.springy_boot.ability.bounce.rank_modifier.strike": "Увеличивает наносимый урон на %2$s%% за каждый отскок от поверхностей в пределах одного использования способности.",
   "tooltip.relics.springy_boot.ability.bounce.rank_modifier.shockwave": "При приседе во время приземления создается ударная волна с радиусом в %3$s блоков, наносящая %4$s единиц урона и оглушающая на %5$s секунд за единицу вертикальной скорости носителя реликвии в момент приземления.",
 
+  "item.relics.leafy_ring": "Лиственная мантия",
+  "tooltip.relics.leafy_ring.description": "",
+  "tooltip.relics.leafy_ring.ability.camouflage": "Камуфляж",
+  "tooltip.relics.leafy_ring.ability.camouflage.description": "Позволяет свободно перемещаться в листве деревьев и не получать урона при падении на неё. Носитель реликвии также будет исцеляться на %1$s единиц здоровья каждую секунду пока находится в листве.",
+  "tooltip.relics.leafy_ring.ability.camouflage.rank_modifier.absorption": "При срабатывании способности носитель реликвии получает %2$s дополнительных единиц поглощения.",
+  "tooltip.relics.leafy_ring.ability.camouflage.rank_modifier.disappearance": "Носитель реликвии получает эффект исчезновения во время действия способности.",
+  "tooltip.relics.leafy_ring.ability.revival": "Дар рощи",
+  "tooltip.relics.leafy_ring.ability.revival.description": "Получая фатальный урон, носитель реликвии защищается от смерти, поглощая листву в радиусе %1$s блоков. Количество поглощаемой листвы зависит от полученного фатального урона из расчета где 1 блок блокирует до %2$s единиц урона.",
+  "tooltip.relics.leafy_ring.ability.revival.rank_modifier.piercing": "Лиственные снаряды наносят %3$s единиц урона и парализуют на %4$s секунд все цели на своём пути.",
+
   "item.relics.spore_sack": "Мешок со спорами",
   "tooltip.relics.spore_sack.description": "Самый обыкновенный холщевый мешок, доверху набитый смертельными миазмами.",
   "tooltip.relics.spore_sack.ability.spore_mist": "Споровый туман",

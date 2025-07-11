@@ -36,6 +36,12 @@ public class RelicsEntities {
                     .build("shockwave_block")
     );
 
+    public static final DeferredHolder<EntityType<?>, EntityType<LeavesBlockEntity>> LEAVES_BLOCK = ENTITIES.register("leaves_block", () ->
+            EntityType.Builder.<LeavesBlockEntity>of(LeavesBlockEntity::new, MobCategory.MISC)
+                    .sized(0.75F, 0.75F)
+                    .build("leaves_block")
+    );
+
     public static final DeferredHolder<EntityType<?>, EntityType<LifeEssenceEntity>> LIFE_ESSENCE = ENTITIES.register("life_essence", () ->
             EntityType.Builder.<LifeEssenceEntity>of(LifeEssenceEntity::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)

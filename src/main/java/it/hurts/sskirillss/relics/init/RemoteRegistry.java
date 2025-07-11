@@ -142,6 +142,7 @@ public class RemoteRegistry {
         EntityTrailRegistry.registerProvider(RelicsEntities.SPORE.get(), SporeEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.DEATH_ESSENCE.get(), DeathEssenceEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.LIFE_ESSENCE.get(), LifeEssenceEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockEntity.TrailProvider::new);
 
         DescriptionCategories.registerCategory(RelicDescriptionCategory::new);
         DescriptionCategories.registerCategory(AbilityDescriptionCategory::new);
@@ -185,7 +186,7 @@ public class RemoteRegistry {
         event.registerEntityRenderer(RelicsEntities.DISSECTION.get(), DissectionRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SPORE.get(), SporeRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SOLID_SNOWBALL.get(), SolidSnowballRenderer::new);
-//        event.registerEntityRenderer(EntityRegistry.ARROW_RAIN.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockRenderer::new);
         event.registerEntityRenderer(RelicsEntities.RELIC_EXPERIENCE_ORB.get(), RelicExperienceOrbRenderer::new);
         event.registerEntityRenderer(RelicsEntities.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(RelicsEntities.CHAIR.get(), NullRenderer::new);

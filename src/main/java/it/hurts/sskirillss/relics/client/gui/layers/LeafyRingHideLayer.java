@@ -33,7 +33,7 @@ public class LeafyRingHideLayer implements LayeredDraw.Layer {
 
         var stack = EntityUtils.findEquippedCurio(player, RelicsItems.LEAFY_RING.get());
 
-        if (!(stack.getItem() instanceof LeafyRingItem relic))
+        if (!(stack.getItem() instanceof LeafyRingItem relic) || !relic.isAbilityRankModifierUnlocked(player, stack, "camouflage", "disappearance"))
             return;
 
         var progress = relic.getCurrentProgress(stack);
