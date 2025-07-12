@@ -2,13 +2,16 @@ package it.hurts.sskirillss.relics.client.renderer.entities;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.client.models.entities.LeafCoreModel;
 import it.hurts.sskirillss.relics.entities.LeavesBlockEntity;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -38,9 +41,22 @@ public class LeavesBlockRenderer extends EntityRenderer<LeavesBlockEntity> {
 
         poseStack.pushPose();
 
-        poseStack.scale(0.75F, 0.75F, 0.75F);
+        poseStack.translate(0F, 0.35F, 0F);
 
-        poseStack.translate(0F, 0.5F, 0F);
+        poseStack.mulPose(Axis.YN.rotationDegrees(time * 20));
+        poseStack.mulPose(Axis.XN.rotationDegrees(time * 20));
+
+        poseStack.translate(0F, -1.35F, 0F);
+
+        new LeafCoreModel<>().renderToBuffer(poseStack, buffer.getBuffer(RenderType.entityCutout(this.getTextureLocation(entity))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+
+        poseStack.popPose();
+
+        poseStack.pushPose();
+
+        poseStack.scale(0.65F, 0.65F, 0.65F);
+
+        poseStack.translate(0F, 0.575F, 0F);
 
         poseStack.mulPose(Axis.YP.rotationDegrees(time * 20));
         poseStack.mulPose(Axis.XP.rotationDegrees(time * 20));
@@ -54,7 +70,7 @@ public class LeavesBlockRenderer extends EntityRenderer<LeavesBlockEntity> {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(LeavesBlockEntity pEntity) {
-        return TextureAtlas.LOCATION_BLOCKS;
+    public ResourceLocation getTextureLocation(LeavesBlockEntity entity) {
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/entities/leaf_core" + (entity.isFlawless() ? "_flawless" : "") + ".png");
     }
 }
