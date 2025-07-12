@@ -221,6 +221,14 @@
   "tooltip.relics.leafy_ring.ability.revival.description": "Получая фатальный урон, носитель реликвии защищается от смерти, поглощая листву в радиусе %1$s блоков. Количество поглощаемой листвы зависит от полученного фатального урона из расчета где 1 блок блокирует до %2$s единиц урона.",
   "tooltip.relics.leafy_ring.ability.revival.rank_modifier.piercing": "Лиственные снаряды наносят %3$s единиц урона и парализуют на %4$s секунд все цели на своём пути.",
 
+  "item.relics.roller_skates": "Роликовые коньки",
+  "tooltip.relics.roller_skates.description": "",
+  "tooltip.relics.roller_skates.ability.skating": "Разгон",
+  "tooltip.relics.roller_skates.ability.skating.description": "При непрерывном беге плавно увеличивает скорость передвижения игрока и достигает максимального значения бонуса в %1$s%% уже спустя 5 секунд. По мере увеличения скорости передвижения также увеличивает и скользкость блоков.",
+  "tooltip.relics.roller_skates.ability.skating.rank_modifier.step_height": "Увеличивает высоту шага во время бега на %2$s блоков.",
+  "tooltip.relics.roller_skates.ability.skating.rank_modifier.resistance": "По мере увеличения скорости передвижения также увеличивает и сопротивление входящему урону вплоть до %3$s.",
+  "tooltip.relics.roller_skates.ability.skating.rank_modifier.sparkling": "Во время дрифта разбрасывает искры, наносящие %4$s единиц урона и поджигающие цели на %5$s секунд за единицу скорости носителя реликвии в момент их появления.",
+
   "item.relics.spore_sack": "Мешок со спорами",
   "tooltip.relics.spore_sack.description": "Самый обыкновенный холщевый мешок, доверху набитый смертельными миазмами.",
   "tooltip.relics.spore_sack.ability.spore_mist": "Споровый туман",
@@ -313,11 +321,6 @@
   "tooltip.relics.wool_mitten.description": "+1 ед. опыта за каждые 5 единиц размера при попадании снежком от способности «Лепка».",
   "tooltip.relics.wool_mitten.ability.mold": "Лепка",
   "tooltip.relics.wool_mitten.ability.mold.description": "Сбор снега на ПКМ пустой рукой постепенно формирует особые твёрдые снежки, размером до %1$s единиц. Попадание такого снежка в цель нанесёт ей урон, размером в %2$s, оглушит на %3$s секунд, а также заморозит цели на %3$s за единицу размера снежка. Удержание снежка в инвентаре без экипированной реликвии также замораживает игрока.",
-
-  "item.relics.roller_skates": "Роликовые коньки",
-  "tooltip.relics.roller_skates.description": "+1 ед. опыта за каждую секунду ускорения от способности «Разгон».",
-  "tooltip.relics.roller_skates.ability.skating": "Разгон",
-  "tooltip.relics.roller_skates.ability.skating.description": "Увеличивает скорость передвижения на %1$s%% за секунду передвижения. Модификатор перестает увеличиваться если продолжительность передвижения превышает %2$s секунд. Все блоки также становятся скользкими для носителя.",
 
   "item.relics.space_dissector": "Рассекатель пространства",
   "tooltip.relics.space_dissector.description": "+1 ед. опыта за каждый созданный портал при условии отсутствия уже существующего.",

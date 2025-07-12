@@ -143,6 +143,7 @@ public class RemoteRegistry {
         EntityTrailRegistry.registerProvider(RelicsEntities.DEATH_ESSENCE.get(), DeathEssenceEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.LIFE_ESSENCE.get(), LifeEssenceEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.ROLLER_SPARK.get(), RollerSparkEntity.TrailProvider::new);
 
         DescriptionCategories.registerCategory(RelicDescriptionCategory::new);
         DescriptionCategories.registerCategory(AbilityDescriptionCategory::new);
@@ -179,6 +180,7 @@ public class RemoteRegistry {
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveRenderer::new);
         event.registerEntityRenderer(RelicsEntities.ELECTRIC_SPARK.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.ROLLER_SPARK.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SHOCKWAVE_BLOCK.get(), ShockwaveBlockRenderer::new);
         event.registerEntityRenderer(RelicsEntities.LIFE_ESSENCE.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.DEATH_ESSENCE.get(), NullRenderer::new);
