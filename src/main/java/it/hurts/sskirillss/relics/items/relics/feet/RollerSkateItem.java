@@ -14,17 +14,14 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
-import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -39,16 +36,16 @@ public class RollerSkateItem extends RelicItem {
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("skating")
                                 .rankModifier(1, "step_height")
-                                .rankModifier(1, "resistance")
-                                .rankModifier(1, "sparkling")
+                                .rankModifier(3, "resistance")
+                                .rankModifier(5, "sparkling")
                                 .stat(StatTemplate.builder("speed")
-                                        .initialValue(0.05D, 0.1D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 0.2511D)
+                                        .initialValue(0.1D, 0.25D)
+                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 0.6279D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("step_height")
                                         .initialValue(0.6D, 1D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.05D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("resistance")
@@ -108,9 +105,8 @@ public class RollerSkateItem extends RelicItem {
         if (entity.isSprinting() && entity.onGround() && !entity.isInLiquid() && !entity.isFallFlying()) {
             if (duration < this.getMaxDuration())
                 this.addDuration(stack, 1);
-        } else if (duration > 0) {
+        } else if (duration > 0)
             this.addDuration(stack, -1);
-        }
 
         if (duration > 0) {
             EntityUtils.resetAttribute(entity, stack, Attributes.MOVEMENT_SPEED, (float) (this.getStatValue(entity, stack, "skating", "speed") / this.getMaxDuration() * this.getDuration(stack)), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
@@ -126,9 +122,6 @@ public class RollerSkateItem extends RelicItem {
             var zMotion = motion.z;
 
             var speed = Mth.sqrt((float) (xMotion * xMotion + zMotion * zMotion));
-
-            if (entity instanceof Player player && level.isClientSide)
-                player.displayClientMessage(Component.literal("S: " + speed), true);
 
             if (speed > 0.25F && entity.onGround()) {
                 var yawRad = entity.getYRot() * (float) Math.PI / 180F;
@@ -147,8 +140,8 @@ public class RollerSkateItem extends RelicItem {
 
                     var dot = directionX * (xMotion / speed) + directionZ * (zMotion / speed);
 
-                    if (dot < 0.5F) {
-                        var count = Mth.clamp((int) (speed * 6), 1, 20);
+                    if (dot < 0.75F) {
+                        var count = Mth.clamp((int) (speed * 10), 1, 20);
 
                         for (int i = 0; i < count; i++) {
                             var force = ((0.25F + random.nextFloat() * 0.25F) * speed) * 2F;
@@ -198,7 +191,7 @@ public class RollerSkateItem extends RelicItem {
             var relic = (RollerSkateItem) stack.getItem();
 
             var base = 0.6F;
-            var max = 1.075F;
+            var max = 1F;
             var diff = max - base;
             var modifier = diff / relic.getMaxDuration() * relic.getDuration(stack);
 
