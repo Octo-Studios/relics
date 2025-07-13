@@ -149,7 +149,7 @@ public class BasicColoredParticle extends TextureSheetParticle {
     @Nonnull
     @Override
     public ParticleRenderType getRenderType() {
-        return constructor.isVisibleThroughWalls() ? RENDERER_NO_DEPTH : ParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return constructor.isVisibleThroughWalls() ? RENDERER_NO_DEPTH : RENDERER_TRANSLUCENT;
     }
 
     @Override
@@ -175,6 +175,23 @@ public class BasicColoredParticle extends TextureSheetParticle {
         @Override
         public String toString() {
             return Relics.MODID + ":" + "basic_colored_no_depth";
+        }
+    };
+
+    public static final ParticleRenderType RENDERER_TRANSLUCENT = new ParticleRenderType() {
+        @Override
+        public BufferBuilder begin(Tesselator tesselator, TextureManager manager) {
+            RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_PARTICLES);
+            RenderSystem.enableBlend();
+            RenderSystem.depthMask(false);
+            RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+
+            return tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.PARTICLE);
+        }
+
+        @Override
+        public String toString() {
+            return Relics.MODID + ":" + "basic_colored_translucent";
         }
     };
 

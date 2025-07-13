@@ -27,6 +27,7 @@ public class ParticleEngineMixin {
         var order = new ArrayList<>(RENDER_ORDER);
 
         order.add(4, BasicColoredParticle.RENDERER_NO_DEPTH);
+        order.add(5, BasicColoredParticle.RENDERER_TRANSLUCENT);
 
         RENDER_ORDER = ImmutableList.copyOf(order);
     }
