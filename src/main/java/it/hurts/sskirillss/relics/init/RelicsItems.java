@@ -45,7 +45,6 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> BASTION_RING = ITEMS.register("bastion_ring", BastionRingItem::new);
     public static final DeferredHolder<Item, RelicItem> CHORUS_INHIBITOR = ITEMS.register("chorus_inhibitor", ChorusInhibitorItem::new);
     // TODO: public static final DeferredHolder<Item, RelicItem> ARROW_QUIVER = ITEMS.register("arrow_quiver", ArrowQuiverItem::new);
-    public static final DeferredHolder<Item, RelicItem> SPACE_DISSECTOR = ITEMS.register("space_dissector", SpaceDissectorItem::new);
     public static final DeferredHolder<Item, RelicItem> HOLY_LOCKET = ITEMS.register("holy_locket", HolyLocketItem::new);
     public static final DeferredHolder<Item, RelicItem> ENDER_HAND = ITEMS.register("enders_hand", EnderHandItem::new);
     public static final DeferredHolder<Item, RelicItem> ELYTRA_BOOSTER = ITEMS.register("elytra_booster", ElytraBoosterItem::new);
