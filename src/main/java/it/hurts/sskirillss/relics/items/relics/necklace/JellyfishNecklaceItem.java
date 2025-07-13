@@ -341,6 +341,13 @@ public class JellyfishNecklaceItem extends RelicItem {
         @SubscribeEvent
         public static void onLivingHeal(LivingHealEvent event) {
             var entity = event.getEntity();
+            var level = entity.level();
+
+            var pos = entity.blockPosition();
+
+            // WHY!? (cuz of thread locks lol)
+            if (!level.hasChunkAt(pos) || !level.isLoaded(pos))
+                return;
 
             if (!entity.isInLiquid())
                 return;
