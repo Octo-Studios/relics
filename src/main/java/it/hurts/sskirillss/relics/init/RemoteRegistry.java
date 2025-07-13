@@ -185,7 +185,6 @@ public class RemoteRegistry {
         event.registerEntityRenderer(RelicsEntities.LIFE_ESSENCE.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.DEATH_ESSENCE.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.REFLECTIVE_ORB.get(), ReflectiveOrbRenderer::new);
-        event.registerEntityRenderer(RelicsEntities.DISSECTION.get(), DissectionRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SPORE.get(), SporeRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SOLID_SNOWBALL.get(), SolidSnowballRenderer::new);
         event.registerEntityRenderer(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockRenderer::new);

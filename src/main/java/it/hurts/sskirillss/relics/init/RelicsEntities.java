@@ -60,12 +60,6 @@ public class RelicsEntities {
                     .build("death_essence")
     );
 
-    public static final DeferredHolder<EntityType<?>, EntityType<DissectionEntity>> DISSECTION = ENTITIES.register("dissection", () ->
-            EntityType.Builder.<DissectionEntity>of(DissectionEntity::new, MobCategory.MISC)
-                    .sized(3F, 3F)
-                    .build("dissection")
-    );
-
     public static final DeferredHolder<EntityType<?>, EntityType<SporeEntity>> SPORE = ENTITIES.register("spore", () ->
             EntityType.Builder.<SporeEntity>of(SporeEntity::new, MobCategory.MISC)
                     .sized(0.3F, 0.3F)
