@@ -40,4 +40,34 @@ public class WorldUtils {
 
         return -level.getMaxBuildHeight();
     }
+
+    public static int findSurfaceY(Level level, int x, int z, int centerY, int maxOffset) {
+        for (int dy = 0; dy <= maxOffset; dy++) {
+            int y = centerY - dy;
+
+            if (y < level.getMinBuildHeight())
+                break;
+
+            BlockPos pos = new BlockPos(x, y, z);
+            BlockPos above = pos.above();
+
+            if (!level.isEmptyBlock(pos) && level.isEmptyBlock(above)) {
+                return y;
+            }
+        }
+        for (int dy = 1; dy <= maxOffset; dy++) {
+            int y = centerY + dy;
+
+            if (y > level.getMaxBuildHeight())
+                break;
+
+            BlockPos pos = new BlockPos(x, y, z);
+            BlockPos above = pos.above();
+
+            if (!level.isEmptyBlock(pos) && level.isEmptyBlock(above)) {
+                return y;
+            }
+        }
+        return centerY;
+    }
 }

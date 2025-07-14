@@ -23,6 +23,7 @@ public class ShockwaveBlockEntity extends Projectile {
     private static final EntityDataAccessor<BlockPos> CENTER = SynchedEntityData.defineId(ShockwaveBlockEntity.class, EntityDataSerializers.BLOCK_POS);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ShockwaveBlockEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> STUN = SynchedEntityData.defineId(ShockwaveBlockEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Float> KNOCKBACK = SynchedEntityData.defineId(ShockwaveBlockEntity.class, EntityDataSerializers.FLOAT);
 
     public BlockState getBlockState() {
         return this.getEntityData().get(BLOCK_STATE);
@@ -56,6 +57,14 @@ public class ShockwaveBlockEntity extends Projectile {
         this.getEntityData().set(STUN, stun);
     }
 
+    public float getKnockback() {
+        return this.getEntityData().get(KNOCKBACK);
+    }
+
+    public void setKnockback(float knockback) {
+        this.getEntityData().set(KNOCKBACK, knockback);
+    }
+
     public ShockwaveBlockEntity(EntityType<? extends ShockwaveBlockEntity> pEntityType, Level level) {
         super(pEntityType, level);
 
@@ -79,7 +88,7 @@ public class ShockwaveBlockEntity extends Projectile {
         var owner = this.getOwner();
 
         for (var entity : level.getEntitiesOfClass(Entity.class, this.getBoundingBox(), entity -> !(entity instanceof ShockwaveBlockEntity) && (owner == null || !owner.getStringUUID().equals(entity.getStringUUID())))) {
-            var motion = entity.position().subtract(center).normalize().add(0F, 1F, 0F);
+            var motion = entity.position().add(0F, 1F, 0F).subtract(center).normalize().scale(this.getKnockback());
 
             entity.setDeltaMovement(motion);
 
@@ -96,6 +105,7 @@ public class ShockwaveBlockEntity extends Projectile {
         builder.define(CENTER, BlockPos.ZERO);
         builder.define(DAMAGE, 0F);
         builder.define(STUN, 0);
+        builder.define(KNOCKBACK, 0F);
     }
 
     @Override
@@ -106,6 +116,7 @@ public class ShockwaveBlockEntity extends Projectile {
         this.setCenter(NbtUtils.readBlockPos(tag, "center").orElse(BlockPos.ZERO));
         this.setDamage(tag.getFloat("damage"));
         this.setStun(tag.getInt("stun"));
+        this.setKnockback(tag.getFloat("knockback"));
     }
 
     @Override
@@ -116,6 +127,7 @@ public class ShockwaveBlockEntity extends Projectile {
         tag.put("center", NbtUtils.writeBlockPos(this.getCenter()));
         tag.putFloat("damage", this.getDamage());
         tag.putInt("stun", this.getStun());
+        tag.putFloat("knockback", this.getKnockback());
     }
 
     @Override

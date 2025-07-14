@@ -8,17 +8,11 @@ import it.hurts.sskirillss.relics.client.gui.layers.ActiveAbilitiesLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.InfoTileLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.LeafyRingHideLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.PhantomBootBridgeLayer;
-import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceModel;
-import it.hurts.sskirillss.relics.client.models.items.KineticBeltModel;
-import it.hurts.sskirillss.relics.client.models.items.ReflectiveNecklaceModel;
-import it.hurts.sskirillss.relics.client.models.items.SpringyBootModel;
+import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
-import it.hurts.sskirillss.relics.client.renderer.items.JellyfishNecklaceRenderer;
-import it.hurts.sskirillss.relics.client.renderer.items.KineticBeltRenderer;
-import it.hurts.sskirillss.relics.client.renderer.items.ReflectiveNecklaceRenderer;
-import it.hurts.sskirillss.relics.client.renderer.items.SpringyBootRenderer;
+import it.hurts.sskirillss.relics.client.renderer.items.*;
 import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
 import it.hurts.sskirillss.relics.description_categories.AbilityDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategory;
@@ -128,6 +122,7 @@ public class RemoteRegistry {
         CuriosRendererRegistry.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
         CuriosRendererRegistry.register(RelicsItems.KINETIC_BELT.get(), KineticBeltRenderer::new);
         CuriosRendererRegistry.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
+        CuriosRendererRegistry.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleRenderer::new);
 
         for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
             if (!(item instanceof IRenderableCurio))
@@ -156,6 +151,7 @@ public class RemoteRegistry {
         event.registerLayerDefinition(JellyfishNecklaceModel.LAYER, JellyfishNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(KineticBeltModel.LAYER, KineticBeltModel::constructLayerDefinition);
         event.registerLayerDefinition(SpringyBootModel.LAYER, SpringyBootModel::constructLayerDefinition);
+        event.registerLayerDefinition(MidnightMantleModel.LAYER, MidnightMantleModel::constructLayerDefinition);
 
         for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
             if (!(item instanceof IRenderableCurio renderable))
@@ -179,6 +175,7 @@ public class RemoteRegistry {
     @SubscribeEvent
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.FALLING_STAR.get(), FallingStarRenderer::new);
         event.registerEntityRenderer(RelicsEntities.ELECTRIC_SPARK.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.ROLLER_SPARK.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SHOCKWAVE_BLOCK.get(), ShockwaveBlockRenderer::new);

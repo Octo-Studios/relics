@@ -4,10 +4,8 @@ import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
-import it.hurts.sskirillss.relics.init.DataComponentRegistry;
-import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
+import it.hurts.sskirillss.relics.entities.FallingStarEntity;
+import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -23,6 +21,7 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
@@ -230,7 +229,31 @@ public class MidnightMantleItem extends RelicItem {
 
         @SubscribeEvent
         public static void onLivingHurt(LivingIncomingDamageEvent event) {
+            if (!(event.getSource().getEntity() instanceof LivingEntity entity))
+                return;
 
+            var target = event.getEntity();
+
+            var level = entity.level();
+            var random = level.getRandom();
+
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
+                var relic = (MidnightMantleItem) stack.getItem();
+
+                var pos = new Vec3(target.getX() + MathUtils.randomFloat(random) * 10, target.getY() + 50, target.getZ() + MathUtils.randomFloat(random) * 10);
+                var motion = target.position().subtract(pos).normalize().scale(2F);
+
+                var star = new FallingStarEntity(RelicsEntities.FALLING_STAR.get(), level);
+
+                star.setFlawless(relic.isRelicFlawless(entity, stack));
+                star.setMotion(motion);
+                star.setOwner(entity);
+                star.setDamage(10);
+                star.setPos(pos);
+                star.setStun(1);
+
+                level.addFreshEntity(star);
+            }
         }
     }
 }

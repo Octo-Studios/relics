@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.Scheduler;
+import it.hurts.sskirillss.relics.utils.WorldUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundSource;
@@ -109,7 +110,7 @@ public class BlockMixin {
                                     int finalStep = step;
 
                                     Scheduler.schedule(finalStep, () -> {
-                                        var height = 0.15F;
+                                        var height = 0.25F;
 
                                         var localRandom = new Random();
 
@@ -120,12 +121,14 @@ public class BlockMixin {
 
                                             return dist >= finalStep && dist < finalStep + 1;
                                         }).forEach(entryPos -> {
-                                            var groundY = level.getHeight(Heightmap.Types.MOTION_BLOCKING_NO_LEAVES, entryPos.getX(), entryPos.getZ());
-
                                             var centerY = center.getY();
 
-                                            var minAllowedY = Math.max(level.getMinBuildHeight(), centerY - 8);
-                                            var maxAllowedY = Math.min(level.getMaxBuildHeight(), centerY + 8);
+                                            int maxOffset = 8;
+
+                                            var groundY = WorldUtils.findSurfaceY(level, entryPos.getX(), entryPos.getZ(), centerY, maxOffset);;
+
+                                            var minAllowedY = Math.max(level.getMinBuildHeight(), centerY - maxOffset);
+                                            var maxAllowedY = Math.min(level.getMaxBuildHeight(), centerY + maxOffset);
 
                                             if (groundY < minAllowedY || groundY > maxAllowedY)
                                                 return;
@@ -137,10 +140,11 @@ public class BlockMixin {
                                             shockwave.setDamage((float) relic.getStatValue(livingEntity, stack, "bounce", "damage"));
                                             shockwave.setStun((int) relic.getStatValue(livingEntity, stack, "bounce", "stun") * 20);
                                             shockwave.setPos(surfacePos.getX() + 0.5F, surfacePos.getY(), surfacePos.getZ() + 0.5F);
-                                            shockwave.setBlockState(level.getBlockState(surfacePos.below()));
+                                            shockwave.setBlockState(level.getBlockState(surfacePos));
                                             shockwave.setDeltaMovement(0, height, 0);
                                             shockwave.setOwner(livingEntity);
                                             shockwave.setCenter(surfacePos);
+                                            shockwave.setKnockback(1F);
 
                                             level.addFreshEntity(shockwave);
 
@@ -149,14 +153,14 @@ public class BlockMixin {
                                             var rad = (finalStep + 0.5F + (localRandom.nextFloat() - 0.5F) * 0.3F);
 
                                             var px = (float) (surfacePos.getX() + Math.cos(angle) * rad + 0.5F);
-                                            var py = surfacePos.getY() + 0.5F + localRandom.nextFloat() * 0.2F;
+                                            var py = surfacePos.getY() + 1.5F + localRandom.nextFloat() * 0.2F;
                                             var pz = (float) (surfacePos.getZ() + Math.sin(angle) * rad + 0.5F);
 
                                             var vx = (float) Math.cos(angle) * 0.2F;
                                             var vy = 0.025F + localRandom.nextFloat() * 0.05F;
                                             var vz = (float) Math.sin(angle) * 0.2F;
 
-                                            NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CSpawnParticle(ParticleTypes.CLOUD, new Vector3f(px, py, pz), new Vector3f(vx, vy, vz)), livingEntity);
+                                            NetworkHandler.sendToClientsTrackingEntity(new S2CSpawnParticle(ParticleTypes.CLOUD, new Vector3f(px, py, pz), new Vector3f(vx, vy, vz)), shockwave);
                                         });
                                     });
                                 }

@@ -12,6 +12,12 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class RelicsEntities {
     private static final DeferredRegister<EntityType<?>> ENTITIES = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, Relics.MODID);
 
+    public static final DeferredHolder<EntityType<?>, EntityType<FallingStarEntity>> FALLING_STAR = ENTITIES.register("falling_star", () ->
+            EntityType.Builder.<FallingStarEntity>of(FallingStarEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build("falling_star")
+    );
+
     public static final DeferredHolder<EntityType<?>, EntityType<RollerSparkEntity>> ROLLER_SPARK = ENTITIES.register("roller_spark", () ->
             EntityType.Builder.<RollerSparkEntity>of(RollerSparkEntity::new, MobCategory.MISC)
                     .sized(0.15F, 0.15F)

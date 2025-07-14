@@ -305,7 +305,9 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     @UnstableApi
     @ApiStatus.Experimental
     default String getAbilityMode(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityComponent(entity, stack, ability).getMode();
+        var mode = this.getAbilityComponent(entity, stack, ability).getMode();
+
+        return mode.isEmpty() ? this.getAbilityTemplate(entity, stack, ability).getModes().getFirst() : mode;
     }
 
     @UnstableApi
