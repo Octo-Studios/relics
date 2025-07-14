@@ -79,8 +79,8 @@ public class ShockwaveBlockEntity extends Projectile {
 
         this.move(MoverType.SELF, this.getDeltaMovement());
 
-        if (this.tickCount % 100 == 0 || (this.tickCount > 10 && this.getCommandSenderWorld().getBlockState(this.blockPosition().above()).blocksMotion()))
-            this.remove(RemovalReason.KILLED);
+        if (this.tickCount >= 20)
+            this.discard();
 
         var level = this.level();
         var center = this.getCenter().getCenter();
