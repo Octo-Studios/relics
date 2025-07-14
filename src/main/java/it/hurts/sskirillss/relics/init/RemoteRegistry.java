@@ -22,8 +22,6 @@ import it.hurts.sskirillss.relics.items.relics.InfiniteHamItem;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.necklace.HolyLocketItem;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -31,10 +29,8 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -45,7 +41,6 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 import static it.hurts.sskirillss.relics.init.DataComponentRegistry.CHARGE;
-import static it.hurts.sskirillss.relics.init.DataComponentRegistry.WORLD_POSITION;
 
 @EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class RemoteRegistry {
@@ -54,51 +49,10 @@ public class RemoteRegistry {
         event.enqueueWork(() -> {
             ItemProperties.register(RelicsItems.INFINITY_HAM.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "pieces"),
                     (stack, world, entity, id) -> ((InfiniteHamItem) stack.getItem()).getPieces(stack));
-            ItemProperties.register(RelicsItems.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "charges"),
-                    (stack, world, entity, id) -> Math.min(8, stack.getOrDefault(CHARGE, 0)));
-            ItemProperties.register(RelicsItems.MAGIC_MIRROR.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "world"),
-                    (stack, world, entity, id) -> {
-                        Entity e = Minecraft.getInstance().getCameraEntity();
-
-                        if (e == null)
-                            return 0;
-
-                        return switch (e.getCommandSenderWorld().dimension().location().getPath()) {
-                            case "overworld" -> 1;
-                            case "the_nether" -> 2;
-                            case "the_end" -> 3;
-                            default -> 0;
-                        };
-                    });
-            ItemProperties.register(RelicsItems.SHADOW_GLAIVE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "charges"),
-                    (stack, world, entity, id) -> Math.min(8, stack.getOrDefault(CHARGE, 0)));
             ItemProperties.register(RelicsItems.MAGMA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "heat"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(entity, stack, "pace", "time") ? 1 : 0);
             ItemProperties.register(RelicsItems.AQUA_WALKER.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "drench"),
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(entity, stack, "walking", "time") ? 1 : 0);
-//            ItemProperties.register(ItemRegistry.ARROW_QUIVER.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "fullness"),
-//                    (stack, world, entity, id) -> {
-//                        int maxAmount = ((ArrowQuiverItem) stack.getItem()).getSlotsAmount(stack);
-//                        int amount = getArrows(world.registryAccess(), stack).size();
-//
-//                        return amount > 0 ? (int) Math.floor(amount / (maxAmount / 2F)) + 1 : 0;
-//                    });
-            ItemProperties.register(RelicsItems.ELYTRA_BOOSTER.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "fuel"),
-                    (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) > 0 ? 1 : 0);
-            ItemProperties.register(RelicsItems.SOLID_SNOWBALL.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "snow"),
-                    (stack, world, entity, id) -> {
-                        ItemStack relic = EntityUtils.findEquippedCurio(entity, RelicsItems.WOOL_MITTEN.get());
-
-                        if (relic.isEmpty())
-                            return 3;
-
-                        return (int) Math.floor(stack.getOrDefault(CHARGE, 0) / (((IRelicItem) relic.getItem()).getStatValue(entity, relic, "mold", "size") / 3F));
-                    });
-            ItemProperties.register(RelicsItems.ROLLER_SKATES.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "active"),
-                    (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) > 0 ? 1 : 0);
-
-            ItemProperties.register(RelicsItems.BLAZING_FLASK.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "active"),
-                    (stack, world, entity, id) -> stack.get(WORLD_POSITION) == null ? 0 : 1);
             ItemProperties.register(RelicsItems.HOLY_LOCKET.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "mode"),
                     (stack, world, entity, id) -> ((HolyLocketItem) stack.getItem()).getMode(stack).getIndex());
             ItemProperties.register(RelicsItems.MIDNIGHT_MANTLE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "mode"),
@@ -183,11 +137,9 @@ public class RemoteRegistry {
         event.registerEntityRenderer(RelicsEntities.DEATH_ESSENCE.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.REFLECTIVE_ORB.get(), ReflectiveOrbRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SPORE.get(), SporeRenderer::new);
-        event.registerEntityRenderer(RelicsEntities.SOLID_SNOWBALL.get(), SolidSnowballRenderer::new);
         event.registerEntityRenderer(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockRenderer::new);
         event.registerEntityRenderer(RelicsEntities.RELIC_EXPERIENCE_ORB.get(), RelicExperienceOrbRenderer::new);
         event.registerEntityRenderer(RelicsEntities.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), ThrownItemRenderer::new);
-        event.registerEntityRenderer(RelicsEntities.CHAIR.get(), NullRenderer::new);
     }
 
     @SubscribeEvent

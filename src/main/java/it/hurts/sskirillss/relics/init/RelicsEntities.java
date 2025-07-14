@@ -72,18 +72,6 @@ public class RelicsEntities {
                     .build("spore")
     );
 
-    public static final DeferredHolder<EntityType<?>, EntityType<SolidSnowballEntity>> SOLID_SNOWBALL = ENTITIES.register("solid_snowball", () ->
-            EntityType.Builder.<SolidSnowballEntity>of(SolidSnowballEntity::new, MobCategory.MISC)
-                    .sized(0.5F, 0.5F)
-                    .build("solid_snowball")
-    );
-
-//    public static final DeferredHolder<EntityType<?>, EntityType<ArrowRainEntity>> ARROW_RAIN = ENTITIES.register("arrow_rain", () ->
-//            EntityType.Builder.<ArrowRainEntity>of(ArrowRainEntity::new, MobCategory.MISC)
-//                    .sized(1F, 1F)
-//                    .build("arrow_rain")
-//    );
-
     public static final DeferredHolder<EntityType<?>, EntityType<RelicExperienceOrbEntity>> RELIC_EXPERIENCE_ORB = ENTITIES.register("relic_experience_orb", () ->
             EntityType.Builder.of(RelicExperienceOrbEntity::new, MobCategory.MISC)
                     .sized(0.3F, 0.3F)
@@ -94,12 +82,6 @@ public class RelicsEntities {
             EntityType.Builder.of(ThrownRelicExperienceBottle::new, MobCategory.MISC)
                     .sized(0.25F, 0.25F)
                     .build("thrown_relic_experience_bottle")
-    );
-
-    public static final DeferredHolder<EntityType<?>, EntityType<ChairEntity>> CHAIR = ENTITIES.register("chair", () ->
-            EntityType.Builder.<ChairEntity>of(ChairEntity::new, MobCategory.MISC)
-                    .sized(0F, 0F)
-                    .build("chair")
     );
 
     public static void register(IEventBus bus) {

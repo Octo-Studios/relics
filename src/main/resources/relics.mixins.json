@@ -8,13 +8,11 @@
     "AbstractContainerMenuMixin",
     "BlockMixin",
     "BlockStateMixin",
-    "EnderManMixin",
     "EntityMixin",
     "GameDataMixin",
     "ItemMixin",
     "LivingEntityMixin",
     "PiglinAiMixin",
-    "PowderSnowBlockMixin",
     "ScreenMixin",
     "compat.sophisticatedbackpacks.FeedingUpgradeWrapperMixin",
     "compat.sophisticatedbackpacks.UpgradeWrapperBaseAccessor"

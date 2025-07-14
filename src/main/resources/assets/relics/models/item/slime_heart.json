@@ -1,9 +1,0 @@
-{
-  "parent": "item/generated",
-    "textures": {
-        "layer0": "relics:item/slime_heart"
-    },
-    "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/slime_heart_broken" }
-    ]
-}
