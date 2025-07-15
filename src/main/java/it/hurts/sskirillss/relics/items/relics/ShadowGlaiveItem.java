@@ -75,7 +75,6 @@ public class ShadowGlaiveItem extends RelicItem {
     public LevelingTemplate constructDefaultLevelingTemplate() {
         return LevelingTemplate.builder()
                 .initialCost(100)
-                .maxLevel(15)
                 .step(100)
                 .sources(LevelingSourcesTemplate.builder()
                         .source(LevelingSourceTemplate.abilityBuilder("mayhem")

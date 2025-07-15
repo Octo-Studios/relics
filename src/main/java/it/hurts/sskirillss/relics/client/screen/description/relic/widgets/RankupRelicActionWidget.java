@@ -53,7 +53,7 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
         var isMaxRank = rank >= maxRank;
 
         var level = relic.getRelicLevel(player, stack);
-        var maxLevel = relic.getRelicTemplate(player, stack).getLeveling().getMaxLevel();
+        var maxLevel = relic.calculateRelicMaxLevel(player, stack);
         var isMaxLevel = level >= maxLevel;
 
         var key = HotkeyRegistry.RESEARCH_RELIC.getKey().getValue();

@@ -27,21 +27,22 @@ public class RelicsCommand {
                                 return 0;
                             }
 
-                            var relicData = relic.getRelicTemplate(player, stack);
+                            relic.setRelicRank(player, stack, relic.getLevelingTemplate(player, stack).getMaxRank());
+                            relic.setRelicLevel(player, stack, relic.calculateRelicMaxLevel(player, stack));
 
-                            relic.setRelicRank(player, stack, relicData.getLeveling().getMaxRank());
-                            relic.setRelicLevel(player, stack, relicData.getLeveling().getMaxLevel());
-
-                            for (var abilityEntry : relicData.getAbilities().getAbilities().entrySet()) {
+                            for (var abilityEntry : relic.getAbilitiesTemplate(player, stack).getAbilities().entrySet()) {
                                 var abilityId = abilityEntry.getKey();
                                 var abilityData = abilityEntry.getValue();
 
-                                relic.setAbilityLevel(player, stack, abilityId, relicData.getAbilities().getAbilities().get(abilityId).getMaxLevel());
+                                relic.setAbilityLevel(player, stack, abilityId, relic.getAbilityTemplate(player, stack, abilityId).getMaxLevel());
                                 relic.setLockUnlocks(player, stack, abilityId, relic.getMaxLockUnlocks());
                                 relic.setAbilityResearched(player, stack, abilityId, true);
 
-                                for (var statEntry : abilityData.getStats().entrySet())
-                                    relic.setStatOverrideValue(player, stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getValue());
+                                for (var statEntry : abilityData.getStats().entrySet()) {
+                                    var statId = statEntry.getKey();
+
+                                    relic.setStatInitialQuality(player, stack, abilityId, statId, relic.getStatMaxQuality(player, stack, abilityId, statId));
+                                }
                             }
 
                             return Command.SINGLE_SUCCESS;
@@ -58,12 +59,11 @@ public class RelicsCommand {
                                 return 0;
                             }
 
-                            var relicData = relic.getRelicTemplate(player, stack);
-
-                            relic.setRelicLevel(player, stack, relicData.getLeveling().getMaxLevel());
+                            relic.setRelicRank(player, stack, 0);
+                            relic.setRelicLevel(player, stack, 0);
                             relic.setRelicExperience(player, stack, 0);
 
-                            for (var abilityEntry : relicData.getAbilities().getAbilities().entrySet()) {
+                            for (var abilityEntry : relic.getAbilitiesTemplate(player, stack).getAbilities().entrySet()) {
                                 var abilityId = abilityEntry.getKey();
 
                                 relic.setAbilityResearched(player, stack, abilityId, false);
@@ -72,8 +72,11 @@ public class RelicsCommand {
                                 if (!relic.isEnoughLevel(player, stack, abilityId))
                                     relic.setLockUnlocks(player, stack, abilityId, 0);
 
-                                for (var statEntry : abilityEntry.getValue().getStats().entrySet())
-                                    relic.setStatOverrideValue(player, stack, abilityId, statEntry.getKey(), statEntry.getValue().getInitialValue().getKey());
+                                for (var statEntry : abilityEntry.getValue().getStats().entrySet()) {
+                                    var statId = statEntry.getKey();
+
+                                    relic.setStatInitialQuality(player, stack, abilityId, statId, 0);
+                                }
                             }
 
                             return Command.SINGLE_SUCCESS;

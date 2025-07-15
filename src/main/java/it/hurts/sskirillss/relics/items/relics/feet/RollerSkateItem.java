@@ -67,7 +67,6 @@ public class RollerSkateItem extends RelicItem {
                         .build())
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
-                        .maxLevel(10)
                         .step(200)
                         .build())
                 .loot(LootTemplate.builder()

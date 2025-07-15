@@ -14,7 +14,6 @@ public class LevelingTemplate {
     private final ScalingModel scalingModel;
     private final double initialCost;
     private final double step;
-    private final int maxLevel;
     private final LevelingSourcesTemplate sources;
     private final int maxRank;
 
@@ -27,7 +26,7 @@ public class LevelingTemplate {
     }
 
     public LevelingConfigData toConfigData() {
-        return new LevelingConfigData(initialCost, maxLevel, step);
+        return new LevelingConfigData(initialCost, step);
     }
 
     @NoArgsConstructor
@@ -35,7 +34,6 @@ public class LevelingTemplate {
         private ScalingModel scalingModel = ScalingModelRegistry.ADDITIVE.get();
         private double initialCost = 100D;
         private double step = 100D;
-        private int maxLevel = 10;
         private LevelingSourcesTemplate sources = LevelingSourcesTemplate.builder().build();
         private int maxRank = 5;
 
@@ -43,7 +41,6 @@ public class LevelingTemplate {
             this.scalingModel = base.getScalingModel();
             this.initialCost = base.getInitialCost();
             this.step = base.getStep();
-            this.maxLevel = base.getMaxLevel();
             this.sources = base.getSources();
             this.maxRank = base.getMaxRank();
         }
@@ -66,12 +63,6 @@ public class LevelingTemplate {
             return this;
         }
 
-        public LevelingTemplateBuilder maxLevel(int maxLevel) {
-            this.maxLevel = maxLevel;
-
-            return this;
-        }
-
         public LevelingTemplateBuilder sources(LevelingSourcesTemplate sources) {
             this.sources = sources;
 
@@ -85,7 +76,7 @@ public class LevelingTemplate {
         }
 
         public LevelingTemplate build() {
-            return new LevelingTemplate(scalingModel, initialCost, step, maxLevel, sources, maxRank);
+            return new LevelingTemplate(scalingModel, initialCost, step, sources, maxRank);
         }
     }
 }

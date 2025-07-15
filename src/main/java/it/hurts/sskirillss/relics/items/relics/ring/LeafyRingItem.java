@@ -91,7 +91,6 @@ public class LeafyRingItem extends RelicItem {
                         .build())
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
-                        .maxLevel(10)
                         .step(200)
                         .build())
                 .build();

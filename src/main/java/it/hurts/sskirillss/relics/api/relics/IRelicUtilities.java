@@ -148,7 +148,7 @@ public interface IRelicUtilities {
         if (!(this instanceof IRelicItem relic))
             return false;
 
-        return relic.getRelicLevel(entity, stack) >= relic.getLevelingTemplate(entity, stack).getMaxLevel();
+        return relic.getRelicLevel(entity, stack) >= relic.calculateRelicMaxLevel(entity, stack);
     }
 
     default boolean isRelicMaxQuality(LivingEntity entity, ItemStack stack) {

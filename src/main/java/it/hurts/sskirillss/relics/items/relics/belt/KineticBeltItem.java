@@ -73,7 +73,6 @@ public class KineticBeltItem extends RelicItem {
                         .build())
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
-                        .maxLevel(15)
                         .step(100)
                         .build())
                 .loot(LootTemplate.builder()

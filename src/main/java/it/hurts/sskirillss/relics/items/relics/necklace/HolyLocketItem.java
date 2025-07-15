@@ -116,7 +116,6 @@ public class HolyLocketItem extends RelicItem {
                         .build())
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
-                        .maxLevel(20)
                         .step(100)
                         .sources(LevelingSourcesTemplate.builder()
                                 .source(LevelingSourceTemplate.abilityBuilder("faith")

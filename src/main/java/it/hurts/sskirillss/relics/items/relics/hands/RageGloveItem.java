@@ -139,7 +139,6 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
                         .build())
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
-                        .maxLevel(20)
                         .step(100)
                         .build())
                 .loot(LootTemplate.builder()

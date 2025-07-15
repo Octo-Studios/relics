@@ -119,7 +119,6 @@ public class JellyfishNecklaceItem extends RelicItem {
                         .build())
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
-                        .maxLevel(20)
                         .step(200)
                         .build())
                 .loot(LootTemplate.builder()

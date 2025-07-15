@@ -19,7 +19,7 @@ public class StatComponent {
 
     public static final Codec<StatComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.DOUBLE.lenientOptionalFieldOf("initialValue").forGetter(StatComponent::getOverrideValue), // TODO: Rename to "overrideValue" while porting to 1.22
+                    Codec.DOUBLE.lenientOptionalFieldOf("overrideValue").forGetter(StatComponent::getOverrideValue),
                     Codec.INT.optionalFieldOf("initialQuality", 0).forGetter(StatComponent::getInitialQuality)
             ).apply(instance, StatComponent::new)
     );

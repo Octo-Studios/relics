@@ -95,7 +95,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         var xp = getRelicExperience(entity, stack);
         var level = getRelicLevel(entity, stack);
         var oldLevel = level;
-        var maxLevel = getLevelingTemplate(entity, stack).getMaxLevel();
+        var maxLevel = this.calculateRelicMaxLevel(entity, stack);
 
         while ((delta > 0 && level < maxLevel) || (delta < 0 && level > 0)) {
             if (delta > 0) {
@@ -170,7 +170,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
      */
     default boolean addRelicLevel(LivingEntity entity, ItemStack stack, int level) {
         var currentLevel = getRelicLevel(entity, stack);
-        var maxLevel = getLevelingTemplate(entity, stack).getMaxLevel();
+        var maxLevel = this.calculateRelicMaxLevel(entity, stack);
 
         var allowedDelta = level > 0
                 ? Math.min(level, maxLevel - currentLevel)
@@ -232,7 +232,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
         var delta = event.getDelta();
         var currentPoints = getRelicLevelingPoints(entity, stack);
-        var maxLevel = getLevelingTemplate(entity, stack).getMaxLevel();
+        var maxLevel = this.calculateRelicMaxLevel(entity, stack);
         var newPoints = currentPoints + delta;
 
         if (newPoints < 0) {
@@ -359,16 +359,15 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
                         .build()
         ));
 
-        var deltaSum = updatedAbilitiesMap.entrySet().stream()
-                .mapToInt(e -> e.getValue().getMaxLevel() - originalAbilities.get(e.getKey()).getMaxLevel())
-                .sum();
-
         return base.toBuilder()
-                .leveling(leveling.toBuilder()
-                        .maxLevel(leveling.getMaxLevel() + deltaSum)
-                        .build())
                 .abilities(abilitiesBuilder.build())
                 .build();
+    }
+
+    default int calculateRelicMaxLevel(LivingEntity entity, ItemStack stack) {
+        return this.getRelicTemplate(entity, stack).getAbilities().getAbilities().values().stream()
+                .mapToInt(AbilityTemplate::getMaxLevel)
+                .sum();
     }
 
     // TODO: Replace with relative integration
@@ -454,7 +453,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         var rank = this.getRelicRank(entity, stack);
         var maxRank = template.getMaxRank();
         var level = this.getRelicLevel(entity, stack);
-        var maxLevel = template.getMaxLevel();
+        var maxLevel = this.calculateRelicMaxLevel(entity, stack);
         var quality = this.calculateRelicQuality(entity, stack);
         var maxQuality = this.getRelicMaxQuality(entity, stack);
 
@@ -906,7 +905,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     default boolean mayPlayerRankup(Player player, ItemStack stack) {
         var levelingTemplate = this.getLevelingTemplate(player, stack);
 
-        return this.getRelicLevel(player, stack) == levelingTemplate.getMaxLevel() && this.getRelicRank(player, stack) < levelingTemplate.getMaxRank();
+        return this.getRelicLevel(player, stack) == this.calculateRelicMaxLevel(player, stack) && this.getRelicRank(player, stack) < levelingTemplate.getMaxRank();
     }
 
     @ApiStatus.Obsolete

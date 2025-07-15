@@ -81,7 +81,6 @@ public class ElytraBoosterItem extends RelicItem implements IRenderableCurio {
                         .build())
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
-                        .maxLevel(10)
                         .step(100)
                         .build())
                 .loot(LootTemplate.builder()
