@@ -49,7 +49,7 @@ public class BastionRingItem extends RelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("compass")
-                                .maxLevel(0)
+                                .initialMaxLevel(0)
                                 .build())
                         .ability(AbilityTemplate.builder("trade")
                                 .requiredLevel(5)

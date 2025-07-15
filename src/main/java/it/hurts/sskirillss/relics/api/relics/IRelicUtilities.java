@@ -169,7 +169,7 @@ public interface IRelicUtilities {
         if (!(this instanceof IRelicItem relic))
             return false;
 
-        return relic.getAbilityLevel(entity, stack, ability) >= relic.getAbilityTemplate(entity, stack, ability).getMaxLevel();
+        return relic.getAbilityLevel(entity, stack, ability) >= relic.getAbilityTemplate(entity, stack, ability).getInitialMaxLevel();
     }
 
     default boolean isAbilityMaxQuality(LivingEntity entity, ItemStack stack, String ability) {

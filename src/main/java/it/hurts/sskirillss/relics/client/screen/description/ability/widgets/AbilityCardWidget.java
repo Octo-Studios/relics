@@ -180,7 +180,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         GUIRenderer.begin(canBeUpgraded ? canUse ? DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_INACTIVE : canUse ? DescriptionTextures.SMALL_CARD_FRAME_LOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_LOCKED_INACTIVE, poseStack).end();
 
         var level = relic.getAbilityLevel(player, stack, ability);
-        var maxLevel = relic.getAbilityTemplate(player, stack, ability).getMaxLevel();
+        var maxLevel = relic.getAbilityTemplate(player, stack, ability).getInitialMaxLevel();
 
         drawProgressBar(guiGraphics, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_filler.png"), (-this.width / 2F) + 2, (-this.height / 2F) + 3F, (float) level / maxLevel);
 

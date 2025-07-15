@@ -33,7 +33,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("reflection")
-                                .maxLevel(10)
+                                .initialMaxLevel(10)
                                 .rankModifier(1, "stun")
                                 .rankModifier(3, "piercing")
                                 .rankModifier(5, "bounce")

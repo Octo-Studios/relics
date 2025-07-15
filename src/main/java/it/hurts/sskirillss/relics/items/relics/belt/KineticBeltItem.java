@@ -41,7 +41,7 @@ public class KineticBeltItem extends RelicItem {
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("slots")
                                 .requiredPoints(2)
-                                .maxLevel(5)
+                                .initialMaxLevel(5)
                                 .stat(StatTemplate.builder("amount")
                                         .initialValue(1D, 2D)
                                         .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)

@@ -30,7 +30,7 @@ public class AbilityConfigData {
         return template.toBuilder()
                 .requiredPoints(requiredPoints)
                 .requiredLevel(requiredLevel)
-                .maxLevel(maxLevel)
+                .initialMaxLevel(maxLevel)
                 .stats(template.getStats().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> stats.get(entry.getKey()).toData(relic, ability, entry.getKey()), (o1, o2) -> o1, LinkedHashMap::new)))
                 .build();
     }

@@ -61,7 +61,7 @@ public class ElytraBoosterItem extends RelicItem implements IRenderableCurio {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("boost")
-                                .maxLevel(10)
+                                .initialMaxLevel(10)
                                 .castData(CastData.builder()
                                         .type(CastType.CYCLICAL)
                                         .predicate("fuel", PredicateType.CAST, (player, stack) -> stack.getOrDefault(CHARGE, 0) > 0)

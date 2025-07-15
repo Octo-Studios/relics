@@ -95,7 +95,7 @@ public class HolyLocketItem extends RelicItem {
                         .ability(AbilityTemplate.builder("ascension")
                                 .requiredLevel(10)
                                 .requiredPoints(3)
-                                .maxLevel(5)
+                                .initialMaxLevel(5)
                                 .stat(StatTemplate.builder("max_duration")
                                         .initialValue(7.5D, 15D)
                                         .upgradeModifier(ScalingModelRegistry.EXPONENTIAL.get(), 0.3195D)

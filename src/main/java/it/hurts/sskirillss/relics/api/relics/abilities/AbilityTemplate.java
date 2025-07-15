@@ -30,7 +30,8 @@ public class AbilityTemplate {
 
     private final Function3<Player, ItemStack, String, String> icon;
     private final Map<String, StatTemplate> stats;
-    private final int maxLevel;
+    private final int initialMaxLevel;
+    private final double maxLevelRankModifier;
     private final int requiredLevel;
     private final int requiredPoints;
     private final CastData castData;
@@ -48,7 +49,7 @@ public class AbilityTemplate {
     }
 
     public AbilityConfigData toConfigData() {
-        return new AbilityConfigData(requiredPoints, requiredLevel, maxLevel, stats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toConfigData(), (o1, o2) -> o1, LinkedHashMap::new)));
+        return new AbilityConfigData(requiredPoints, requiredLevel, initialMaxLevel, stats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toConfigData(), (o1, o2) -> o1, LinkedHashMap::new)));
     }
 
     public static class AbilityTemplateBuilder {
@@ -56,7 +57,8 @@ public class AbilityTemplate {
 
         private Function3<Player, ItemStack, String, String> icon = (player, stack, ability) -> ability;
         private Map<String, StatTemplate> stats = new LinkedHashMap<>();
-        private int maxLevel = 10;
+        private int initialMaxLevel = 10;
+        private double maxLevelRankModifier = 0.25D;
         private int requiredLevel = 0;
         private int requiredPoints = 1;
         private CastData castData = CastData.builder().build();
@@ -74,7 +76,8 @@ public class AbilityTemplate {
 
             this.icon = base.getIcon();
             this.stats = new LinkedHashMap<>(base.getStats());
-            this.maxLevel = base.getMaxLevel();
+            this.initialMaxLevel = base.getInitialMaxLevel();
+            this.maxLevelRankModifier = base.getMaxLevelRankModifier();
             this.requiredLevel = base.getRequiredLevel();
             this.requiredPoints = base.getRequiredPoints();
             this.castData = base.getCastData();
@@ -101,8 +104,14 @@ public class AbilityTemplate {
             return this;
         }
 
-        public AbilityTemplateBuilder maxLevel(int maxLevel) {
-            this.maxLevel = maxLevel;
+        public AbilityTemplateBuilder initialMaxLevel(int maxLevel) {
+            this.initialMaxLevel = maxLevel;
+
+            return this;
+        }
+
+        public AbilityTemplateBuilder maxLevelRankModifier(double maxLevelRankModifier) {
+            this.maxLevelRankModifier = maxLevelRankModifier;
 
             return this;
         }
@@ -152,7 +161,7 @@ public class AbilityTemplate {
         }
 
         public AbilityTemplate build() {
-            return new AbilityTemplate(this.id, this.icon, this.stats, this.maxLevel, this.requiredLevel, this.requiredPoints, this.castData, this.researchTemplate, this.statistic, this.modes, this.rankModifiers);
+            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredPoints, this.castData, this.researchTemplate, this.statistic, this.modes, this.rankModifiers);
         }
     }
 }

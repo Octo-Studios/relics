@@ -327,36 +327,28 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     @Override
     default RelicTemplate getRelicTemplate(LivingEntity entity, ItemStack stack) {
         var base = IRelicTemplateHolder.super.getRelicTemplate(entity, stack);
-        var rank = getRelicRank(entity, stack);
+        var rank = this.getRelicRank(entity, stack);
 
-        var multiplier = 0.25D;
-
-        var leveling = base.getLeveling();
         var abilities = base.getAbilities();
 
-        var originalAbilities = abilities.getAbilities();
-
-        var updatedAbilitiesMap = originalAbilities.entrySet().stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        entry -> {
+        var updatedAbilitiesMap = abilities.getAbilities().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
                             var template = entry.getValue();
 
                             var updatedMax = IntStream.range(0, rank)
-                                    .reduce(template.getMaxLevel(), (lvl, i) -> lvl + (int) Math.ceil(lvl * multiplier));
+                                    .reduce(template.getInitialMaxLevel(), (level, i) -> level + (int) Math.ceil(level * template.getMaxLevelRankModifier()));
 
                             return template.toBuilder()
-                                    .maxLevel(updatedMax)
+                                    .initialMaxLevel(updatedMax)
                                     .build();
                         }
                 ));
 
         var abilitiesBuilder = abilities.toBuilder();
 
-        updatedAbilitiesMap.forEach((key, tmpl) -> abilitiesBuilder.ability(
-                tmpl.toBuilder()
-                        .maxLevel(tmpl.getMaxLevel())
-                        .build()
+        updatedAbilitiesMap.forEach((key, template) -> abilitiesBuilder.ability(template.toBuilder()
+                .initialMaxLevel(template.getInitialMaxLevel())
+                .build()
         ));
 
         return base.toBuilder()
@@ -366,7 +358,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
     default int calculateRelicMaxLevel(LivingEntity entity, ItemStack stack) {
         return this.getRelicTemplate(entity, stack).getAbilities().getAbilities().values().stream()
-                .mapToInt(AbilityTemplate::getMaxLevel)
+                .mapToInt(AbilityTemplate::getInitialMaxLevel)
                 .sum();
     }
 
@@ -841,7 +833,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     }
 
     default boolean canBeUpgraded(LivingEntity entity, ItemStack stack, String ability) {
-        return getAbilityTemplate(entity, stack, ability).getMaxLevel() > 0 && !getAbilityTemplate(entity, stack, ability).getStats().isEmpty();
+        return getAbilityTemplate(entity, stack, ability).getInitialMaxLevel() > 0 && !getAbilityTemplate(entity, stack, ability).getStats().isEmpty();
     }
 
     default boolean mayUpgrade(LivingEntity entity, ItemStack stack, String ability) {

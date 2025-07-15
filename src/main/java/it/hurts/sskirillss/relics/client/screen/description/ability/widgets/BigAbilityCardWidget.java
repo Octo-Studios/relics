@@ -143,7 +143,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getAbilityLevel(player, stack, ability) + "/" + relic.getAbilityTemplate(player, stack, ability).getMaxLevel()),
+                Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getAbilityLevel(player, stack, ability) + "/" + relic.getAbilityTemplate(player, stack, ability).getInitialMaxLevel()),
                 Component.literal("").append(Component.translatable("tooltip.relics.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.calculateAbilityQuality(player, stack, ability) / 2F, 1) + "/" + relic.getAbilityMaxQuality(player, stack, ability) / 2),
                 Component.literal(" ")
         );

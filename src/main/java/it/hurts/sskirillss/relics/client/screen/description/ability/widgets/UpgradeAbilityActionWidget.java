@@ -40,7 +40,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
     public void playDownSound(SoundManager handler) {
         if (getScreen().getStack().getItem() instanceof IRelicItem relic && !isLocked()) {
             int level = relic.getAbilityLevel(minecraft.player, getScreen().getStack(), getAbility());
-            int maxLevel = relic.getAbilityTemplate(minecraft.player, getScreen().getStack(), getAbility()).getMaxLevel();
+            int maxLevel = relic.getAbilityTemplate(minecraft.player, getScreen().getStack(), getAbility()).getInitialMaxLevel();
 
             handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_UPGRADE.get(), Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility()) ? 2F : 1F + ((float) level / maxLevel)));
         }
@@ -91,7 +91,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
         var hasLevelingPoints = requiredLevelingPoints <= currentLevelingPoints;
 
         var level = relic.getAbilityLevel(player, stack, ability);
-        var maxLevel = relic.getRelicTemplate(player, stack).getAbilities().getAbilities().get(ability).getMaxLevel();
+        var maxLevel = relic.getRelicTemplate(player, stack).getAbilities().getAbilities().get(ability).getInitialMaxLevel();
         var isMaxLevel = level >= maxLevel;
 
         description.add(Component.translatable("relics.description.ability.levelup.title")

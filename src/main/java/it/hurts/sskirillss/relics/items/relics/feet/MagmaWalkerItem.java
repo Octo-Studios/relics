@@ -55,7 +55,7 @@ public class MagmaWalkerItem extends RelicItem implements IRenderableCurio {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("heat_resistance")
-                                .maxLevel(0)
+                                .initialMaxLevel(0)
                                 .build())
                         .ability(AbilityTemplate.builder("pace")
                                 .stat(StatTemplate.builder("time")

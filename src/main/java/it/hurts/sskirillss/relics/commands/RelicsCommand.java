@@ -34,7 +34,7 @@ public class RelicsCommand {
                                 var abilityId = abilityEntry.getKey();
                                 var abilityData = abilityEntry.getValue();
 
-                                relic.setAbilityLevel(player, stack, abilityId, relic.getAbilityTemplate(player, stack, abilityId).getMaxLevel());
+                                relic.setAbilityLevel(player, stack, abilityId, relic.getAbilityTemplate(player, stack, abilityId).getInitialMaxLevel());
                                 relic.setLockUnlocks(player, stack, abilityId, relic.getMaxLockUnlocks());
                                 relic.setAbilityResearched(player, stack, abilityId, true);
 
