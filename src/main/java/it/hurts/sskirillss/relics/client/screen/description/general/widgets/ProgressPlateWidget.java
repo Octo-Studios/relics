@@ -15,6 +15,39 @@ public class ProgressPlateWidget extends AbstractPlateWidget {
     }
 
     @Override
+    public void renderIcon(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float partialTick) {
+        var player = minecraft.player;
+
+        if (player == null)
+            return;
+
+        var stack = this.getScreen().getStack();
+        var relic = (IRelicItem) stack.getItem();
+
+        var pose = guiGraphics.pose();
+
+        pose.pushPose();
+
+        if (relic.isRelicFlawless(player, stack)) {
+            var time = player.tickCount + partialTick;
+            var scale = 1F + (float) (Math.sin(time * 0.25F) * 0.075F);
+
+            var pivotX = x + 8F;
+            var pivotY = y + 8F;
+
+            pose.translate(pivotX, pivotY, 0);
+
+            pose.scale(scale, scale, 1f);
+
+            pose.translate(-pivotX, -pivotY, 0);
+        }
+
+        super.renderIcon(guiGraphics, x, y, mouseX, mouseY, partialTick);
+
+        pose.popPose();
+    }
+
+    @Override
     public void renderContent(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         var player = this.minecraft.player;
 

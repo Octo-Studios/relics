@@ -46,10 +46,7 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
 
         poseStack.translate(0F, 0F, 10F);
 
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/icons/" + icon + ".png"), poseStack)
-                .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(3, 3)
-                .end();
+        this.renderIcon(guiGraphics, 3, 3, pMouseX, pMouseY, pPartialTick);
 
         var value = Component.literal(this.getValue(screen.getStack())).withStyle(ChatFormatting.BOLD);
 
@@ -64,6 +61,15 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
                     .end();
 
         poseStack.popPose();
+    }
+
+    public void renderIcon(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float partialTick) {
+        var poseStack = guiGraphics.pose();
+
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/icons/" + icon + ".png"), poseStack)
+                .anchor(SpriteAnchor.TOP_LEFT)
+                .pos(x, y)
+                .end();
     }
 
     public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
