@@ -62,5 +62,9 @@
     "spring_boing": {
         "category": "master",
         "sounds": [ { "name": "relics:spring_boing" } ]
+    },
+    "falling_star_fall": {
+        "category": "master",
+        "sounds": [ { "name": "relics:falling_star_fall" } ]
     }
 }

@@ -62,7 +62,7 @@ public class MidnightMantleItem extends RelicItem {
                         .ability(AbilityTemplate.builder("invisibility")
                                 .stat(StatTemplate.builder("brightness")
                                         .thresholdValue(0D, 1D)
-                                        .initialValue(0.10D, 0.25D)
+                                        .initialValue(0.1D, 0.25D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
@@ -74,6 +74,25 @@ public class MidnightMantleItem extends RelicItem {
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.35D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .build())
+                        .ability(AbilityTemplate.builder("starfall")
+                                .rankModifier(1, "stun")
+                                .stat(StatTemplate.builder("chance")
+                                        .thresholdValue(0D, 1D)
+                                        .initialValue(0.1D, 0.25D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.025D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .stat(StatTemplate.builder("damage")
+                                        .initialValue(0.25D, 0.5D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .stat(StatTemplate.builder("stun")
+                                        .initialValue(0.25D, 0.5D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .build())
@@ -130,18 +149,18 @@ public class MidnightMantleItem extends RelicItem {
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         var entity = slotContext.entity();
-        var level = entity.getCommandSenderWorld();
+        var level = entity.level();
 
         if (this.canPlayerUseAbility(entity, stack, "phase")) {
             var mode = this.getAbilityMode(entity, stack, "phase");
 
             if (!mode.isEmpty()) {
                 var totalEffectiveness = this.getModeEffectiveness(entity, stack);
+
                 var attackEffectiveness = mode.equals("full_moon") ? totalEffectiveness : 0D;
                 var healEffectiveness = mode.equals("new_moon") ? totalEffectiveness : 0D;
 
                 EntityUtils.resetAttribute(entity, stack, Attributes.ATTACK_SPEED, (float) (this.getStatValue(entity, stack, "phase", "attack_speed") * attackEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-                EntityUtils.resetAttribute(entity, stack, Attributes.ATTACK_DAMAGE, (float) (this.getStatValue(entity, stack, "phase", "attack_damage") * attackEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
                 EntityUtils.resetAttribute(entity, stack, Attributes.MAX_HEALTH, (float) (this.getStatValue(entity, stack, "phase", "max_health") * healEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
             }
         }
@@ -192,44 +211,51 @@ public class MidnightMantleItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "phase"))
+                if (!relic.canPlayerUseAbility(entity, stack, "phase")  || !relic.getAbilityMode(entity, stack, "phase").equals("new_moon"))
                     continue;
 
-                var mode = relic.getAbilityMode(entity, stack, "phase");
+                event.setAmount((float) (event.getAmount() + (event.getAmount() * relic.getModeEffectiveness(entity, stack))));
+            }
+        }
 
-                if (mode.isEmpty())
+        @SubscribeEvent
+        public static void onLivingHurt1(LivingIncomingDamageEvent event) {
+            if (!(event.getSource().getEntity() instanceof LivingEntity entity))
+                return;
+
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
+                var relic = (MidnightMantleItem) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(entity, stack, "phase") || !relic.getAbilityMode(entity, stack, "phase").equals("full_moon"))
                     continue;
 
-                var totalEffectiveness = relic.getModeEffectiveness(entity, stack);
-                var healEffectiveness = mode.equals("new_moon") ? totalEffectiveness : 0D;
-
-                event.setAmount((float) (event.getAmount() + (event.getAmount() * healEffectiveness)));
+                event.setAmount((float) (event.getAmount() + (event.getAmount() * relic.getModeEffectiveness(entity, stack))));
             }
         }
 
         @SubscribeEvent
         public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
-            onInteract(event.getEntity());
+            CommonEvents.onInteract(event.getEntity());
         }
 
         @SubscribeEvent
         public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-            onInteract(event.getEntity());
+            CommonEvents.onInteract(event.getEntity());
         }
 
         @SubscribeEvent
         public static void onBlockBreakAttempt(PlayerEvent.BreakSpeed event) {
-            onInteract(event.getEntity());
+            CommonEvents.onInteract(event.getEntity());
         }
 
         @SubscribeEvent
         public static void onAttackEntity(AttackEntityEvent event) {
-            onInteract(event.getEntity());
+            CommonEvents.onInteract(event.getEntity());
         }
 
         @SubscribeEvent
-        public static void onLivingHurt(LivingIncomingDamageEvent event) {
-            if (!(event.getSource().getEntity() instanceof LivingEntity entity))
+        public static void onLivingHurt2(LivingIncomingDamageEvent event) {
+            if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity entity))
                 return;
 
             var target = event.getEntity();
@@ -240,17 +266,22 @@ public class MidnightMantleItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                var pos = new Vec3(target.getX() + MathUtils.randomFloat(random) * 10, target.getY() + 50, target.getZ() + MathUtils.randomFloat(random) * 10);
+                if (random.nextFloat() > relic.getStatValue(entity, stack, "starfall", "chance"))
+                    continue;
+
+                var pos = new Vec3(target.getX() + MathUtils.randomFloat(random) * 10, target.getY() + 25 + random.nextInt(25), target.getZ() + MathUtils.randomFloat(random) * 10);
                 var motion = target.position().subtract(pos).normalize().scale(2F);
 
                 var star = new FallingStarEntity(RelicsEntities.FALLING_STAR.get(), level);
 
+                star.setDamage((float) (event.getOriginalAmount() * relic.getStatValue(entity, stack, "starfall", "damage")));
                 star.setFlawless(relic.isRelicFlawless(entity, stack));
                 star.setMotion(motion);
                 star.setOwner(entity);
-                star.setDamage(10);
                 star.setPos(pos);
-                star.setStun(1);
+
+                if (relic.isAbilityRankModifierUnlocked(entity, stack, "starfall", "stun"))
+                    star.setStun((int) (relic.getStatValue(entity, stack, "starfall", "stun") * 20));
 
                 level.addFreshEntity(star);
             }
