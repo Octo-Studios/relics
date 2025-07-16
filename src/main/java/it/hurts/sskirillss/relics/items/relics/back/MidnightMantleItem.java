@@ -170,7 +170,7 @@ public class MidnightMantleItem extends RelicItem {
             if (cooldown > 0) {
                 if (level.getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(16)).stream().noneMatch(mob -> mob.getTarget() == entity && !mob.hasLineOfSight(entity)))
                     this.addInvisibilityCooldown(stack, -1);
-            } else if (!level.isClientSide() && this.canHideInTheDarkness(entity, stack))
+            } else if (false && !level.isClientSide() && this.canHideInTheDarkness(entity, stack))
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
         }
     }

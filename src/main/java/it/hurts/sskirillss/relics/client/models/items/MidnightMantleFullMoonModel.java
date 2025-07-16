@@ -8,20 +8,17 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.world.entity.Entity;
 
-public class MidnightMantleMoonModel<T extends Entity> extends EntityModel<T> {
+public class MidnightMantleFullMoonModel<T extends Entity> extends EntityModel<T> {
     public ModelPart part;
 
-    public MidnightMantleMoonModel() {
+    public MidnightMantleFullMoonModel() {
         MeshDefinition meshDefinition = new MeshDefinition();
         PartDefinition partDefinition = meshDefinition.getRoot();
 
-        PartDefinition body = partDefinition.addOrReplaceChild("body", CubeListBuilder.create(), PartPose.offset(2.5F, 9.5F, -3.875F));
+        PartDefinition bone = partDefinition.addOrReplaceChild("bone", CubeListBuilder.create().texOffs(0, 0).addBox(-8.0F, -17.25F, 7.0F, 16.0F, 16.0F, 2.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 18).addBox(-8.0F, -17.25F, 7.0F, 16.0F, 16.0F, 2.0F, new CubeDeformation(0.25F)), PartPose.offset(0.0F, 0.5F, 0.0F));
 
-        PartDefinition cube_r1 = body.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(0, 10).mirror().addBox(5.0F, -4.5F, 0.875F, 7.0F, 10.0F, 0.0F, new CubeDeformation(0.0F)).mirror(false), PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, -0.7854F, 0.0F));
-
-        PartDefinition cube_r2 = body.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(0, 10).addBox(-12.0F, -4.5F, 0.875F, 7.0F, 10.0F, 0.0F, new CubeDeformation(0.0F)), PartPose.offsetAndRotation(-5.0F, 0.0F, 0.0F, 0.0F, 0.7854F, 0.0F));
-
-        this.part = LayerDefinition.create(meshDefinition, 32, 32).bakeRoot();
+        this.part = LayerDefinition.create(meshDefinition, 64, 64).bakeRoot();
     }
 
     @Override
