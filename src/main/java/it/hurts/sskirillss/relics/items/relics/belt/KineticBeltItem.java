@@ -52,6 +52,7 @@ public class KineticBeltItem extends RelicItem {
                                 .rankModifier(1, "momentum")
                                 .rankModifier(3, "strike")
                                 .rankModifier(5, "resistance")
+                                .modes("enabled", "disabled")
                                 .stat(StatTemplate.builder("efficiency")
                                         .initialValue(0.25D, 0.35D)
                                         .thresholdValue(0D, 1D)
@@ -117,7 +118,7 @@ public class KineticBeltItem extends RelicItem {
 
         var entity = slotContext.entity();
 
-        if (!this.canPlayerUseAbility(entity, stack, "gliding"))
+        if (!this.canPlayerUseAbility(entity, stack, "gliding") || this.getAbilityMode(entity, stack, "gliding").equals("disabled"))
             return;
 
         var level = entity.level();
@@ -214,7 +215,8 @@ public class KineticBeltItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
                 var relic = (KineticBeltItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "gliding") || !relic.isAbilityRankModifierUnlocked(entity, stack, "gliding", "momentum") || !relic.isActive(stack))
+                if (!relic.canPlayerUseAbility(entity, stack, "gliding") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled")
+                        || !relic.isAbilityRankModifierUnlocked(entity, stack, "gliding", "momentum") || !relic.isActive(stack))
                     continue;
 
                 event.setDistance(0);
@@ -233,7 +235,8 @@ public class KineticBeltItem extends RelicItem {
                 for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.KINETIC_BELT.get())) {
                     var relic = (KineticBeltItem) stack.getItem();
 
-                    if (!relic.canPlayerUseAbility(source, stack, "gliding") || !relic.isAbilityRankModifierUnlocked(source, stack, "gliding", "strike") || !relic.isActive(stack))
+                    if (!relic.canPlayerUseAbility(source, stack, "gliding") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled")
+                            || !relic.isAbilityRankModifierUnlocked(source, stack, "gliding", "strike") || !relic.isActive(stack))
                         continue;
 
                     event.setNewDamage((float) (original + (original * relic.getStatValue(entity, stack, "gliding", "damage"))));
@@ -243,7 +246,8 @@ public class KineticBeltItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
                 var relic = (KineticBeltItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "gliding") || !relic.isAbilityRankModifierUnlocked(entity, stack, "gliding", "resistance") || !relic.isActive(stack))
+                if (!relic.canPlayerUseAbility(entity, stack, "gliding") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled")
+                        || !relic.isAbilityRankModifierUnlocked(entity, stack, "gliding", "resistance") || !relic.isActive(stack))
                     continue;
 
                 event.setNewDamage((float) (original - (original * relic.getStatValue(entity, stack, "gliding", "resistance"))));

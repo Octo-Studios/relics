@@ -28,7 +28,7 @@ public class LivingEntityMixin {
         for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
             var relic = (KineticBeltItem) stack.getItem();
 
-            if (!relic.isActive(stack))
+            if (!relic.canPlayerUseAbility(entity, stack, "gliding") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled") || !relic.isActive(stack))
                 continue;
 
             var scale = relic.getStatValue(entity, stack, "gliding", "efficiency");
@@ -48,7 +48,7 @@ public class LivingEntityMixin {
                 .filter(stack -> {
                     var relic = ((KineticBeltItem) stack.getItem());
 
-                    return !relic.isLanded(stack) || relic.isActive(stack);
+                    return relic.canPlayerUseAbility(entity, stack, "gliding") && relic.getAbilityMode(entity, stack, "gliding").equals("disabled") && !relic.isLanded(stack) && relic.isActive(stack);
                 })
                 .mapToDouble(stack -> ((KineticBeltItem) stack.getItem()).getStatValue(entity, stack, "gliding", "efficiency"))
                 .max()
