@@ -14,6 +14,9 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.ApiStatus;

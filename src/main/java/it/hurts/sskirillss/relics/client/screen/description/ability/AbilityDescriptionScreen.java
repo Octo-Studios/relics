@@ -203,6 +203,11 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         var title = Component.translatableWithFallback("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability);
 
+        var modes = relic.getAbilityTemplate(player, stack, ability).getModes();
+
+        if (!modes.isEmpty())
+            title.append(Component.literal(" [").append(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".mode." + relic.getAbilityMode(player, stack, ability))).append(Component.literal("]")));
+
         if (!relic.isAbilityUnlocked(player, stack, ability)) {
             title = ScreenUtils.stylizeWithReplacement(title, 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(0x9E00B0), ability.length());
 

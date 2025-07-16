@@ -127,7 +127,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         }).toList();
 
         var itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
-        var key = "tooltip.relics." + itemId + ".ability." + abilityKey + ".description";
+        var key = "tooltip.relics." + itemId + ".ability." + abilityKey + "." + (relic.getAbilityTemplate(player, stack, abilityKey).getModes().isEmpty() ? "description" : relic.getAbilityMode(player, stack, abilityKey) + ".description");
         var tokens = IntStream.rangeClosed(1, dynamicComponents.size()).mapToObj(i -> "%" + i + "$s").toArray(String[]::new);
         var descriptionComponent = Component.translatable(key, (Object[]) tokens);
 
