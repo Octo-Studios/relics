@@ -48,11 +48,15 @@ public class MidnightMantleRenderer implements ICurioRenderer, IRelicRenderer {
 
         ICurioRenderer.followBodyRotations(entity, this.model);
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_" + (relic.isRelicFlawless(entity, stack) ? "flawless" : relic.getAbilityMode(entity, stack, "phase")) + ".png"))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+        var mode = relic.getAbilityMode(entity, stack, "phase");
+
+        //System.out.println(relic.getAbilityComponent(entity, stack, "phase").getMode());
+
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_" + (relic.isRelicFlawless(entity, stack) ? "flawless" : mode) + ".png"))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         float flicker = 0.75F + 0.25F * Mth.sin(time * 0.15F);
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_stars_" + relic.getAbilityMode(entity, stack, "phase") + ".png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : LightTexture.pack((int) (15 * flicker), (int) (15 * flicker)), OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_stars_" + mode + ".png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : LightTexture.pack((int) (15 * flicker), (int) (15 * flicker)), OverlayTexture.NO_OVERLAY);
 
         if (relic.canPlayerUseAbility(entity, stack, "phase")) {
             var deltaX = (float) (Mth.lerp(partialTicks, player.xCloakO, player.xCloak) - Mth.lerp(partialTicks, player.xo, player.getX()));
@@ -89,8 +93,6 @@ public class MidnightMantleRenderer implements ICurioRenderer, IRelicRenderer {
 
             poseStack.mulPose(Axis.XP.rotation(tiltX));
             poseStack.mulPose(Axis.ZP.rotation(tiltZ));
-
-            var mode = relic.getAbilityMode(entity, stack, "phase");
 
             if (mode.equals("new_moon"))
                 new MidnightMantleNewMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_new_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);

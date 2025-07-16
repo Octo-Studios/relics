@@ -36,7 +36,7 @@ public class DescriptionTextures {
     public static final ResourceLocation SMALL_CARD_FRAME_UNLOCKED_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_unlocked_inactive.png");
     public static final ResourceLocation SMALL_CARD_FRAME_LOCKED_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_locked_active.png");
     public static final ResourceLocation SMALL_CARD_FRAME_LOCKED_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_locked_inactive.png");
-    public static final ResourceLocation SMALL_CARD_FRAME_OUTLINE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_outline.png");
+    public static final ResourceLocation SMALL_CARD_FRAME_SELECTION = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_selection.png");
 
     public static final ResourceLocation RESEARCH_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/research/research_background.png");
     public static final ResourceLocation RESEARCH_FOG = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/research/research_fog.png");

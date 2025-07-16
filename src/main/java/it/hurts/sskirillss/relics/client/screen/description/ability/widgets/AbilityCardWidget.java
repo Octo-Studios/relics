@@ -185,7 +185,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         drawProgressBar(guiGraphics, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_filler.png"), (-this.width / 2F) + 2, (-this.height / 2F) + 3F, (float) level / maxLevel);
 
         if (isHovered())
-            GUIRenderer.begin(DescriptionTextures.SMALL_CARD_FRAME_OUTLINE, poseStack)
+            GUIRenderer.begin(DescriptionTextures.SMALL_CARD_FRAME_SELECTION, poseStack)
                     .end();
 
         if (isLockUnlocked) {

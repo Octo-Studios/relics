@@ -161,6 +161,13 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             this.addRenderableWidget(container);
             this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
         }
+
+        var modes = relic.getAbilityTemplate(player, stack, this.getSelectedAbility()).getModes();
+
+        if (relic.isAbilityUnlocked(player, stack, ability) && !modes.isEmpty()) {
+            this.addRenderableWidget(new AbilityModeWidget(x + 100, y + 53, this, 1));
+            this.addRenderableWidget(new AbilityModeWidget(x + 56, y + 53, this, -1));
+        }
     }
 
     @Override

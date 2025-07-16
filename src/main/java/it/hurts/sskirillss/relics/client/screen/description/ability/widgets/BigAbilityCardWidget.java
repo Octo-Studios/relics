@@ -74,20 +74,10 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         var modes = relic.getAbilityTemplate(player, stack, ability).getModes();
 
-        if (!modes.isEmpty()) {
+        if (isUnlocked && !modes.isEmpty()) {
             GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_list.png"), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(this.getX() + 8, this.getY() + 11)
-                    .end();
-
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_left.png"), poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(this.getX() - 3, this.getY() + 10)
-                    .end();
-
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_right.png"), poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(this.getX() + 41, this.getY() + 10)
                     .end();
 
             var dotWidth = 4;
@@ -163,13 +153,25 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             poseStack.popPose();
         }
 
-        if (isUnlocked && canBeUpgraded && isHovered())
-            GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(getX() - 1, getY() - 1)
-                    .end();
+        if (isUnlocked && canBeUpgraded && this.isHovered()) {
+            if (modes.isEmpty())
+                GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
+                        .anchor(SpriteAnchor.TOP_LEFT)
+                        .pos(this.getX() - 1, this.getY() - 1)
+                        .end();
+            else
+                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_outline_modes.png"), poseStack)
+                        .anchor(SpriteAnchor.TOP_LEFT)
+                        .pos(this.getX() - 4, this.getY() - 1)
+                        .end();
+        }
 
         poseStack.popPose();
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return false;
     }
 
     @Override
@@ -212,14 +214,14 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         poseStack.translate(0F, 0F, 400);
 
-        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, mouseX - 9 - (renderWidth / 2), mouseY);
+        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, (this.getX() - renderWidth / 2) + 16, this.getY() + this.getHeight() + 11);
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
         int yOff = 0;
 
         for (FormattedCharSequence entry : tooltip) {
-            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
+            guiGraphics.drawString(minecraft.font, entry, ((this.getX() - renderWidth / 2) + 14 + 12) * 2, ((this.getY() + yOff + this.getHeight() + 11 + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
 
             yOff += 5;
         }

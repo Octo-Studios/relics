@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
 import io.netty.util.internal.UnstableApi;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
@@ -55,7 +56,13 @@ public class AbilityTemplate {
     public static class AbilityTemplateBuilder {
         private final String id;
 
-        private Function3<Player, ItemStack, String, String> icon = (player, stack, ability) -> ability;
+        private Function3<Player, ItemStack, String, String> icon = (player, stack, ability) -> {
+            var relic = (IRelicItem) stack.getItem();
+
+            var modes = relic.getAbilityTemplate(player, stack, ability).getModes();
+
+            return ability + (modes.isEmpty() ? "" : "_" + relic.getAbilityMode(player, stack, ability));
+        };
         private Map<String, StatTemplate> stats = new LinkedHashMap<>();
         private int initialMaxLevel = 10;
         private double maxLevelRankModifier = 0.25D;
