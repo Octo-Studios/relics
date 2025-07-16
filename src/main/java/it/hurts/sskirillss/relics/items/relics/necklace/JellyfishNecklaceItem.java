@@ -56,6 +56,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                                 .initialMaxLevel(10)
                                 .rankModifier(1, "conductor")
                                 .rankModifier(5, "charge")
+                                .modes("enabled", "disabled")
                                 .stat(StatTemplate.builder("cooldown")
                                         .initialValue(120D, 60D)
                                         .thresholdValue(0, Double.MAX_VALUE)
@@ -244,7 +245,7 @@ public class JellyfishNecklaceItem extends RelicItem {
             }
         }
 
-        if (this.canPlayerUseAbility(entity, stack, "shock")) {
+        if (this.canPlayerUseAbility(entity, stack, "shock") && !this.getAbilityMode(entity, stack, "gliding").equals("disabled")) {
             var cooldown = this.getCooldown(stack);
             var rings = this.getRings(stack);
 
@@ -369,7 +370,8 @@ public class JellyfishNecklaceItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {
                 var relic = (JellyfishNecklaceItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "shock") || !relic.isAbilityRankModifierUnlocked(entity, stack, "shock", "charge"))
+                if (!relic.canPlayerUseAbility(entity, stack, "shock") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled")
+                        || !relic.isAbilityRankModifierUnlocked(entity, stack, "shock", "charge"))
                     continue;
 
                 var duration = relic.getDuration(stack);
