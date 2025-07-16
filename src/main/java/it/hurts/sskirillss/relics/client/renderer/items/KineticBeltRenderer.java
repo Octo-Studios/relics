@@ -41,7 +41,12 @@ public class KineticBeltRenderer implements ICurioRenderer, IRelicRenderer {
 
         ICurioRenderer.followBodyRotations(entity, this.model);
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt.png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+        if (relic.isRelicFlawless(entity, stack))
+            this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt_flawless.png"))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        else {
+            this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt.png"))), light, OverlayTexture.NO_OVERLAY);
+            this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt_glow.png"))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        }
 
         if (relic.isActive(stack)) {
             var time = entity.tickCount + partialTicks;
@@ -52,7 +57,7 @@ public class KineticBeltRenderer implements ICurioRenderer, IRelicRenderer {
 
             poseStack.translate(shakeX, shakeY, shakeZ);
 
-            new KineticBeltWingsModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityTranslucentCull(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt_wings.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, new Color(1F,1F,1F,0.9F + Mth.sin(time * 2F) * 0.1F).getRGB());
+            new KineticBeltWingsModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityTranslucentCull(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt_wings.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, new Color(1F, 1F, 1F, 0.9F + Mth.sin(time * 2F) * 0.1F).getRGB());
         }
 
         poseStack.popPose();
