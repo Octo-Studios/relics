@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
@@ -20,6 +21,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.RandomSource;
 
@@ -50,7 +52,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         poseStack.pushPose();
 
-        float color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
+        var color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
 
         if (isUnlocked)
             GUIRenderer.begin(DescriptionTextures.getAbilityCardTexture(stack, ability), poseStack)
@@ -69,6 +71,50 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(getX(), getY())
                 .end();
+
+        var modes = relic.getAbilityTemplate(player, stack, ability).getModes();
+
+        if (!modes.isEmpty()) {
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_list.png"), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(this.getX() + 8, this.getY() + 11)
+                    .end();
+
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_left.png"), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(this.getX() - 3, this.getY() + 10)
+                    .end();
+
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_right.png"), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(this.getX() + 41, this.getY() + 10)
+                    .end();
+
+            var dotWidth = 4;
+            var fieldWidth = 30;
+
+            var amount = modes.size();
+
+            if (amount > 0) {
+                var totalWidth = amount * dotWidth;
+                var margin = (fieldWidth - totalWidth) / (amount + 1);
+
+                for (int index = 0; index < amount; index++) {
+                    var x = this.getX() + 11 + margin * (index + 1) + dotWidth * index;
+
+                    GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_point.png"), poseStack)
+                            .anchor(SpriteAnchor.TOP_LEFT)
+                            .pos(x, this.getY() + 15)
+                            .end();
+
+                    if (index == modes.indexOf(relic.getAbilityMode(player, stack, ability)))
+                        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_selection.png"), poseStack)
+                                .anchor(SpriteAnchor.TOP_LEFT)
+                                .pos(x - 1, this.getY() + 14)
+                                .end();
+                }
+            }
+        }
 
         int xOff = 0;
 
@@ -112,7 +158,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
             poseStack.scale(0.75F, 0.75F, 1F);
 
-            guiGraphics.drawString(minecraft.font, pointsComponent, (int) (((getX() + 25.5F) * 1.33F) - (minecraft.font.width(pointsComponent) / 2F)), (int) ((getY() + 4) * 1.33F), isUnlocked ? 0xFFE278 : 0xB7AED9, true);
+            guiGraphics.drawString(minecraft.font, pointsComponent, (int) (((getX() + 26.5F) * 1.33F) - (minecraft.font.width(pointsComponent) / 2F)), (int) ((getY() + 4.5F) * 1.33F), 0xFFE278, false);
 
             poseStack.popPose();
         }

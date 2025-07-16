@@ -49,7 +49,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
     private final String ability;
 
     public AbilityCardWidget(int x, int y, AbilityDescriptionScreen screen, String ability) {
-        super(x, y, 38, 49);
+        super(x, y, 38, 51);
 
         this.screen = screen;
         this.ability = ability;
@@ -170,7 +170,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             GUIRenderer.begin(DescriptionTextures.getAbilityCardTexture(stack, ability), poseStack)
                     .color(color, color, color, 1F)
                     .texSize(22, 31)
-                    .pos(0, -1)
+                    .pos(0, -2)
                     .end();
 
         if (!canUse)
@@ -281,7 +281,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                 poseStack.scale(textScale, textScale, textScale);
 
-                guiGraphics.drawString(minecraft.font, title, -((width + 1) / 2) - (minecraft.font.width(title) / 2) + 19, (-(height / 2) - 19), canUse ? 0xFFE278 : 0xB7AED9, true);
+                guiGraphics.drawString(minecraft.font, title, -((width + 1) / 2) - (minecraft.font.width(title) / 2) + 19, (-(height / 2) - 20), canUse ? 0xFFE278 : 0xB7AED9, true);
             }
         }
 
@@ -292,7 +292,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
     public static void drawProgressBar(GuiGraphics gui, ResourceLocation tex, float x, float y, float progress) {
         var textureWidth = 34;
-        var textureHeight = 44;
+        var textureHeight = 46;
         var cornerSize = 3;
         var borderThickness = 3;
         var topStartU = 7;

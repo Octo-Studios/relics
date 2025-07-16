@@ -99,7 +99,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
                 .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
                 .toList();
 
-        var maxEntries = 5;
+        var maxEntries = 4;
 
         if (abilities.size() > maxEntries) {
             this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 151, this, -1));
