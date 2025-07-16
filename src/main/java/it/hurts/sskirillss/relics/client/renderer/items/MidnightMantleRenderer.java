@@ -40,7 +40,7 @@ public class MidnightMantleRenderer implements ICurioRenderer, IRelicRenderer {
 
         ICurioRenderer.followBodyRotations(entity, this.model);
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_" + relic.getAbilityMode(entity, stack, "phase") + ".png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_" + (relic.isRelicFlawless(entity, stack) ? "flawless" : relic.getAbilityMode(entity, stack, "phase")) + ".png"))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         float flicker = 0.75F + 0.25F * Mth.sin(time * 0.25F);
 
