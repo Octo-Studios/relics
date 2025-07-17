@@ -245,7 +245,7 @@ public class JellyfishNecklaceItem extends RelicItem {
             }
         }
 
-        if (this.canPlayerUseAbility(entity, stack, "shock") && !this.getAbilityMode(entity, stack, "gliding").equals("disabled")) {
+        if (this.canPlayerUseAbility(entity, stack, "shock") && !this.getAbilityMode(entity, stack, "shock").equals("disabled")) {
             var cooldown = this.getCooldown(stack);
             var rings = this.getRings(stack);
 
