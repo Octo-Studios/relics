@@ -119,6 +119,8 @@ public class DataComponentRegistry {
                     .build()
     );
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_DURATION = DataComponentRegistry.construct("midnight_mantle/duration", Codec.INT);
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROLLER_SKATE_DURATION = DataComponentRegistry.construct("roller_skate/duration", Codec.INT);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SPRINGY_BOOT_BOUNCE_COOLDOWN = DataComponentRegistry.construct("springy_boot/bounce_cooldown", Codec.INT);

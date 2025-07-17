@@ -164,13 +164,6 @@
   "tooltip.relics.elytra_booster.ability.boost.predicate.elytra": "Полёт на элитрах",
   "tooltip.relics.elytra_booster.ability.boost.predicate.fuel": "Топливо в ускорителе",
 
-  "item.relics.midnight_robe": "Полуночная мантия",
-  "tooltip.relics.midnight_robe.description": "+1 ед. опыта за каждые 2 единицы урона при атаке из невидимости от способности «Исчезновение».",
-  "tooltip.relics.midnight_robe.ability.vanish": "Исчезновение",
-  "tooltip.relics.midnight_robe.ability.vanish.description": "Наделяет носителя полной невидимостью и увеличивает скорость его передвижения на %2$s%% при суммированном уровне света, не превышающем %1$s.",
-  "tooltip.relics.midnight_robe.ability.backstab": "Предательство",
-  "tooltip.relics.midnight_robe.ability.backstab.description": "Атака из способности «Исчезновение» наносит увеличенный на %1$s%% урон, очерчивая круг радиусом в %2$s блоков вокруг цели и рассеивая эффект невидимости носителя. Повторное использование способности «Исчезновение» возможно лишь после выхода носителя за пределы круга.",
-
   "tooltip.relics.description.ability.rank_modifier": "Начиная с %1$s ранга:",
 
   "tooltip.relics.statistic.relic.retention_time": "Время удержания реликвии",
@@ -234,6 +227,21 @@
   "tooltip.relics.roller_skates.ability.skating.rank_modifier.step_height": "Увеличивает высоту шага во время бега на %2$s блоков.",
   "tooltip.relics.roller_skates.ability.skating.rank_modifier.resistance": "По мере увеличения скорости передвижения также увеличивает и сопротивление входящему урону вплоть до %3$s%%.",
   "tooltip.relics.roller_skates.ability.skating.rank_modifier.sparkling": "Во время дрифта разбрасывает искры, наносящие %4$s единиц урона и поджигающие цели на %5$s секунд за единицу скорости носителя реликвии в момент их появления.",
+
+  "item.relics.midnight_mantle": "Полуночная мантия",
+  "tooltip.relics.midnight_mantle.description": "",
+  "tooltip.relics.midnight_mantle.ability.phase": "Лунная фаза",
+  "tooltip.relics.midnight_mantle.ability.phase.mode.full_moon": "Полнолуние",
+  "tooltip.relics.midnight_mantle.ability.phase.mode.new_moon": "Новолуние",
+  "tooltip.relics.midnight_mantle.ability.phase.full_moon.description": "Увеличивает наносимый носителем реликвии урон на %1$s%% и его скорость атаки на %2$s%% за фазу Луны. Эффективность бонусов зависит от приближённости текущей фазы Луны к выбранной режимом способности.",
+  "tooltip.relics.midnight_mantle.ability.phase.new_moon.description": "Увеличивает максимальное здоровье носителя реликвии на %3$s%% и его регенерацию на %4$s%% за фазу Луны. Эффективность бонусов зависит от приближённости текущей фазы Луны к выбранной режимом способности.",
+  "tooltip.relics.midnight_mantle.ability.phase.rank_modifier.switch": "Смена режима способности на %5$s секунд повысит его эффективность на %6$s%%.",
+  "tooltip.relics.midnight_mantle.ability.invisibility": "Тень",
+  "tooltip.relics.midnight_mantle.ability.invisibility.description": "При уровне освещённости ниже %1$s%% маскирует носителя реликвии в тени, наделяя его эффектом исчезновения.При выходе из тени повторное срабатывание способности невозможно как минимум на %3$s секунд, а также до тех пор, пока все цели в радиусе 16 блоков не потеряют носителя реликвии из виду.",
+  "tooltip.relics.midnight_mantle.ability.invisibility.rank_modifier.bounce": "Атака из тени наносит повышенный на %4$s%% урон.",
+  "tooltip.relics.midnight_mantle.ability.starfall": "Звездопад",
+  "tooltip.relics.midnight_mantle.ability.starfall.description": "При нанесении урона носителем реликвии с вероятностью в %1$s%% призывает с неба падающую звезду, которая по приземлении вызывает ударную волну радиусом в %2$s блоков, наносящую %3$s%% от исходно нанесённого урона и оглушающую цель на %4$s секунд.",
+  "tooltip.relics.midnight_mantle.ability.starfall.rank_modifier.bounce": "С вероятностью в %5$s%% упавшая звезда будет отброшена от поверхности без разрушения. Радиус ударной волны снижается на 1 за каждый совершённый отскок. Эффект может срабатывать многократно.",
 
   "item.relics.spore_sack": "Мешок со спорами",
   "tooltip.relics.spore_sack.description": "Самый обыкновенный холщевый мешок, доверху набитый смертельными миазмами.",

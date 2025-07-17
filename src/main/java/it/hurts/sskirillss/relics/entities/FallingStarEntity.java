@@ -27,17 +27,26 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class FallingStarEntity extends ThrowableProjectile {
-    private static final EntityDataAccessor<Vector3f> MOTION = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.VECTOR3);
+    private static final EntityDataAccessor<Float> BOUNCE_CHANCE = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> RADIUS = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> STUN = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.BOOLEAN);
 
-    public void setMotion(Vec3 motion) {
-        this.getEntityData().set(MOTION, motion.toVector3f());
+    public void setBounceChance(float bounceChance) {
+        this.getEntityData().set(BOUNCE_CHANCE, bounceChance);
     }
 
-    public Vec3 getMotion() {
-        return new Vec3(this.getEntityData().get(MOTION));
+    public float getBounceChance() {
+        return this.getEntityData().get(BOUNCE_CHANCE);
+    }
+
+    public void setRadius(int radius) {
+        this.getEntityData().set(RADIUS, radius);
+    }
+
+    public int getRadius() {
+        return this.getEntityData().get(RADIUS);
     }
 
     public void setDamage(float damage) {
@@ -64,6 +73,9 @@ public class FallingStarEntity extends ThrowableProjectile {
         return this.getEntityData().get(FLAWLESS);
     }
 
+    private boolean bounced = false;
+    private int bounces = 0;
+
     public FallingStarEntity(EntityType<? extends FallingStarEntity> type, Level worldIn) {
         super(type, worldIn);
     }
@@ -71,13 +83,15 @@ public class FallingStarEntity extends ThrowableProjectile {
     @Override
     public void tick() {
         super.tick();
+
+        var level = this.level();
+
         var ringInterval = 2;
-        var cycleTicks = 20;
-        var cyclePos = (tickCount % cycleTicks) / (float) cycleTicks;
 
         var prevX = xOld;
         var prevY = yOld + getBbHeight() / 2F;
         var prevZ = zOld;
+
         var currX = getX();
         var currY = getY() + getBbHeight() / 2F;
         var currZ = getZ();
@@ -85,18 +99,21 @@ public class FallingStarEntity extends ThrowableProjectile {
         var dx = currX - prevX;
         var dy = currY - prevY;
         var dz = currZ - prevZ;
+
         var distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
         var step = 0.1;
+
         var segments = (int) Math.ceil(distance / step);
 
         var swirlRadius = 0.01F;
-        var level = level();
 
         var blueStart = new Color(50, 100, 255);
         var blueEnd = new Color(150, 200, 255);
 
         for (var i = 0; i <= segments; i++) {
             var t = segments > 0 ? (float) i / segments : 0F;
+
             var bx = prevX + dx * t;
             var by = prevY + dy * t;
             var bz = prevZ + dz * t;
@@ -108,20 +125,23 @@ public class FallingStarEntity extends ThrowableProjectile {
             var r = (int) (blueStart.getRed() * (1 - t) + blueEnd.getRed() * t);
             var g = (int) (blueStart.getGreen() * (1 - t) + blueEnd.getGreen() * t);
             var b = (int) (blueStart.getBlue() * (1 - t) + blueEnd.getBlue() * t);
+
             var color = new Color(r, g, b);
 
-            level.addParticle(
-                    ParticleUtils.constructSimpleSpark(color, 0.5F, 30, 0.925F), true,
-                    bx, by, bz, vx, vy, vz
-            );
+            level.addParticle(ParticleUtils.constructSimpleSpark(this.isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : color, 0.5F, 30, 0.925F), true, bx, by, bz, vx, vy, vz);
         }
 
         if (tickCount % ringInterval == 0) {
             var motion = getDeltaMovement();
+
             if (motion.lengthSqr() > 1e-6) {
                 var dir = motion.normalize();
+
                 var v1 = dir.cross(new Vec3(0, 1, 0)).normalize();
-                if (v1.lengthSqr() < 1e-6) v1 = dir.cross(new Vec3(1, 0, 0)).normalize();
+
+                if (v1.lengthSqr() < 1e-6)
+                    v1 = dir.cross(new Vec3(1, 0, 0)).normalize();
+
                 var v2 = dir.cross(v1).normalize();
 
                 var ringCount = 50;
@@ -135,35 +155,38 @@ public class FallingStarEntity extends ThrowableProjectile {
 
                 for (var j = 0; j < ringCount; j++) {
                     var a = 2 * Math.PI * j / ringCount;
+
                     var offset = v1.scale((float) Math.cos(a) * ringRadius)
                             .add(v2.scale((float) Math.sin(a) * ringRadius));
+
                     var px = currX + offset.x;
                     var py = currY + offset.y;
                     var pz = currZ + offset.z;
 
                     var radial = offset.normalize();
                     var tangential = radial.cross(dir).normalize();
+
                     var vel = radial.scale(radialSpeed)
                             .add(tangential.scale(tangentialSpeed))
                             .add(new Vec3(0, upwardSpeed, 0));
 
                     var tRing = j / (float) (ringCount - 1);
+
                     var rr = (int) (purpleStart.getRed() * (1 - tRing) + purpleEnd.getRed() * tRing);
                     var rg = (int) (purpleStart.getGreen() * (1 - tRing) + purpleEnd.getGreen() * tRing);
                     var rb = (int) (purpleStart.getBlue() * (1 - tRing) + purpleEnd.getBlue() * tRing);
+
                     var ringColor = new Color(rr, rg, rb);
 
-                    level.addParticle(
-                            ParticleUtils.constructSimpleSpark(ringColor, 0.5F, 20, 0.9F), true,
-                            px, py, pz,
-                            (float) vel.x, (float) vel.y, (float) vel.z
-                    );
+                    level.addParticle(ParticleUtils.constructSimpleSpark(this.isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : ringColor, 0.5F, 20, 0.9F), true, px, py, pz, (float) vel.x, (float) vel.y, (float) vel.z);
                 }
             }
         }
 
-        if (tickCount > 100) discard();
-        setDeltaMovement(getMotion());
+        if (tickCount > 500)
+            this.discard();
+
+        this.bounced = false;
     }
 
     @Override
@@ -174,7 +197,7 @@ public class FallingStarEntity extends ThrowableProjectile {
         if (level.isClientSide() || this.noPhysics || !level.getBlockState(center).blocksMotion())
             return;
 
-        var radius = 3;
+        var radius = Math.max(this.getRadius() - this.bounces, 1);
 
         var poses = new ArrayList<BlockPos>();
 
@@ -240,20 +263,40 @@ public class FallingStarEntity extends ThrowableProjectile {
                         var vy = finalStep * 0.025F + localRandom.nextFloat() * 0.05F;
                         var vz = (float) Math.sin(angle) * 0.1F;
 
-                        NetworkHandler.sendToClientsTrackingEntity(new S2CSpawnParticle(ParticleUtils.constructSimpleSpark(new Color(50 + random.nextInt(50), 50 + random.nextInt(100), 255), 0.35F + random.nextFloat() * 0.25F, 10 + random.nextInt(20), 0.9F), new Vector3f(px, py, pz), new Vector3f(vx, vy, vz)), shockwave);
+                        NetworkHandler.sendToClientsTrackingEntity(new S2CSpawnParticle(ParticleUtils.constructSimpleSpark(this.isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(50 + random.nextInt(50), 50 + random.nextInt(100), 255), 0.35F + random.nextFloat() * 0.25F, 10 + random.nextInt(20), 0.9F), new Vector3f(px, py, pz), new Vector3f(vx, vy, vz)), shockwave);
                     }
                 });
             });
         }
 
-        level.playSound(null, this.blockPosition(), SoundRegistry.FALLING_STAR_FALL.get(), SoundSource.MASTER, 0.5F, 1F + random.nextFloat());
+        level.playSound(null, this.blockPosition(), SoundRegistry.FALLING_STAR_FALL.get(), SoundSource.MASTER, 0.5F, 1F + random.nextFloat() + this.bounces * 0.2F);
 
-        this.discard();
+        var bounceChance = this.getBounceChance();
+
+        if (bounceChance > 0F) {
+            if (this.bounced)
+                return;
+
+            if (random.nextFloat() <= bounceChance) {
+                var normal = Vec3.atLowerCornerOf(result.getDirection().getNormal()).normalize();
+
+                var motion = this.getDeltaMovement();
+                var reflected = motion.subtract(normal.scale(2 * motion.dot(normal))).normalize().scale(0.5F + this.getRadius() * 0.075F);
+
+                this.setDeltaMovement(reflected);
+
+                this.bounced = true;
+                this.bounces++;
+            } else
+                this.discard();
+        } else
+            this.discard();
     }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(MOTION, Vec3.ZERO.toVector3f());
+        builder.define(BOUNCE_CHANCE, 0F);
+        builder.define(RADIUS, 1);
         builder.define(DAMAGE, 0F);
         builder.define(STUN, 0);
         builder.define(FLAWLESS, false);
@@ -263,6 +306,8 @@ public class FallingStarEntity extends ThrowableProjectile {
     public void addAdditionalSaveData(CompoundTag tag) {
         super.addAdditionalSaveData(tag);
 
+        tag.putFloat("bounce_chance", this.getBounceChance());
+        tag.putInt("radius", this.getRadius());
         tag.putFloat("damage", this.getDamage());
         tag.putInt("stun", this.getStun());
         tag.putBoolean("flawless", this.isFlawless());
@@ -272,6 +317,8 @@ public class FallingStarEntity extends ThrowableProjectile {
     public void readAdditionalSaveData(CompoundTag tag) {
         super.readAdditionalSaveData(tag);
 
+        this.setBounceChance(tag.getFloat("bounce_chance"));
+        this.setRadius(tag.getInt("radius"));
         this.setDamage(tag.getFloat("damage"));
         this.setStun(tag.getInt("stun"));
         this.setFlawless(tag.getBoolean("flawless"));
@@ -279,6 +326,6 @@ public class FallingStarEntity extends ThrowableProjectile {
 
     @Override
     protected double getDefaultGravity() {
-        return 0D;
+        return 0.03D;
     }
 }

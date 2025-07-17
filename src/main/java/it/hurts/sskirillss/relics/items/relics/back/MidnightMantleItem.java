@@ -38,7 +38,13 @@ public class MidnightMantleItem extends RelicItem {
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("phase")
                                 .modes("full_moon", "new_moon")
+                                .rankModifier(1, "switch")
                                 .stat(StatTemplate.builder("attack_damage")
+                                        .initialValue(0.25D, 0.5D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .stat(StatTemplate.builder("attack_speed")
                                         .initialValue(0.25D, 0.5D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
@@ -53,13 +59,19 @@ public class MidnightMantleItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .stat(StatTemplate.builder("attack_speed")
-                                        .initialValue(0.25D, 0.5D)
+                                .stat(StatTemplate.builder("duration")
+                                        .initialValue(5D, 10D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("modifier")
+                                        .initialValue(0.1D, 0.25D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("invisibility")
+                                .rankModifier(3, "strike")
                                 .stat(StatTemplate.builder("brightness")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
@@ -68,22 +80,27 @@ public class MidnightMantleItem extends RelicItem {
                                         .build())
                                 .stat(StatTemplate.builder("cooldown")
                                         .initialValue(10D, 15D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.1D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 1))
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.05D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.35D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("starfall")
-                                .rankModifier(1, "stun")
+                                .rankModifier(5, "bounce")
                                 .stat(StatTemplate.builder("chance")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.025D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .stat(StatTemplate.builder("radius")
+                                        .initialValue(1D, 2D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
@@ -93,6 +110,11 @@ public class MidnightMantleItem extends RelicItem {
                                 .stat(StatTemplate.builder("stun")
                                         .initialValue(0.25D, 0.5D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("bounce_chance")
+                                        .initialValue(0.05D, 0.15D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .build())
@@ -114,7 +136,18 @@ public class MidnightMantleItem extends RelicItem {
                 .build();
     }
 
+    public int getDuration(ItemStack stack) {
+        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_DURATION, 0);
+    }
+
+    public void setDuration(ItemStack stack, int duration) {
+        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_DURATION, Math.max(duration, 0));
+    }
+
     public double getModeEffectiveness(LivingEntity entity, ItemStack stack) {
+        if (!this.canPlayerUseAbility(entity, stack, "phase"))
+            return 0D;
+
         var mode = this.getAbilityMode(entity, stack, "phase");
         var level = entity.getCommandSenderWorld();
 
@@ -129,7 +162,12 @@ public class MidnightMantleItem extends RelicItem {
         var wrappedDistance = 8 - directDistance;
         var minDistance = Math.min(directDistance, wrappedDistance);
 
-        return 1 - (minDistance / 4D);
+        var effectiveness = 1 - (minDistance / 4D);
+
+        if (this.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch"))
+            effectiveness *= 1F + this.getStatValue(entity, stack, "phase", "modifier");
+
+        return effectiveness;
     }
 
     public boolean canHideInTheDarkness(LivingEntity entity, ItemStack stack) {
@@ -170,7 +208,7 @@ public class MidnightMantleItem extends RelicItem {
             if (cooldown > 0) {
                 if (level.getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(16)).stream().noneMatch(mob -> mob.getTarget() == entity && !mob.hasLineOfSight(entity)))
                     this.addInvisibilityCooldown(stack, -1);
-            } else if (false && !level.isClientSide() && this.canHideInTheDarkness(entity, stack))
+            } else if (!level.isClientSide() && this.canHideInTheDarkness(entity, stack))
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
         }
     }
@@ -210,7 +248,7 @@ public class MidnightMantleItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "phase")  || !relic.getAbilityMode(entity, stack, "phase").equals("new_moon"))
+                if (!relic.canPlayerUseAbility(entity, stack, "phase") || !relic.getAbilityMode(entity, stack, "phase").equals("new_moon"))
                     continue;
 
                 event.setAmount((float) (event.getAmount() + (event.getAmount() * relic.getModeEffectiveness(entity, stack))));
@@ -228,7 +266,22 @@ public class MidnightMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "phase") || !relic.getAbilityMode(entity, stack, "phase").equals("full_moon"))
                     continue;
 
-                event.setAmount((float) (event.getAmount() + (event.getAmount() * relic.getModeEffectiveness(entity, stack))));
+                event.setAmount((float) (event.getAmount() * (1F + relic.getModeEffectiveness(entity, stack))));
+            }
+        }
+
+        @SubscribeEvent
+        public static void onLivingHurt2(LivingIncomingDamageEvent event) {
+            if (!(event.getSource().getEntity() instanceof LivingEntity entity))
+                return;
+
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
+                var relic = (MidnightMantleItem) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(entity, stack, "invisibility") || !relic.isAbilityRankModifierUnlocked(entity, stack, "invisibility", "strike"))
+                    continue;
+
+                event.setAmount((float) (event.getAmount() * (1F + relic.getStatValue(entity, stack, "invisibility", "damage"))));
             }
         }
 
@@ -253,7 +306,7 @@ public class MidnightMantleItem extends RelicItem {
         }
 
         @SubscribeEvent
-        public static void onLivingHurt2(LivingIncomingDamageEvent event) {
+        public static void onLivingHurt3(LivingIncomingDamageEvent event) {
             if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity entity))
                 return;
 
@@ -274,13 +327,15 @@ public class MidnightMantleItem extends RelicItem {
                 var star = new FallingStarEntity(RelicsEntities.FALLING_STAR.get(), level);
 
                 star.setDamage((float) (event.getOriginalAmount() * relic.getStatValue(entity, stack, "starfall", "damage")));
+                star.setRadius((int) Math.round(relic.getStatValue(entity, stack, "starfall", "radius")));
+                star.setStun((int) (relic.getStatValue(entity, stack, "starfall", "stun") * 20));
                 star.setFlawless(relic.isRelicFlawless(entity, stack));
-                star.setMotion(motion);
+                star.setDeltaMovement(motion);
                 star.setOwner(entity);
                 star.setPos(pos);
 
-                if (relic.isAbilityRankModifierUnlocked(entity, stack, "starfall", "stun"))
-                    star.setStun((int) (relic.getStatValue(entity, stack, "starfall", "stun") * 20));
+                if (relic.isAbilityRankModifierUnlocked(entity, stack, "starfall", "bounce"))
+                    star.setBounceChance((float) relic.getStatValue(entity, stack, "starfall", "bounce_chance"));
 
                 level.addFreshEntity(star);
             }

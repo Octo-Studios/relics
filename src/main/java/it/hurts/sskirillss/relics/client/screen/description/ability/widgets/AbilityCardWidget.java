@@ -267,7 +267,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                 if (isAliquot)
                     GUIRenderer.begin(DescriptionTextures.SMALL_STAR_ACTIVE, poseStack)
-                            .pos(-(width / 2F) + xOff + 8, -(height / 2F) + 42)
+                            .pos(-(width / 2F) + xOff + 8, -(height / 2F) + 43)
                             .patternSize(1, 2)
                             .end();
             }
