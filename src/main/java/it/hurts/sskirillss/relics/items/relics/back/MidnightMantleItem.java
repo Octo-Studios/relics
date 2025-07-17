@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
+import it.hurts.sskirillss.relics.api.events.leveling.AbilityModeSwitchEvent;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
@@ -14,6 +15,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.Scheduler;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -79,7 +81,8 @@ public class MidnightMantleItem extends RelicItem {
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("cooldown")
-                                        .initialValue(10D, 15D)
+                                        .thresholdValue(0D, Double.MAX_VALUE)
+                                        .initialValue(15D, 10D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.05D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
@@ -136,12 +139,28 @@ public class MidnightMantleItem extends RelicItem {
                 .build();
     }
 
+    public int getCooldown(ItemStack stack) {
+        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_COOLDOWN.get(), 0);
+    }
+
+    public void setCooldown(ItemStack stack, int cooldown) {
+        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_COOLDOWN.get(), cooldown);
+    }
+
+    public void addCooldown(ItemStack stack, int cooldown) {
+        this.setCooldown(stack, this.getCooldown(stack) + cooldown);
+    }
+
     public int getDuration(ItemStack stack) {
         return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_DURATION, 0);
     }
 
     public void setDuration(ItemStack stack, int duration) {
         stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_DURATION, Math.max(duration, 0));
+    }
+
+    public void addDuration(ItemStack stack, int duration) {
+        this.setDuration(stack, this.getDuration(stack) + duration);
     }
 
     public double getModeEffectiveness(LivingEntity entity, ItemStack stack) {
@@ -154,8 +173,8 @@ public class MidnightMantleItem extends RelicItem {
         if (mode.isEmpty() || level.isDay())
             return 0;
 
-        var maxPhase = 7;
-        var selectedPhase = mode.equals("full_moon") ? maxPhase : 0;
+        var newMoonPhase = 4;
+        var selectedPhase = mode.equals("new_moon") ? newMoonPhase : 0;
         var currentPhase = level.getMoonPhase();
 
         var directDistance = Math.abs(currentPhase - selectedPhase);
@@ -164,7 +183,7 @@ public class MidnightMantleItem extends RelicItem {
 
         var effectiveness = 1 - (minDistance / 4D);
 
-        if (this.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch"))
+        if (this.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch") && this.getDuration(stack) > 0)
             effectiveness *= 1F + this.getStatValue(entity, stack, "phase", "modifier");
 
         return effectiveness;
@@ -188,6 +207,9 @@ public class MidnightMantleItem extends RelicItem {
         var entity = slotContext.entity();
         var level = entity.level();
 
+        if (level.isClientSide())
+            return;
+
         if (this.canPlayerUseAbility(entity, stack, "phase")) {
             var mode = this.getAbilityMode(entity, stack, "phase");
 
@@ -197,32 +219,36 @@ public class MidnightMantleItem extends RelicItem {
                 var attackEffectiveness = mode.equals("full_moon") ? totalEffectiveness : 0D;
                 var healEffectiveness = mode.equals("new_moon") ? totalEffectiveness : 0D;
 
-                EntityUtils.resetAttribute(entity, stack, Attributes.ATTACK_SPEED, (float) (this.getStatValue(entity, stack, "phase", "attack_speed") * attackEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
-                EntityUtils.resetAttribute(entity, stack, Attributes.MAX_HEALTH, (float) (this.getStatValue(entity, stack, "phase", "max_health") * healEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_BASE);
+                EntityUtils.resetAttribute(entity, stack, Attributes.ATTACK_SPEED, (float) (this.getStatValue(entity, stack, "phase", "attack_speed") * attackEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                EntityUtils.resetAttribute(entity, stack, Attributes.MAX_HEALTH, (float) (this.getStatValue(entity, stack, "phase", "max_health") * healEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             }
+
+            if (this.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch") && this.getDuration(stack) > 0)
+                this.addDuration(stack, -1);
         }
 
         if (this.canPlayerUseAbility(entity, stack, "invisibility")) {
-            var cooldown = this.getInvisibilityCooldown(stack);
+            var cooldown = this.getCooldown(stack);
 
             if (cooldown > 0) {
-                if (level.getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(16)).stream().noneMatch(mob -> mob.getTarget() == entity && !mob.hasLineOfSight(entity)))
-                    this.addInvisibilityCooldown(stack, -1);
-            } else if (!level.isClientSide() && this.canHideInTheDarkness(entity, stack))
+                if (level.getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(16)).stream().noneMatch(mob -> mob.getTarget() == entity && mob.hasLineOfSight(entity)))
+                    this.addCooldown(stack, -1);
+            } else if (this.canHideInTheDarkness(entity, stack))
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
         }
     }
 
-    public int getInvisibilityCooldown(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.COOLDOWN.get(), 0);
-    }
+    @Override
+    public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
+        super.onUnequip(slotContext, newStack, stack);
 
-    public void setInvisibilityCooldown(ItemStack stack, int cooldown) {
-        stack.set(DataComponentRegistry.COOLDOWN.get(), cooldown);
-    }
+        if (stack.getItem() == newStack.getItem())
+            return;
 
-    public void addInvisibilityCooldown(ItemStack stack, int cooldown) {
-        setInvisibilityCooldown(stack, getInvisibilityCooldown(stack) + cooldown);
+        var entity = slotContext.entity();
+
+        EntityUtils.removeAttribute(entity, stack, Attributes.ATTACK_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        EntityUtils.removeAttribute(entity, stack, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
     @EventBusSubscriber
@@ -237,13 +263,20 @@ public class MidnightMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "invisibility"))
                     continue;
 
-                relic.setInvisibilityCooldown(stack, (int) (relic.getStatValue(entity, stack, "invisibility", "cooldown") * 20));
+                Scheduler.schedule(1, () -> relic.setCooldown(stack, (int) (relic.getStatValue(entity, stack, "invisibility", "cooldown") * 20)));
             }
         }
 
         @SubscribeEvent
         public static void onLivingHeal(LivingHealEvent event) {
             var entity = event.getEntity();
+            var level = entity.level();
+
+            var pos = entity.blockPosition();
+
+            // WHY!? (cuz of thread locks lol)
+            if (!level.hasChunkAt(pos) || !level.isLoaded(pos))
+                return;
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
@@ -266,7 +299,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "phase") || !relic.getAbilityMode(entity, stack, "phase").equals("full_moon"))
                     continue;
 
-                event.setAmount((float) (event.getAmount() * (1F + relic.getModeEffectiveness(entity, stack))));
+                event.setAmount((float) (event.getAmount() * (1F + (relic.getStatValue(entity, stack, "phase", "attack_damage") * relic.getModeEffectiveness(entity, stack)))));
             }
         }
 
@@ -278,11 +311,19 @@ public class MidnightMantleItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "invisibility") || !relic.isAbilityRankModifierUnlocked(entity, stack, "invisibility", "strike"))
+                if (!relic.canPlayerUseAbility(entity, stack, "invisibility") || !relic.isAbilityRankModifierUnlocked(entity, stack, "invisibility", "strike")
+                        || relic.getCooldown(stack) > 0 || !relic.canHideInTheDarkness(entity, stack))
                     continue;
 
                 event.setAmount((float) (event.getAmount() * (1F + relic.getStatValue(entity, stack, "invisibility", "damage"))));
+
+                relic.setCooldown(stack, (int) relic.getStatValue(entity, stack, "invisibility", "cooldown"));
             }
+        }
+
+        @SubscribeEvent
+        public static void onLivingHurt3(LivingIncomingDamageEvent event) {
+            CommonEvents.onInteract(event.getEntity());
         }
 
         @SubscribeEvent
@@ -306,7 +347,21 @@ public class MidnightMantleItem extends RelicItem {
         }
 
         @SubscribeEvent
-        public static void onLivingHurt3(LivingIncomingDamageEvent event) {
+        public static void onAbilityModeSwitch(AbilityModeSwitchEvent event) {
+            var entity = event.getEntity();
+
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
+                var relic = (MidnightMantleItem) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(entity, stack, "phase") || !relic.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch"))
+                    continue;
+
+                relic.setDuration(stack, (int) relic.getStatValue(entity, stack, "phase", "duration") * 20);
+            }
+        }
+
+        @SubscribeEvent
+        public static void onLivingHurt4(LivingIncomingDamageEvent event) {
             if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity entity))
                 return;
 
@@ -322,11 +377,12 @@ public class MidnightMantleItem extends RelicItem {
                     continue;
 
                 var pos = new Vec3(target.getX() + MathUtils.randomFloat(random) * 10, target.getY() + 25 + random.nextInt(25), target.getZ() + MathUtils.randomFloat(random) * 10);
+
                 var motion = target.position().subtract(pos).normalize().scale(2F);
 
                 var star = new FallingStarEntity(RelicsEntities.FALLING_STAR.get(), level);
 
-                star.setDamage((float) (event.getOriginalAmount() * relic.getStatValue(entity, stack, "starfall", "damage")));
+                star.setDamage((float) (event.getAmount() * relic.getStatValue(entity, stack, "starfall", "damage")));
                 star.setRadius((int) Math.round(relic.getStatValue(entity, stack, "starfall", "radius")));
                 star.setStun((int) (relic.getStatValue(entity, stack, "starfall", "stun") * 20));
                 star.setFlawless(relic.isRelicFlawless(entity, stack));
@@ -337,7 +393,8 @@ public class MidnightMantleItem extends RelicItem {
                 if (relic.isAbilityRankModifierUnlocked(entity, stack, "starfall", "bounce"))
                     star.setBounceChance((float) relic.getStatValue(entity, stack, "starfall", "bounce_chance"));
 
-                level.addFreshEntity(star);
+                if (entity.hasLineOfSight(target))
+                    level.addFreshEntity(star);
             }
         }
     }

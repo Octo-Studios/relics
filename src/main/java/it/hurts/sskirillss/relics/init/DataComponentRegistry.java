@@ -120,6 +120,7 @@ public class DataComponentRegistry {
     );
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_DURATION = DataComponentRegistry.construct("midnight_mantle/duration", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_COOLDOWN = DataComponentRegistry.construct("midnight_mantle/cooldown", Codec.INT);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROLLER_SKATE_DURATION = DataComponentRegistry.construct("roller_skate/duration", Codec.INT);
 

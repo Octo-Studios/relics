@@ -161,8 +161,12 @@ public class EntityUtils {
     }
 
     public static void resetAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
-        removeAttribute(entity, stack, attributeHolder, operation);
-        applyAttribute(entity, stack, attributeHolder, value, operation);
+        var attribute = entity.getAttribute(attributeHolder);
+
+        if (attribute == null || attribute.getValue() != value) {
+            EntityUtils.removeAttribute(entity, stack, attributeHolder, operation);
+            EntityUtils.applyAttribute(entity, stack, attributeHolder, value, operation);
+        }
     }
 
     public static ItemStack findEquippedCurio(Entity entity, Item item) {

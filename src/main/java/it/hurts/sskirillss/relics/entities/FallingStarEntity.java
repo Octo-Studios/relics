@@ -183,7 +183,7 @@ public class FallingStarEntity extends ThrowableProjectile {
             }
         }
 
-        if (tickCount > 500)
+        if (tickCount > (250 + this.bounces * 150))
             this.discard();
 
         this.bounced = false;
@@ -291,6 +291,11 @@ public class FallingStarEntity extends ThrowableProjectile {
                 this.discard();
         } else
             this.discard();
+    }
+
+    @Override
+    public boolean isOnFire() {
+        return false;
     }
 
     @Override

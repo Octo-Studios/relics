@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.network.packets.description.ability;
 
 import io.netty.buffer.ByteBuf;
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.events.leveling.AbilityModeSwitchEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.network.packets.description.IRelicValidator;
@@ -11,7 +12,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 @Data
@@ -55,7 +56,12 @@ public class C2SChangeMode implements CustomPacketPayload, IRelicValidator {
                 return;
             }
 
-            relic.setAbilityMode(player, stack, this.getAbility(), this.getMode());
+            var event = new AbilityModeSwitchEvent(player, stack, this.getAbility(), relic.getAbilityMode(player, stack, this.getAbility()), this.getMode());
+
+            NeoForge.EVENT_BUS.post(event);
+
+            if (!event.isCanceled())
+                relic.setAbilityMode(event.getEntity(), event.getStack(), event.getAbility(), event.getToMode());
 
             try {
                 player.containerMenu.getSlot(this.getSlot()).set(stack);

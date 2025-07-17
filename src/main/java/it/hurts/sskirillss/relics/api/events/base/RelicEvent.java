@@ -6,12 +6,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.Event;
 
-import javax.annotation.Nullable;
-
 @AllArgsConstructor
 public class RelicEvent extends Event {
     @Getter
-    @Nullable
     LivingEntity entity;
 
     @Getter
