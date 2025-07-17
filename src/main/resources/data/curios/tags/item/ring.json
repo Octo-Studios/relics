@@ -2,7 +2,6 @@
   "replace": false,
   "values": [
     "relics:chorus_inhibitor",
-    "relics:bastion_ring",
-    "relics:leafy_ring"
+    "relics:bastion_ring"
   ]
 }

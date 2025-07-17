@@ -5,7 +5,7 @@ import it.hurts.octostudios.octolib.client.animation.easing.EaseType;
 import it.hurts.octostudios.octolib.client.animation.easing.TransitionType;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.items.relics.ring.LeafyRingItem;
+import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -19,8 +19,8 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.awt.*;
 
-public class LeafyRingHideLayer implements LayeredDraw.Layer {
-    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/leafy_ring_hide.png");
+public class LeafyMantleHideLayer implements LayeredDraw.Layer {
+    private static final ResourceLocation TEXTURE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/hud/leafy_mantle_hide.png");
     private static final ResourceLocation VIGNETTE = ResourceLocation.withDefaultNamespace("textures/misc/vignette.png");
 
     @Override
@@ -31,9 +31,9 @@ public class LeafyRingHideLayer implements LayeredDraw.Layer {
         if (player == null)
             return;
 
-        var stack = EntityUtils.findEquippedCurio(player, RelicsItems.LEAFY_RING.get());
+        var stack = EntityUtils.findEquippedCurio(player, RelicsItems.LEAFY_MANTLE.get());
 
-        if (!(stack.getItem() instanceof LeafyRingItem relic) || !relic.isAbilityRankModifierUnlocked(player, stack, "camouflage", "disappearance"))
+        if (!(stack.getItem() instanceof LeafyMantleItem relic) || !relic.isAbilityRankModifierUnlocked(player, stack, "camouflage", "disappearance"))
             return;
 
         var progress = relic.getCurrentProgress(stack);

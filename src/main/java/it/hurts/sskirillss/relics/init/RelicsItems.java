@@ -18,7 +18,7 @@ import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import it.hurts.sskirillss.relics.items.relics.ring.BastionRingItem;
 import it.hurts.sskirillss.relics.items.relics.ring.ChorusInhibitorItem;
-import it.hurts.sskirillss.relics.items.relics.ring.LeafyRingItem;
+import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
@@ -44,7 +44,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> INFINITY_HAM = ITEMS.register("infinity_ham", InfiniteHamItem::new); // TODO: Replace ID with "infinite_ham"
 
     // NEW GEN
-    public static final DeferredHolder<Item, RelicItem> LEAFY_RING = ITEMS.register("leafy_ring", LeafyRingItem::new);
+    public static final DeferredHolder<Item, RelicItem> LEAFY_MANTLE = ITEMS.register("leafy_mantle", LeafyMantleItem::new);
     public static final DeferredHolder<Item, RelicItem> PHANTOM_BOOT = ITEMS.register("phantom_boot", PhantomBootItem::new);
     public static final DeferredHolder<Item, RelicItem> SPRINGY_BOOT = ITEMS.register("springy_boot", SpringyBootItem::new);
     public static final DeferredHolder<Item, RelicItem> KINETIC_BELT = ITEMS.register("kinetic_belt", KineticBeltItem::new);

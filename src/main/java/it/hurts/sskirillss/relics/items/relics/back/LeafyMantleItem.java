@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.items.relics.ring;
+package it.hurts.sskirillss.relics.items.relics.back;
 
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
@@ -38,7 +38,7 @@ import java.util.stream.IntStream;
 import static it.hurts.sskirillss.relics.init.DataComponentRegistry.PROGRESS;
 import static it.hurts.sskirillss.relics.init.DataComponentRegistry.TOGGLED;
 
-public class LeafyRingItem extends RelicItem {
+public class LeafyMantleItem extends RelicItem {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -193,8 +193,8 @@ public class LeafyRingItem extends RelicItem {
             var entity = event.getEntity();
             var level = entity.level();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_RING.get())) {
-                var relic = (LeafyRingItem) stack.getItem();
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
+                var relic = (LeafyMantleItem) stack.getItem();
 
                 if (!relic.canPlayerUseAbility(entity, stack, "camouflage") || !level.getBlockState(entity.getBlockPosBelowThatAffectsMyMovement()).is(BlockTags.LEAVES))
                     continue;
@@ -225,8 +225,8 @@ public class LeafyRingItem extends RelicItem {
             if (diff > 0)
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_RING.get())) {
-                var relic = (LeafyRingItem) stack.getItem();
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
+                var relic = (LeafyMantleItem) stack.getItem();
 
                 if (!relic.canPlayerUseAbility(entity, stack, "revival"))
                     continue;

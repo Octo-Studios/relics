@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.items.relics.ring.LeafyRingItem;
+import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
@@ -27,12 +27,12 @@ public class BlockStateMixin {
                 || !(entityContext.getEntity() instanceof LivingEntity entity))
             return;
 
-        var stack = EntityUtils.findEquippedCurio(entity, RelicsItems.LEAFY_RING.get());
+        var stack = EntityUtils.findEquippedCurio(entity, RelicsItems.LEAFY_MANTLE.get());
 
         if (stack.isEmpty())
             return;
 
-        var relic = (LeafyRingItem) stack.getItem();
+        var relic = (LeafyMantleItem) stack.getItem();
 
         if (!relic.canPlayerUseAbility(entity, stack, "camouflage"))
             return;
