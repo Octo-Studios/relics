@@ -55,7 +55,7 @@ public class RemoteRegistry {
                     (stack, world, entity, id) -> stack.getOrDefault(CHARGE, 0) >= ((IRelicItem) stack.getItem()).getStatValue(entity, stack, "walking", "time") ? 1 : 0);
             ItemProperties.register(RelicsItems.HOLY_LOCKET.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "mode"),
                     (stack, world, entity, id) -> ((HolyLocketItem) stack.getItem()).getMode(stack).getIndex());
-            ItemProperties.register(RelicsItems.MIDNIGHT_MANTLE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "mode"),
+            ItemProperties.register(RelicsItems.MIDNIGHT_MANTLE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "phase"),
                     (stack, world, entity, id) -> {
                         var relic = (MidnightMantleItem) stack.getItem();
                         var mode = relic.getAbilityMode(entity, stack, "phase");

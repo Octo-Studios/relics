@@ -5,20 +5,30 @@
   },
   "overrides": [
     {
-      "predicate": { "relics:mode": 1, "relics:flawless": 1 },
-      "model":     "relics:item/midnight_mantle_full_moon_flawless"
+      "predicate": {
+        "relics:phase": 0
+      },
+      "model": "relics:item/midnight_mantle_new_moon"
     },
     {
-      "predicate": { "relics:mode": 1, "relics:flawless": 0 },
-      "model":     "relics:item/midnight_mantle_full_moon"
+      "predicate": {
+        "relics:phase": 1
+      },
+      "model": "relics:item/midnight_mantle_full_moon"
     },
     {
-      "predicate": { "relics:mode": 0, "relics:flawless": 1 },
-      "model":     "relics:item/midnight_mantle_new_moon_flawless"
+      "predicate": {
+        "relics:flawless": 1,
+        "relics:phase": 1
+      },
+      "model": "relics:item/midnight_mantle_full_moon_flawless"
     },
     {
-      "predicate": { "relics:mode": 0, "relics:flawless": 0 },
-      "model":     "relics:item/midnight_mantle_new_moon"
+      "predicate": {
+        "relics:flawless": 1,
+        "relics:phase": 0
+      },
+      "model": "relics:item/midnight_mantle_new_moon_flawless"
     }
   ]
 }
