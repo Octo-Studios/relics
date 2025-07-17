@@ -22,7 +22,9 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -378,6 +380,9 @@ public class MidnightMantleItem extends RelicItem {
 
                 var pos = new Vec3(target.getX() + MathUtils.randomFloat(random) * 10, target.getY() + 25 + random.nextInt(25), target.getZ() + MathUtils.randomFloat(random) * 10);
 
+                if (level.clip(new ClipContext(pos, target.position(), ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, target)).getType() != HitResult.Type.MISS)
+                    continue;
+
                 var motion = target.position().subtract(pos).normalize().scale(2F);
 
                 var star = new FallingStarEntity(RelicsEntities.FALLING_STAR.get(), level);
@@ -393,8 +398,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (relic.isAbilityRankModifierUnlocked(entity, stack, "starfall", "bounce"))
                     star.setBounceChance((float) relic.getStatValue(entity, stack, "starfall", "bounce_chance"));
 
-                if (entity.hasLineOfSight(target))
-                    level.addFreshEntity(star);
+                level.addFreshEntity(star);
             }
         }
     }

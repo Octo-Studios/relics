@@ -183,7 +183,7 @@ public class FallingStarEntity extends ThrowableProjectile {
             }
         }
 
-        if (tickCount > (250 + this.bounces * 150))
+        if (!level.isClientSide() && tickCount > (250 + this.bounces * 150))
             this.discard();
 
         this.bounced = false;
