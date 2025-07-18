@@ -190,7 +190,7 @@
   "tooltip.relics.jellyfish_necklace.ability.shock.rank_modifier.charge":  "При срабатывании способности носитель реликвии получает на %10$s секунд возможность парализовать цели своими атаками на %5$s секунд. Паралич работает только на те цели, которые еще не были парализованы этой механикой в пределах текущего срабатывания способности.",
 
   "item.relics.kinetic_belt": "Кинетический пояс",
-  "tooltip.relics.kinetic_belt.description": "",
+  "tooltip.relics.kinetic_belt.description": "Когда-то принадлежавший мастеру летных искусств и ученику древней школы аэроформ, этот пояс создан из материалов, не подчиняющихся обычным законам физики. Тонкие пластины, вшитые в ткань, реагируют не на вес тела, а на его движение - будто сам воздух подчиняется носителю. Те, кто овладел искусством обращения с этой реликвией, рассказывают о чувстве почти полного слияния с воздухом: каждый шаг становится прыжком, каждый прыжок - полётом, а каждое падение - лишь рывком для следующего взлёта.",
   "tooltip.relics.kinetic_belt.ability.slots": "Расширение арсенала",
   "tooltip.relics.kinetic_belt.ability.slots.description": "Увеличивает максимальный объём экипируемых амулетов на %1$s единиц.",
   "tooltip.relics.kinetic_belt.ability.gliding": "Планирование",
@@ -201,6 +201,9 @@
   "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.momentum":  "Использование способности перед падением подавит весь потенциальный урон от падения и сохранит инерцию для следующего прыжка.",
   "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.strike":  "При использовании способности увеличивает наносимый снарядами носителя реликвии урон на %2$s%%.",
   "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.resistance":  "Снижает входящий по носителю реликвии урон на %3$s%% во время использования способности.",
+  "tooltip.relics.kinetic_belt.statistic.duration":  "Время планирования",
+  "tooltip.relics.kinetic_belt.statistic.resistance":  "Заблокировано урона",
+  "tooltip.relics.kinetic_belt.statistic.damage":  "Нанесено дополнительного урона",
 
   "item.relics.springy_boot": "Пружинный ботинок",
   "tooltip.relics.springy_boot.description": "",

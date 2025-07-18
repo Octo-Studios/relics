@@ -154,7 +154,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         switch (this.getPage()) {
             case DESCRIPTION -> container = new AbilityDescriptionContainerWidget(x + 107, y + 77, this);
-            //case STATISTIC -> container = new RelicStatisticContainerWidget(x + 107, y + 77, this);
+            case STATISTIC -> container = new AbilityStatisticContainerWidget(x + 107, y + 77, this);
         }
 
         if (container != null) {

@@ -49,7 +49,7 @@ public class ItemMixin {
         }
 
         if (livingEntity.tickCount % 20 == 0)
-            relic.addMetricValue(livingEntity, stack, "retention_time", 1);
+            relic.addRelicMetricValue(livingEntity, stack, "retention_time", 1);
     }
 
     @Inject(method = "appendHoverText", at = @At("HEAD"))

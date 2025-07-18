@@ -172,30 +172,30 @@ public interface IRelicDataHolder {
         return getAbilityComponent(entity, stack, ability).getResearch();
     }
 
-    default StatisticComponent getStatisticComponent(LivingEntity entity, ItemStack stack) {
-        return getRelicComponent(entity, stack).getStatistic();
+    default StatisticComponent getRelicStatisticComponent(LivingEntity entity, ItemStack stack) {
+        return this.getRelicComponent(entity, stack).getStatistic();
     }
 
-    default void setStatisticComponent(LivingEntity entity, ItemStack stack, StatisticComponent component) {
-        setRelicComponent(entity, stack, getRelicComponent(entity, stack).toBuilder()
+    default void setRelicStatisticComponent(LivingEntity entity, ItemStack stack, StatisticComponent component) {
+        this.setRelicComponent(entity, stack, this.getRelicComponent(entity, stack).toBuilder()
                 .statistic(component)
                 .build());
     }
 
-    default MetricComponent getMetricComponent(LivingEntity entity, ItemStack stack, String metric) {
+    default MetricComponent getRelicMetricComponent(LivingEntity entity, ItemStack stack, String metric) {
         if (!(stack.getItem() instanceof IRelicTemplateHolder templateHolder))
             return null;
 
-        var statisticComponent = getStatisticComponent(entity, stack);
+        var statisticComponent = this.getRelicStatisticComponent(entity, stack);
         var metricComponent = statisticComponent.getMetrics().get(metric);
-        var metricTemplate = templateHolder.getMetricTemplate(entity, stack, metric);
+        var metricTemplate = templateHolder.getRelicMetricTemplate(entity, stack, metric);
 
         if (metricComponent != null)
             return metricComponent;
         else if (metricTemplate != null) {
             metricComponent = MetricComponent.EMPTY;
 
-            setStatisticComponent(entity, stack, statisticComponent.toBuilder()
+            this.setRelicStatisticComponent(entity, stack, statisticComponent.toBuilder()
                     .metric(metric, metricComponent)
                     .build());
 
@@ -204,21 +204,71 @@ public interface IRelicDataHolder {
             return null;
     }
 
-    default void setMetricComponent(LivingEntity entity, ItemStack stack, String metric, MetricComponent component) {
-        setStatisticComponent(entity, stack, getStatisticComponent(entity, stack).toBuilder()
+    default void setRelicMetricComponent(LivingEntity entity, ItemStack stack, String metric, MetricComponent component) {
+        this.setRelicStatisticComponent(entity, stack, this.getRelicStatisticComponent(entity, stack).toBuilder()
                 .metric(metric, component)
                 .build());
     }
 
-    default double getMetricValue(LivingEntity entity, ItemStack stack, String metric) {
-        return getMetricComponent(entity, stack, metric).getValue();
+    default double getRelicMetricValue(LivingEntity entity, ItemStack stack, String metric) {
+        return this.getRelicMetricComponent(entity, stack, metric).getValue();
     }
 
-    default void setMetricValue(LivingEntity entity, ItemStack stack, String metric, double value) {
-        setMetricComponent(entity, stack, metric, getMetricComponent(entity, stack, metric).toBuilder().value(value).build());
+    default void setRelicMetricValue(LivingEntity entity, ItemStack stack, String metric, double value) {
+        this.setRelicMetricComponent(entity, stack, metric, this.getRelicMetricComponent(entity, stack, metric).toBuilder().value(value).build());
     }
 
-    default void addMetricValue(LivingEntity entity, ItemStack stack, String metric, double value) {
-        setMetricValue(entity, stack, metric, getMetricValue(entity, stack, metric) + value);
+    default void addRelicMetricValue(LivingEntity entity, ItemStack stack, String metric, double value) {
+        this.setRelicMetricValue(entity, stack, metric, this.getRelicMetricValue(entity, stack, metric) + value);
+    }
+
+    default StatisticComponent getAbilityStatisticComponent(LivingEntity entity, ItemStack stack, String ability) {
+        return this.getAbilityComponent(entity, stack, ability).getStatistic();
+    }
+
+    default void setAbilityStatisticComponent(LivingEntity entity, ItemStack stack, String ability, StatisticComponent component) {
+        this.setAbilityComponent(entity, stack, ability, this.getAbilityComponent(entity, stack, ability).toBuilder()
+                .statistic(component)
+                .build());
+    }
+
+    default MetricComponent getAbilityMetricComponent(LivingEntity entity, ItemStack stack, String ability, String metric) {
+        if (!(stack.getItem() instanceof IRelicTemplateHolder templateHolder))
+            return null;
+
+        var statisticComponent = this.getAbilityStatisticComponent(entity, stack, ability);
+        var metricComponent = statisticComponent.getMetrics().get(metric);
+        var metricTemplate = templateHolder.getAbilityMetricTemplate(entity, stack, ability, metric);
+
+        if (metricComponent != null)
+            return metricComponent;
+        else if (metricTemplate != null) {
+            metricComponent = MetricComponent.EMPTY;
+
+            this.setAbilityStatisticComponent(entity, stack, ability, statisticComponent.toBuilder()
+                    .metric(metric, metricComponent)
+                    .build());
+
+            return metricComponent;
+        } else
+            return null;
+    }
+
+    default void setAbilityMetricComponent(LivingEntity entity, ItemStack stack, String ability, String metric, MetricComponent component) {
+        this.setAbilityStatisticComponent(entity, stack, ability, this.getAbilityStatisticComponent(entity, stack, ability).toBuilder()
+                .metric(metric, component)
+                .build());
+    }
+
+    default double getAbilityMetricValue(LivingEntity entity, ItemStack stack, String ability, String metric) {
+        return this.getAbilityMetricComponent(entity, stack, ability, metric).getValue();
+    }
+
+    default void setAbilityMetricValue(LivingEntity entity, ItemStack stack, String ability, String metric, double value) {
+        this.setAbilityMetricComponent(entity, stack, ability, metric, this.getAbilityMetricComponent(entity, stack, ability, metric).toBuilder().value(value).build());
+    }
+
+    default void addAbilityMetricValue(LivingEntity entity, ItemStack stack, String ability, String metric, double value) {
+        this.setAbilityMetricValue(entity, stack, ability, metric, this.getAbilityMetricValue(entity, stack, ability, metric) + value);
     }
 }

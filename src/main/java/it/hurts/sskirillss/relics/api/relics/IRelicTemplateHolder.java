@@ -344,8 +344,8 @@ public interface IRelicTemplateHolder {
      */
     @ApiStatus.Obsolete
     @ApiStatus.NonExtendable
-    default StatisticTemplate getStatisticTemplate(LivingEntity entity, ItemStack stack) {
-        return getRelicTemplate(entity, stack).getStatistic();
+    default StatisticTemplate getRelicStatisticTemplate(LivingEntity entity, ItemStack stack) {
+        return this.getRelicTemplate(entity, stack).getStatistic();
     }
 
     /**
@@ -358,7 +358,20 @@ public interface IRelicTemplateHolder {
      */
     @ApiStatus.Obsolete
     @ApiStatus.NonExtendable
-    default MetricTemplate getMetricTemplate(LivingEntity entity, ItemStack stack, String metric) {
-        return getStatisticTemplate(entity, stack).getMetrics().get(metric);
+    default MetricTemplate getRelicMetricTemplate(LivingEntity entity, ItemStack stack, String metric) {
+        return this.getRelicStatisticTemplate(entity, stack).getMetrics().get(metric);
+    }
+
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
+    default StatisticTemplate getAbilityStatisticTemplate(LivingEntity entity, ItemStack stack, String ability) {
+        return this.getAbilityTemplate(entity, stack, ability).getStatistic();
+    }
+
+
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
+    default MetricTemplate getAbilityMetricTemplate(LivingEntity entity, ItemStack stack, String ability, String metric) {
+        return this.getAbilityStatisticTemplate(entity, stack, ability).getMetrics().get(metric);
     }
 }

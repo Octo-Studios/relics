@@ -1,6 +1,8 @@
 package it.hurts.sskirillss.relics.items.relics.belt;
 
+import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
@@ -69,6 +71,19 @@ public class KineticBeltItem extends RelicItem {
                                         .thresholdValue(0D, 0.75D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
+                                        .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("duration")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(MetricTemplate.builder("damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .visibilityCondition((entity, stack, optional) -> this.isAbilityRankModifierUnlocked(entity, stack, optional.get(), "strike"))
+                                                .build())
+                                        .metric(MetricTemplate.builder("resistance")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .visibilityCondition((entity, stack, optional) -> this.isAbilityRankModifierUnlocked(entity, stack, optional.get(), "resistance"))
+                                                .build())
                                         .build())
                                 .build())
                         .build())
@@ -150,6 +165,9 @@ public class KineticBeltItem extends RelicItem {
         }
 
         if (isActive) {
+            if (entity.tickCount % 20 == 0)
+                this.addAbilityMetricValue(entity, stack, "gliding", "duration", 1);
+
             if (!hasAttribute)
                 EntityUtils.applyAttribute(entity, stack, Attributes.GRAVITY, (float) -Math.min(this.getStatValue(entity, stack, "gliding", "efficiency"), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
@@ -239,7 +257,11 @@ public class KineticBeltItem extends RelicItem {
                             || !relic.isAbilityRankModifierUnlocked(source, stack, "gliding", "strike") || !relic.isActive(stack))
                         continue;
 
-                    event.setNewDamage((float) (original + (original * relic.getStatValue(entity, stack, "gliding", "damage"))));
+                    var additional = original * relic.getStatValue(entity, stack, "gliding", "damage");
+
+                    relic.addAbilityMetricValue(entity, stack, "gliding", "damage", additional);
+
+                    event.setNewDamage((float) (original + additional));
                 }
             }
 
@@ -250,7 +272,11 @@ public class KineticBeltItem extends RelicItem {
                         || !relic.isAbilityRankModifierUnlocked(entity, stack, "gliding", "resistance") || !relic.isActive(stack))
                     continue;
 
-                event.setNewDamage((float) (original - (original * relic.getStatValue(entity, stack, "gliding", "resistance"))));
+                var additional = original * relic.getStatValue(entity, stack, "gliding", "resistance");
+
+                relic.addAbilityMetricValue(entity, stack, "gliding", "resistance", additional);
+
+                event.setNewDamage((float) (original - additional));
             }
         }
     }

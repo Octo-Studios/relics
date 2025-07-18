@@ -92,6 +92,7 @@ public class AbilityTemplate {
             this.requiredPoints = base.getRequiredPoints();
             this.castData = base.getCastData();
             this.researchTemplate = base.getResearchTemplate();
+            this.statistic = base.getStatistic();
             this.modes = base.getModes();
             this.rankModifiers = base.getRankModifiers();
         }

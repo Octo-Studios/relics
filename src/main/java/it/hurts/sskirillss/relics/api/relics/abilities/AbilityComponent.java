@@ -34,7 +34,7 @@ public class AbilityComponent {
                     ResearchComponent.CODEC.fieldOf("research").forGetter(AbilityComponent::getResearch),
                     LockComponent.CODEC.fieldOf("lock").forGetter(AbilityComponent::getLock),
                     AbilityExtenderComponent.CODEC.fieldOf("extender").forGetter(AbilityComponent::getExtender),
-                    StatisticComponent.CODEC.fieldOf("statistic").forGetter(AbilityComponent::getStatistic),
+                    StatisticComponent.CODEC.optionalFieldOf("statistic", StatisticComponent.EMPTY).forGetter(AbilityComponent::getStatistic),
                     Codec.STRING.optionalFieldOf("mode", "").forGetter(AbilityComponent::getMode),
                     Codec.INT.fieldOf("points").forGetter(AbilityComponent::getPoints)
             ).apply(instance, AbilityComponent::new)
