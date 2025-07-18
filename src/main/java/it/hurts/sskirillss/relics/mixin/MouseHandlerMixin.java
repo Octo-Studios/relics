@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MouseHandlerMixin {
     @Inject(method = "turnPlayer", at = @At("HEAD"), cancellable = true)
     public void onKeyPress(CallbackInfo ci) {
-        Player player = Minecraft.getInstance().player;
+        var player = Minecraft.getInstance().player;
 
         if (player != null && player.hasEffect(RelicsMobEffects.STUN))
             ci.cancel();

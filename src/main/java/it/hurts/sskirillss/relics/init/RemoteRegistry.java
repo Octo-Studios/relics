@@ -4,10 +4,7 @@ import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailRegistry;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
-import it.hurts.sskirillss.relics.client.gui.layers.ActiveAbilitiesLayer;
-import it.hurts.sskirillss.relics.client.gui.layers.InfoTileLayer;
-import it.hurts.sskirillss.relics.client.gui.layers.LeafyMantleHideLayer;
-import it.hurts.sskirillss.relics.client.gui.layers.PhantomBootBridgeLayer;
+import it.hurts.sskirillss.relics.client.gui.layers.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
@@ -153,5 +150,6 @@ public class RemoteRegistry {
         event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "active_abilities"), new ActiveAbilitiesLayer());
         event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "leafy_ring_hide"), new LeafyMantleHideLayer());
         event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "phantom_boot_bridge"), new PhantomBootBridgeLayer());
+        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "stun_effect"), new StunEffectLayer());
     }
 }

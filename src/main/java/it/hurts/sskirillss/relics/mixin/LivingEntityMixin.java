@@ -68,15 +68,15 @@ public class LivingEntityMixin {
         return event.getFriction();
     }
 
-    @Inject(method = "isImmobile", at = @At("HEAD"), cancellable = true)
-    protected void onAiStep(CallbackInfoReturnable<Boolean> cir) {
-        LivingEntity entity = (LivingEntity) (Object) this;
+    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z", shift = At.Shift.AFTER), cancellable = true)
+    protected void onAiStep(CallbackInfo ci) {
+        var entity = (LivingEntity) (Object) this;
 
         if (entity.hasEffect(RelicsMobEffects.STUN))
-            cir.setReturnValue(true);
+            ci.cancel();
 
         if (entity.hasEffect(RelicsMobEffects.PARALYSIS))
-            cir.setReturnValue(true);
+            ci.cancel();
     }
 
     @Inject(method = "onEffectAdded", at = @At("TAIL"))
