@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class KeyboardHandlerMixin {
     @Inject(method = "keyPress", at = @At("HEAD"), cancellable = true)
     public void onKeyPress(long windowPointer, int key, int scanCode, int action, int modifiers, CallbackInfo ci) {
-        if (key != GLFW.GLFW_KEY_ESCAPE)
+        if (key == GLFW.GLFW_KEY_ESCAPE)
             return;
 
         var player = Minecraft.getInstance().player;

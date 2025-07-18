@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
@@ -68,15 +69,17 @@ public class LivingEntityMixin {
         return event.getFriction();
     }
 
-    @Inject(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z", shift = At.Shift.AFTER), cancellable = true)
-    protected void onAiStep(CallbackInfo ci) {
+    @ModifyExpressionValue(method = "aiStep", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/LivingEntity;isImmobile()Z"))
+    protected boolean onAiStep(boolean original) {
         var entity = (LivingEntity) (Object) this;
 
         if (entity.hasEffect(RelicsMobEffects.STUN))
-            ci.cancel();
+            return true;
 
         if (entity.hasEffect(RelicsMobEffects.PARALYSIS))
-            ci.cancel();
+            return true;
+
+        return original;
     }
 
     @Inject(method = "onEffectAdded", at = @At("TAIL"))

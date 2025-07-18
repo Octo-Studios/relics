@@ -22,7 +22,7 @@ import net.neoforged.neoforge.client.event.RenderLivingEvent;
 
 public class StunEffect extends MobEffect {
     public StunEffect() {
-        super(MobEffectCategory.HARMFUL, 0X6836AA);
+        super(MobEffectCategory.HARMFUL, 0xdab826);
     }
 
     @EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
@@ -61,7 +61,7 @@ public class StunEffect extends MobEffect {
             poseStack.translate(0, entity.getBbHeight() + 0.25F, 0);
             poseStack.scale(0.25F, 0.25F, 0.25F);
 
-            var stars = (int) entity.getBbWidth() * 10;
+            var stars = Math.round(entity.getBbWidth() * 10F);
             var ticks = entity.tickCount + event.getPartialTick();
             var radius = 1F + stars * 0.15F;
 
