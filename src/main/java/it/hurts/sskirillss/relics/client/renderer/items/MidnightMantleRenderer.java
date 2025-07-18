@@ -50,8 +50,6 @@ public class MidnightMantleRenderer implements ICurioRenderer, IRelicRenderer {
 
         var mode = relic.getAbilityMode(entity, stack, "phase");
 
-        //System.out.println(relic.getAbilityComponent(entity, stack, "phase").getMode());
-
         this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_" + (relic.isRelicFlawless(entity, stack) ? "flawless" : mode) + ".png"))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         float flicker = 0.75F + 0.25F * Mth.sin(time * 0.15F);
@@ -95,9 +93,9 @@ public class MidnightMantleRenderer implements ICurioRenderer, IRelicRenderer {
             poseStack.mulPose(Axis.ZP.rotation(tiltZ));
 
             if (mode.equals("new_moon"))
-                new MidnightMantleNewMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_new_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                new MidnightMantleNewMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.eyes(this.getFlawlessOrDefaultTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_new_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
             else if (mode.equals("full_moon"))
-                new MidnightMantleFullMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_full_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                new MidnightMantleFullMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.eyes(this.getFlawlessOrDefaultTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_full_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
             poseStack.popPose();
         }
