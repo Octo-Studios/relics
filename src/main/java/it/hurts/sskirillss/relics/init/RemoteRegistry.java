@@ -126,7 +126,8 @@ public class RemoteRegistry {
     @SubscribeEvent
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveRenderer::new);
-        event.registerEntityRenderer(RelicsEntities.FALLING_STAR.get(), FallingStarRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.CONSTELLATION_STAR.get(), ConstellationStarRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.FALLING_STAR.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.ELECTRIC_SPARK.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.ROLLER_SPARK.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SHOCKWAVE_BLOCK.get(), ShockwaveBlockRenderer::new);

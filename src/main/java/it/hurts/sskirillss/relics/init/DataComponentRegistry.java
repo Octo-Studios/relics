@@ -119,8 +119,9 @@ public class DataComponentRegistry {
                     .build()
     );
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_DURATION = DataComponentRegistry.construct("midnight_mantle/duration", Codec.INT);
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_COOLDOWN = DataComponentRegistry.construct("midnight_mantle/cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_PHASE_DURATION = DataComponentRegistry.construct("midnight_mantle/duration", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN = DataComponentRegistry.construct("midnight_mantle/invisibility_cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN = DataComponentRegistry.construct("midnight_mantle/constellation_cooldown", Codec.INT);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROLLER_SKATE_DURATION = DataComponentRegistry.construct("roller_skate/duration", Codec.INT);
 

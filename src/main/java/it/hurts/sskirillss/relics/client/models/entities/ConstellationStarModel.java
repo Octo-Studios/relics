@@ -8,10 +8,10 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.world.entity.Entity;
 
-public class FallingStarModel<T extends Entity> extends EntityModel<T> {
+public class ConstellationStarModel<T extends Entity> extends EntityModel<T> {
     private final ModelPart part;
 
-    public FallingStarModel() {
+    public ConstellationStarModel() {
         MeshDefinition meshdefinition = new MeshDefinition();
         PartDefinition partdefinition = meshdefinition.getRoot();
 

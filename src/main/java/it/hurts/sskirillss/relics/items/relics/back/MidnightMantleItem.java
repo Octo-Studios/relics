@@ -1,11 +1,14 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
 import it.hurts.sskirillss.relics.api.events.leveling.AbilityModeSwitchEvent;
+import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
-import it.hurts.sskirillss.relics.entities.FallingStarEntity;
+import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.ConstellationStarEntity;
+import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.FallingStarEntity;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -13,10 +16,14 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
+import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.item.midnight_mantle.S2CSyncConstellation;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.Scheduler;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -34,6 +41,10 @@ import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import top.theillusivec4.curios.api.SlotContext;
+
+import java.util.ArrayList;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class MidnightMantleItem extends RelicItem {
     @Override
@@ -73,6 +84,20 @@ public class MidnightMantleItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("duration_new_moon")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(MetricTemplate.builder("duration_full_moon")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(MetricTemplate.builder("additional_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("health_regeneration")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .build())
                                 .build())
                         .ability(AbilityTemplate.builder("invisibility")
                                 .rankModifier(3, "strike")
@@ -93,9 +118,56 @@ public class MidnightMantleItem extends RelicItem {
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("duration")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(MetricTemplate.builder("additional_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .build())
+                                .build())
+                        .ability(AbilityTemplate.builder("constellation")
+                                .rankModifier(5, "stun")
+                                .stat(StatTemplate.builder("stars_amount")
+                                        .initialValue(2D, 7D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.05D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .build())
+                                .stat(StatTemplate.builder("ability_cooldown")
+                                        .thresholdValue(0D, Double.MAX_VALUE)
+                                        .initialValue(120D, 180D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.1D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("tremor_duration")
+                                        .initialValue(0.25D, 1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("explosion_radius")
+                                        .initialValue(0.5D, 1D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("explosion_damage")
+                                        .initialValue(1D, 5D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("star_lifetime")
+                                        .initialValue(10D, 15D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("stun_duration")
+                                        .initialValue(1D, 2.5D)
+                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
                                 .build())
                         .ability(AbilityTemplate.builder("starfall")
-                                .rankModifier(5, "bounce")
+                                .rankModifier(7, "bounce")
                                 .stat(StatTemplate.builder("chance")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
@@ -125,7 +197,8 @@ public class MidnightMantleItem extends RelicItem {
                                 .build())
                         .build())
                 .leveling(LevelingTemplate.builder()
-                        .initialCost(100)
+                        .initialCost(1000)
+                        .maxRank(7)
                         .step(100)
                         .build())
                 .style(StyleTemplate.builder()
@@ -141,28 +214,40 @@ public class MidnightMantleItem extends RelicItem {
                 .build();
     }
 
-    public int getCooldown(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_COOLDOWN.get(), 0);
+    public int getInvisibilityCooldown(ItemStack stack) {
+        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN.get(), 0);
     }
 
-    public void setCooldown(ItemStack stack, int cooldown) {
-        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_COOLDOWN.get(), cooldown);
+    public void setInvisibilityCooldown(ItemStack stack, int cooldown) {
+        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN.get(), cooldown);
     }
 
-    public void addCooldown(ItemStack stack, int cooldown) {
-        this.setCooldown(stack, this.getCooldown(stack) + cooldown);
+    public void addInvisibilityCooldown(ItemStack stack, int cooldown) {
+        this.setInvisibilityCooldown(stack, this.getInvisibilityCooldown(stack) + cooldown);
     }
 
-    public int getDuration(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_DURATION, 0);
+    public int getConstellationCooldown(ItemStack stack) {
+        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN.get(), 0);
     }
 
-    public void setDuration(ItemStack stack, int duration) {
-        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_DURATION, Math.max(duration, 0));
+    public void setConstellationCooldown(ItemStack stack, int cooldown) {
+        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN.get(), cooldown);
     }
 
-    public void addDuration(ItemStack stack, int duration) {
-        this.setDuration(stack, this.getDuration(stack) + duration);
+    public void addConstellationCooldown(ItemStack stack, int cooldown) {
+        this.setConstellationCooldown(stack, this.getConstellationCooldown(stack) + cooldown);
+    }
+
+    public int getPhaseDuration(ItemStack stack) {
+        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_PHASE_DURATION, 0);
+    }
+
+    public void setPhaseDuration(ItemStack stack, int duration) {
+        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_PHASE_DURATION, Math.max(duration, 0));
+    }
+
+    public void addPhaseDuration(ItemStack stack, int duration) {
+        this.setPhaseDuration(stack, this.getPhaseDuration(stack) + duration);
     }
 
     public double getModeEffectiveness(LivingEntity entity, ItemStack stack) {
@@ -185,7 +270,7 @@ public class MidnightMantleItem extends RelicItem {
 
         var effectiveness = 1 - (minDistance / 4D);
 
-        if (this.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch") && this.getDuration(stack) > 0)
+        if (this.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch") && this.getPhaseDuration(stack) > 0)
             effectiveness *= 1F + this.getStatValue(entity, stack, "phase", "modifier");
 
         return effectiveness;
@@ -225,18 +310,23 @@ public class MidnightMantleItem extends RelicItem {
                 EntityUtils.resetAttribute(entity, stack, Attributes.MAX_HEALTH, (float) (this.getStatValue(entity, stack, "phase", "max_health") * healEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             }
 
-            if (this.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch") && this.getDuration(stack) > 0)
-                this.addDuration(stack, -1);
+            if (this.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch") && this.getPhaseDuration(stack) > 0)
+                this.addPhaseDuration(stack, -1);
         }
 
         if (this.canPlayerUseAbility(entity, stack, "invisibility")) {
-            var cooldown = this.getCooldown(stack);
+            var cooldown = this.getInvisibilityCooldown(stack);
 
             if (cooldown > 0) {
                 if (level.getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(16)).stream().noneMatch(mob -> mob.getTarget() == entity && mob.hasLineOfSight(entity)))
-                    this.addCooldown(stack, -1);
+                    this.addInvisibilityCooldown(stack, -1);
             } else if (this.canHideInTheDarkness(entity, stack))
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
+        }
+
+        if (this.canPlayerUseAbility(entity, stack, "constellation")) {
+            if (this.getConstellationCooldown(stack) > 0)
+                this.addConstellationCooldown(stack, -1);
         }
     }
 
@@ -265,7 +355,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "invisibility"))
                     continue;
 
-                Scheduler.schedule(1, () -> relic.setCooldown(stack, (int) (relic.getStatValue(entity, stack, "invisibility", "cooldown") * 20)));
+                Scheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getStatValue(entity, stack, "invisibility", "cooldown") * 20)));
             }
         }
 
@@ -314,12 +404,12 @@ public class MidnightMantleItem extends RelicItem {
                 var relic = (MidnightMantleItem) stack.getItem();
 
                 if (!relic.canPlayerUseAbility(entity, stack, "invisibility") || !relic.isAbilityRankModifierUnlocked(entity, stack, "invisibility", "strike")
-                        || relic.getCooldown(stack) > 0 || !relic.canHideInTheDarkness(entity, stack))
+                        || relic.getInvisibilityCooldown(stack) > 0 || !relic.canHideInTheDarkness(entity, stack))
                     continue;
 
                 event.setAmount((float) (event.getAmount() * (1F + relic.getStatValue(entity, stack, "invisibility", "damage"))));
 
-                relic.setCooldown(stack, (int) relic.getStatValue(entity, stack, "invisibility", "cooldown"));
+                relic.setInvisibilityCooldown(stack, (int) relic.getStatValue(entity, stack, "invisibility", "cooldown"));
             }
         }
 
@@ -358,12 +448,104 @@ public class MidnightMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "phase") || !relic.isAbilityRankModifierUnlocked(entity, stack, "phase", "switch"))
                     continue;
 
-                relic.setDuration(stack, (int) relic.getStatValue(entity, stack, "phase", "duration") * 20);
+                relic.setPhaseDuration(stack, (int) relic.getStatValue(entity, stack, "phase", "duration") * 20);
             }
         }
 
         @SubscribeEvent
         public static void onLivingHurt4(LivingIncomingDamageEvent event) {
+//            if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity))
+//                return;
+
+            var entity = event.getEntity();
+
+            var level = entity.level();
+            var random = level.getRandom();
+
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
+                var relic = (MidnightMantleItem) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(entity, stack, "constellation") || relic.getConstellationCooldown(stack) > 0)
+                    continue;
+
+                var stars = new ArrayList<ConstellationStarEntity>();
+
+                var count = Math.max(random.nextInt((int) relic.getStatValue(entity, stack, "constellation", "stars_amount")), 2);
+                var radius = 3F + (count * 0.25F);
+                var apexHeight = radius / 3F;
+                var gravity = 0.1F;
+
+                var startPos = entity.getEyePosition();
+                var groundY = entity.position().y();
+
+                var centerPos = new Vec3(startPos.x(), groundY, startPos.z());
+
+                for (int i = 0; i < count; i++) {
+                    var angle = random.nextDouble() * Math.PI * 2;
+                    var randomFactor = random.nextDouble();
+                    var radialDistance = radius * Math.sqrt(randomFactor);
+
+                    var targetX = centerPos.x() + Math.cos(angle) * radialDistance;
+                    var targetZ = centerPos.z() + Math.sin(angle) * radialDistance;
+                    var targetY = groundY;
+
+                    var targetPos = new Vec3(targetX, targetY, targetZ);
+
+                    var deltaXZ = targetPos.subtract(startPos).multiply(1, 0, 1);
+                    var distanceXZ = deltaXZ.length();
+                    var directionXZ = deltaXZ.normalize();
+
+                    var startY = startPos.y();
+                    var deltaY = targetY - startY;
+                    var maxBaseHeight = Math.max(startY, targetY);
+                    var heightDiffToApex = (maxBaseHeight + apexHeight) - startY;
+
+                    var flightTime = Math.sqrt((4 * heightDiffToApex - 2 * deltaY) / gravity);
+
+                    var verticalVelocity = (deltaY + 0.5 * gravity * flightTime * flightTime) / flightTime;
+
+                    var horizontalSpeed = distanceXZ / flightTime;
+
+                    var motion = new Vec3(directionXZ.x() * horizontalSpeed, verticalVelocity, directionXZ.z() * horizontalSpeed);
+
+                    var star = new ConstellationStarEntity(RelicsEntities.CONSTELLATION_STAR.get(), level);
+
+                    star.setDamage((float) relic.getStatValue(entity, stack, "constellation", "explosion_damage"));
+                    star.setRadius((float) relic.getStatValue(entity, stack, "constellation", "explosion_radius"));
+                    star.setTremor((float) relic.getStatValue(entity, stack, "constellation", "tremor_duration"));
+                    star.setLifetime((int) relic.getStatValue(entity, stack, "constellation", "star_lifetime"));
+                    star.setFlawless(relic.isRelicFlawless(entity, stack));
+                    star.setDeltaMovement(motion);
+                    star.setCenter(centerPos);
+                    star.setMaster(i == 0);
+                    star.setPos(startPos);
+                    star.setOwner(entity);
+
+                    if (relic.isAbilityRankModifierUnlocked(entity, stack, "constellation", "stun"))
+                        star.setStun((float) relic.getStatValue(entity, stack, "constellation", "explosion_stun"));
+
+                    level.addFreshEntity(star);
+
+                    stars.add(star);
+                }
+
+                var uuids = stars.stream()
+                        .map(Entity::getUUID)
+                        .toList();
+
+                for (var star : stars) {
+                    star.setConstellation(uuids);
+
+                    if (level instanceof ServerLevel serverLevel)
+                        NetworkHandler.sendToClientsTrackingEntity(new S2CSyncConstellation(star.getId(), star.getConstellation().stream().map(serverLevel::getEntity).filter(Objects::nonNull).map(Entity::getId).collect(Collectors.toList())), star);
+                }
+
+                relic.setConstellationCooldown(stack, (int) (relic.getStatValue(entity, stack, "constellation", "ability_cooldown") * 20));
+            }
+        }
+
+        @SubscribeEvent
+        public static void onLivingHurt5(LivingIncomingDamageEvent event) {
             if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity entity))
                 return;
 
@@ -375,7 +557,8 @@ public class MidnightMantleItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (random.nextFloat() > relic.getStatValue(entity, stack, "starfall", "chance"))
+                if (!relic.canPlayerUseAbility(entity, stack, "starfall")
+                        || random.nextFloat() > relic.getStatValue(entity, stack, "starfall", "chance"))
                     continue;
 
                 var pos = new Vec3(target.getX() + MathUtils.randomFloat(random) * 10, target.getY() + 25 + random.nextInt(25), target.getZ() + MathUtils.randomFloat(random) * 10);

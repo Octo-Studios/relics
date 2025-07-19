@@ -9,6 +9,7 @@ import it.hurts.sskirillss.relics.network.packets.abilities.SpellCastPacket;
 import it.hurts.sskirillss.relics.network.packets.capability.CapabilitySyncPacket;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeMode;
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
+import it.hurts.sskirillss.relics.network.packets.item.midnight_mantle.S2CSyncConstellation;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.network.packets.leveling.FixLevelingPoints;
@@ -48,14 +49,19 @@ public class NetworkHandler {
         registrar.playToServer(PacketResearchHint.TYPE, PacketResearchHint.STREAM_CODEC, PacketResearchHint::handle);
         registrar.playToServer(FixLevelingPoints.TYPE, FixLevelingPoints.STREAM_CODEC, FixLevelingPoints::handle);
         registrar.playToServer(PacketRelicTweak.TYPE, PacketRelicTweak.STREAM_CODEC, PacketRelicTweak::handle);
-
         registrar.playToServer(C2SChangeMode.TYPE, C2SChangeMode.STREAM_CODEC, C2SChangeMode::handle);
 
+        // === KINETIC BELT ===
         registrar.playToServer(C2SSetActive.TYPE, C2SSetActive.STREAM_CODEC, C2SSetActive::handle);
 
+        // === SPRINGY BOOT ===
         registrar.playToClient(S2CBounceFromSurface.TYPE, S2CBounceFromSurface.STREAM_CODEC, S2CBounceFromSurface::handle);
 
+        // === ROLLER SKATE ===
         registrar.playToServer(C2SCreateSpark.TYPE, C2SCreateSpark.STREAM_CODEC, C2SCreateSpark::handle);
+
+        // === MIDNIGHT MANTLE ===
+        registrar.playToClient(S2CSyncConstellation.TYPE, S2CSyncConstellation.STREAM_CODEC, S2CSyncConstellation::handle);
     }
 
     public static <MSG extends CustomPacketPayload> void sendToServer(MSG message) {

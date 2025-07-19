@@ -1,5 +1,6 @@
-package it.hurts.sskirillss.relics.entities;
+package it.hurts.sskirillss.relics.entities.relic.midnight_mantle;
 
+import it.hurts.sskirillss.relics.entities.ShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.SoundRegistry;
 import it.hurts.sskirillss.relics.network.NetworkHandler;

@@ -2,6 +2,8 @@ package it.hurts.sskirillss.relics.init;
 
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.entities.*;
+import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.ConstellationStarEntity;
+import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.FallingStarEntity;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -16,6 +18,12 @@ public class RelicsEntities {
             EntityType.Builder.<FallingStarEntity>of(FallingStarEntity::new, MobCategory.MISC)
                     .sized(0.5F, 0.5F)
                     .build("falling_star")
+    );
+
+    public static final DeferredHolder<EntityType<?>, EntityType<ConstellationStarEntity>> CONSTELLATION_STAR = ENTITIES.register("constellation_star", () ->
+            EntityType.Builder.<ConstellationStarEntity>of(ConstellationStarEntity::new, MobCategory.MISC)
+                    .sized(0.5F, 0.5F)
+                    .build("constellation_star")
     );
 
     public static final DeferredHolder<EntityType<?>, EntityType<RollerSparkEntity>> ROLLER_SPARK = ENTITIES.register("roller_spark", () ->
