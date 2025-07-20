@@ -35,9 +35,11 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import top.theillusivec4.curios.api.SlotContext;
@@ -439,6 +441,16 @@ public class MidnightMantleItem extends RelicItem {
         }
 
         @SubscribeEvent
+        public static void onItemToss(ItemTossEvent event) {
+            CommonEvents.onInteract(event.getPlayer());
+        }
+
+        @SubscribeEvent
+        public static void onItemPickup(ItemEntityPickupEvent event) {
+            CommonEvents.onInteract(event.getPlayer());
+        }
+
+        @SubscribeEvent
         public static void onAbilityModeSwitch(AbilityModeSwitchEvent event) {
             var entity = event.getEntity();
 
@@ -454,10 +466,13 @@ public class MidnightMantleItem extends RelicItem {
 
         @SubscribeEvent
         public static void onLivingHurt4(LivingIncomingDamageEvent event) {
-            if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity))
+            if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity source))
                 return;
 
             var entity = event.getEntity();
+
+            if (source.getStringUUID().equals(entity.getStringUUID()))
+                return;
 
             var level = entity.level();
             var random = level.getRandom();
@@ -533,6 +548,9 @@ public class MidnightMantleItem extends RelicItem {
                     star.setPos(startPos);
                     star.setOwner(entity);
 
+                    if (relic.isAbilityRankModifierUnlocked(entity, stack, "constellation", "stun"))
+                        star.setStun((int) relic.getStatValue(entity, stack, "constellation", "stun_duration"));
+
                     level.addFreshEntity(star);
 
                     stars.add(star);
@@ -559,6 +577,9 @@ public class MidnightMantleItem extends RelicItem {
                 return;
 
             var target = event.getEntity();
+
+            if (target.getStringUUID().equals(entity.getStringUUID()))
+                return;
 
             var level = entity.level();
             var random = level.getRandom();

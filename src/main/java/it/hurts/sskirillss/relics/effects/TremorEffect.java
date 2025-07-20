@@ -12,6 +12,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.RenderHandEvent;
 import net.neoforged.neoforge.event.entity.EntityInvulnerabilityCheckEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 
@@ -29,6 +30,12 @@ public class TremorEffect extends MobEffect {
 
             if (event.getSource().getDirectEntity() instanceof LivingEntity entity && entity.hasEffect(RelicsMobEffects.TREMOR))
                 event.setInvulnerable(true);
+        }
+
+        @SubscribeEvent
+        public static void onItemUse(LivingEntityUseItemEvent.Start event) {
+            if (event.getEntity().hasEffect(RelicsMobEffects.TREMOR))
+                event.setCanceled(true);
         }
 
         @SubscribeEvent

@@ -142,24 +142,11 @@ public class ConstellationStarEntity extends ThrowableProjectile {
 
         if (this.isStuck()) {
             if (!level.isClientSide()) {
-                var entities = level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(this.getRadius()), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID()));
+                if (!level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox(), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID())).isEmpty())
+                    this.discard();
 
-                if (entities.stream().anyMatch(entity -> this.getBoundingBox().intersects(entity.getBoundingBox()))) {
-                    var discard = false;
-
-                    for (var target : entities) {
-                        target.invulnerableTime = 0;
-
-                        if (target.hurt(this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), 1 + this.getDamage())) {
-                            target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (this.getStun() * 20), 0));
-
-                            discard = true;
-                        }
-                    }
-
-                    if (discard)
-                        this.discard();
-                }
+                if (this.tickCount % 5 == 0 && this.tickCount >= this.getLifetime() * 20 && random.nextInt(20) == 0)
+                    this.discard();
             }
 
             if (level.isClientSide()) {
@@ -199,7 +186,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
 
                     for (var neighborStarUuid : foundEntity.getConstellation()) {
                         var entity = serverLevel.getEntity(neighborStarUuid);
-
                         if (entity == null)
                             continue;
 
@@ -296,12 +282,33 @@ public class ConstellationStarEntity extends ThrowableProjectile {
                 if (a == null || b == null)
                     continue;
 
+                var dir = b.subtract(a);
+                var length = dir.length();
+                var dirNorm = dir.scale(1 / length);
+
+                var proximityThreshold = 0.5;
+
+                var segmentBox = new AABB(
+                        Math.min(a.x(), b.x()) - proximityThreshold,
+                        Math.min(a.y(), b.y()) - proximityThreshold,
+                        Math.min(a.z(), b.z()) - proximityThreshold,
+                        Math.max(a.x(), b.x()) + proximityThreshold,
+                        Math.max(a.y(), b.y()) + proximityThreshold,
+                        Math.max(a.z(), b.z()) + proximityThreshold
+                );
+
+                var crossed = false;
+
+                for (var ent : level.getEntitiesOfClass(LivingEntity.class, segmentBox, ent -> ent != this.getOwner())) {
+                    if (ent.getBoundingBox().clip(a, b).isPresent()) {
+                        crossed = true;
+
+                        ent.addEffect(new MobEffectInstance(RelicsMobEffects.TREMOR, (int) (this.getTremor() * 20), 0));
+                    }
+                }
+
                 if (level.isClientSide()) {
                     var particleSpacing = 0.15;
-
-                    var dir = b.subtract(a);
-                    var length = dir.length();
-                    var dirNorm = dir.scale(1 / length);
 
                     var up = new Vec3(0, 1, 0);
                     var u = dirNorm.cross(up);
@@ -315,37 +322,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
 
                     var stepCount = Math.max(1, (int) Math.ceil(length / particleSpacing));
 
-                    var proximityThreshold = 0.5;
-
-                    var segmentBox = new AABB(
-                            Math.min(a.x(), b.x()) - proximityThreshold,
-                            Math.min(a.y(), b.y()) - proximityThreshold,
-                            Math.min(a.z(), b.z()) - proximityThreshold,
-                            Math.max(a.x(), b.x()) + proximityThreshold,
-                            Math.max(a.y(), b.y()) + proximityThreshold,
-                            Math.max(a.z(), b.z()) + proximityThreshold
-                    );
-
-                    var crossed = false;
-
-                    for (var ent : level.getEntitiesOfClass(LivingEntity.class, segmentBox)) {
-                        if (ent == this.getOwner())
-                            continue;
-
-                        var AM = ent.position().subtract(a);
-                        var t = AM.dot(dir) / dir.lengthSqr();
-
-                        if (t >= 0 && t <= 1) {
-                            var proj = a.add(dirNorm.scale(t * length));
-
-                            if (ent.getBoundingBox().contains(proj)) {
-                                crossed = true;
-
-                                break;
-                            }
-                        }
-                    }
-
                     var amplitude = 0.05D;
                     var wavelength = 2D;
                     var speed = 0.05D;
@@ -355,7 +331,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
                     for (var step = 0; step <= stepCount; step++) {
                         var f = step / (double) stepCount;
                         var basePos = a.add(dir.scale(f));
-
                         var phase = (f * length) / wavelength * 2 * Math.PI + time;
                         var offset = u.scale(Math.cos(phase) * amplitude).add(v.scale(Math.sin(phase) * amplitude));
                         var pos = basePos.add(offset);
@@ -432,6 +407,13 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         var level = this.level();
         var random = level.getRandom();
         var position = this.position();
+
+        for (var target : level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(this.getRadius()), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID()))) {
+            target.invulnerableTime = 0;
+
+            if (target.hurt(this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), 1 + this.getDamage()))
+                target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (this.getStun() * 20), 0));
+        }
 
         var ringParticleCount = 100 + random.nextInt(50);
 
