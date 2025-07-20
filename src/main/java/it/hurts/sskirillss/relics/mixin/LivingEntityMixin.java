@@ -12,6 +12,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.common.NeoForge;
 import org.spongepowered.asm.mixin.Mixin;
@@ -42,6 +43,9 @@ public class LivingEntityMixin {
     private float removeAirDrag(float original) {
         var entity = (LivingEntity) (Object) this;
 
+        if (entity instanceof Player player && (player.getAbilities().flying || player.isSpectator()))
+            return original;
+
         var maxValue = 0.985F;
         var diff = maxValue - original;
 
@@ -49,7 +53,7 @@ public class LivingEntityMixin {
                 .filter(stack -> {
                     var relic = ((KineticBeltItem) stack.getItem());
 
-                    return relic.canPlayerUseAbility(entity, stack, "gliding") && relic.getAbilityMode(entity, stack, "gliding").equals("disabled") && !relic.isLanded(stack) && relic.isActive(stack);
+                    return relic.canPlayerUseAbility(entity, stack, "gliding") && !relic.getAbilityMode(entity, stack, "gliding").equals("disabled") && (!relic.isLanded(stack) || relic.isActive(stack));
                 })
                 .mapToDouble(stack -> ((KineticBeltItem) stack.getItem()).getStatValue(entity, stack, "gliding", "efficiency"))
                 .max()
