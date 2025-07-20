@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.entities.relic.midnight_mantle;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.midnight_mantle.S2CSyncConstellation;
+import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -20,11 +21,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
@@ -42,7 +41,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<String> CONSTELLATION = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Boolean> STUCK = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Boolean> MASTER = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.BOOLEAN);
 
     public void setCenter(Vec3 center) {
@@ -121,14 +119,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         this.getEntityData().set(STUCK, stuck);
     }
 
-    public boolean isMaster() {
-        return this.getEntityData().get(MASTER);
-    }
-
-    public void setMaster(boolean master) {
-        this.getEntityData().set(MASTER, master);
-    }
-
     public boolean isFlawless() {
         return this.getEntityData().get(FLAWLESS);
     }
@@ -148,197 +138,242 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         if (this.isStuck())
             this.setDeltaMovement(Vec3.ZERO);
 
-        if (!this.isMaster())
-            return;
-
         var level = this.level();
 
-        var originEntityId = this.getId();
+        if (this.isStuck()) {
+            if (!level.isClientSide()) {
+                var entities = level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(this.getRadius()), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID()));
 
-        var entityIdQueue = new ArrayDeque<Integer>();
-        var discoveredIds = new HashSet<Integer>();
+                if (entities.stream().anyMatch(entity -> this.getBoundingBox().intersects(entity.getBoundingBox()))) {
+                    var discard = false;
 
-        entityIdQueue.add(originEntityId);
-        discoveredIds.add(originEntityId);
+                    for (var target : entities) {
+                        target.invulnerableTime = 0;
 
-        if (level.isClientSide()) {
-            while (!entityIdQueue.isEmpty()) {
-                var currentEntityId = entityIdQueue.removeFirst();
+                        if (target.hurt(this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), 1 + this.getDamage())) {
+                            target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (this.getStun() * 20), 0));
 
-                if (!(level.getEntity(currentEntityId) instanceof ConstellationStarEntity foundEntity))
-                    continue;
+                            discard = true;
+                        }
+                    }
 
-                for (var neighborStarId : foundEntity.getClientConstellation())
-                    if (discoveredIds.add(neighborStarId))
-                        entityIdQueue.add(neighborStarId);
-            }
-        } else {
-            var serverLevel = (ServerLevel) level;
-
-            while (!entityIdQueue.isEmpty()) {
-                var currentEntityId = entityIdQueue.removeFirst();
-
-                if (!(serverLevel.getEntity(currentEntityId) instanceof ConstellationStarEntity foundEntity))
-                    continue;
-
-                for (var neighborStarUuid : foundEntity.getConstellation()) {
-                    var entity = serverLevel.getEntity(neighborStarUuid);
-
-                    if (entity == null)
-                        continue;
-
-                    var id = entity.getId();
-
-                    if (discoveredIds.add(id))
-                        entityIdQueue.add(id);
+                    if (discard)
+                        this.discard();
                 }
             }
-        }
 
-        if (discoveredIds.size() < 2)
-            return;
+            if (level.isClientSide()) {
+                var color = isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(50 + random.nextInt(50), 50 + random.nextInt(150), 255);
+                var data = ParticleUtils.constructSimpleSpark(color, 0.2F + random.nextFloat() * 0.1F, 30 + random.nextInt(20), 0.95F);
 
-        var sortedIds = new ArrayList<>(discoveredIds);
-
-        Collections.sort(sortedIds);
-
-        var totalStars = sortedIds.size();
-
-        var starEntities = new ConstellationStarEntity[totalStars];
-        var starCenters = new Vec3[totalStars];
-        var midYs = new double[totalStars];
-
-        for (var i = 0; i < totalStars; i++) {
-            var e = (ConstellationStarEntity) level.getEntity(sortedIds.get(i));
-
-            starEntities[i] = e;
-
-            if (e != null) {
-                var c = e.getBoundingBox().getCenter();
-
-                starCenters[i] = c;
-                midYs[i] = c.y;
+                level.addParticle(data, this.getX() + MathUtils.randomFloat(random) * this.getBbWidth() / 2F, this.getY(), this.getZ() + MathUtils.randomFloat(random) * this.getBbWidth() / 2F, 0, 0.1F + random.nextFloat() * 0.1F, 0);
             }
-        }
 
-        var edgeCandidates = new ArrayList<EdgeCandidate>();
+            var originEntityId = this.getId();
 
-        for (int i = 0; i < totalStars; i++) {
-            var eu = starEntities[i];
-            var a = starCenters[i];
+            var entityIdQueue = new ArrayDeque<Integer>();
+            var discoveredIds = new HashSet<Integer>();
 
-            if (eu == null || a == null || !eu.isStuck())
-                continue;
+            entityIdQueue.add(originEntityId);
+            discoveredIds.add(originEntityId);
 
-            for (int j = i + 1; j < totalStars; j++) {
-                var ev = starEntities[j];
-                var b = starCenters[j];
+            if (level.isClientSide()) {
+                while (!entityIdQueue.isEmpty()) {
+                    var currentEntityId = entityIdQueue.removeFirst();
 
-                if (ev == null || b == null || !ev.isStuck())
-                    continue;
+                    if (!(level.getEntity(currentEntityId) instanceof ConstellationStarEntity foundEntity))
+                        continue;
 
-                var from = eu.position().add(0F, eu.getBbHeight() / 2F, 0F);
-                var to = ev.position().add(0F, ev.getBbHeight() / 2F, 0F);
+                    for (var neighborStarId : foundEntity.getClientConstellation())
+                        if (discoveredIds.add(neighborStarId))
+                            entityIdQueue.add(neighborStarId);
+                }
+            } else {
+                var serverLevel = (ServerLevel) level;
 
-                var ctx = new ClipContext(from, to, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, ev);
+                while (!entityIdQueue.isEmpty()) {
+                    var currentEntityId = entityIdQueue.removeFirst();
 
-                if (level.clip(ctx).getType() != HitResult.Type.MISS)
-                    continue;
+                    if (!(serverLevel.getEntity(currentEntityId) instanceof ConstellationStarEntity foundEntity))
+                        continue;
 
-                double dx = a.x - b.x;
-                double dy = a.y - b.y;
-                double dz = a.z - b.z;
+                    for (var neighborStarUuid : foundEntity.getConstellation()) {
+                        var entity = serverLevel.getEntity(neighborStarUuid);
 
-                edgeCandidates.add(new EdgeCandidate(i, j, dx * dx + dy * dy + dz * dz));
-            }
-        }
+                        if (entity == null)
+                            continue;
 
-        edgeCandidates.sort(Comparator.comparingDouble(e -> e.weightSquared));
+                        var id = entity.getId();
 
-        var planarEdges = new ArrayList<int[]>();
-        var exists = new boolean[totalStars][totalStars];
-
-        for (var candidate : edgeCandidates) {
-            var u = candidate.indexU;
-            var v = candidate.indexV;
-
-            if (exists[u][v])
-                continue;
-
-            var a = starCenters[u];
-            var b = starCenters[v];
-
-            if (a == null || b == null)
-                continue;
-
-            var midY = (midYs[u] + midYs[v]) * 0.5;
-            var valid = true;
-
-            for (var edge : planarEdges) {
-                var x = edge[0];
-                var y = edge[1];
-
-                if (Math.abs(midY - (midYs[x] + midYs[y]) * 0.5) <= 1.0) {
-                    if (GEOM.intersectsXZ(a, b, starCenters[x], starCenters[y])) {
-                        valid = false;
-
-                        break;
+                        if (discoveredIds.add(id))
+                            entityIdQueue.add(id);
                     }
                 }
             }
 
-            if (!valid)
-                continue;
+            if (discoveredIds.size() < 2)
+                return;
 
-            planarEdges.add(new int[]{u, v});
-            exists[u][v] = exists[v][u] = true;
-        }
+            var sortedIds = new ArrayList<>(discoveredIds);
 
-        for (var edge : planarEdges) {
-            var a = starCenters[edge[0]];
-            var b = starCenters[edge[1]];
+            Collections.sort(sortedIds);
 
-            if (a == null || b == null)
-                continue;
+            var originIndex = sortedIds.indexOf(originEntityId);
 
-            if (level.isClientSide()) {
-                var particleSpacing = 0.15;
+            var totalStars = sortedIds.size();
+            var starEntities = new ConstellationStarEntity[totalStars];
+            var starCenters = new Vec3[totalStars];
+            var midYs = new double[totalStars];
 
-                var dir = b.subtract(a);
-                var stepCount = Math.max(1, (int) Math.ceil(dir.length() / particleSpacing));
+            for (var i = 0; i < totalStars; i++) {
+                var e = (ConstellationStarEntity) level.getEntity(sortedIds.get(i));
 
-                for (var step = 0; step <= stepCount; step++) {
-                    var f = step / (double) stepCount;
-                    var pos = a.add(dir.scale(f));
-                    var color = this.isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(50 + random.nextInt(50), 50 + random.nextInt(150), 255);
-                    var data = ParticleUtils.constructSimpleSpark(color, 0.25F, 0, 1F);
+                starEntities[i] = e;
 
-                    level.addParticle(data, true, pos.x, pos.y, pos.z, 0, 0, 0);
+                if (e != null) {
+                    var c = e.getBoundingBox().getCenter();
+
+                    starCenters[i] = c;
+                    midYs[i] = c.y;
                 }
-            } else {
-                var proximityThreshold = 0.5;
+            }
 
-                var segmentBox = new AABB(
-                        Math.min(a.x, b.x) - proximityThreshold,
-                        Math.min(a.y, b.y) - proximityThreshold,
-                        Math.min(a.z, b.z) - proximityThreshold,
-                        Math.max(a.x, b.x) + proximityThreshold,
-                        Math.max(a.y, b.y) + proximityThreshold,
-                        Math.max(a.z, b.z) + proximityThreshold
-                );
+            var edges = new ArrayList<int[]>();
+            var exists = new boolean[totalStars][totalStars];
 
-                for (var ent : level.getEntitiesOfClass(LivingEntity.class, segmentBox)) {
-                    var AB = b.subtract(a);
-                    var AM = ent.position().subtract(a);
-                    var t = AM.dot(AB) / AB.lengthSqr();
+            for (var i = 0; i < totalStars; i++) {
+                var a = starCenters[i];
 
-                    if (t < 0 || t > 1)
+                if (a == null || !starEntities[i].isStuck())
+                    continue;
+
+                var neighbors = new ArrayList<EdgeCandidate>();
+
+                for (var j = 0; j < totalStars; j++) {
+                    if (i == j)
                         continue;
 
-                    var proj = a.add(AB.scale(t));
+                    var b = starCenters[j];
 
-                    if (ent.getBoundingBox().contains(proj))
-                        ent.addEffect(new MobEffectInstance(RelicsMobEffects.TREMOR, (int) (this.getTremor() * 20), 0));
+                    if (b == null || !starEntities[j].isStuck())
+                        continue;
+
+                    var dx = a.x - b.x;
+                    var dy = a.y - b.y;
+                    var dz = a.z - b.z;
+
+                    neighbors.add(new EdgeCandidate(i, j, dx * dx + dy * dy + dz * dz));
+                }
+
+                neighbors.sort(Comparator.comparingDouble(e -> e.weightSquared));
+
+                var connections = 0;
+
+                for (var candidate : neighbors) {
+                    if (connections >= 2)
+                        break;
+
+                    var u = candidate.indexU;
+                    var v = candidate.indexV;
+
+                    if (exists[u][v])
+                        continue;
+
+                    edges.add(new int[]{u, v});
+                    exists[u][v] = exists[v][u] = true;
+
+                    connections++;
+                }
+            }
+
+            for (var edge : edges) {
+                if (edge[0] != originIndex)
+                    continue;
+
+                var a = starCenters[edge[0]];
+                var b = starCenters[edge[1]];
+
+                if (a == null || b == null)
+                    continue;
+
+                if (level.isClientSide()) {
+                    var particleSpacing = 0.15;
+
+                    var dir = b.subtract(a);
+                    var length = dir.length();
+                    var dirNorm = dir.scale(1 / length);
+
+                    var up = new Vec3(0, 1, 0);
+                    var u = dirNorm.cross(up);
+
+                    if (u.length() < 1e-4)
+                        u = dirNorm.cross(new Vec3(1, 0, 0));
+
+                    u = u.normalize();
+
+                    var v = dirNorm.cross(u).normalize();
+
+                    var stepCount = Math.max(1, (int) Math.ceil(length / particleSpacing));
+
+                    var proximityThreshold = 0.5;
+
+                    var segmentBox = new AABB(
+                            Math.min(a.x(), b.x()) - proximityThreshold,
+                            Math.min(a.y(), b.y()) - proximityThreshold,
+                            Math.min(a.z(), b.z()) - proximityThreshold,
+                            Math.max(a.x(), b.x()) + proximityThreshold,
+                            Math.max(a.y(), b.y()) + proximityThreshold,
+                            Math.max(a.z(), b.z()) + proximityThreshold
+                    );
+
+                    var crossed = false;
+
+                    for (var ent : level.getEntitiesOfClass(LivingEntity.class, segmentBox)) {
+                        if (ent == this.getOwner())
+                            continue;
+
+                        var AM = ent.position().subtract(a);
+                        var t = AM.dot(dir) / dir.lengthSqr();
+
+                        if (t >= 0 && t <= 1) {
+                            var proj = a.add(dirNorm.scale(t * length));
+
+                            if (ent.getBoundingBox().contains(proj)) {
+                                crossed = true;
+
+                                break;
+                            }
+                        }
+                    }
+
+                    var amplitude = 0.05D;
+                    var wavelength = 2D;
+                    var speed = 0.05D;
+
+                    var time = (level.getGameTime() + this.getId()) * speed;
+
+                    for (var step = 0; step <= stepCount; step++) {
+                        var f = step / (double) stepCount;
+                        var basePos = a.add(dir.scale(f));
+
+                        var phase = (f * length) / wavelength * 2 * Math.PI + time;
+                        var offset = u.scale(Math.cos(phase) * amplitude).add(v.scale(Math.sin(phase) * amplitude));
+                        var pos = basePos.add(offset);
+
+                        if (crossed) {
+                            var color = new Color(255, random.nextInt(50), 0);
+                            var data = ParticleUtils.constructSimpleSpark(color, 0.25F, 5, 0.9F);
+
+                            var motion = 0.05F;
+
+                            level.addParticle(data, true, pos.x, pos.y, pos.z, MathUtils.randomFloat(random) * motion, MathUtils.randomFloat(random) * motion, MathUtils.randomFloat(random) * motion);
+                        } else {
+                            var color = isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(50 + random.nextInt(50), 50 + random.nextInt(150), 255);
+                            var data = ParticleUtils.constructSimpleSpark(color, 0.25F, 0, 1F);
+
+                            level.addParticle(data, true, pos.x, pos.y, pos.z, 0, 0, 0);
+                        }
+                    }
                 }
             }
         }
@@ -349,27 +384,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         final int indexU, indexV;
         final double weightSquared;
     }
-
-    private static class GeometryHelper {
-        double orient(double ax, double az, double bx, double bz, double cx, double cz) {
-            return (bx - ax) * (cz - az) - (bz - az) * (cx - ax);
-        }
-
-        boolean intersectsXZ(Vec3 A, Vec3 B, Vec3 C, Vec3 D) {
-            var o1 = orient(A.x, A.z, B.x, B.z, C.x, C.z);
-            var o2 = orient(A.x, A.z, B.x, B.z, D.x, D.z);
-
-            if (o1 * o2 >= 0)
-                return false;
-
-            var o3 = orient(C.x, C.z, D.x, D.z, A.x, A.z);
-            var o4 = orient(C.x, C.z, D.x, D.z, B.x, B.z);
-
-            return o3 * o4 < 0;
-        }
-    }
-
-    private static final GeometryHelper GEOM = new GeometryHelper();
 
     @Override
     protected void onHitBlock(BlockHitResult result) {
@@ -412,6 +426,60 @@ public class ConstellationStarEntity extends ThrowableProjectile {
     }
 
     @Override
+    public void onRemovedFromLevel() {
+        super.onRemovedFromLevel();
+
+        var level = this.level();
+        var random = level.getRandom();
+        var position = this.position();
+
+        var ringParticleCount = 100 + random.nextInt(50);
+
+        for (var i = 0; i < ringParticleCount; i++) {
+            var angle = 2 * Math.PI * i / ringParticleCount;
+            var velocity = new Vec3(Math.cos(angle), 0.15D + random.nextDouble() * 0.1D, Math.sin(angle)).normalize().scale(0.05D + random.nextDouble() * 0.05D);
+
+            var color = this.isFlawless() ? new Color(255, 215, 0) : new Color(50 + random.nextInt(150), 50 + random.nextInt(150), 255);
+
+            level.addParticle(ParticleUtils.constructSimpleSpark(color, 0.75F + random.nextFloat() * 0.25F, 50 + random.nextInt(25), 0.95F), true, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z);
+        }
+
+        var burstParticleCount = 250 + random.nextInt(100);
+
+        for (var i = 0; i < burstParticleCount; i++) {
+            var velocity = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize().scale(0.1 + random.nextDouble() * 0.1);
+            var color = this.isFlawless() ? new Color(255, 235, 100) : new Color(100 + random.nextInt(155), 100 + random.nextInt(155), 255);
+
+            var spark = ParticleUtils.constructSimpleSpark(color, 0.25F + random.nextFloat(), 20 + random.nextInt(10), 0.9F);
+
+            level.addParticle(spark, true, position.x, position.y, position.z, velocity.x, velocity.y, velocity.z);
+        }
+
+        var trailCount = 10;
+        var pointCount = 25;
+        var maxDistance = 2.5;
+
+        for (var i = 0; i < trailCount; i++) {
+            var direction = new Vec3(random.nextGaussian(), random.nextDouble(), random.nextGaussian()).normalize();
+
+            for (var j = 1; j <= pointCount; j++) {
+                var t = j / (double) pointCount;
+
+                var spacedT = Math.pow(t, 1.5);
+
+                var px = position.x + direction.x * spacedT * maxDistance;
+                var py = position.y + direction.y * spacedT * maxDistance;
+                var pz = position.z + direction.z * spacedT * maxDistance;
+
+                var color = this.isFlawless() ? new Color(255, 200, 50) : new Color(80 + random.nextInt(100), 80 + random.nextInt(100), 255);
+                var spark = ParticleUtils.constructSimpleSpark(color, (float) (1F * (1 - t) + 0.1F), 15 + random.nextInt(15), 0.5F);
+
+                level.addParticle(spark, true, px, py, pz, direction.x * 0.02, direction.y * 0.02, direction.z * 0.02);
+            }
+        }
+    }
+
+    @Override
     public void startSeenByPlayer(ServerPlayer serverPlayer) {
         super.startSeenByPlayer(serverPlayer);
 
@@ -438,7 +506,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         builder.define(LIFETIME, 0);
         builder.define(CONSTELLATION, "");
         builder.define(STUCK, false);
-        builder.define(MASTER, false);
         builder.define(FLAWLESS, false);
         builder.define(TREMOR, 0F);
         builder.define(STUN, 0F);
@@ -453,7 +520,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         tag.putInt("lifetime", this.getLifetime());
         tag.putString("constellation", this.getRawConstellation());
         tag.putBoolean("stuck", this.isStuck());
-        tag.putBoolean("master", this.isMaster());
         tag.putBoolean("flawless", this.isFlawless());
         tag.putFloat("tremor", this.getTremor());
         tag.putFloat("stun", this.getStun());
@@ -468,7 +534,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         this.setLifetime(tag.getInt("lifetime"));
         this.setRawConstellation(tag.getString("constellation"));
         this.setStuck(tag.getBoolean("stuck"));
-        this.setMaster(tag.getBoolean("master"));
         this.setFlawless(tag.getBoolean("flawless"));
         this.setTremor(tag.getFloat("tremor"));
         this.setStun(tag.getFloat("stun"));

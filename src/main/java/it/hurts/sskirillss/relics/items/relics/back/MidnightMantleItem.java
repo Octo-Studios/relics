@@ -454,8 +454,8 @@ public class MidnightMantleItem extends RelicItem {
 
         @SubscribeEvent
         public static void onLivingHurt4(LivingIncomingDamageEvent event) {
-//            if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity))
-//                return;
+            if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity))
+                return;
 
             var entity = event.getEntity();
 
@@ -469,6 +469,7 @@ public class MidnightMantleItem extends RelicItem {
                     continue;
 
                 var stars = new ArrayList<ConstellationStarEntity>();
+                var targets = new ArrayList<Vec3>();
 
                 var count = Math.max(random.nextInt((int) relic.getStatValue(entity, stack, "constellation", "stars_amount")), 2);
                 var radius = 3F + (count * 0.25F);
@@ -477,35 +478,47 @@ public class MidnightMantleItem extends RelicItem {
 
                 var startPos = entity.getEyePosition();
                 var groundY = entity.position().y();
-
                 var centerPos = new Vec3(startPos.x(), groundY, startPos.z());
 
-                for (int i = 0; i < count; i++) {
-                    var angle = random.nextDouble() * Math.PI * 2;
-                    var randomFactor = random.nextDouble();
-                    var radialDistance = radius * Math.sqrt(randomFactor);
+                var minSep = radius / (float) Math.sqrt(count);
 
-                    var targetX = centerPos.x() + Math.cos(angle) * radialDistance;
-                    var targetZ = centerPos.z() + Math.sin(angle) * radialDistance;
-                    var targetY = groundY;
+                for (var i = 0; i < count; i++) {
+                    Vec3 targetPos = null;
 
-                    var targetPos = new Vec3(targetX, targetY, targetZ);
+                    for (int step = 0; step < 10; step++) {
+                        var angle = random.nextDouble() * Math.PI * 2;
+
+                        var randomFactor = random.nextDouble();
+                        var radialDistance = radius * Math.sqrt(randomFactor);
+
+                        var tx = centerPos.x() + Math.cos(angle) * radialDistance;
+                        var tz = centerPos.z() + Math.sin(angle) * radialDistance;
+
+                        final var candidate = new Vec3(tx, groundY, tz);
+
+                        if (targets.stream().noneMatch(tp -> tp.distanceTo(candidate) < minSep)) {
+                            targetPos = candidate;
+
+                            break;
+                        }
+                    }
+
+                    if (targetPos == null)
+                        continue;
+
+                    targets.add(targetPos);
 
                     var deltaXZ = targetPos.subtract(startPos).multiply(1, 0, 1);
                     var distanceXZ = deltaXZ.length();
                     var directionXZ = deltaXZ.normalize();
 
                     var startY = startPos.y();
-                    var deltaY = targetY - startY;
-                    var maxBaseHeight = Math.max(startY, targetY);
-                    var heightDiffToApex = (maxBaseHeight + apexHeight) - startY;
-
+                    var deltaY = groundY - startY;
+                    var heightDiffToApex = (Math.max(startY, groundY) + apexHeight) - startY;
                     var flightTime = Math.sqrt((4 * heightDiffToApex - 2 * deltaY) / gravity);
 
                     var verticalVelocity = (deltaY + 0.5 * gravity * flightTime * flightTime) / flightTime;
-
                     var horizontalSpeed = distanceXZ / flightTime;
-
                     var motion = new Vec3(directionXZ.x() * horizontalSpeed, verticalVelocity, directionXZ.z() * horizontalSpeed);
 
                     var star = new ConstellationStarEntity(RelicsEntities.CONSTELLATION_STAR.get(), level);
@@ -517,12 +530,8 @@ public class MidnightMantleItem extends RelicItem {
                     star.setFlawless(relic.isRelicFlawless(entity, stack));
                     star.setDeltaMovement(motion);
                     star.setCenter(centerPos);
-                    star.setMaster(i == 0);
                     star.setPos(startPos);
                     star.setOwner(entity);
-
-                    if (relic.isAbilityRankModifierUnlocked(entity, stack, "constellation", "stun"))
-                        star.setStun((float) relic.getStatValue(entity, stack, "constellation", "explosion_stun"));
 
                     level.addFreshEntity(star);
 
