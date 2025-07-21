@@ -446,7 +446,7 @@ public class MidnightMantleItem extends RelicItem {
         }
 
         @SubscribeEvent
-        public static void onItemPickup(ItemEntityPickupEvent event) {
+        public static void onItemPickup(ItemEntityPickupEvent.Post event) {
             CommonEvents.onInteract(event.getPlayer());
         }
 
