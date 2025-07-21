@@ -7,6 +7,7 @@ import com.mojang.math.Axis;
 import it.hurts.octostudios.octolib.client.animation.Tween;
 import it.hurts.octostudios.octolib.client.animation.easing.EaseType;
 import it.hurts.octostudios.octolib.client.animation.easing.TransitionType;
+import it.hurts.octostudios.octolib.client.particle.ExtendedUIParticle;
 import it.hurts.octostudios.octolib.client.particle.UIParticle;
 import it.hurts.octostudios.octolib.util.OctoColor;
 import it.hurts.sskirillss.relics.Relics;
@@ -18,11 +19,11 @@ import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescr
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ChainParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.research.AbilityResearchScreen;
 import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
-import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
+import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
@@ -45,7 +46,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import org.joml.Vector2f;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,14 +55,23 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
     @Getter
     @Setter
-    private float xSqueeze = 1F;
+    private float clickXSqueeze = 1F;
     @Getter
     @Setter
-    private float ySqueeze = 1F;
+    private float clickYSqueeze = 1F;
+    @Getter
+    @Setter
+    private float clickZRotation = 0F;
+
+    public Tween hoverTween;
+    private boolean hasHovered = false;
 
     @Getter
     @Setter
-    private float xRotation = 0F;
+    private float hoverXSqueeze = 1F;
+    @Getter
+    @Setter
+    private float hoverYSqueeze = 1F;
 
     public AbilityCardWidget(int x, int y, AbilityDescriptionScreen screen, String ability) {
         super(x, y, 38, 51);
@@ -103,7 +112,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             } else {
                 var unlocks = relic.getLockUnlocks(player, stack, ability) + 1;
 
-                //NetworkHandler.sendToServer(new C2SPacketAbilityUnlock(screen.container, screen.slot, ability, unlocks));
+                NetworkHandler.sendToServer(new C2SPacketAbilityUnlock(screen.container, screen.slot, ability, unlocks));
 
                 var random = player.getRandom();
 
@@ -112,23 +121,23 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                 var tween = Tween.create().setParallel(true);
 
-                tween.tweenMethod(this::setYSqueeze, this.getYSqueeze(), overshoot, 0.08D)
+                tween.tweenMethod(this::setClickYSqueeze, this.getClickYSqueeze(), overshoot, 0.08D)
                         .setEaseType(EaseType.EASE_OUT)
                         .setTransitionType(TransitionType.QUAD);
-                tween.tweenMethod(this::setXSqueeze, this.getXSqueeze(), overshoot, 0.08D)
+                tween.tweenMethod(this::setClickXSqueeze, this.getClickXSqueeze(), overshoot, 0.08D)
                         .setEaseType(EaseType.EASE_OUT)
                         .setTransitionType(TransitionType.QUAD);
 
-                tween.tweenMethod(this::setYSqueeze, overshoot, 1F, 0.12D)
+                tween.tweenMethod(this::setClickYSqueeze, overshoot, 1F, 0.12D)
                         .setDelay(0.04D)
                         .setEaseType(EaseType.EASE_IN)
                         .setTransitionType(TransitionType.QUAD);
-                tween.tweenMethod(this::setXSqueeze, overshoot, 1F, 0.12D)
+                tween.tweenMethod(this::setClickXSqueeze, overshoot, 1F, 0.12D)
                         .setDelay(0.04D)
                         .setEaseType(EaseType.EASE_IN)
                         .setTransitionType(TransitionType.QUAD);
 
-                var initialRotation = this.getXRotation();
+                var initialRotation = this.getClickZRotation();
                 var rotationBase = 0.05F * unlocks;
                 var amplitude = random.nextBoolean() ? rotationBase : -rotationBase;
                 var decay = 0.75F;
@@ -139,7 +148,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 for (var i = 0; i < 10; i++) {
                     var nextTarget = (i % 2 == 0 ? amplitude : -amplitude);
 
-                    tween.tweenMethod(this::setXRotation, lastTarget, nextTarget, segmentDuration)
+                    tween.tweenMethod(this::setClickZRotation, lastTarget, nextTarget, segmentDuration)
                             .setDelay(delay)
                             .setEaseType(i == 0 ? EaseType.EASE_OUT : EaseType.EASE_IN_OUT)
                             .setTransitionType(TransitionType.QUAD);
@@ -149,23 +158,22 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     amplitude *= decay;
                 }
 
-                tween.tweenMethod(this::setXRotation, lastTarget, 0f, segmentDuration)
+                tween.tweenMethod(this::setClickZRotation, lastTarget, 0f, segmentDuration)
                         .setDelay(delay)
                         .setEaseType(EaseType.EASE_IN);
 
                 tween.start();
 
-                for (int i = 0; i < unlocks * 50; i++) {
+                for (int i = 0; i < unlocks * 75; i++) {
                     var center = new Vec2(width / 2F, height / 2F);
                     var margin = new Vec2(center.x + MathUtils.randomFloat(random) * 7F, center.y + MathUtils.randomFloat(random) * 8.5F);
 
-                    var particle = new PixelUIParticle(5F, random.nextInt(20, 40), getX() + margin.x, getY() + margin.y, UIParticle.Layer.SCREEN, 10);
+                    var particle = new PixelUIParticle(5F, random.nextInt(20, 40), getX() + margin.x, getY() + margin.y, UIParticle.Layer.SCREEN, 110);
 
                     var size = (random.nextFloat() * 0.5F) + 0.75F;
-                    var angle = random.nextFloat() * Math.PI * 2;
 
-                    particle.setColors(new OctoColor(1F, 1F, random.nextFloat() * 0.25F, 1F), new OctoColor(1F, 0F, 0F, 0F));
-                    particle.setDirection((float) Math.cos(angle), (float) Math.sin(angle));
+                    particle.setColors(new OctoColor(1F, 0.5F + random.nextFloat() * 0.5F, random.nextFloat() * 0.25F, 1F), new OctoColor(1F, 0F, 0F, 0F));
+                    particle.setDirection(MathUtils.randomFloat(random),  MathUtils.randomFloat(random) * 0.25F);
                     particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
                     particle.getTransform().setSize(new Vector2f(size, size));
                     particle.setGravityDirection(0, 1);
@@ -183,13 +191,21 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                         var center = new Vec2(width / 2F, height / 2F);
                         var margin = new Vec2(center.x + MathUtils.randomFloat(random) * 7F, center.y + MathUtils.randomFloat(random) * 8.5F);
 
-                        var motion = new Vec2(margin.x - center.x, margin.y - center.y).normalized().scale(7.5F);
+                        var particle = new ExtendedUIParticle(new UIParticle.Texture2D(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/particle/chain.png"), 0, 0, 6, 6, 6, 6),
+                                5F, random.nextInt(40, 60), getX() + margin.x, getY() + margin.y, UIParticle.Layer.SCREEN, 110);
 
-                        ParticleStorage.addParticle(screen, new ChainParticleData(new Color(255, 255, 255),
-                                getX() + margin.x, getY() + margin.y, 1F + (random.nextFloat() * 0.5F), 50 + random.nextInt(20))
-                                .setDeltaX(random.nextFloat() * motion.x)
-                                .setDeltaY(random.nextFloat() * motion.y)
-                        );
+                        var size = (random.nextFloat() * 0.5F) + 0.75F;
+
+                        particle.setDirection(MathUtils.randomFloat(random),  MathUtils.randomFloat(random) * 0.25F);
+                        particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
+                        particle.getTransform().setSize(new Vector2f(size, size));
+                        particle.setGravityDirection(0, 1);
+                        particle.enableBlend(false);
+                        particle.setScreen(this.screen);
+                        particle.setGravity(0.5F);
+                        particle.setSpeed(3.5F);
+
+                        particle.instantiate();
                     }
 
                     soundManager.play(SimpleSoundInstance.forUI(SoundEvents.WITHER_BREAK_BLOCK, 1F));
@@ -236,9 +252,10 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         poseStack.translate((this.getX() + (this.width / 2F)), (this.getY() + (this.height / 2F)), 0);
 
-        poseStack.scale(this.getXSqueeze(), this.getYSqueeze(), 1F);
+        poseStack.scale(this.getHoverXSqueeze(), this.getHoverYSqueeze(), 1F);
+        poseStack.scale(this.getClickXSqueeze(), this.getClickYSqueeze(), 1F);
 
-        poseStack.mulPose(Axis.ZP.rotation(this.getXRotation()));
+        poseStack.mulPose(Axis.ZP.rotation(this.getClickZRotation()));
 
         var color = (float) ((canUpgrade ? 0.75F : 1.05F) + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
 
@@ -511,7 +528,43 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
     @Override
     public void onTick() {
+        var hovered = this.isHovered();
 
+        var overshoot = 1.075F;
+
+        if (hovered && !hasHovered) {
+            hasHovered = true;
+
+            if (hoverTween != null)
+                hoverTween.kill();
+
+            hoverTween = Tween.create().setParallel(true);
+
+            hoverTween.tweenMethod(this::setHoverYSqueeze, 1F, overshoot, 0.25D)
+                    .setEaseType(EaseType.EASE_OUT)
+                    .setTransitionType(TransitionType.QUAD);
+            hoverTween.tweenMethod(this::setHoverXSqueeze, 1F, overshoot, 0.25D)
+                    .setEaseType(EaseType.EASE_OUT)
+                    .setTransitionType(TransitionType.QUAD);
+
+            hoverTween.start();
+        } else if (!hovered && hasHovered) {
+            hasHovered = false;
+
+            if (hoverTween != null)
+                hoverTween.kill();
+
+            hoverTween = Tween.create().setParallel(true);
+
+            hoverTween.tweenMethod(this::setHoverYSqueeze, overshoot, 1F, 0.25D)
+                    .setEaseType(EaseType.EASE_IN)
+                    .setTransitionType(TransitionType.QUAD);
+            hoverTween.tweenMethod(this::setHoverXSqueeze, overshoot, 1F, 0.25D)
+                    .setEaseType(EaseType.EASE_IN)
+                    .setTransitionType(TransitionType.QUAD);
+
+            hoverTween.start();
+        }
     }
 
     @Override

@@ -56,9 +56,12 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
         RenderSystem.setShaderColor(color, color, color, 1F);
         RenderSystem.setShaderTexture(0, DescriptionTextures.LOGO);
 
-        poseStack.translate(this.getX() + (this.width / 2F) + Math.sin((player.tickCount + pPartialTick) * 0.075F), this.getY() + (this.height / 2F) + Math.cos((player.tickCount + pPartialTick) * 0.075F) * 0.5F, 0);
+        poseStack.translate(this.getX() + (this.width / 2F) + Math.sin((player.tickCount + pPartialTick) * 0.075F), this.getY() + (this.height / 2F) + Math.cos((player.tickCount + pPartialTick) * 0.075F) * 0.5F, 110);
+
+        var modifier = 1F + LogoWidget.getCurrentClicks() * 0.05F;
 
         poseStack.scale(this.getXSqueeze(), this.getYSqueeze(), 1F);
+        poseStack.scale(modifier, modifier, 1F);
 
         GUIRenderer.begin(DescriptionTextures.LOGO, poseStack)
                 .anchor(SpriteAnchor.CENTER)
@@ -119,7 +122,7 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
         if (remainingClicks == 0) {
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.LOGO_EXPLOSION.get(), 1F, 1F));
 
-            //screen.rebuildWidgets();
+            screen.rebuildWidgets();
         } else
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.LOGO_INFLATE.get(), 1F + LogoWidget.getCurrentClicks() * (1F / LogoWidget.MAX_CLICKS)));
     }
@@ -134,7 +137,10 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
         var random = player.getRandom();
 
         if (minecraft.player.tickCount % 2 == 0) {
-            var particle = new PixelUIParticle(0.4F, random.nextInt(30, 50), this.getX() + 5 + random.nextInt(width), this.getY() + random.nextInt(3), UIParticle.Layer.SCREEN, 10);
+            var modifier = 1F + LogoWidget.getCurrentClicks() * 0.05F;
+            var semiWidth = (int) (width * modifier / 2F);
+
+            var particle = new PixelUIParticle(0.4F, random.nextInt(30, 50), this.getX() + width / 2F + random.nextInt(-semiWidth, semiWidth), this.getY() + random.nextInt(3), UIParticle.Layer.SCREEN, 10);
 
             float size = (random.nextFloat() * 0.5F) + 0.75F;
 

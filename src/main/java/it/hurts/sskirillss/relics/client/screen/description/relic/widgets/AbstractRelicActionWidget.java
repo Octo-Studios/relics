@@ -11,6 +11,8 @@ import it.hurts.sskirillss.relics.client.screen.description.relic.particles.Expe
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
+import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -30,7 +32,7 @@ public abstract class AbstractRelicActionWidget extends AbstractDescriptionWidge
     private final RelicDescriptionScreen screen;
 
     public AbstractRelicActionWidget(int x, int y, PacketRelicTweak.Operation operation, RelicDescriptionScreen screen) {
-        super(x, y, 14, 13);
+        super(x, y, 14, 14);
 
         this.operation = operation;
         this.screen = screen;
@@ -42,19 +44,25 @@ public abstract class AbstractRelicActionWidget extends AbstractDescriptionWidge
     @Override
     public void onPress() {
         if (!isLocked())
-            NetworkHandler.sendToServer(new PacketRelicTweak(getScreen().getContainer(), getScreen().getSlot(), operation, Screen.hasShiftDown()));
+            NetworkHandler.sendToServer(new PacketRelicTweak(this.getScreen().getContainer(), getScreen().getSlot(), this.getOperation(), Screen.hasShiftDown()));
     }
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        var poseStack = guiGraphics.pose();
 
-        String actionId = operation.toString().toLowerCase(Locale.ROOT);
+        var actionId = this.getOperation().toString().toLowerCase(Locale.ROOT);
 
-        guiGraphics.blit(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/" + actionId + "_button_" + (isLocked() ? "inactive" : "active") + ".png"), getX(), getY(), 0, 0, width, height, width, height);
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/" + actionId + "_button_" + (this.isLocked() ? "inactive" : "active") + ".png"), poseStack)
+                .anchor(SpriteAnchor.TOP_LEFT)
+                .pos(this.getX(), this.getY())
+                .end();
 
-        if (isHovered)
-            guiGraphics.blit(DescriptionTextures.ACTION_BUTTON_OUTLINE, getX(), getY(), 0, 0, width, height, width, height);
+        if (this.isHoveredOrFocused())
+            GUIRenderer.begin(DescriptionTextures.ACTION_BUTTON_OUTLINE, poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(this.getX() - 1, this.getY() - 1)
+                    .end();
     }
 
     @Override

@@ -76,7 +76,7 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider, I
     }
 
     protected void initSidebar() {
-        //if (LogoWidget.getRemainingClicks() != 0)
+        if (LogoWidget.getRemainingClicks() != 0)
             this.addRenderableWidget(new LogoWidget(this.x + 313, this.y + 53, this));
 
 //        FIXME: Somebody do something :'\
