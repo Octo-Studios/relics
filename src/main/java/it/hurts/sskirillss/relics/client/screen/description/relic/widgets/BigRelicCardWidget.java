@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHoverableWidget {
-    private static final List<ResourceLocation> BACKGROUNDS = Stream.of("blue", "cyan", "green", "light_blue", "orange", "magenta", "purple", "red", "yellow")
+    public static final List<ResourceLocation> BACKGROUNDS = Stream.of("blue", "cyan", "green", "light_blue", "orange", "magenta", "purple", "red", "yellow")
             .map(color -> ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/backgrounds/" + color + ".png"))
             .toList();
 

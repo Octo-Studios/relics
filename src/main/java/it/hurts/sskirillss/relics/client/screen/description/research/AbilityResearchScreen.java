@@ -20,7 +20,7 @@ import it.hurts.sskirillss.relics.client.screen.description.research.widgets.Sta
 import it.hurts.sskirillss.relics.client.screen.description.research.widgets.TipWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
-import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.StarData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
@@ -598,7 +598,7 @@ public class AbilityResearchScreen extends DescriptionScreen {
                     point.x + MathUtils.randomFloat(random), point.y + MathUtils.randomFloat(random), 1F + (random.nextFloat() * 0.25F), 10 + random.nextInt(50), random.nextFloat() * 0.01F));
         });
 
-        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundRegistry.DISCONNECT_STARS.get(), 0.75F + minecraft.player.getRandom().nextFloat() * 0.5F, 0.75F));
+        minecraft.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.DISCONNECT_STARS.get(), 0.75F + minecraft.player.getRandom().nextFloat() * 0.5F, 0.75F));
     }
 
     @Override

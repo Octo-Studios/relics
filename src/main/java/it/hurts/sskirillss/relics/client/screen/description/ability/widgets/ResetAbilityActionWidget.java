@@ -6,7 +6,7 @@ import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescr
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
-import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.ChatFormatting;
@@ -34,7 +34,7 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
     @Override
     public void playDownSound(SoundManager handler) {
         if (!isLocked())
-            handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_RESET.get(), 1F));
+            handler.play(SimpleSoundInstance.forUI(RelicsSounds.TABLE_RESET.get(), 1F));
     }
 
     @Override

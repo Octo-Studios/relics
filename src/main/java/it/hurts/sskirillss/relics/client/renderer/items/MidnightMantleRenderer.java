@@ -6,8 +6,8 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.items.MidnightMantleFullMoonModel;
 import it.hurts.sskirillss.relics.client.models.items.MidnightMantleModel;
 import it.hurts.sskirillss.relics.client.models.items.MidnightMantleNewMoonModel;
-import it.hurts.sskirillss.relics.client.renderer.items.base.IRelicRenderer;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
+import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LightTexture;
@@ -23,7 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
-public class MidnightMantleRenderer implements ICurioRenderer, IRelicRenderer {
+public class MidnightMantleRenderer implements ICurioRenderer {
     private final MidnightMantleModel model;
 
     public MidnightMantleRenderer() {
@@ -54,7 +54,7 @@ public class MidnightMantleRenderer implements ICurioRenderer, IRelicRenderer {
 
         float flicker = 0.75F + 0.25F * Mth.sin(time * 0.15F);
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_stars_" + mode + ".png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : LightTexture.pack((int) (15 * flicker), (int) (15 * flicker)), OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_stars_" + mode + ".png")))), relic.isRelicFlawless(entity, stack) ? LightTexture.FULL_BRIGHT : LightTexture.pack((int) (15 * flicker), (int) (15 * flicker)), OverlayTexture.NO_OVERLAY);
 
         if (relic.canPlayerUseAbility(entity, stack, "phase")) {
             var deltaX = (float) (Mth.lerp(partialTicks, player.xCloakO, player.xCloak) - Mth.lerp(partialTicks, player.xo, player.getX()));
@@ -93,9 +93,9 @@ public class MidnightMantleRenderer implements ICurioRenderer, IRelicRenderer {
             poseStack.mulPose(Axis.ZP.rotation(tiltZ));
 
             if (mode.equals("new_moon"))
-                new MidnightMantleNewMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.eyes(this.getFlawlessOrDefaultTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_new_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                new MidnightMantleNewMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.eyes(FlawlessUtils.getTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_new_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
             else if (mode.equals("full_moon"))
-                new MidnightMantleFullMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.eyes(this.getFlawlessOrDefaultTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_full_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                new MidnightMantleFullMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.eyes(FlawlessUtils.getTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_full_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
             poseStack.popPose();
         }

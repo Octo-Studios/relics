@@ -5,7 +5,7 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
-import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -32,7 +32,7 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
     @Override
     public void playDownSound(SoundManager handler) {
         if (!isLocked())
-            handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_REROLL.get(), 1F));
+            handler.play(SimpleSoundInstance.forUI(RelicsSounds.TABLE_REROLL.get(), 1F));
     }
 
     @Override

@@ -66,5 +66,13 @@
     "falling_star_fall": {
         "category": "master",
         "sounds": [ { "name": "relics:falling_star_fall" } ]
+    },
+    "logo_inflate": {
+        "category": "master",
+        "sounds": [ { "name": "relics:logo_inflate" } ]
+    },
+    "logo_explosion": {
+        "category": "master",
+        "sounds": [ { "name": "relics:logo_explosion" } ]
     }
 }

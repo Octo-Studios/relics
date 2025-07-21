@@ -9,15 +9,15 @@ public class MathUtils {
         return -1 + 2 * random.nextFloat();
     }
 
-    public static float randomBetween(Random random, float min, float max) {
+    public static float randomBetween(RandomSource random, float min, float max) {
         return random.nextFloat() * (max - min) + min;
     }
 
-    public static double randomBetween(Random random, double min, double max) {
+    public static double randomBetween(RandomSource random, double min, double max) {
         return random.nextDouble() * (max - min) + min;
     }
 
-    public static int randomBetween(Random random, int min, int max) {
+    public static int randomBetween(RandomSource random, int min, int max) {
         return (int) Math.round(randomBetween(random, (double) min, (double) max));
     }
 

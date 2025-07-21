@@ -10,8 +10,10 @@ import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescr
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.research.particles.SmokeParticleData;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
+import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -24,7 +26,9 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
 
+import java.util.Comparator;
 import java.util.List;
 
 public class BigAbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
@@ -58,13 +62,13 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             GUIRenderer.begin(DescriptionTextures.getAbilityCardTexture(stack, ability), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .color(color, color, color, 1F)
-                    .pos(getX() + 8, getY() + 20)
+                    .pos(this.getX() + 8, this.getY() + 20)
                     .texSize(34, 49)
                     .end();
         else
-            GUIRenderer.begin(DescriptionTextures.BIG_CARD_BACKGROUND, poseStack)
+            GUIRenderer.begin(BigRelicCardWidget.pickClosestBackground(stack, BigRelicCardWidget.BACKGROUNDS), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(getX() + 7, getY() + 10)
+                    .pos(this.getX() + 8, this.getY() + 20)
                     .end();
 
         GUIRenderer.begin(canBeUpgraded ? isUnlocked ? DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_INACTIVE : isUnlocked ? DescriptionTextures.BIG_CARD_FRAME_LOCKED_ACTIVE : DescriptionTextures.BIG_CARD_FRAME_LOCKED_INACTIVE, poseStack)
@@ -167,6 +171,14 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         }
 
         poseStack.popPose();
+    }
+
+    private ResourceLocation pickClosestBackground(ItemStack itemStack, List<ResourceLocation> backgroundTextures) {
+        var cardColor = BigRelicCardWidget.getTextureColor(DescriptionTextures.getAbilityCardTexture(itemStack, this.screen.getSelectedAbility()));
+
+        return backgroundTextures.stream()
+                .min(Comparator.comparingDouble(texture -> BigRelicCardWidget.colorDistance(cardColor, BigRelicCardWidget.getTextureColor(texture))))
+                .orElse(null);
     }
 
     @Override

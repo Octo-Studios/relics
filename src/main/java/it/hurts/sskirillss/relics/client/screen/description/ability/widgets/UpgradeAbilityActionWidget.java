@@ -9,7 +9,7 @@ import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
-import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.ChatFormatting;
@@ -42,7 +42,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
             int level = relic.getAbilityLevel(minecraft.player, getScreen().getStack(), getAbility());
             int maxLevel = relic.getAbilityTemplate(minecraft.player, getScreen().getStack(), getAbility()).getInitialMaxLevel();
 
-            handler.play(SimpleSoundInstance.forUI(SoundRegistry.TABLE_UPGRADE.get(), Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility()) ? 2F : 1F + ((float) level / maxLevel)));
+            handler.play(SimpleSoundInstance.forUI(RelicsSounds.TABLE_UPGRADE.get(), Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility()) ? 2F : 1F + ((float) level / maxLevel)));
         }
     }
 

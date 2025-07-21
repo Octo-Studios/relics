@@ -21,7 +21,7 @@ public class Relics {
         RelicsItems.register(bus);
         TileRegistry.register(bus);
         RelicsBlocks.register(bus);
-        SoundRegistry.register(bus);
+        RelicsSounds.register(bus);
         BadgeRegistry.register(bus);
         RelicsEntities.register(bus);
         RelicsMobEffects.register(bus);

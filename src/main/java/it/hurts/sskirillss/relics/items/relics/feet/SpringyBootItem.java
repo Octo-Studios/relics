@@ -169,7 +169,7 @@ public class SpringyBootItem extends RelicItem {
                 relic.setLeaped(stack, true);
                 relic.addBounceCooldown(stack, 5);
 
-                level.playSound(null, entity.blockPosition(), SoundRegistry.SPRING_BOING.get(), SoundSource.MASTER, 5F, 0.5F);
+                level.playSound(null, entity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.MASTER, 5F, 0.5F);
             }
         }
 

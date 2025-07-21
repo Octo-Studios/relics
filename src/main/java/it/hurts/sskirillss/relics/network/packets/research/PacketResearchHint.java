@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -85,9 +85,9 @@ public class PacketResearchHint implements CustomPacketPayload {
             if (relic.testAbilityResearch(player, stack, ability)) {
                 relic.setAbilityResearched(player, stack, ability, true);
 
-                player.connection.send(new ClientboundSoundPacket(Holder.direct(SoundRegistry.FINISH_RESEARCH.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1F, 1F, random.nextLong()));
+                player.connection.send(new ClientboundSoundPacket(Holder.direct(RelicsSounds.FINISH_RESEARCH.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1F, 1F, random.nextLong()));
             } else
-                player.connection.send(new ClientboundSoundPacket(Holder.direct(SoundRegistry.CONNECT_STARS.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.75F, 0.75F + random.nextFloat() * 0.5F, random.nextLong()));
+                player.connection.send(new ClientboundSoundPacket(Holder.direct(RelicsSounds.CONNECT_STARS.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.75F, 0.75F + random.nextFloat() * 0.5F, random.nextLong()));
 
             try {
                 player.containerMenu.getSlot(slot).set(stack);

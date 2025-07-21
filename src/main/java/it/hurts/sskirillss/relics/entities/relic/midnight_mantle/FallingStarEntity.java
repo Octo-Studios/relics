@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.entities.relic.midnight_mantle;
 
 import it.hurts.sskirillss.relics.entities.ShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
-import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -270,7 +270,7 @@ public class FallingStarEntity extends ThrowableProjectile {
             });
         }
 
-        level.playSound(null, this.blockPosition(), SoundRegistry.FALLING_STAR_FALL.get(), SoundSource.MASTER, 0.5F, 1F + random.nextFloat() + this.bounces * 0.2F);
+        level.playSound(null, this.blockPosition(), RelicsSounds.FALLING_STAR_FALL.get(), SoundSource.MASTER, 0.5F, 1F + random.nextFloat() + this.bounces * 0.2F);
 
         var bounceChance = this.getBounceChance();
 

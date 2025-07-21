@@ -705,7 +705,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     default AbilityComponent randomizeAbilityStats(LivingEntity entity, ItemStack stack, String ability) {
         Map<String, StatTemplate> stats = getAbilityTemplate(entity, stack, ability).getStats();
 
-        Random random = new Random();
+        var random = entity.getRandom();
 
         double targetQuality;
 

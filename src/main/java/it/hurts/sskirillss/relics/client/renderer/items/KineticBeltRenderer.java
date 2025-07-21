@@ -4,8 +4,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.items.KineticBeltModel;
 import it.hurts.sskirillss.relics.client.models.items.KineticBeltWingsModel;
-import it.hurts.sskirillss.relics.client.renderer.items.base.IRelicRenderer;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
+import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LightTexture;
@@ -22,7 +22,7 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 import java.awt.*;
 
-public class KineticBeltRenderer implements ICurioRenderer, IRelicRenderer {
+public class KineticBeltRenderer implements ICurioRenderer {
     private final KineticBeltModel model;
 
     public KineticBeltRenderer() {
@@ -57,7 +57,7 @@ public class KineticBeltRenderer implements ICurioRenderer, IRelicRenderer {
 
             poseStack.translate(shakeX, shakeY, shakeZ);
 
-            new KineticBeltWingsModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityTranslucentCull(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt_wings.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, new Color(1F, 1F, 1F, 0.9F + Mth.sin(time * 2F) * 0.1F).getRGB());
+            new KineticBeltWingsModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityTranslucentCull(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt_wings.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY, new Color(1F, 1F, 1F, 0.9F + Mth.sin(time * 2F) * 0.1F).getRGB());
         }
 
         poseStack.popPose();

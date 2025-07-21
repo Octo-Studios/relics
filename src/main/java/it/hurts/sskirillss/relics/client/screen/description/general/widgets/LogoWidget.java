@@ -11,6 +11,7 @@ import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScre
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -18,6 +19,7 @@ import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
 import org.joml.Vector2f;
 
@@ -73,19 +75,53 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
     public void onPress() {
         super.onPress();
 
+        var intensity = 0.75F + LogoWidget.getCurrentClicks() * 0.15F;
+
+        var yPeak = 1F + (1.1F - 1F) * intensity;
+        var xPeak = 1F + (1.2F - 1F) * intensity;
+        var yValley = 1F - (1F - 0.95F) * intensity;
+        var xValley = 1F - (1F - 0.9F) * intensity;
+
         var tween = Tween.create().setParallel(true);
 
-        tween.tweenMethod(this::setYSqueeze, this.getYSqueeze(), 1.2F, 0.2D).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUAD);
-        tween.tweenMethod(this::setXSqueeze, this.getXSqueeze(), 1.2F, 0.2D).setEaseType(EaseType.EASE_OUT).setTransitionType(TransitionType.QUAD);
-        tween.tweenMethod(this::setYSqueeze, 1.2F, 1F, 0.4D).setDelay(0.2D).setEaseType(EaseType.EASE_OUT);
-        tween.tweenMethod(this::setXSqueeze, 1.2F, 1F, 0.4D).setDelay(0.2D).setEaseType(EaseType.EASE_IN);
+        tween.tweenMethod(this::setYSqueeze, this.getYSqueeze(), yPeak, 0.2D)
+                .setEaseType(EaseType.EASE_OUT)
+                .setTransitionType(TransitionType.QUAD);
+        tween.tweenMethod(this::setXSqueeze, this.getXSqueeze(), xPeak, 0.15D)
+                .setEaseType(EaseType.EASE_OUT)
+                .setTransitionType(TransitionType.QUAD);
+
+        tween.tweenMethod(this::setYSqueeze, yPeak, yValley, 0.18D)
+                .setDelay(0.2D)
+                .setEaseType(EaseType.EASE_IN_OUT)
+                .setTransitionType(TransitionType.QUAD);
+        tween.tweenMethod(this::setXSqueeze, xPeak, xValley, 0.17D)
+                .setDelay(0.15D)
+                .setEaseType(EaseType.EASE_IN_OUT)
+                .setTransitionType(TransitionType.QUAD);
+
+        tween.tweenMethod(this::setYSqueeze, yValley, 1F, 0.25D)
+                .setDelay(0.38D)
+                .setEaseType(EaseType.EASE_IN)
+                .setTransitionType(TransitionType.QUAD);
+        tween.tweenMethod(this::setXSqueeze, xValley, 1F, 0.2D)
+                .setDelay(0.32D)
+                .setEaseType(EaseType.EASE_IN)
+                .setTransitionType(TransitionType.QUAD);
 
         tween.start();
 
-        LogoWidget.addClicks(1);
+        var remainingClicks = LogoWidget.getRemainingClicks();
 
-//        if (LogoWidget.getRemainingClicks() == 0)
-//            screen.rebuildWidgets();
+        if (remainingClicks > 0)
+            LogoWidget.addClicks(1);
+
+        if (remainingClicks == 0) {
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.LOGO_EXPLOSION.get(), 1F, 1F));
+
+            //screen.rebuildWidgets();
+        } else
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.LOGO_INFLATE.get(), 1F + LogoWidget.getCurrentClicks() * (1F / LogoWidget.MAX_CLICKS)));
     }
 
     @Override

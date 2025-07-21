@@ -15,7 +15,7 @@ import it.hurts.sskirillss.relics.client.models.items.base.SidedFPRCurioModel;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
-import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
@@ -183,7 +183,7 @@ public class RageGloveItem extends RelicItem implements IRenderableCurio {
 
             player.fallDistance = 0F;
 
-            level.playSound(null, player.blockPosition(), SoundRegistry.SPURT.get(), SoundSource.MASTER, 1F, 0.75F + random.nextFloat() * 0.5F);
+            level.playSound(null, player.blockPosition(), RelicsSounds.SPURT.get(), SoundSource.MASTER, 1F, 0.75F + random.nextFloat() * 0.5F);
 
             Vec3 start = current.add(0, 1, 0);
             Vec3 end = target.add(0, 1, 0);

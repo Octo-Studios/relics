@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.renderer.items.base;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.LightTexture;
@@ -20,7 +21,7 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 import java.util.function.Supplier;
 
-public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends EntityModel<?> & INecklaceModel<T>> implements ICurioRenderer, IRelicRenderer {
+public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends EntityModel<?> & INecklaceModel<T>> implements ICurioRenderer {
     private final M model;
     private final ResourceLocation texture;
 
@@ -48,7 +49,7 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
 
         poseStack.translate(0.0F, 1.0F, 0.015F);
 
-        var vertexConsumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.entityTranslucentCull(this.getFlawlessOrDefaultTexture(player, stack, texture)), stack.hasFoil());
+        var vertexConsumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.entityTranslucentCull(FlawlessUtils.getTexture(player, stack, texture)), stack.hasFoil());
 
         this.model.getBodyPart().getChild("neck").render(poseStack, vertexConsumer, relic.isRelicFlawless(player, stack) ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 

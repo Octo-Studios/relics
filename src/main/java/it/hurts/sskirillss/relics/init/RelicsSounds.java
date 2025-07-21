@@ -8,7 +8,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class SoundRegistry {
+public class RelicsSounds {
     public static final DeferredRegister<SoundEvent> SOUNDS = DeferredRegister.create(BuiltInRegistries.SOUND_EVENT, Relics.MODID);
 
     public static final DeferredHolder<SoundEvent, SoundEvent> RICOCHET = SOUNDS.register("ricochet", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "ricochet")));
@@ -31,6 +31,9 @@ public class SoundRegistry {
     public static final DeferredHolder<SoundEvent, SoundEvent> CONNECT_STARS = SOUNDS.register("connect_stars", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "connect_stars")));
     public static final DeferredHolder<SoundEvent, SoundEvent> DISCONNECT_STARS = SOUNDS.register("disconnect_stars", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "disconnect_stars")));
     public static final DeferredHolder<SoundEvent, SoundEvent> FINISH_RESEARCH = SOUNDS.register("finish_research", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "finish_research")));
+
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOGO_INFLATE = SOUNDS.register("logo_inflate", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "logo_inflate")));
+    public static final DeferredHolder<SoundEvent, SoundEvent> LOGO_EXPLOSION = SOUNDS.register("logo_explosion", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "logo_explosion")));
 
     public static void register(IEventBus bus) {
         SOUNDS.register(bus);

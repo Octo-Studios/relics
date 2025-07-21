@@ -9,7 +9,7 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.init.HotkeyRegistry;
-import it.hurts.sskirillss.relics.init.SoundRegistry;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
@@ -476,7 +476,7 @@ public class HUDRenderHandler {
                 cache.setIconShakeDelta(Math.min(20, delta + (delta > 0 ? 5 : 15)));
 
                 MC.getSoundManager().play(SimpleSoundInstance.forUI(relic.isAbilityOnCooldown(player, stack, ability.getId())
-                        ? SoundRegistry.ABILITY_COOLDOWN.get() : SoundRegistry.ABILITY_LOCKED.get(), 1F));
+                        ? RelicsSounds.ABILITY_COOLDOWN.get() : RelicsSounds.ABILITY_LOCKED.get(), 1F));
 
                 event.setCanceled(true);
 
@@ -487,7 +487,7 @@ public class HUDRenderHandler {
 
             CastType type = relic.getAbilityTemplate(player, stack, ability.getId()).getCastData().getType();
 
-            MC.getSoundManager().play(SimpleSoundInstance.forUI(SoundRegistry.ABILITY_CAST.get(), 1F));
+            MC.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.ABILITY_CAST.get(), 1F));
 
             switch (type) {
                 case INSTANTANEOUS -> {

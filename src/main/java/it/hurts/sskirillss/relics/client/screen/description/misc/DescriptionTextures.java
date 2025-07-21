@@ -48,7 +48,7 @@ public class DescriptionTextures {
     public static final ResourceLocation BIG_CARD_FRAME_LOCKED_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_locked_inactive.png");
     public static final ResourceLocation BIG_CARD_FRAME_OUTLINE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_outline.png");
 
-    public static final ResourceLocation CHAINS_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/chains_inactive.png");
+    public static final ResourceLocation ABILITY_CHAINS_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/chains_inactive.png");
 
     public static final ResourceLocation SMALL_STAR_HOLE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/small_star_hole.png");
     public static final ResourceLocation SMALL_STAR_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/small_star_active.png");

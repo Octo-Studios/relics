@@ -7,6 +7,7 @@ import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceArcModel;
 import it.hurts.sskirillss.relics.client.models.items.JellyfishNecklaceModel;
 import it.hurts.sskirillss.relics.client.renderer.items.base.AbstractNecklaceRenderer;
 import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
+import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LightTexture;
@@ -59,7 +60,7 @@ public class JellyfishNecklaceRenderer extends AbstractNecklaceRenderer<LivingEn
 
             poseStack.scale(scale, scale, scale);
 
-            new JellyfishNecklaceArcModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(this.getFlawlessOrDefaultTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/jellyfish_necklace_arc_" + ((int) (time % 4) + 1) + ".png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+            new JellyfishNecklaceArcModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutoutNoCull(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/jellyfish_necklace_arc_" + ((int) (time % 4) + 1) + ".png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
             poseStack.popPose();
         }

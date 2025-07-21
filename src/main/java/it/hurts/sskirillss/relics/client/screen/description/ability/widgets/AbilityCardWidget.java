@@ -3,6 +3,12 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import it.hurts.octostudios.octolib.client.animation.Tween;
+import it.hurts.octostudios.octolib.client.animation.easing.EaseType;
+import it.hurts.octostudios.octolib.client.animation.easing.TransitionType;
+import it.hurts.octostudios.octolib.client.particle.UIParticle;
+import it.hurts.octostudios.octolib.util.OctoColor;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
@@ -13,19 +19,18 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.particles.ChainParticleData;
-import it.hurts.sskirillss.relics.client.screen.description.relic.particles.SparkParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.research.AbilityResearchScreen;
+import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
-import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.lock.PacketAbilityUnlock;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
@@ -37,8 +42,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec2;
+import org.joml.Vector2f;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -47,6 +52,17 @@ import java.util.List;
 public class AbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     private final AbilityDescriptionScreen screen;
     private final String ability;
+
+    @Getter
+    @Setter
+    private float xSqueeze = 1F;
+    @Getter
+    @Setter
+    private float ySqueeze = 1F;
+
+    @Getter
+    @Setter
+    private float xRotation = 0F;
 
     public AbilityCardWidget(int x, int y, AbilityDescriptionScreen screen, String ability) {
         super(x, y, 38, 51);
@@ -63,9 +79,9 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        boolean isEnoughLevel = relic.isEnoughLevel(player, stack, ability);
-        boolean isLockUnlocked = relic.isLockUnlocked(player, stack, ability);
-        boolean isAbilityResearched = relic.isAbilityResearched(player, stack, ability);
+        var isEnoughLevel = relic.isEnoughLevel(player, stack, ability);
+        var isLockUnlocked = relic.isLockUnlocked(player, stack, ability);
+        var isAbilityResearched = relic.isAbilityResearched(player, stack, ability);
 
         SoundManager soundManager = minecraft.getSoundManager();
 
@@ -85,24 +101,80 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 } else
                     minecraft.setScreen(new AbilityResearchScreen(minecraft.player, screen.container, screen.slot, screen, ability));
             } else {
-                int unlocks = relic.getLockUnlocks(player, stack, ability) + 1;
+                var unlocks = relic.getLockUnlocks(player, stack, ability) + 1;
 
-                RandomSource random = minecraft.player.getRandom();
+                //NetworkHandler.sendToServer(new C2SPacketAbilityUnlock(screen.container, screen.slot, ability, unlocks));
+
+                var random = player.getRandom();
+
+                var overshootFactor = 0.05F * unlocks;
+                var overshoot = 1F + overshootFactor;
+
+                var tween = Tween.create().setParallel(true);
+
+                tween.tweenMethod(this::setYSqueeze, this.getYSqueeze(), overshoot, 0.08D)
+                        .setEaseType(EaseType.EASE_OUT)
+                        .setTransitionType(TransitionType.QUAD);
+                tween.tweenMethod(this::setXSqueeze, this.getXSqueeze(), overshoot, 0.08D)
+                        .setEaseType(EaseType.EASE_OUT)
+                        .setTransitionType(TransitionType.QUAD);
+
+                tween.tweenMethod(this::setYSqueeze, overshoot, 1F, 0.12D)
+                        .setDelay(0.04D)
+                        .setEaseType(EaseType.EASE_IN)
+                        .setTransitionType(TransitionType.QUAD);
+                tween.tweenMethod(this::setXSqueeze, overshoot, 1F, 0.12D)
+                        .setDelay(0.04D)
+                        .setEaseType(EaseType.EASE_IN)
+                        .setTransitionType(TransitionType.QUAD);
+
+                var initialRotation = this.getXRotation();
+                var rotationBase = 0.05F * unlocks;
+                var amplitude = random.nextBoolean() ? rotationBase : -rotationBase;
+                var decay = 0.75F;
+                var segmentDuration = 0.2D;
+                var delay = 0D;
+                var lastTarget = initialRotation;
+
+                for (var i = 0; i < 10; i++) {
+                    var nextTarget = (i % 2 == 0 ? amplitude : -amplitude);
+
+                    tween.tweenMethod(this::setXRotation, lastTarget, nextTarget, segmentDuration)
+                            .setDelay(delay)
+                            .setEaseType(i == 0 ? EaseType.EASE_OUT : EaseType.EASE_IN_OUT)
+                            .setTransitionType(TransitionType.QUAD);
+
+                    lastTarget = nextTarget;
+                    delay += segmentDuration;
+                    amplitude *= decay;
+                }
+
+                tween.tweenMethod(this::setXRotation, lastTarget, 0f, segmentDuration)
+                        .setDelay(delay)
+                        .setEaseType(EaseType.EASE_IN);
+
+                tween.start();
 
                 for (int i = 0; i < unlocks * 50; i++) {
                     var center = new Vec2(width / 2F, height / 2F);
                     var margin = new Vec2(center.x + MathUtils.randomFloat(random) * 7F, center.y + MathUtils.randomFloat(random) * 8.5F);
 
-                    var motion = new Vec2(margin.x - center.x, margin.y - center.y).normalized().scale(5F + unlocks);
+                    var particle = new PixelUIParticle(5F, random.nextInt(20, 40), getX() + margin.x, getY() + margin.y, UIParticle.Layer.SCREEN, 10);
 
-                    ParticleStorage.addParticle(screen, new SparkParticleData(new Color(150 + random.nextInt(100), 100 + random.nextInt(50), 0),
-                            getX() + margin.x, getY() + margin.y, 1F + (random.nextFloat() * 0.5F), 20 + random.nextInt(100))
-                            .setDeltaX(random.nextFloat() * motion.x)
-                            .setDeltaY(random.nextFloat() * motion.y)
-                    );
+                    var size = (random.nextFloat() * 0.5F) + 0.75F;
+                    var angle = random.nextFloat() * Math.PI * 2;
+
+                    particle.setColors(new OctoColor(1F, 1F, random.nextFloat() * 0.25F, 1F), new OctoColor(1F, 0F, 0F, 0F));
+                    particle.setDirection((float) Math.cos(angle), (float) Math.sin(angle));
+                    particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
+                    particle.getTransform().setSize(new Vector2f(size, size));
+                    particle.setGravityDirection(0, 1);
+                    particle.setScreen(this.screen);
+                    particle.setGravity(0.25F);
+                    particle.setSpeed(2.5F);
+
+                    particle.instantiate();
                 }
-
-                NetworkHandler.sendToServer(new PacketAbilityUnlock(screen.container, screen.slot, ability, unlocks));
 
                 soundManager.play(SimpleSoundInstance.forUI(SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, 1F));
 
@@ -131,28 +203,28 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        var player = Minecraft.getInstance().player;
+        var player = this.minecraft.player;
 
-        if (player == null || !(screen.stack.getItem() instanceof IRelicItem relic))
+        if (player == null || !(this.screen.stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var stack = screen.getStack();
+        var stack = this.screen.getStack();
 
-        var manager = minecraft.getTextureManager();
+        var manager = this.minecraft.getTextureManager();
         var poseStack = guiGraphics.pose();
 
-        var unlocks = relic.getLockUnlocks(player, stack, ability);
+        var unlocks = relic.getLockUnlocks(player, stack, this.ability);
 
-        var isEnoughLevel = relic.isEnoughLevel(player, stack, ability);
-        var isLockUnlocked = relic.isLockUnlocked(player, stack, ability);
-        var isAbilityResearched = relic.isAbilityResearched(player, stack, ability);
+        var isEnoughLevel = relic.isEnoughLevel(player, stack, this.ability);
+        var isLockUnlocked = relic.isLockUnlocked(player, stack, this.ability);
+        var isAbilityResearched = relic.isAbilityResearched(player, stack, this.ability);
 
         var canUse = isEnoughLevel && isLockUnlocked && isAbilityResearched;
 
-        var canUpgrade = relic.mayPlayerUpgrade(player, stack, ability);
-        var canResearch = relic.mayResearch(player, stack, ability);
+        var canUpgrade = relic.mayPlayerUpgrade(player, stack, this.ability);
+        var canResearch = relic.mayResearch(player, stack, this.ability);
 
-        var canBeUpgraded = relic.canBeUpgraded(player, stack, ability);
+        var canBeUpgraded = relic.canBeUpgraded(player, stack, this.ability);
 
         var hasAction = canUpgrade || canResearch;
 
@@ -162,7 +234,11 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         poseStack.pushPose();
 
-        poseStack.translate((getX() + (width / 2F)), (getY() + (height / 2F)), 0);
+        poseStack.translate((this.getX() + (this.width / 2F)), (this.getY() + (this.height / 2F)), 0);
+
+        poseStack.scale(this.getXSqueeze(), this.getYSqueeze(), 1F);
+
+        poseStack.mulPose(Axis.ZP.rotation(this.getXRotation()));
 
         var color = (float) ((canUpgrade ? 0.75F : 1.05F) + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
 
@@ -205,11 +281,10 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                         .end();
             }
         } else {
-            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/chains_active_" + unlocks + ".png") : DescriptionTextures.CHAINS_INACTIVE, poseStack)
+            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/chains_active_" + unlocks + ".png") : DescriptionTextures.ABILITY_CHAINS_INACTIVE, poseStack)
                     .pos(0, -1)
                     .end();
 
-            MutableComponent levelComponent = Component.literal(String.valueOf(relic.getAbilityTemplate(player, stack, ability).getRequiredLevel())).withStyle(ChatFormatting.BOLD);
 
             poseStack.pushPose();
 
@@ -218,7 +293,9 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             poseStack.scale(0.5F, 0.5F, 0.5F);
 
-            guiGraphics.drawString(minecraft.font, levelComponent, (-(width / 2) + 16) * 2 - minecraft.font.width(levelComponent) / 2, (-(height / 2) + 24) * 2, isEnoughLevel ? 0xFFE278 : 0xB7AED9, true);
+            var requiredLevelComponent = Component.literal(String.valueOf(relic.getAbilityTemplate(player, stack, ability).getRequiredLevel())).withStyle(ChatFormatting.BOLD);
+
+            guiGraphics.drawString(minecraft.font, requiredLevelComponent, (-(width / 2) + 19) * 2 - minecraft.font.width(requiredLevelComponent) / 2, (-(height / 2) + 26) * 2, isEnoughLevel ? 0xFFE278 : 0xB7AED9, true);
 
             poseStack.popPose();
         }
