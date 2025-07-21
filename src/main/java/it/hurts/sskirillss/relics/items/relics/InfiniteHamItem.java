@@ -10,11 +10,7 @@ import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
 import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourceTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourcesTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
@@ -126,20 +122,6 @@ public class InfiniteHamItem extends RelicItem {
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .step(100)
-                        .sources(LevelingSourcesTemplate.builder()
-                                .source(LevelingSourceTemplate.abilityBuilder("regeneration")
-                                        .initialValue(1)
-                                        .gem(GemShape.SQUARE, GemColor.ORANGE)
-                                        .build())
-                                .source(LevelingSourceTemplate.abilityBuilder("marinade")
-                                        .initialValue(1)
-                                        .gem(GemShape.SQUARE, GemColor.ORANGE)
-                                        .build())
-                                .source(LevelingSourceTemplate.abilityBuilder("meat_bat")
-                                        .initialValue(1)
-                                        .gem(GemShape.SQUARE, GemColor.ORANGE)
-                                        .build())
-                                .build())
                         .build())
                 .style(StyleTemplate.builder()
                         .tooltip(TooltipData.builder()
@@ -202,8 +184,7 @@ public class InfiniteHamItem extends RelicItem {
         if (eaten > 0) {
             addPieces(stack, -eaten);
 
-            if (isLevelingSourceUnlocked(player, stack, "regeneration"))
-                spreadRelicExperience(player, stack, eaten);
+            spreadRelicExperience(player, stack, eaten);
         }
 
         return stack;
@@ -344,8 +325,7 @@ public class InfiniteHamItem extends RelicItem {
             if (charge <= 0)
                 return;
 
-            if (relic.isLevelingSourceUnlocked(player, stack, "meat_bat"))
-                relic.spreadRelicExperience(player, stack, charge);
+            relic.spreadRelicExperience(player, stack, charge);
 
             event.setAmount((float) (event.getAmount() + (relic.getStatValue(player, stack, "meat_bat", "damage") * charge)));
             event.getEntity().addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) Math.round(relic.getStatValue(player, stack, "meat_bat", "stun") * charge * 20), 0));
@@ -375,8 +355,7 @@ public class InfiniteHamItem extends RelicItem {
             else {
                 slotStack.set(DataComponents.POTION_CONTENTS, new PotionContents(Optional.empty(), Optional.empty(), effects));
 
-                if (relic.isLevelingSourceUnlocked(player, slotStack, "marinade"))
-                    relic.spreadRelicExperience(player, slotStack, effects.size());
+                relic.spreadRelicExperience(player, slotStack, effects.size());
             }
 
             var bottle = new ItemStack(Items.GLASS_BOTTLE);

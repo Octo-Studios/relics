@@ -87,7 +87,8 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         if (this.selectedAbility == null)
             this.setSelectedAbility(relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream().findFirst().get());
 
-        this.addRenderableWidget(new PageWidget(x + 242, y + 35, this, DescriptionPage.DESCRIPTION));
+        this.addRenderableWidget(new PageWidget(x + 223, y + 35, this, DescriptionPage.DESCRIPTION));
+        this.addRenderableWidget(new PageWidget(x + 242, y + 35, this, DescriptionPage.EXPERIENCE));
         this.addRenderableWidget(new PageWidget(x + 261, y + 35, this, DescriptionPage.STATISTIC));
 
         var ability = getSelectedAbility();
@@ -155,6 +156,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         switch (this.getPage()) {
             case DESCRIPTION -> container = new AbilityDescriptionContainerWidget(x + 107, y + 77, this);
             case STATISTIC -> container = new AbilityStatisticContainerWidget(x + 107, y + 77, this);
+            case EXPERIENCE -> container = new AbilityExperienceContainerWidget(x + 107, y + 77, this);
         }
 
         if (container != null) {

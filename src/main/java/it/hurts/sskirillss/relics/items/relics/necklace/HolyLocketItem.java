@@ -15,8 +15,6 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourceTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourcesTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
@@ -117,20 +115,6 @@ public class HolyLocketItem extends RelicItem {
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .step(100)
-                        .sources(LevelingSourcesTemplate.builder()
-                                .source(LevelingSourceTemplate.abilityBuilder("faith")
-                                        .initialValue(1)
-                                        .gem(GemShape.SQUARE, GemColor.ORANGE)
-                                        .build())
-                                .source(LevelingSourceTemplate.abilityBuilder("penitence")
-                                        .initialValue(1)
-                                        .gem(GemShape.SQUARE, GemColor.ORANGE)
-                                        .build())
-                                .source(LevelingSourceTemplate.abilityBuilder("ascension")
-                                        .initialValue(1)
-                                        .gem(GemShape.SQUARE, GemColor.ORANGE)
-                                        .build())
-                                .build())
                         .build())
                 .style(StyleTemplate.builder()
                         .tooltip((player, stack) -> getMode(stack) == Mode.HOLINESS

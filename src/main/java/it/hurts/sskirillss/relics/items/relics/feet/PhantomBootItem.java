@@ -16,8 +16,6 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourceTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourcesTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemColor;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.misc.GemShape;
@@ -78,12 +76,6 @@ public class PhantomBootItem extends RelicItem implements IRenderableCurio {
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .step(100)
-                        .sources(LevelingSourcesTemplate.builder()
-                                .source(LevelingSourceTemplate.abilityBuilder("bridge")
-                                        .initialValue(1)
-                                        .gem(GemShape.SQUARE, GemColor.PURPLE)
-                                        .build())
-                                .build())
                         .build())
                 .style(StyleTemplate.builder()
                         .tooltip(TooltipData.builder()

@@ -486,36 +486,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         return RelicSlotModifier.builder().build();
     }
 
-    @UnstableApi
-    default boolean isLevelingSourceUnlocked(LivingEntity entity, ItemStack stack, String source) {
-        var data = getLevelingSourceTemplate(entity, stack, source);
-        var ability = data.getRequiredAbility();
-
-        return isLevelingSourceEnabled(entity, stack, source) && getRelicLevel(entity, stack) >= data.getRequiredLevel() && (ability.isEmpty() || isAbilityUnlocked(entity, stack, ability));
-    }
-
-    @UnstableApi
-    default boolean isLevelingSourceEnabled(LivingEntity entity, ItemStack stack, String source) {
-        var data = getLevelingSourceTemplate(entity, stack, source);
-        var ability = data.getRequiredAbility();
-
-        return data.getRequiredAbility().isEmpty() || isAbilityEnabled(entity, stack, ability);
-    }
-
-    @UnstableApi
-    default int getLevelingSourceValue(LivingEntity entity, ItemStack stack, String source) {
-        var data = getLevelingSourceTemplate(entity, stack, source);
-
-        // TODO: Use component value instead
-        return data.getInitialValue();
-    }
-
-    @UnstableApi
-    default int getLevelingSourceLevel(ItemStack stack, String source) {
-        // TODO: Use component value instead
-        return 1;
-    }
-
     default LootTemplate getLootTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getLoot();
     }

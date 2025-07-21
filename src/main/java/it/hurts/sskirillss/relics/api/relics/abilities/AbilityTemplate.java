@@ -4,7 +4,6 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
-import io.netty.util.internal.UnstableApi;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
@@ -14,12 +13,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import org.jetbrains.annotations.ApiStatus;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -42,6 +37,7 @@ public class AbilityTemplate {
     private final ResearchTemplate researchTemplate;
     private final StatisticTemplate statistic;
     private final List<String> modes;
+    private final List<String> experienceSources;
     private final Multimap<Integer, String> rankModifiers;
 
     public static AbilityTemplateBuilder builder(String id) {
@@ -75,6 +71,7 @@ public class AbilityTemplate {
         private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
         private StatisticTemplate statistic = StatisticTemplate.builder().build();
         private List<String> modes = new ArrayList<>();
+        private List<String> experienceSources = new ArrayList<>();
         private Multimap<Integer, String> rankModifiers = LinkedHashMultimap.create();
 
         public AbilityTemplateBuilder(String id) {
@@ -157,10 +154,14 @@ public class AbilityTemplate {
             return this;
         }
 
-        @UnstableApi
-        @ApiStatus.Experimental
         public AbilityTemplateBuilder modes(String... mode) {
             this.modes.addAll(Lists.newArrayList(mode));
+
+            return this;
+        }
+
+        public AbilityTemplateBuilder experienceSources(String... source) {
+            this.experienceSources.addAll(Lists.newArrayList(source));
 
             return this;
         }
@@ -172,7 +173,7 @@ public class AbilityTemplate {
         }
 
         public AbilityTemplate build() {
-            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredPoints, this.castData, this.researchTemplate, this.statistic, this.modes, this.rankModifiers);
+            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredPoints, this.castData, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers);
         }
     }
 }

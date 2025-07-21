@@ -4,8 +4,6 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourceTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingSourcesTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
@@ -184,27 +182,6 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link LevelingSourcesTemplate} describing XP sources in the default leveling configuration.
-     *
-     * @return the default {@link LevelingSourcesTemplate}
-     */
-    @ApiStatus.Internal
-    default LevelingSourcesTemplate getDefaultLevelingSourcesTemplate() {
-        return getDefaultLevelingTemplate().getSources();
-    }
-
-    /**
-     * Retrieves a specific {@link LevelingSourceTemplate} by its ID from the default leveling sources.
-     *
-     * @param source the ID of the XP source
-     * @return the corresponding {@link LevelingSourceTemplate}, or {@code null} if not found
-     */
-    @ApiStatus.Internal
-    default LevelingSourceTemplate getDefaultLevelingSourceTemplate(String source) {
-        return getDefaultLevelingSourcesTemplate().getSources().get(source);
-    }
-
-    /**
      * Returns the {@link StatisticTemplate} from the default relic template, without context overrides.
      *
      * @return the default {@link StatisticTemplate}
@@ -306,33 +283,6 @@ public interface IRelicTemplateHolder {
     @ApiStatus.NonExtendable
     default LevelingTemplate getLevelingTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getLeveling();
-    }
-
-    /**
-     * Returns the {@link LevelingSourcesTemplate} describing XP sources from the contextual leveling configuration.
-     *
-     * @param entity the holder of the item
-     * @param stack  the item stack instance
-     * @return the contextual {@link LevelingSourcesTemplate}
-     */
-    @ApiStatus.Obsolete
-    @ApiStatus.NonExtendable
-    default LevelingSourcesTemplate getLevelingSourcesTemplate(LivingEntity entity, ItemStack stack) {
-        return getRelicTemplate(entity, stack).getLeveling().getSources();
-    }
-
-    /**
-     * Retrieves a specific {@link LevelingSourceTemplate} by its ID from the contextual leveling configuration.
-     *
-     * @param entity the holder of the item
-     * @param stack  the item stack instance
-     * @param source the ID of the leveling source
-     * @return the contextual {@link LevelingSourceTemplate}, or {@code null} if not found
-     */
-    @ApiStatus.Obsolete
-    @ApiStatus.NonExtendable
-    default LevelingSourceTemplate getLevelingSourceTemplate(LivingEntity entity, ItemStack stack, String source) {
-        return getRelicTemplate(entity, stack).getLeveling().getSources().getSources().get(source);
     }
 
     /**

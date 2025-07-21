@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.description_categories;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.experience.ExperienceDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -18,9 +18,10 @@ public class SynergyDescriptionCategory extends DescriptionCategory {
         return 3;
     }
 
+    // FIXME
     @Override
     public DescriptionScreen getScreen(DescriptionScreen source) {
-        return new ExperienceDescriptionScreen(Minecraft.getInstance().player, source.container, source.slot, source.screen);
+        return new RelicDescriptionScreen(Minecraft.getInstance().player, source.container, source.slot, source.screen);
     }
 
     @Override
