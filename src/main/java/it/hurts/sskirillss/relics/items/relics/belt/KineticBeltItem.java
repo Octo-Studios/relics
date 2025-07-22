@@ -274,8 +274,8 @@ public class KineticBeltItem extends RelicItem {
 
                     var additional = original * relic.getStatValue(entity, stack, "gliding", "damage");
 
-                    if (relic.canAddRelicExperience(entity, stack, "gliding", "damage"))
-                        relic.addRelicExperience(entity, stack, "gliding", "damage", additional);
+                    if (relic.canAddRelicExperience(entity, stack, "gliding", "strike"))
+                        relic.addRelicExperience(entity, stack, "gliding", "strike", additional);
                     relic.addAbilityMetricValue(entity, stack, "gliding", "damage", additional);
 
                     event.setNewDamage((float) (original + additional));
