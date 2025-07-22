@@ -2,7 +2,6 @@
   "replace": false,
   "values": [
     "relics:reflective_necklace",
-    "relics:jellyfish_necklace",
-    "relics:holy_locket"
+    "relics:jellyfish_necklace"
   ]
 }

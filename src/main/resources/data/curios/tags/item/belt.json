@@ -1,8 +1,6 @@
 {
   "replace": false,
   "values": [
-    "relics:drowned_belt",
-    "relics:hunter_belt",
     "relics:kinetic_belt"
   ]
 }
