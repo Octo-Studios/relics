@@ -15,7 +15,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Scheduler;
+import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
@@ -253,7 +253,7 @@ public class LeafyMantleItem extends RelicItem {
                 var blocks = 0;
 
                 for (var pos : positions) {
-                    Scheduler.schedule(blocks + random.nextInt(10), () -> {
+                    ServerScheduler.schedule(blocks + random.nextInt(10), () -> {
                         var leaves = new LeavesBlockEntity(RelicsEntities.LEAVES_BLOCK.get(), level);
 
                         var posVec = new Vec3(pos.getX() + 0.5D, pos.getY() + 0.5D, pos.getZ() + 0.5D);
@@ -289,7 +289,7 @@ public class LeafyMantleItem extends RelicItem {
                     if (diff > 0) {
                         var healAmount = diff;
 
-                        Scheduler.schedule(1, () -> entity.heal(healAmount));
+                        ServerScheduler.schedule(1, () -> entity.heal(healAmount));
                     }
                 }
             }

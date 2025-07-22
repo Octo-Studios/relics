@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.AbilityBadgeWidget;
@@ -40,7 +41,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
-import java.util.ArrayList;
+import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
 public class AbilityDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
@@ -144,11 +145,11 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             }
         }
 
-        if (relic.isAbilityUpgradeEnabled(player, stack, ability))
+        if (relic.isAbilityUpgradeEnabled(player, this.stack, ability))
             this.upgradeButton = this.addRenderableWidget(new UpgradeAbilityActionWidget(x + 289, y + 63, this));
-        if (relic.isAbilityRerollEnabled(player, stack, ability))
+        if (relic.isAbilityRerollEnabled(player, this.stack, ability))
             this.rerollButton = this.addRenderableWidget(new RerollAbilityActionWidget(x + 289, y + 84, this));
-        if (relic.isAbilityResetEnabled(player, stack, ability))
+        if (relic.isAbilityResetEnabled(player, this.stack, ability))
             this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 289, y + 105, this));
 
         DescriptionContainerWidget container = null;
@@ -173,17 +174,10 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
     }
 
     @Override
-    public void rebuildWidgets() {
-        stack = DescriptionUtils.gatherRelicStack(Minecraft.getInstance().player, slot);
-
-        super.rebuildWidgets();
-    }
-
-    @Override
     public void tick() {
         super.tick();
 
-        stack = DescriptionUtils.gatherRelicStack(Minecraft.getInstance().player, slot);
+        this.stack = DescriptionUtils.gatherRelicStack(Minecraft.getInstance().player, slot);
     }
 
     @Override

@@ -9,7 +9,7 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
-import it.hurts.sskirillss.relics.utils.Scheduler;
+import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.WorldUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -108,7 +108,7 @@ public class BlockMixin {
                                 for (var step = 0; step <= radius; step++) {
                                     int finalStep = step;
 
-                                    Scheduler.schedule(finalStep, () -> {
+                                    ServerScheduler.schedule(finalStep, () -> {
                                         var height = 0.25F;
 
                                         var localRandom = new Random();

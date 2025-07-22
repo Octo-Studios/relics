@@ -56,9 +56,9 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
         RenderSystem.setShaderColor(color, color, color, 1F);
         RenderSystem.setShaderTexture(0, DescriptionTextures.LOGO);
 
-        poseStack.translate(this.getX() + (this.width / 2F) + Math.sin((player.tickCount + pPartialTick) * 0.075F), this.getY() + (this.height / 2F) + Math.cos((player.tickCount + pPartialTick) * 0.075F) * 0.5F, 110);
+        poseStack.translate(this.getX() + (this.width / 2F) + Math.sin((player.tickCount + pPartialTick) * 0.075F), this.getY() + (this.height / 2F) + Math.cos((player.tickCount + pPartialTick) * 0.075F) * 0.5F, 100);
 
-        var modifier = 1F + LogoWidget.getCurrentClicks() * 0.05F;
+        var modifier = 1F + LogoWidget.getCurrentClicks() * 0.15F;
 
         poseStack.scale(this.getXSqueeze(), this.getYSqueeze(), 1F);
         poseStack.scale(modifier, modifier, 1F);
@@ -119,7 +119,7 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
         if (remainingClicks > 0)
             LogoWidget.addClicks(1);
 
-        if (remainingClicks == 0) {
+        if (remainingClicks <= 0) {
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.LOGO_EXPLOSION.get(), 1F, 1F));
 
             screen.rebuildWidgets();
@@ -137,12 +137,13 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
         var random = player.getRandom();
 
         if (minecraft.player.tickCount % 2 == 0) {
-            var modifier = 1F + LogoWidget.getCurrentClicks() * 0.05F;
-            var semiWidth = (int) (width * modifier / 2F);
+            var widthModifier = 1F + LogoWidget.getCurrentClicks() * 0.15F;
+            var heightModifier = LogoWidget.getCurrentClicks() * 1.5F;
+            var semiWidth = (int) (width * widthModifier / 2F);
 
-            var particle = new PixelUIParticle(0.4F, random.nextInt(30, 50), this.getX() + width / 2F + random.nextInt(-semiWidth, semiWidth), this.getY() + random.nextInt(3), UIParticle.Layer.SCREEN, 10);
+            var particle = new PixelUIParticle(0.4F, random.nextInt(30, 50), this.getX() + width / 2F + random.nextInt(-semiWidth, semiWidth), this.getY() + random.nextInt(3) - heightModifier, UIParticle.Layer.SCREEN, 10);
 
-            float size = (random.nextFloat() * 0.5F) + 0.75F;
+            float size = (random.nextFloat() * 0.5F) + 0.75F + LogoWidget.getCurrentClicks() * 0.1F;
 
             particle.setColors(new OctoColor(1F, 1F, random.nextFloat() * 0.25F, 1F), new OctoColor(1F, 0F, 0F, 0F));
             particle.setDirection(MathUtils.randomFloat(random) * 0.5F, random.nextFloat() * -0.5F);
@@ -164,7 +165,7 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
     }
 
     private static int CLICKS_AMOUNT = 0;
-    private static final int MAX_CLICKS = 10;
+    private static final int MAX_CLICKS = 5;
 
     public static int getCurrentClicks() {
         return CLICKS_AMOUNT;

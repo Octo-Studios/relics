@@ -24,6 +24,7 @@ import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
+import it.hurts.sskirillss.relics.utils.ClientScheduler;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
@@ -51,6 +52,7 @@ import java.util.List;
 
 public class AbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     private final AbilityDescriptionScreen screen;
+    @Getter
     private final String ability;
 
     @Getter
@@ -116,7 +118,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                 var random = player.getRandom();
 
-                var overshootFactor = 0.05F * unlocks;
+                var overshootFactor = 0.035F * unlocks;
                 var overshoot = 1F + overshootFactor;
 
                 var tween = Tween.create().setParallel(true);
@@ -138,7 +140,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                         .setTransitionType(TransitionType.QUAD);
 
                 var initialRotation = this.getClickZRotation();
-                var rotationBase = 0.05F * unlocks;
+                var rotationBase = 0.035F * unlocks;
                 var amplitude = random.nextBoolean() ? rotationBase : -rotationBase;
                 var decay = 0.75F;
                 var segmentDuration = 0.2D;
@@ -172,14 +174,14 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                     var size = (random.nextFloat() * 0.5F) + 0.75F;
 
-                    particle.setColors(new OctoColor(1F, 0.5F + random.nextFloat() * 0.5F, random.nextFloat() * 0.25F, 1F), new OctoColor(1F, 0F, 0F, 0F));
-                    particle.setDirection(MathUtils.randomFloat(random),  MathUtils.randomFloat(random) * 0.25F);
+                    particle.setColors(new OctoColor(1F, 0.5F + random.nextFloat() * 0.5F, random.nextFloat() * 0.25F, 1F), new OctoColor(1F, 0F, 0F, 1F));
+                    particle.setDirection(MathUtils.randomFloat(random),  -random.nextFloat());
                     particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
                     particle.getTransform().setSize(new Vector2f(size, size));
+                    particle.setGravity(0.5F + random.nextFloat() * 0.5F);
+                    particle.setSpeed(1.5F + random.nextFloat() * 1.5F);
                     particle.setGravityDirection(0, 1);
                     particle.setScreen(this.screen);
-                    particle.setGravity(0.25F);
-                    particle.setSpeed(2.5F);
 
                     particle.instantiate();
                 }
@@ -187,6 +189,8 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 soundManager.play(SimpleSoundInstance.forUI(SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, 1F));
 
                 if (unlocks >= relic.getMaxLockUnlocks()) {
+                    ClientScheduler.schedule(1, this.screen::rebuildWidgets);
+
                     for (int i = 0; i < 25; i++) {
                         var center = new Vec2(width / 2F, height / 2F);
                         var margin = new Vec2(center.x + MathUtils.randomFloat(random) * 7F, center.y + MathUtils.randomFloat(random) * 8.5F);
@@ -196,13 +200,13 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                         var size = (random.nextFloat() * 0.5F) + 0.75F;
 
-                        particle.setDirection(MathUtils.randomFloat(random),  MathUtils.randomFloat(random) * 0.25F);
+                        particle.setDirection(MathUtils.randomFloat(random) * 0.25F,  -random.nextFloat());
                         particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
                         particle.getTransform().setSize(new Vector2f(size, size));
                         particle.setGravityDirection(0, 1);
                         particle.enableBlend(false);
                         particle.setScreen(this.screen);
-                        particle.setGravity(0.5F);
+                        particle.setGravity(1F);
                         particle.setSpeed(3.5F);
 
                         particle.instantiate();

@@ -17,7 +17,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Scheduler;
+import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -138,7 +138,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
                         .sorted(Comparator.comparingInt(orb -> (int) orb.position().distanceTo(entity.position())))
                         .toList()) {
 
-                    Scheduler.schedule(step++ * 2, () -> orb.setTarget(entity.position().add(0D, entity.getBbHeight(), 0D).add(entity.getKnownMovement())));
+                    ServerScheduler.schedule(step++ * 2, () -> orb.setTarget(entity.position().add(0D, entity.getBbHeight(), 0D).add(entity.getKnownMovement())));
                 }
             }
         }

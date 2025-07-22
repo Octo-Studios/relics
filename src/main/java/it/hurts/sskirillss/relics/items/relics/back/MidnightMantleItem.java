@@ -20,7 +20,7 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.midnight_mantle.S2CSyncConstellation;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.Scheduler;
+import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -357,7 +357,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "invisibility"))
                     continue;
 
-                Scheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getStatValue(entity, stack, "invisibility", "cooldown") * 20)));
+                ServerScheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getStatValue(entity, stack, "invisibility", "cooldown") * 20)));
             }
         }
 

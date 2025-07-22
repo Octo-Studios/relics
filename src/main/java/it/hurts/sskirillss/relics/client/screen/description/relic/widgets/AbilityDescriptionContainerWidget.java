@@ -5,6 +5,8 @@ import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescr
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -84,7 +86,11 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         }
     }
 
-    private record LineEntry(Component rawLine, boolean justify) {
+    @Data
+    @AllArgsConstructor
+    private static class LineEntry {
+        private MutableComponent rawLine;
+        private boolean justify;
     }
 
     public record LayoutLine(List<Word> words, boolean justify) {
@@ -97,20 +103,20 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         var player = minecraft.player;
         var screen = (AbilityDescriptionScreen) getScreen();
         var stack = screen.getStack();
-        var abilityKey = screen.getSelectedAbility();
+        var ability = screen.getSelectedAbility();
 
         if (player == null || stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return new DescriptionData(List.of(), List.of());
 
-        var template = relic.getAbilityTemplate(player, stack, abilityKey);
-        var level = relic.getAbilityLevel(player, stack, abilityKey);
+        var template = relic.getAbilityTemplate(player, stack, ability);
+        var level = relic.getAbilityLevel(player, stack, ability);
 
-        var wantsUpgrade = screen.getUpgradeButton() != null && screen.getUpgradeButton().isHovered() && relic.mayUpgrade(player, stack, abilityKey);
-        var wantsReroll = screen.getRerollButton() != null && screen.getRerollButton().isHovered() && relic.mayReroll(player, stack, abilityKey);
-        var wantsReset = screen.getResetButton() != null && screen.getResetButton().isHovered() && relic.mayReset(player, stack, abilityKey);
+        var wantsUpgrade = screen.getUpgradeButton() != null && screen.getUpgradeButton().isHovered() && relic.mayUpgrade(player, stack, ability);
+        var wantsReroll = screen.getRerollButton() != null && screen.getRerollButton().isHovered() && relic.mayReroll(player, stack, ability);
+        var wantsReset = screen.getResetButton() != null && screen.getResetButton().isHovered() && relic.mayReset(player, stack, ability);
 
         var dynamicComponents = template.getStats().values().stream().map(stat -> {
-            var rawValue = relic.getStatValueForLevel(player, stack, abilityKey, stat.getId(), wantsUpgrade ? level + 1 : wantsReset ? 0 : level);
+            var rawValue = relic.getStatValueForLevel(player, stack, ability, stat.getId(), wantsUpgrade ? level + 1 : wantsReset ? 0 : level);
             var txt = stat.getFormatValue().apply(rawValue).toString();
 
             if (txt.endsWith(".0"))
@@ -127,7 +133,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         }).toList();
 
         var itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
-        var key = "tooltip.relics." + itemId + ".ability." + abilityKey + "." + (relic.getAbilityTemplate(player, stack, abilityKey).getModes().isEmpty() ? "description" : relic.getAbilityMode(player, stack, abilityKey) + ".description");
+        var key = "tooltip.relics." + itemId + ".ability." + ability + "." + (relic.getAbilityTemplate(player, stack, ability).getModes().isEmpty() ? "description" : relic.getAbilityMode(player, stack, ability) + ".description");
         var tokens = IntStream.rangeClosed(1, dynamicComponents.size()).mapToObj(i -> "%" + i + "$s").toArray(String[]::new);
         var descriptionComponent = Component.translatable(key, (Object[]) tokens);
 
@@ -140,13 +146,17 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
             rawLines.add(new LineEntry(Component.translatable("tooltip.relics.description.ability.rank_modifier", entry.getKey())
                     .withStyle(ChatFormatting.BOLD), false));
 
-            var description = Component.literal("● ").append(Component.translatable("tooltip.relics." + itemId + ".ability." + abilityKey + ".rank_modifier." + entry.getValue(), (Object[]) tokens));
+            var description = Component.literal("● ").append(Component.translatable("tooltip.relics." + itemId + ".ability." + ability + ".rank_modifier." + entry.getValue(), (Object[]) tokens));
 
             if (relic.getRelicRank(player, stack) < entry.getKey())
-                description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.CUSTOM_COLOR(0x851b1b)));
+                description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
 
             rawLines.add(new LineEntry(description, true));
         }
+
+        if (!relic.isAbilityUnlocked(player, stack, ability))
+            for (var line : rawLines)
+                line.setRawLine(ScreenUtils.randomizeAllCharacters(line.getRawLine(), this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true))));
 
         return new DescriptionData(rawLines, dynamicComponents);
     }
@@ -158,7 +168,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         var result = new ArrayList<LayoutLine>();
 
         for (var entry : rawLineEntries) {
-            var rawText = entry.rawLine().getString();
+            var rawText = entry.getRawLine().getString();
 
             if (rawText.isEmpty()) {
                 result.add(new LayoutLine(List.of(), false));
@@ -176,7 +186,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
 
                     Arrays.stream(before.split(" "))
                             .filter(tok -> !tok.isEmpty())
-                            .forEach(tok -> words.add(new Word(Component.literal(tok).withStyle(entry.rawLine().getStyle()), false)));
+                            .forEach(tok -> words.add(new Word(Component.literal(tok).withStyle(entry.getRawLine().getStyle()), false)));
                 }
 
                 var segment = matcher.group(1);
@@ -205,7 +215,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
                 Arrays.stream(after.split(" "))
                         .filter(tok -> !tok.isEmpty())
                         .forEach(tok -> words.add(new Word(
-                                Component.literal(tok).withStyle(entry.rawLine().getStyle()),
+                                Component.literal(tok).withStyle(entry.getRawLine().getStyle()),
                                 false
                         )));
             }
@@ -234,7 +244,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
                 lines.add(current);
 
             for (int i = 0; i < lines.size(); i++) {
-                boolean justifyLine = entry.justify() && i < lines.size() - 1;
+                boolean justifyLine = entry.isJustify() && i < lines.size() - 1;
 
                 result.add(new LayoutLine(lines.get(i), justifyLine));
             }

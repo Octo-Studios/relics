@@ -271,14 +271,14 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.translate(0F, 0F, 400);
 
-        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, mouseX - 9 - (renderWidth / 2), mouseY);
+        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, (this.getX() - renderWidth / 2) + 16, this.getY() + this.getHeight() - 2);
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
         int yOff = 0;
 
         for (FormattedCharSequence entry : tooltip) {
-            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
+            guiGraphics.drawString(minecraft.font, entry, ((this.getX() - renderWidth / 2) + 14 + 12) * 2, ((this.getY() + yOff + this.getHeight() - 2 + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
 
             yOff += 5;
         }

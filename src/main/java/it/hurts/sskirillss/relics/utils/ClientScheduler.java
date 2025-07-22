@@ -1,7 +1,12 @@
 package it.hurts.sskirillss.relics.utils;
 
+import it.hurts.sskirillss.relics.Relics;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 
@@ -10,8 +15,8 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 
-@EventBusSubscriber
-public class Scheduler {
+@EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
+public class ClientScheduler {
     private static final Deque<ScheduledTask> allTasksQueue = new LinkedList<>();
     private static final List<ScheduledTask> allTasks = new ArrayList<>();
 
@@ -24,7 +29,7 @@ public class Scheduler {
     }
 
     @SubscribeEvent
-    public static void serverTick(ServerTickEvent.Pre e) {
+    public static void onClientTick(ClientTickEvent.Post event) {
         while (!allTasksQueue.isEmpty()) {
             var task = allTasksQueue.removeFirst();
 
@@ -35,7 +40,13 @@ public class Scheduler {
     }
 
     @SubscribeEvent
-    public static void reset(ServerStoppedEvent e) {
+    public static void onLevelUnload(LevelEvent.Unload event) {
+        allTasks.clear();
+        allTasksQueue.clear();
+    }
+
+    @SubscribeEvent
+    public static void onClientDisconnect(ClientPlayerNetworkEvent.LoggingOut event) {
         allTasks.clear();
         allTasksQueue.clear();
     }

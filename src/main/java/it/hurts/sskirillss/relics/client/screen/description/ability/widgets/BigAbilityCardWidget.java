@@ -31,11 +31,11 @@ import net.minecraft.world.item.ItemStack;
 import java.util.Comparator;
 import java.util.List;
 
-public class BigAbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
+public class BigAbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget {
     private AbilityDescriptionScreen screen;
 
     public BigAbilityCardWidget(int x, int y, AbilityDescriptionScreen screen) {
-        super(x, y, 48, 74);
+        super(x, y, 50, 87);
 
         this.screen = screen;
     }
@@ -66,7 +66,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
                     .texSize(34, 49)
                     .end();
         else
-            GUIRenderer.begin(BigRelicCardWidget.pickClosestBackground(stack, BigRelicCardWidget.BACKGROUNDS), poseStack)
+            GUIRenderer.begin(this.pickClosestBackground(stack, BigRelicCardWidget.BACKGROUNDS), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(this.getX() + 8, this.getY() + 20)
                     .end();
@@ -110,7 +110,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             }
         }
 
-        int xOff = 0;
+        var xOff = 0;
 
         if (isUnlocked && canBeUpgraded) {
             for (int i = 0; i < 5; i++) {
@@ -148,7 +148,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         if (canBeUpgraded) {
             poseStack.pushPose();
 
-            MutableComponent pointsComponent = Component.literal(isUnlocked ? String.valueOf(relic.getAbilityLevel(player, stack, ability)) : "?").withStyle(ChatFormatting.BOLD);
+            var pointsComponent = Component.literal(isUnlocked ? String.valueOf(relic.getAbilityLevel(player, stack, ability)) : "?").withStyle(ChatFormatting.BOLD);
 
             poseStack.scale(0.75F, 0.75F, 1F);
 
@@ -226,38 +226,19 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         poseStack.translate(0F, 0F, 400);
 
-        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, (this.getX() - renderWidth / 2) + 16, this.getY() + this.getHeight() + 11);
+        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, (this.getX() - renderWidth / 2) + 16, this.getY() + this.getHeight() - 2);
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
         int yOff = 0;
 
         for (FormattedCharSequence entry : tooltip) {
-            guiGraphics.drawString(minecraft.font, entry, ((this.getX() - renderWidth / 2) + 14 + 12) * 2, ((this.getY() + yOff + this.getHeight() + 11 + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
+            guiGraphics.drawString(minecraft.font, entry, ((this.getX() - renderWidth / 2) + 14 + 12) * 2, ((this.getY() + yOff + this.getHeight() - 2 + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
 
             yOff += 5;
         }
 
         poseStack.popPose();
-    }
-
-    @Override
-    public void onTick() {
-        var player = minecraft.player;
-        var stack = screen.getStack();
-        var ability = screen.getSelectedAbility();
-
-        if (!(stack.getItem() instanceof IRelicItem relic))
-            return;
-
-        var isUnlocked = relic.isAbilityUnlocked(player, stack, ability);
-
-        if (!isUnlocked) {
-            RandomSource random = minecraft.player.getRandom();
-
-            ParticleStorage.addParticle(screen, new SmokeParticleData(getX() + 11 + random.nextInt(27), getY() + 15 + random.nextInt(43), 0.75F + (random.nextFloat() * 0.25F), 20 + random.nextInt(40), 0.5F)
-                    .setDeltaX(MathUtils.randomFloat(random) * 0.1F).setDeltaY(MathUtils.randomFloat(random) * 0.1F));
-        }
     }
 
     @Override

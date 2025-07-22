@@ -7,7 +7,7 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
-import it.hurts.sskirillss.relics.utils.Scheduler;
+import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.WorldUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -212,7 +212,7 @@ public class FallingStarEntity extends ThrowableProjectile {
         for (var step = 0; step <= radius; step++) {
             int finalStep = step;
 
-            Scheduler.schedule(finalStep, () -> {
+            ServerScheduler.schedule(finalStep, () -> {
                 var height = 0.25F;
 
                 var localRandom = new Random();
