@@ -80,16 +80,16 @@ public class EntityMixin {
         return original;
     }
 
-    @Inject(at = @At(value = "RETURN"), method = "isInWaterOrRain", cancellable = true)
-    public void setWet(CallbackInfoReturnable<Boolean> info) {
-        Entity entity = (Entity) (Object) this;
-
-        if (!(entity instanceof LivingEntity))
-            return;
-
-        if (!EntityUtils.findEquippedCurio(entity, RelicsItems.DROWNED_BELT.get()).isEmpty())
-            info.setReturnValue(true);
-    }
+//    @Inject(at = @At(value = "RETURN"), method = "isInWaterOrRain", cancellable = true)
+//    public void setWet(CallbackInfoReturnable<Boolean> info) {
+//        Entity entity = (Entity) (Object) this;
+//
+//        if (!(entity instanceof LivingEntity))
+//            return;
+//
+//        if (!EntityUtils.findEquippedCurio(entity, RelicsItems.DROWNED_BELT.get()).isEmpty())
+//            info.setReturnValue(true);
+//    }
 
     @Inject(method = "getBlockSpeedFactor", at = @At("RETURN"), cancellable = true)
     public void getBlockSpeedFactor(CallbackInfoReturnable<Float> cir) {

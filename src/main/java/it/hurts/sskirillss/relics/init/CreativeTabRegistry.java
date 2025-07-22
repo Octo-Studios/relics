@@ -21,7 +21,7 @@ public class CreativeTabRegistry {
 
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> RELICS_TAB = CREATIVE_TABS.register("relics", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.relics"))
-            .icon(() -> RelicsItems.BASTION_RING.get().getDefaultInstance())
+            .icon(() -> RelicsItems.MIDNIGHT_MANTLE.get().getDefaultInstance())
             .build());
 
     public static void register(IEventBus bus) {
