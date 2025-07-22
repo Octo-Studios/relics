@@ -2,6 +2,8 @@ package it.hurts.sskirillss.relics.api.relics;
 
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -318,10 +320,21 @@ public interface IRelicTemplateHolder {
         return this.getAbilityTemplate(entity, stack, ability).getStatistic();
     }
 
-
     @ApiStatus.Obsolete
     @ApiStatus.NonExtendable
     default MetricTemplate getAbilityMetricTemplate(LivingEntity entity, ItemStack stack, String ability, String metric) {
         return this.getAbilityStatisticTemplate(entity, stack, ability).getMetrics().get(metric);
+    }
+
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
+    default ExperienceSourcesTemplate getExperienceSourcesTemplate(LivingEntity entity, ItemStack stack, String ability) {
+        return this.getAbilityTemplate(entity, stack, ability).getExperienceSources();
+    }
+
+    @ApiStatus.Obsolete
+    @ApiStatus.NonExtendable
+    default ExperienceSourceTemplate getExperienceSourceTemplate(LivingEntity entity, ItemStack stack, String ability, String metric) {
+        return this.getExperienceSourcesTemplate(entity, stack, ability).getSources().get(metric);
     }
 }

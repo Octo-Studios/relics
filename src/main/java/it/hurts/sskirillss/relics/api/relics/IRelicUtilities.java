@@ -1,10 +1,12 @@
 package it.hurts.sskirillss.relics.api.relics;
 
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.events.RelicExperienceChangeEvent;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
@@ -177,5 +179,64 @@ public interface IRelicUtilities {
             return false;
 
         return relic.calculateAbilityQuality(entity, stack, ability) >= relic.getAbilityMaxQuality(entity, stack, ability);
+    }
+
+    default boolean addRelicExperience(LivingEntity entity, ItemStack stack, double amount) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        var xp = relic.getRelicExperience(entity, stack);
+        var level = relic.getRelicLevel(entity, stack);
+        var oldLevel = level;
+        var maxLevel = relic.calculateRelicMaxLevel(entity, stack);
+
+        while ((amount > 0 && level < maxLevel) || (amount < 0 && level > 0)) {
+            if (amount > 0) {
+                var requirement = getTotalRelicExperienceBetweenLevels(entity, stack, level, level + 1) - xp;
+
+                if (amount >= requirement) {
+                    amount -= requirement;
+
+                    level++;
+
+                    xp = 0;
+                } else {
+                    xp += amount;
+
+                    amount = 0;
+                }
+            } else {
+                if (xp + amount >= 0) {
+                    xp += amount;
+
+                    amount = 0;
+                } else {
+                    amount += xp;
+
+                    level--;
+
+                    xp = getTotalRelicExperienceBetweenLevels(entity, stack, level, level + 1);
+                }
+            }
+        }
+
+        if (amount < 0)
+            xp = 0;
+
+        relic.setRelicExperience(entity, stack, xp);
+
+        if (level != oldLevel)
+            relic.addRelicLevel(entity, stack, level - oldLevel);
+
+        return true;
+    }
+
+    default boolean canAddRelicExperience(LivingEntity entity, ItemStack stack, String ability, String experienceSource) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        relic.getRelicTemplate(entity, stack).getAbilities().getAbilities().get(ability).getExperienceSources().getSources().get(experienceSource).getCondition().test(entity, stack, ability);
+
+        return relic.getExperienceSourceTemplate(entity, stack, ability, experienceSource).getCondition().test(entity, stack, ability);
     }
 }

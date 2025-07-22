@@ -76,64 +76,15 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
                 .build());
     }
 
-    /**
-     * Adds experience to the relic and handles leveling up or down as necessary.
-     *
-     * @param entity the entity holding the relic
-     * @param stack  the item stack representing the relic
-     * @param amount the amount of experience to add (can be negative)
-     * @return true if the experience was changed, false otherwise
-     */
-    default boolean addRelicExperience(LivingEntity entity, ItemStack stack, double amount) {
-        var event = NeoForge.EVENT_BUS.post(new RelicExperienceChangeEvent(entity, stack, amount));
+    default boolean addRelicExperience(LivingEntity entity, ItemStack stack, String ability, String experienceSource, double amount) {
+        var event = NeoForge.EVENT_BUS.post(new RelicExperienceChangeEvent(entity, stack, ability, experienceSource, amount));
 
         var delta = event.getDelta();
 
         if (event.isCanceled() || delta == 0)
             return false;
 
-        var xp = getRelicExperience(entity, stack);
-        var level = getRelicLevel(entity, stack);
-        var oldLevel = level;
-        var maxLevel = this.calculateRelicMaxLevel(entity, stack);
-
-        while ((delta > 0 && level < maxLevel) || (delta < 0 && level > 0)) {
-            if (delta > 0) {
-                var requirement = getTotalRelicExperienceBetweenLevels(entity, stack, level, level + 1) - xp;
-
-                if (delta >= requirement) {
-                    delta -= requirement;
-
-                    level++;
-
-                    xp = 0;
-                } else {
-                    xp += delta;
-
-                    delta = 0;
-                }
-            } else {
-                if (xp + delta >= 0) {
-                    xp += delta;
-
-                    delta = 0;
-                } else {
-                    delta += xp;
-
-                    level--;
-
-                    xp = getTotalRelicExperienceBetweenLevels(entity, stack, level, level + 1);
-                }
-            }
-        }
-
-        if (delta < 0)
-            xp = 0;
-
-        setRelicExperience(entity, stack, xp);
-
-        if (level != oldLevel)
-            addRelicLevel(entity, stack, level - oldLevel);
+        this.addRelicExperience(event.getBearer(), event.getStack(), delta);
 
         return true;
     }

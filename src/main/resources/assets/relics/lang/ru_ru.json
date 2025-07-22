@@ -202,6 +202,8 @@
   "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.strike": "При использовании способности увеличивает наносимый снарядами носителя реликвии урон на %2$s%%.",
   "tooltip.relics.kinetic_belt.ability.gliding.rank_modifier.resistance": "Снижает входящий по носителю реликвии урон на %3$s%% во время использования способности.",
   "tooltip.relics.kinetic_belt.ability.gliding.experience_source.gliding": "+1 единица опыта за каждую секунду планирования.",
+  "tooltip.relics.kinetic_belt.ability.gliding.experience_source.strike": "+1 единица опыта за каждую дополнительную единицу урона от модификатора.",
+  "tooltip.relics.kinetic_belt.ability.gliding.experience_source.resistance": "+1 единица опыта за каждую единицу заблокированного урона благодаря модификатору.",
   "tooltip.relics.kinetic_belt.ability.gliding.statistic.duration": "Время планирования",
   "tooltip.relics.kinetic_belt.ability.gliding.statistic.resistance": "Заблокировано урона",
   "tooltip.relics.kinetic_belt.ability.gliding.statistic.damage": "Нанесено дополнительного урона",

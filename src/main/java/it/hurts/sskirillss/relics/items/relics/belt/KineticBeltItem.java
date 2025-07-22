@@ -5,6 +5,8 @@ import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.init.DataComponentRegistry;
 import it.hurts.sskirillss.relics.init.RelicsItems;
@@ -55,7 +57,6 @@ public class KineticBeltItem extends RelicItem {
                                 .rankModifier(3, "strike")
                                 .rankModifier(5, "resistance")
                                 .modes("enabled", "disabled")
-                                .experienceSources("gliding")
                                 .stat(StatTemplate.builder("efficiency")
                                         .initialValue(0.25D, 0.35D)
                                         .thresholdValue(0D, 1D)
@@ -72,6 +73,16 @@ public class KineticBeltItem extends RelicItem {
                                         .thresholdValue(0D, 0.75D)
                                         .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("gliding")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("strike")
+                                                .condition((entity, stack, ability) -> this.isAbilityRankModifierUnlocked(entity, stack, ability, "strike"))
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("resistance")
+                                                .condition((entity, stack, ability) -> this.isAbilityRankModifierUnlocked(entity, stack, ability, "resistance"))
+                                                .build())
                                         .build())
                                 .statistic(StatisticTemplate.builder()
                                         .metric(MetricTemplate.builder("duration")
@@ -168,7 +179,8 @@ public class KineticBeltItem extends RelicItem {
             if (entity.tickCount % 20 == 0) {
                 this.addAbilityMetricValue(entity, stack, "gliding", "duration", 1);
 
-                this.addRelicExperience(entity, stack, 1);
+                if (this.canAddRelicExperience(entity, stack, "gliding", "gliding"))
+                    this.addRelicExperience(entity, stack, "gliding", "gliding", 1);
             }
 
             if (!hasAttribute)
@@ -262,6 +274,8 @@ public class KineticBeltItem extends RelicItem {
 
                     var additional = original * relic.getStatValue(entity, stack, "gliding", "damage");
 
+                    if (relic.canAddRelicExperience(entity, stack, "gliding", "damage"))
+                        relic.addRelicExperience(entity, stack, "gliding", "damage", additional);
                     relic.addAbilityMetricValue(entity, stack, "gliding", "damage", additional);
 
                     event.setNewDamage((float) (original + additional));
@@ -277,6 +291,8 @@ public class KineticBeltItem extends RelicItem {
 
                 var additional = original * relic.getStatValue(entity, stack, "gliding", "resistance");
 
+                if (relic.canAddRelicExperience(entity, stack, "gliding", "resistance"))
+                    relic.addRelicExperience(entity, stack, "gliding", "resistance", additional);
                 relic.addAbilityMetricValue(entity, stack, "gliding", "resistance", additional);
 
                 event.setNewDamage((float) (original - additional));

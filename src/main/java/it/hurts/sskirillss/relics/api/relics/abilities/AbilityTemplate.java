@@ -37,7 +37,7 @@ public class AbilityTemplate {
     private final ResearchTemplate researchTemplate;
     private final StatisticTemplate statistic;
     private final List<String> modes;
-    private final List<String> experienceSources;
+    private final ExperienceSourcesTemplate experienceSources;
     private final Multimap<Integer, String> rankModifiers;
 
     public static AbilityTemplateBuilder builder(String id) {
@@ -71,7 +71,7 @@ public class AbilityTemplate {
         private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
         private StatisticTemplate statistic = StatisticTemplate.builder().build();
         private List<String> modes = new ArrayList<>();
-        private List<String> experienceSources = new ArrayList<>();
+        private ExperienceSourcesTemplate experienceSources = ExperienceSourcesTemplate.builder().build();
         private Multimap<Integer, String> rankModifiers = LinkedHashMultimap.create();
 
         public AbilityTemplateBuilder(String id) {
@@ -161,8 +161,8 @@ public class AbilityTemplate {
             return this;
         }
 
-        public AbilityTemplateBuilder experienceSources(String... source) {
-            this.experienceSources.addAll(Lists.newArrayList(source));
+        public AbilityTemplateBuilder experienceSources(ExperienceSourcesTemplate sources) {
+            this.experienceSources = sources;
 
             return this;
         }

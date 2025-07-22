@@ -3,14 +3,15 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.StatisticContainerWidget;
-import net.minecraft.ChatFormatting;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class AbilityExperienceContainerWidget extends StatisticContainerWidget {
     public AbilityExperienceContainerWidget(int x, int y, AbilityDescriptionScreen screen) {
@@ -30,8 +31,13 @@ public class AbilityExperienceContainerWidget extends StatisticContainerWidget {
         var font = this.minecraft.font;
         var maxWidth = 320;
 
-        for (var source : relic.getAbilityTemplate(player, stack, screen.getSelectedAbility()).getExperienceSources()) {
-            sequences.addAll(font.split(Component.literal("● ").append(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + screen.getSelectedAbility() + ".experience_source." + source)), maxWidth));
+        for (var source : relic.getExperienceSourcesTemplate(player, stack, screen.getSelectedAbility()).getSources().values()) {
+            var description = Component.literal("● ").append(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + screen.getSelectedAbility() + ".experience_source." + source.getId()));
+
+            if (!source.getCondition().test(player, stack, screen.getSelectedAbility()))
+                description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.CUSTOM_COLOR(0x851b1b)));
+
+            sequences.addAll(font.split(description, maxWidth));
 
             sequences.addAll(font.split(Component.literal(" "), maxWidth));
         }
