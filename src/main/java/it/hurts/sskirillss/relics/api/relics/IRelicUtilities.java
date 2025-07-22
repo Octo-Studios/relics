@@ -1,12 +1,10 @@
 package it.hurts.sskirillss.relics.api.relics;
 
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
-import it.hurts.sskirillss.relics.api.relics.events.RelicExperienceChangeEvent;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
@@ -33,11 +31,8 @@ public interface IRelicUtilities {
 
         var total = 0D;
 
-        for (int i = 1; i < level; i++) {
-            double value = operation.evaluate(entity, stack, template.getInitialCost(), template.getStep(), i - 1);
-
-            total += value;
-        }
+        for (int i = 0; i < level; i++)
+            total += operation.evaluate(entity, stack, template.getInitialCost(), template.getStep(), i);
 
         return (int) Math.floor(total);
     }
@@ -60,12 +55,12 @@ public interface IRelicUtilities {
             return 0;
 
         var statComponent = relic.getStatComponent(entity, stack, ability, stat);
-        
+
         var optional = statComponent.getOverrideValue();
-        
+
         if (optional.isEmpty())
             return statComponent.getInitialQuality();
-        
+
         var statData = relic.getStatTemplate(entity, stack, ability, stat);
 
         var format = statData.getFormatValue();
