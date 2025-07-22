@@ -55,6 +55,7 @@ public class KineticBeltItem extends RelicItem {
                                 .rankModifier(3, "strike")
                                 .rankModifier(5, "resistance")
                                 .modes("enabled", "disabled")
+                                .experienceSources("gliding")
                                 .stat(StatTemplate.builder("efficiency")
                                         .initialValue(0.25D, 0.35D)
                                         .thresholdValue(0D, 1D)
@@ -148,11 +149,10 @@ public class KineticBeltItem extends RelicItem {
 
         if (level.isClientSide()) {
             if (entity instanceof LocalPlayer player) {
-                if (player.input.jumping && !player.isFallFlying() && !player.getAbilities().flying && !player.isSwimming()) {
+                if (player.input.jumping && !player.isFallFlying() && !player.getAbilities().flying && !player.isSwimming())
                     NetworkHandler.sendToServer(new C2SSetActive(slotContext.identifier(), slotContext.index(), true));
-                } else if (isActive) {
+                else if (isActive)
                     NetworkHandler.sendToServer(new C2SSetActive(slotContext.identifier(), slotContext.index(), false));
-                }
             }
         }
 
@@ -165,8 +165,11 @@ public class KineticBeltItem extends RelicItem {
         }
 
         if (isActive) {
-            if (entity.tickCount % 20 == 0)
+            if (entity.tickCount % 20 == 0) {
                 this.addAbilityMetricValue(entity, stack, "gliding", "duration", 1);
+
+                this.addRelicExperience(entity, stack, 1);
+            }
 
             if (!hasAttribute)
                 EntityUtils.applyAttribute(entity, stack, Attributes.GRAVITY, (float) -Math.min(this.getStatValue(entity, stack, "gliding", "efficiency"), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);

@@ -31,7 +31,7 @@ public class AbilityExperienceContainerWidget extends StatisticContainerWidget {
         var maxWidth = 320;
 
         for (var source : relic.getAbilityTemplate(player, stack, screen.getSelectedAbility()).getExperienceSources()) {
-            sequences.addAll(font.split(Component.literal("● ").append(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "ability." + screen.getSelectedAbility() + ".experience_source." + source)), maxWidth));
+            sequences.addAll(font.split(Component.literal("● ").append(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + screen.getSelectedAbility() + ".experience_source." + source)), maxWidth));
 
             sequences.addAll(font.split(Component.literal(" "), maxWidth));
         }

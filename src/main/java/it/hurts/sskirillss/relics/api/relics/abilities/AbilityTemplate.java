@@ -90,6 +90,7 @@ public class AbilityTemplate {
             this.castData = base.getCastData();
             this.researchTemplate = base.getResearchTemplate();
             this.statistic = base.getStatistic();
+            this.experienceSources = base.getExperienceSources();
             this.modes = base.getModes();
             this.rankModifiers = base.getRankModifiers();
         }
