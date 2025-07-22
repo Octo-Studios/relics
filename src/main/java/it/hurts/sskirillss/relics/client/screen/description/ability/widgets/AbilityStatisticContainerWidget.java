@@ -34,7 +34,7 @@ public class AbilityStatisticContainerWidget extends StatisticContainerWidget {
             if (!metric.getVisibilityCondition().test(player, stack, Optional.of(screen.getSelectedAbility())))
                 continue;
 
-            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, Optional.empty())).append(Component.literal(" "));
+            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, Optional.of(screen.getSelectedAbility()))).append(Component.literal(" "));
             var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(relic.getAbilityMetricComponent(player, stack, screen.getSelectedAbility(), metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));
 
             var availableWidth = maxWidth - font.width(prefix) - font.width(suffix);

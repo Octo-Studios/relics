@@ -39,7 +39,7 @@ public class MetricTemplate {
         private TriFunction<LivingEntity, ItemStack, Optional<String>, Component> component = (entity, stack, optional) -> {
             var itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
 
-            return Component.translatable(optional.map(ability -> "tooltip.relics." + itemId + "ability." + ability + ".statistic." + this.id).orElseGet(() -> "tooltip.relics." + itemId + ".statistic." + this.id));
+            return Component.translatable(optional.map(ability -> "tooltip.relics." + itemId + ".ability." + ability + ".statistic." + this.id).orElseGet(() -> "tooltip.relics." + itemId + ".statistic." + this.id));
         };
         private TriPredicate<LivingEntity, ItemStack, Optional<String>> visibilityCondition = ((entity, stack, optional) -> true);
 
