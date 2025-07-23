@@ -18,9 +18,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-public class RelicAbilityStatArgument implements ArgumentType<String> {
-    public static RelicAbilityStatArgument abilityStat() {
-        return new RelicAbilityStatArgument();
+public class AbilityStatArgument implements ArgumentType<String> {
+    public static AbilityStatArgument abilityStat() {
+        return new AbilityStatArgument();
     }
 
     public static String getAbilityStat(final CommandContext<?> context, final String name) {

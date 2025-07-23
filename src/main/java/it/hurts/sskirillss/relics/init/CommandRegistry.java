@@ -2,8 +2,10 @@ package it.hurts.sskirillss.relics.init;
 
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.commands.RelicsCommand;
-import it.hurts.sskirillss.relics.commands.arguments.RelicAbilityArgument;
-import it.hurts.sskirillss.relics.commands.arguments.RelicAbilityStatArgument;
+import it.hurts.sskirillss.relics.commands.arguments.AbilityArgument;
+import it.hurts.sskirillss.relics.commands.arguments.RelicAbilityStatisticMetricArgument;
+import it.hurts.sskirillss.relics.commands.arguments.AbilityStatArgument;
+import it.hurts.sskirillss.relics.commands.arguments.RelicStatisticMetricArgument;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -19,8 +21,10 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class CommandRegistry {
     private static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENTS = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, Relics.MODID);
 
-    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> RELIC_ABILITY = COMMAND_ARGUMENTS.register("relic_ability", () -> ArgumentTypeInfos.registerByClass(RelicAbilityArgument.class, SingletonArgumentInfo.contextFree(RelicAbilityArgument::ability)));
-    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> RELIC_ABILITY_STAT = COMMAND_ARGUMENTS.register("relic_ability_stat", () -> ArgumentTypeInfos.registerByClass(RelicAbilityStatArgument.class, SingletonArgumentInfo.contextFree(RelicAbilityStatArgument::abilityStat)));
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> ABILITY = COMMAND_ARGUMENTS.register("ability", () -> ArgumentTypeInfos.registerByClass(AbilityArgument.class, SingletonArgumentInfo.contextFree(AbilityArgument::ability)));
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> ABILITY_STAT = COMMAND_ARGUMENTS.register("ability_stat", () -> ArgumentTypeInfos.registerByClass(AbilityStatArgument.class, SingletonArgumentInfo.contextFree(AbilityStatArgument::abilityStat)));
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> ABILITY_STATISTIC_METRIC = COMMAND_ARGUMENTS.register("ability_statistic_metric", () -> ArgumentTypeInfos.registerByClass(RelicAbilityStatisticMetricArgument.class, SingletonArgumentInfo.contextFree(RelicAbilityStatisticMetricArgument::abilityStatisticMetric)));
+    public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> RELIC_STATISTIC_METRIC = COMMAND_ARGUMENTS.register("relic_statistic_metric", () -> ArgumentTypeInfos.registerByClass(RelicStatisticMetricArgument.class, SingletonArgumentInfo.contextFree(RelicStatisticMetricArgument::relicStatisticMetric)));
 
     public static void register(IEventBus bus) {
         COMMAND_ARGUMENTS.register(bus);
