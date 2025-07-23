@@ -9,7 +9,7 @@
   "tooltip.relics.researching.bookmarks.relic_statistic": "Статистика реликвии",
 
   "tooltip.relics.researching.bookmarks.ability_description": "Описание способности",
-  "tooltip.relics.researching.bookmarks.ability experience": "Источники опыта способности",
+  "tooltip.relics.researching.bookmarks.ability_experience": "Источники опыта способности",
   "tooltip.relics.researching.bookmarks.ability_statistic": "Статистика способности",
 
   "tooltip.relics.researching.bookmarks.relic": "Реликвия",
@@ -71,7 +71,7 @@
   "relics.description.ability.research.rule_1.title": "Поиск",
   "relics.description.ability.research.rule_1.description": "Води курсором по туману слева, изучая иконку способности, расположенную под ним, и находя спрятанные звёзды.",
   "relics.description.ability.research.rule_2.title": "Соединение",
-  "relics.description.ability.research.rule_2.description": "Исходя из иконки способности, сопоставляй узор звёзд и соединяй их между собой, чтобы созвездие.",
+  "relics.description.ability.research.rule_2.description": "Исходя из иконки способности, сопоставляй узор звёзд и соединяй их между собой, чтобы получить созвездие.",
   "relics.description.ability.research.rule_3.title": "Внимание к деталям",
   "relics.description.ability.research.rule_3.description": "Присматривайся к мелочам: на позиции звёзд видно частицы даже сквозь туман, а количество летающих вокруг звезды точек указывает на её необходимое количество соединений.",
 

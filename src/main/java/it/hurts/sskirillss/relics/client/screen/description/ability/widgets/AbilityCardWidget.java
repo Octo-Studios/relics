@@ -270,9 +270,11 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     .pos(0, -2)
                     .end();
 
-        if (!canUse)
+        if (!canUse) {
             GUIRenderer.begin(isLockUnlocked ? DescriptionTextures.SMALL_CARD_RESEARCH_BACKGROUND : DescriptionTextures.SMALL_CARD_LOCK_BACKGROUND, poseStack)
+                    .pos(0, -2)
                     .end();
+            }
 
         GUIRenderer.begin(canBeUpgraded ? canUse ? DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_INACTIVE : canUse ? DescriptionTextures.SMALL_CARD_FRAME_LOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_LOCKED_INACTIVE, poseStack).end();
 
@@ -290,7 +292,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 var time = minecraft.player.tickCount + (ability.length() * 10F) + partialTick;
 
                 GUIRenderer.begin(DescriptionTextures.RESEARCH, poseStack)
-                        .pos((float) Math.sin(time * 0.25F), (float) Math.cos(time * 0.25F) + 0.5F)
+                        .pos((float) Math.sin(time * 0.25F), (float) Math.cos(time * 0.25F) + 0.5F - 2)
                         .patternSize(16, 16)
                         .animation(AnimationData.builder()
                                 .frame(0, 2).frame(1, 2)
@@ -310,13 +312,14 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             poseStack.pushPose();
 
             GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/icons/lock_active_" + unlocks + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
+                    .pos(0, -2)
                     .end();
 
             poseStack.scale(0.5F, 0.5F, 0.5F);
 
             var requiredLevelComponent = Component.literal(String.valueOf(relic.getAbilityTemplate(player, stack, ability).getRequiredLevel())).withStyle(ChatFormatting.BOLD);
 
-            guiGraphics.drawString(minecraft.font, requiredLevelComponent, (-(width / 2) + 19) * 2 - minecraft.font.width(requiredLevelComponent) / 2, (-(height / 2) + 26) * 2, isEnoughLevel ? 0xFFE278 : 0xB7AED9, true);
+            guiGraphics.drawString(minecraft.font, requiredLevelComponent, (-(width / 2) + 19) * 2 - minecraft.font.width(requiredLevelComponent) / 2, (-(height / 2) + 24) * 2, isEnoughLevel ? 0xFFE278 : 0xB7AED9, true);
 
             poseStack.popPose();
         }

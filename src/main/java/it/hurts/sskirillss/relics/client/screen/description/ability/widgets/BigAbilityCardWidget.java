@@ -152,7 +152,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
             poseStack.scale(0.75F, 0.75F, 1F);
 
-            guiGraphics.drawString(minecraft.font, pointsComponent, (int) (((getX() + 26.5F) * 1.33F) - (minecraft.font.width(pointsComponent) / 2F)), (int) ((getY() + 4.5F) * 1.33F), 0xFFE278, false);
+            guiGraphics.drawString(minecraft.font, pointsComponent, (int) (((getX() + 26.5F) * 1.33F) - (minecraft.font.width(pointsComponent) / 2F)), (int) ((getY() + 4.5F) * 1.33F), isUnlocked ? 0xFFE278 : 0xB7AED9, false);
 
             poseStack.popPose();
         }
