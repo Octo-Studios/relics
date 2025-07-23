@@ -143,7 +143,7 @@ public class AbilityTemplate {
             return this;
         }
 
-        public AbilityTemplateBuilder researchTemplate(ResearchTemplate researchTemplate) {
+        public AbilityTemplateBuilder research(ResearchTemplate researchTemplate) {
             this.researchTemplate = researchTemplate;
 
             return this;

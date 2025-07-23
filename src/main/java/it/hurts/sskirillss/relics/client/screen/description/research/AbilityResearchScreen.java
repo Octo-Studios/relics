@@ -11,13 +11,13 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.base.SimpleDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.research.misc.BurnPoint;
 import it.hurts.sskirillss.relics.client.screen.description.research.particles.ResearchParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.research.widgets.HintWidget;
 import it.hurts.sskirillss.relics.client.screen.description.research.widgets.StarWidget;
-import it.hurts.sskirillss.relics.client.screen.description.research.widgets.TipWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
@@ -60,7 +60,7 @@ import java.util.Objects;
 import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityResearchScreen extends DescriptionScreen {
+public class AbilityResearchScreen extends SimpleDescriptionScreen {
     public final String ability;
 
     @Nullable
@@ -71,6 +71,12 @@ public class AbilityResearchScreen extends DescriptionScreen {
 
     private final int maxResearchProgress = 40;
     private int researchProgress = 0;
+
+    public final int backgroundHeight = 256;
+    public final int backgroundWidth = 418;
+
+    public int x;
+    public int y;
 
     public AbilityResearchScreen(Player player, int container, int slot, Screen screen, String ability) {
         super(player, container, slot, screen);
@@ -104,6 +110,9 @@ public class AbilityResearchScreen extends DescriptionScreen {
     protected void init() {
         super.init();
 
+        this.x = (this.width - this.backgroundWidth) / 2;
+        this.y = (this.height - this.backgroundHeight) / 2;
+
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
@@ -111,8 +120,6 @@ public class AbilityResearchScreen extends DescriptionScreen {
 
         stars.clear();
         points.clear();
-
-        this.addRenderableWidget(new TipWidget(x + 117, y + 207, this));
 
         this.addRenderableWidget(new HintWidget(x + 192, y + 198, this));
 
@@ -285,6 +292,15 @@ public class AbilityResearchScreen extends DescriptionScreen {
         PoseStack poseStack = guiGraphics.pose();
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+
+        {
+            GUIRenderer.begin(DescriptionTextures.SPACE_BACKGROUND, poseStack)
+                    .texSize(418, 4096)
+                    .patternSize(backgroundWidth, backgroundHeight)
+                    .pos(x + (backgroundWidth / 2F), y + (backgroundHeight / 2F))
+                    .animation(AnimationData.construct(4096, backgroundHeight, 2))
+                    .end();
+        }
 
         {
             float color = (float) (0.5F + (Math.sin((player.tickCount + pPartialTick) * 0.1F) * 0.1F));

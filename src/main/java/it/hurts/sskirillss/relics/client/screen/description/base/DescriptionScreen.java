@@ -1,39 +1,23 @@
 package it.hurts.sskirillss.relics.client.screen.description.base;
 
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
-import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
-import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.TabWidget;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
-import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.Comparator;
 
-// TODO: Get rid of IRelicScreenProvider, use DescriptionScreen instead
 @OnlyIn(Dist.CLIENT)
-public class DescriptionScreen extends Screen implements IRelicScreenProvider, IAutoScaledScreen {
-    public final Screen screen;
-
-    @Getter
-    public final int container;
-    @Getter
-    public final int slot;
-    @Getter
-    public ItemStack stack;
-
+public class DescriptionScreen extends SimpleDescriptionScreen {
     public final int backgroundHeight = 256;
     public final int backgroundWidth = 418;
 
@@ -41,13 +25,7 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider, I
     public int y;
 
     protected DescriptionScreen(Player player, int container, int slot, Screen screen) {
-        super(Component.empty());
-
-        this.container = container;
-        this.slot = slot;
-        this.screen = screen;
-
-        stack = DescriptionUtils.gatherRelicStack(player, slot);
+        super(player, container, slot, screen);
     }
 
     @Override
@@ -110,13 +88,7 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider, I
                 .texSize(418, 4096)
                 .patternSize(backgroundWidth, backgroundHeight)
                 .pos(x + (backgroundWidth / 2F), y + (backgroundHeight / 2F))
-                .animation(AnimationData.builder()
-                        .frame(0, 2).frame(1, 2).frame(2, 2)
-                        .frame(3, 2).frame(4, 2).frame(5, 2)
-                        .frame(6, 2).frame(7, 2).frame(8, 2)
-                        .frame(9, 2).frame(10, 2).frame(11, 2)
-                        .frame(12, 2).frame(13, 2).frame(14, 2)
-                        .frame(15, 2))
+                .animation(AnimationData.construct(4096, backgroundHeight, 2))
                 .end();
     }
 
@@ -136,10 +108,5 @@ public class DescriptionScreen extends Screen implements IRelicScreenProvider, I
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(x + 59, y + 144)
                 .end();
-    }
-
-    @Override
-    public int getAutoScale() {
-        return 4;
     }
 }

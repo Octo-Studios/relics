@@ -16,6 +16,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
@@ -50,6 +51,10 @@ public class KineticBeltItem extends RelicItem {
                                         .initialValue(1D, 2D)
                                         .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 0)))
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 11, 2).star(1, 5, 6).star(2, 17, 6).star(3, 2, 10).star(4, 20, 10).star(5, 11, 11).star(6, 2, 17).star(7, 7, 17).star(8, 15, 17).star(9, 20, 17).star(10, 2, 24).star(11, 20, 24).star(12, 11, 25)
+                                        .link(0, 1).link(0, 2).link(2, 5).link(1, 5).link(5, 7).link(5, 8).link(7, 12).link(8, 12).link(7, 3).link(7, 6).link(7, 10).link(8, 4).link(8, 9).link(8, 11)
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("gliding")
@@ -96,6 +101,10 @@ public class KineticBeltItem extends RelicItem {
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .visibilityCondition((entity, stack, optional) -> this.isAbilityRankModifierUnlocked(entity, stack, optional.get(), "resistance"))
                                                 .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 2, 9).star(1, 20, 9).star(2, 5, 13).star(3, 17, 13).star(4, 11, 14).star(5, 2, 18).star(6, 20, 18).star(7, 5, 19).star(8, 11, 19).star(9, 17, 19).star(10, 7, 26).star(11, 15, 26)
+                                        .link(8, 4).link(8, 2).link(8, 3).link(8, 10).link(8, 11).link(2, 7).link(2, 0).link(0, 5).link(3, 9).link(3, 1).link(1, 6)
                                         .build())
                                 .build())
                         .build())
