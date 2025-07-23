@@ -73,7 +73,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
         if (relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability)) {
             GUIRenderer.begin(DescriptionTextures.BULB_BROKEN, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(getX() + 34, getY() - 3)
+                    .pos(getX() + 33, getY() - 3)
                     .end();
         } else {
             if (isHovered()) {
