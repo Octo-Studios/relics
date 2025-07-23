@@ -82,24 +82,21 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
                 if (Screen.hasShiftDown())
                     GUIRenderer.begin(DescriptionTextures.BULB_BURNING, poseStack)
                             .anchor(SpriteAnchor.TOP_LEFT)
-                            .pos(getX() + 34, getY() - 17)
-                            .patternSize(16, 34)
+                            .pos(getX() + 33, getY() - 13)
+                            .patternSize(18, 32)
                             .color(color, color, color, 1F)
-                            .animation(AnimationData.builder()
-                                    .frame(0, 2).frame(1, 2).frame(2, 2)
-                                    .frame(3, 2).frame(4, 2).frame(5, 2)
-                                    .frame(6, 2).frame(7, 2))
+                            .animation(AnimationData.construct(256, 32, 2))
                             .end();
                 else
                     GUIRenderer.begin(DescriptionTextures.BULB_GLOWING, poseStack)
                             .anchor(SpriteAnchor.TOP_LEFT)
-                            .pos(getX() + 34, getY() - 3)
+                            .pos(getX() + 33, getY() - 3)
                             .color(color, color, color, 1F)
                             .end();
             } else
                 GUIRenderer.begin(DescriptionTextures.BULB, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
-                        .pos(getX() + 34, getY() - 3)
+                        .pos(getX() + 33, getY() - 3)
                         .end();
         }
 
