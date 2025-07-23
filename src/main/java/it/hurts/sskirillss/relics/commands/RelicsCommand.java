@@ -292,7 +292,7 @@ public class RelicsCommand {
                                         )
                                 )
                         )
-                        .then(Commands.literal("value")
+                        .then(Commands.literal("stat")
                                 .then(Commands.argument("action", EnumArgument.enumArgument(CommandAction.class))
                                         .then(Commands.argument("ability", AbilityArgument.ability())
                                                 .then(Commands.argument("stat", AbilityStatArgument.abilityStat())
