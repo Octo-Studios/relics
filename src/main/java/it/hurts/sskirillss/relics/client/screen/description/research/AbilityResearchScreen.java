@@ -9,11 +9,15 @@ import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.SimpleDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.TabWidget;
 import it.hurts.sskirillss.relics.client.screen.description.research.misc.BurnPoint;
 import it.hurts.sskirillss.relics.client.screen.description.research.particles.ResearchParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.research.widgets.HintWidget;
@@ -55,12 +59,13 @@ import org.lwjgl.glfw.GLFW;
 import javax.annotation.Nullable;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class AbilityResearchScreen extends SimpleDescriptionScreen {
+public class AbilityResearchScreen extends DescriptionScreen {
     public final String ability;
 
     @Nullable
@@ -292,15 +297,6 @@ public class AbilityResearchScreen extends SimpleDescriptionScreen {
         PoseStack poseStack = guiGraphics.pose();
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-
-        {
-            GUIRenderer.begin(DescriptionTextures.SPACE_BACKGROUND, poseStack)
-                    .texSize(418, 4096)
-                    .patternSize(backgroundWidth, backgroundHeight)
-                    .pos(x + (backgroundWidth / 2F), y + (backgroundHeight / 2F))
-                    .animation(AnimationData.construct(4096, backgroundHeight, 2))
-                    .end();
-        }
 
         {
             float color = (float) (0.5F + (Math.sin((player.tickCount + pPartialTick) * 0.1F) * 0.1F));
@@ -645,6 +641,26 @@ public class AbilityResearchScreen extends SimpleDescriptionScreen {
         }
 
         return super.mouseReleased(pMouseX, pMouseY, pButton);
+    }
+
+    @Override
+    protected void initTabs() {
+
+    }
+
+    @Override
+    protected void initTopScroll() {
+
+    }
+
+    @Override
+    protected void renderTopScroll(GuiGraphics guiGraphics) {
+
+    }
+
+    @Override
+    protected void renderBottomScroll(GuiGraphics guiGraphics) {
+
     }
 
     @Override

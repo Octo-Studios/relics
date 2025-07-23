@@ -35,12 +35,9 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
         this.x = (this.width - this.backgroundWidth) / 2;
         this.y = (this.height - this.backgroundHeight) / 2;
 
+        initTopScroll();
         initSidebar();
         initTabs();
-
-        // TODO: Spread between categories
-
-        this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 133, this));
     }
 
     @Override
@@ -79,6 +76,10 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
 
             xOff += 19;
         }
+    }
+
+    protected void initTopScroll() {
+        this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 133, this));
     }
 
     protected void renderSpaceBackground(GuiGraphics guiGraphics) {
