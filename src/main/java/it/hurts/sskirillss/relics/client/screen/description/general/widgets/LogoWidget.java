@@ -4,8 +4,10 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.octostudios.octolib.client.animation.Tween;
 import it.hurts.octostudios.octolib.client.animation.easing.EaseType;
 import it.hurts.octostudios.octolib.client.animation.easing.TransitionType;
+import it.hurts.octostudios.octolib.client.particle.ExtendedUIParticle;
 import it.hurts.octostudios.octolib.client.particle.UIParticle;
 import it.hurts.octostudios.octolib.util.OctoColor;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
@@ -21,6 +23,7 @@ import lombok.Setter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector2f;
 
 public class LogoWidget extends AbstractDescriptionWidget implements ITickingWidget {
@@ -114,13 +117,55 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
 
         tween.start();
 
+        LogoWidget.setNoClickDuration(0);
+
         var remainingClicks = LogoWidget.getRemainingClicks();
 
         if (remainingClicks > 0)
-            LogoWidget.addClicks(1);
+            LogoWidget.addCurrentClicks(1);
 
-        if (remainingClicks <= 0) {
+        if (remainingClicks <= 1) {
             minecraft.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.LOGO_EXPLOSION.get(), 1F, 1F));
+
+            var random = minecraft.player.getRandom();
+
+            for (int i = 0; i < 100; i++) {
+                var particle = new ExtendedUIParticle(new UIParticle.Texture2D(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/particle/logo_air.png"), 0, 0, 10, 10, 10, 10),
+                        5F, random.nextInt(50, 100), this.getX() + random.nextInt(this.getWidth()), this.getY() + random.nextInt(this.getHeight()), UIParticle.Layer.SCREEN, 10);
+
+                float size = (random.nextFloat() * 0.5F) + 0.75F;
+
+                particle.setColors(new OctoColor(1F, 1F, 1F, 1F), new OctoColor(1F, 1F, 1F, 0F));
+                particle.setDirection(MathUtils.randomFloat(random), -random.nextFloat() * 0.5F);
+                particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
+                particle.getTransform().setSize(new Vector2f(size, size));
+                particle.setGravityDirection(0, -1);
+                particle.setScreen(this.screen);
+                particle.setGravity(0.01F);
+                particle.setFriction(0.075F);
+                particle.setSpeed(random.nextFloat() * 5F);
+
+                particle.instantiate();
+            }
+
+            for (int i = 0; i < 20; i++) {
+                var particle = new ExtendedUIParticle(new UIParticle.Texture2D(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/particle/logo_part.png"), 0, 0, 6, 9, 6, 9),
+                        5F, random.nextInt(50, 100), this.getX() + random.nextInt(this.getWidth()), this.getY() + random.nextInt(this.getHeight()), UIParticle.Layer.SCREEN, 10);
+
+                float size = (random.nextFloat() * 0.5F) + 0.75F;
+
+                particle.setColors(new OctoColor(1F, 1F, 1F, 1F), new OctoColor(1F, 1F, 1F, 0F));
+                particle.setDirection(MathUtils.randomFloat(random), MathUtils.randomFloat(random) * 0.5F);
+                particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
+                particle.getTransform().setSize(new Vector2f(size, size));
+                particle.setGravityDirection(0, 1);
+                particle.setScreen(this.screen);
+                particle.setGravity(0.25F);
+                particle.enableBlend(false);
+                particle.setSpeed(random.nextFloat() * 3.5F);
+
+                particle.instantiate();
+            }
 
             screen.rebuildWidgets();
         } else
@@ -133,6 +178,44 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
 
         if (player == null)
             return;
+
+        var noClickDuration = LogoWidget.getNoClickDuration();
+        var currentClicks = LogoWidget.getCurrentClicks();
+
+        if (noClickDuration < MAX_NO_CLICK_DURATION)
+            LogoWidget.addNoClickDuration(1);
+        else if (currentClicks > 0 && currentClicks < MAX_CLICKS && player.tickCount % 10 == 0) {
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.LOGO_INFLATE.get(), 1F));
+
+            var intensity = 0.75F + LogoWidget.MAX_CLICKS * 0.15F;
+
+            var yPeak = 1F + (1.2F - 1F) * intensity;
+            var xPeak = 1F + (1.4F - 1F) * intensity;
+            var yValley = 1F - (1F - 0.9F) * intensity;
+            var xValley = 1F - (1F - 0.85F) * intensity;
+
+            var tween = Tween.create().setParallel(true);
+
+            tween.tweenMethod(this::setYSqueeze, yPeak, yValley, 0.2D)
+                    .setEaseType(EaseType.EASE_OUT)
+                    .setTransitionType(TransitionType.QUAD);
+            tween.tweenMethod(this::setXSqueeze, xPeak, xValley, 0.15D)
+                    .setEaseType(EaseType.EASE_OUT)
+                    .setTransitionType(TransitionType.QUAD);
+
+            tween.tweenMethod(this::setYSqueeze, yValley, 1F, 0.25D)
+                    .setDelay(0.2D)
+                    .setEaseType(EaseType.EASE_IN)
+                    .setTransitionType(TransitionType.QUAD);
+            tween.tweenMethod(this::setXSqueeze, xValley, 1F, 0.2D)
+                    .setDelay(0.15D)
+                    .setEaseType(EaseType.EASE_IN)
+                    .setTransitionType(TransitionType.QUAD);
+
+            tween.start();
+
+            LogoWidget.setCurrentClicks(0);
+        }
 
         var random = player.getRandom();
 
@@ -165,7 +248,7 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
     }
 
     private static int CLICKS_AMOUNT = 0;
-    private static final int MAX_CLICKS = 5;
+    private static final int MAX_CLICKS = 6;
 
     public static int getCurrentClicks() {
         return CLICKS_AMOUNT;
@@ -175,11 +258,26 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
         CLICKS_AMOUNT = Math.clamp(clicks, 0, MAX_CLICKS);
     }
 
-    public static void addClicks(int clicks) {
-        setCurrentClicks(getCurrentClicks() + clicks);
+    public static void addCurrentClicks(int clicks) {
+        LogoWidget.setCurrentClicks(LogoWidget.getCurrentClicks() + clicks);
     }
 
     public static int getRemainingClicks() {
-        return MAX_CLICKS - getCurrentClicks();
+        return MAX_CLICKS - LogoWidget.getCurrentClicks();
+    }
+
+    private static int NO_CLICK_DURATION = 0;
+    private static final int MAX_NO_CLICK_DURATION = 100;
+
+    public static int getNoClickDuration() {
+        return NO_CLICK_DURATION;
+    }
+
+    public static void setNoClickDuration(int duration) {
+        NO_CLICK_DURATION = Math.clamp(duration, 0, MAX_NO_CLICK_DURATION);
+    }
+
+    public static void addNoClickDuration(int duration) {
+        LogoWidget.setNoClickDuration(LogoWidget.getNoClickDuration() + duration);
     }
 }
