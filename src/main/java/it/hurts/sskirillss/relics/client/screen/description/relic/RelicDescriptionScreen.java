@@ -124,8 +124,11 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
         var splitter = font.getSplitter();
         var words = new ArrayList<FormattedText>();
         text.visit((style, str) -> {
-            for (var word : str.split(" ")) {
-                if (!word.isEmpty()) words.add(FormattedText.of(word, style));
+            for (var token : str.split(" ", -1)) {
+                if (token.isEmpty())
+                    words.add(FormattedText.of(" ", style));
+                else
+                    words.add(FormattedText.of(token, style));
             }
             return Optional.empty();
         }, Style.EMPTY);
