@@ -4,17 +4,18 @@ import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
-import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
 import it.hurts.sskirillss.relics.badges.base.RelicBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RelicBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RankupRelicActionWidget;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -46,7 +47,7 @@ import java.util.Optional;
 public class RelicDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
     @Getter
     @Setter
-    private DescriptionPage page = DescriptionPage.DESCRIPTION;
+    private DescriptionSubcategory subcategory = DescriptionSubcategories.getSubcategory("relic_description");
 
     public RelicDescriptionScreen(Player player, int container, int slot, Screen screen) {
         super(player, container, slot, screen);
@@ -58,9 +59,6 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
 
         if (this.stack == null || !(this.stack.getItem() instanceof IRelicItem relic))
             return;
-
-        this.addRenderableWidget(new PageWidget(x + 242, y + 35, this, DescriptionPage.DESCRIPTION));
-        this.addRenderableWidget(new PageWidget(x + 261, y + 35, this, DescriptionPage.STATISTIC));
 
         int xOff = 0;
 
@@ -75,17 +73,10 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
             xOff += 15;
         }
 
-        DescriptionContainerWidget container = null;
+        var container = subcategory.getContainerWidget(this);
 
-        switch (this.getPage()) {
-            case DESCRIPTION -> container = new RelicDescriptionContainerWidget(x + 107, y + 77, this);
-            case STATISTIC -> container = new RelicStatisticContainerWidget(x + 107, y + 77, this);
-        }
-
-        if (container != null) {
-            this.addRenderableWidget(container);
-            this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
-        }
+        this.addRenderableWidget(container);
+        this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
 
         this.addRenderableWidget(new RankupRelicActionWidget(x + 289, y + 84, this));
     }
@@ -222,7 +213,7 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
     }
 
     @Override
-    public DescriptionCategory getCategory() {
+    public it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory getCategory() {
         return DescriptionCategories.getCategory("relic");
     }
 }

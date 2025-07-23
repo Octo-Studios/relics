@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.client.screen.base;
 
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
 
 public interface IPagedDescriptionScreen {
-    DescriptionPage getPage();
+    DescriptionSubcategory getSubcategory();
 
-    void setPage(DescriptionPage page);
+    void setSubcategory(DescriptionSubcategory subcategory);
 }

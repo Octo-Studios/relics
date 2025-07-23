@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.StatisticContainerWidget;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -12,8 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class AbilityStatisticContainerWidget extends StatisticContainerWidget {
-    public AbilityStatisticContainerWidget(int x, int y, AbilityDescriptionScreen screen) {
-        super(x, y, screen);
+    public AbilityStatisticContainerWidget(DescriptionScreen screen) {
+        super(screen);
     }
 
     @Override

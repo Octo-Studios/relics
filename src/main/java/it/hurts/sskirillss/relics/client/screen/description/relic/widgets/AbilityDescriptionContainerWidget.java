@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
@@ -26,8 +27,8 @@ import java.util.stream.IntStream;
 public class AbilityDescriptionContainerWidget extends DescriptionContainerWidget {
     private static final int VERTICAL_PADDING = 1;
 
-    public AbilityDescriptionContainerWidget(int x, int y, AbilityDescriptionScreen screen) {
-        super(x, y, screen);
+    public AbilityDescriptionContainerWidget(DescriptionScreen screen) {
+        super(screen);
     }
 
     @Override

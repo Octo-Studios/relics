@@ -4,21 +4,17 @@ import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
-import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.AbilityBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.AbilityDescriptionContainerWidget;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.PageWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.BadgeRegistry;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -41,7 +37,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
-import java.util.*;
+import java.util.ArrayList;
 
 @OnlyIn(Dist.CLIENT)
 public class AbilityDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
@@ -55,7 +51,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
     @Getter
     @Setter
-    private DescriptionPage page = DescriptionPage.DESCRIPTION;
+    private DescriptionSubcategory subcategory = DescriptionSubcategories.getSubcategory("ability_description");
 
     @Getter
     private UpgradeAbilityActionWidget upgradeButton;
@@ -87,10 +83,6 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         if (this.selectedAbility == null)
             this.setSelectedAbility(relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream().findFirst().get());
-
-        this.addRenderableWidget(new PageWidget(x + 223, y + 35, this, DescriptionPage.DESCRIPTION));
-        this.addRenderableWidget(new PageWidget(x + 242, y + 35, this, DescriptionPage.EXPERIENCE));
-        this.addRenderableWidget(new PageWidget(x + 261, y + 35, this, DescriptionPage.STATISTIC));
 
         var ability = getSelectedAbility();
 
@@ -152,18 +144,10 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         if (relic.isAbilityResetEnabled(player, this.stack, ability))
             this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 289, y + 105, this));
 
-        DescriptionContainerWidget container = null;
+        var container = subcategory.getContainerWidget(this);
 
-        switch (this.getPage()) {
-            case DESCRIPTION -> container = new AbilityDescriptionContainerWidget(x + 107, y + 77, this);
-            case STATISTIC -> container = new AbilityStatisticContainerWidget(x + 107, y + 77, this);
-            case EXPERIENCE -> container = new AbilityExperienceContainerWidget(x + 107, y + 77, this);
-        }
-
-        if (container != null) {
-            this.addRenderableWidget(container);
-            this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
-        }
+        this.addRenderableWidget(container);
+        this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
 
         var modes = relic.getAbilityTemplate(player, stack, this.getSelectedAbility()).getModes();
 
@@ -268,7 +252,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
     }
 
     @Override
-    public DescriptionCategory getCategory() {
+    public it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory getCategory() {
         return DescriptionCategories.getCategory("ability");
     }
 }

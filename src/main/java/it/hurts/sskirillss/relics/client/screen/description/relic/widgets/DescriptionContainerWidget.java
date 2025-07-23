@@ -15,8 +15,8 @@ public abstract class DescriptionContainerWidget extends AbstractDescriptionWidg
 
     public static final int MAX_LINES = 9;
 
-    public DescriptionContainerWidget(int x, int y, DescriptionScreen screen) {
-        super(x, y, 170, 44);
+    public DescriptionContainerWidget(DescriptionScreen screen) {
+        super(screen.x + 107, screen.y + 77, 170, 44);
 
         this.screen = screen;
     }

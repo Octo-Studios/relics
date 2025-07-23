@@ -4,6 +4,8 @@ import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailRegistry;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
 import it.hurts.sskirillss.relics.client.gui.layers.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
@@ -14,6 +16,7 @@ import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
 import it.hurts.sskirillss.relics.description_categories.AbilityDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCategory;
+import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -90,6 +93,12 @@ public class RemoteRegistry {
         DescriptionCategories.registerCategory(RelicDescriptionCategory::new);
         DescriptionCategories.registerCategory(AbilityDescriptionCategory::new);
         DescriptionCategories.registerCategory(SynergyDescriptionCategory::new);
+
+        DescriptionSubcategories.registerSubcategory(AbilityDescriptionDescriptionSubcategory::new);
+        DescriptionSubcategories.registerSubcategory(AbilityExperienceDescriptionSubcategory::new);
+        DescriptionSubcategories.registerSubcategory(AbilityStatisticDescriptionSubcategory::new);
+        DescriptionSubcategories.registerSubcategory(RelicDescriptionDescriptionSubcategory::new);
+        DescriptionSubcategories.registerSubcategory(RelicStatisticDescriptionSubcategory::new);
     }
 
     @SubscribeEvent

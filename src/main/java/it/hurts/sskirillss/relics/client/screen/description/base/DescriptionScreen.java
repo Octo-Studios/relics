@@ -1,8 +1,11 @@
 package it.hurts.sskirillss.relics.client.screen.description.base;
 
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.PageWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicExperienceWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.TabWidget;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
@@ -14,7 +17,9 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.stream.Collectors;
 
 @OnlyIn(Dist.CLIENT)
 public class DescriptionScreen extends SimpleDescriptionScreen {
@@ -35,9 +40,9 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
         this.x = (this.width - this.backgroundWidth) / 2;
         this.y = (this.height - this.backgroundHeight) / 2;
 
-        initTopScroll();
-        initSidebar();
-        initTabs();
+        this.initSidebar();
+        this.initTopScroll();
+        this.initBottomScroll();
     }
 
     @Override
@@ -54,9 +59,8 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
         if (LogoWidget.getRemainingClicks() != 0)
             this.addRenderableWidget(new LogoWidget(this.x + 313, this.y + 53, this));
 
-//        FIXME: Somebody do something :'\
-//        if (relic.isSomethingWrongWithLevelingPoints(minecraft.player, stack))
-//            this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
+        if (((IRelicItem) stack.getItem()).isSomethingWrongWithLevelingPoints(minecraft.player, stack))
+            this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
         this.addRenderableWidget(new ProgressPlateWidget(this.x + 313, this.y + 77, this));
         this.addRenderableWidget(new RankPlateWidget(this.x + 313, this.y + 102, this));
@@ -64,7 +68,30 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
         this.addRenderableWidget(new PlayerExperiencePlateWidget(this.x + 313, this.y + 152, this));
     }
 
-    protected void initTabs() {
+    protected void initTopScroll() {
+        var player = minecraft.player;
+
+        int xOff = 0;
+
+        var subcategories = DescriptionSubcategories.getSubcategories().values().stream()
+                .filter(subcategory -> subcategory.shouldAppear(this, player, stack))
+                .sorted(Comparator.comparingInt(subcategory -> subcategory.getOrder(player, stack)))
+                .collect(Collectors.toList());
+
+        if (subcategories.size() > 1) {
+            Collections.reverse(subcategories);
+
+            for (var subcategory : subcategories) {
+                this.addRenderableWidget(new PageWidget(x + 261 + xOff, y + 35, this, subcategory));
+
+                xOff -= 19;
+            }
+        }
+
+        this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 133, this));
+    }
+
+    protected void initBottomScroll() {
         var player = minecraft.player;
 
         int xOff = 0;
@@ -76,10 +103,6 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
 
             xOff += 19;
         }
-    }
-
-    protected void initTopScroll() {
-        this.addRenderableWidget(new RelicExperienceWidget(x + 142, y + 133, this));
     }
 
     protected void renderSpaceBackground(GuiGraphics guiGraphics) {

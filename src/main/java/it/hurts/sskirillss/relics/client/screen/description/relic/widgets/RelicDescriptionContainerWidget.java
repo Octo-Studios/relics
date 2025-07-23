@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
@@ -10,8 +11,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
 public class RelicDescriptionContainerWidget extends DescriptionContainerWidget {
-    public RelicDescriptionContainerWidget(int x, int y, RelicDescriptionScreen screen) {
-        super(x, y, screen);
+    public RelicDescriptionContainerWidget(DescriptionScreen screen) {
+        super(screen);
     }
 
     @Override

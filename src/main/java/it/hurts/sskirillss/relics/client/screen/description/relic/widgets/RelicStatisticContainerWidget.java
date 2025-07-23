@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.StatisticContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
@@ -16,8 +17,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class RelicStatisticContainerWidget extends StatisticContainerWidget {
-    public RelicStatisticContainerWidget(int x, int y, RelicDescriptionScreen screen) {
-        super(x, y, screen);
+    public RelicStatisticContainerWidget(DescriptionScreen screen) {
+        super(screen);
     }
 
     @Override

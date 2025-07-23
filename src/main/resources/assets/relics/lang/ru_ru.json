@@ -5,9 +5,13 @@
 
   "tooltip.relics.researching.info": "Удерживай [%1$s] для исследования...",
 
-  "tooltip.relics.researching.bookmarks.description": "Описание",
-  "tooltip.relics.researching.bookmarks.experience": "Источники опыта",
-  "tooltip.relics.researching.bookmarks.statistic": "Статистика",
+  "tooltip.relics.researching.bookmarks.relic_description": "Описание реликвии",
+  "tooltip.relics.researching.bookmarks.relic_statistic": "Статистика реликвии",
+
+  "tooltip.relics.researching.bookmarks.ability_description": "Описание способности",
+  "tooltip.relics.researching.bookmarks.ability experience": "Источники опыта способности",
+  "tooltip.relics.researching.bookmarks.ability_statistic": "Статистика способности",
+
   "tooltip.relics.researching.bookmarks.relic": "Реликвия",
   "tooltip.relics.researching.bookmarks.ability": "Способности",
   "tooltip.relics.researching.bookmarks.synergy": "Синергии",

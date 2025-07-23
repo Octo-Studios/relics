@@ -1,18 +1,18 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.misc.DescriptionPage;
 
 import java.util.Locale;
 
 public class PageWidget extends BookmarkWidget {
-    private DescriptionPage page;
+    private DescriptionSubcategory subcategory;
 
-    public PageWidget(int x, int y, DescriptionScreen screen, DescriptionPage page) {
+    public PageWidget(int x, int y, DescriptionScreen screen, DescriptionSubcategory subcategory) {
         super(x, y, screen);
 
-        this.page = page;
+        this.subcategory = subcategory;
     }
 
     @Override
@@ -20,18 +20,18 @@ public class PageWidget extends BookmarkWidget {
         if (this.isLocked() || !(this.getScreen() instanceof IPagedDescriptionScreen screen))
             return;
 
-        screen.setPage(this.page);
+        screen.setSubcategory(this.subcategory);
 
         this.getScreen().rebuildWidgets();
     }
 
     @Override
     public boolean isLocked() {
-        return this.getScreen() instanceof IPagedDescriptionScreen screen && screen.getPage() == this.page;
+        return this.getScreen() instanceof IPagedDescriptionScreen screen && screen.getSubcategory() == this.subcategory;
     }
 
     @Override
     public String getId() {
-        return this.page.name().toLowerCase(Locale.ROOT);
+        return this.subcategory.getId();
     }
 }

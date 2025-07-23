@@ -644,12 +644,12 @@ public class AbilityResearchScreen extends DescriptionScreen {
     }
 
     @Override
-    protected void initTabs() {
+    protected void initTopScroll() {
 
     }
 
     @Override
-    protected void initTopScroll() {
+    protected void initBottomScroll() {
 
     }
 

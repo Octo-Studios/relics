@@ -16,8 +16,8 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class StatisticContainerWidget extends DescriptionContainerWidget {
-    public StatisticContainerWidget(int x, int y, DescriptionScreen screen) {
-        super(x, y, screen);
+    public StatisticContainerWidget(DescriptionScreen screen) {
+        super(screen);
     }
 
     @Override

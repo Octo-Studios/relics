@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.StatisticContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
@@ -14,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AbilityExperienceContainerWidget extends StatisticContainerWidget {
-    public AbilityExperienceContainerWidget(int x, int y, AbilityDescriptionScreen screen) {
-        super(x, y, screen);
+    public AbilityExperienceContainerWidget(DescriptionScreen screen) {
+        super(screen);
     }
 
     @Override
