@@ -68,7 +68,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
-        if (this.isHoveredOrFocused())
+        if (this.isHovered())
             GUIRenderer.begin(DescriptionTextures.ACTION_BUTTON_OUTLINE, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(this.getX() - 1, this.getY() - 1)

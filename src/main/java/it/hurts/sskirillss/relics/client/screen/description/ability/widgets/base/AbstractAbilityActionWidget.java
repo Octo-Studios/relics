@@ -61,7 +61,7 @@ public abstract class AbstractAbilityActionWidget extends AbstractDescriptionWid
                 .pos(this.getX(), this.getY())
                 .end();
 
-        if (this.isHoveredOrFocused())
+        if (this.isHovered())
             GUIRenderer.begin(DescriptionTextures.ACTION_BUTTON_OUTLINE, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(this.getX() - 1, this.getY() - 1)
