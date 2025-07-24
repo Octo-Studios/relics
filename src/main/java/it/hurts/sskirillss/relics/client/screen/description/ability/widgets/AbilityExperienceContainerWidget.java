@@ -3,8 +3,9 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.StatisticContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.SimpleDescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -15,7 +16,7 @@ import net.minecraft.util.FormattedCharSequence;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AbilityExperienceContainerWidget extends StatisticContainerWidget {
+public class AbilityExperienceContainerWidget extends SimpleDescriptionContainerWidget {
     public AbilityExperienceContainerWidget(DescriptionScreen screen) {
         super(screen);
     }
@@ -40,7 +41,7 @@ public class AbilityExperienceContainerWidget extends StatisticContainerWidget {
             var description = Component.literal("● ").append(source.getDescriptionComponent().apply(player, stack, ability, source.getId()));
 
             if (!source.getCondition().test(player, stack, screen.getSelectedAbility()))
-                description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.CUSTOM_COLOR(0x851b1b)));
+                description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
 
             var content = new ArrayList<MutableComponent>();
 

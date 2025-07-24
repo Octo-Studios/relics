@@ -1,22 +1,16 @@
-package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
+package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
-import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.FormattedCharSequence;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
-public abstract class StatisticContainerWidget extends DescriptionContainerWidget {
-    public StatisticContainerWidget(DescriptionScreen screen) {
+public abstract class SimpleDescriptionContainerWidget extends DescriptionContainerWidget {
+    public SimpleDescriptionContainerWidget(DescriptionScreen screen) {
         super(screen);
     }
 
@@ -61,7 +55,9 @@ public abstract class StatisticContainerWidget extends DescriptionContainerWidge
         GUIScissors.end();
     }
 
-    public abstract List<FormattedCharSequence> getContent();
+    public List<FormattedCharSequence> getContent() {
+        return List.of();
+    }
 
     @Override
     public int getContentHeight() {
