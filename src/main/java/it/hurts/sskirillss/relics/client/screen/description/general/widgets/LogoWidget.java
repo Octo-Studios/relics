@@ -149,7 +149,7 @@ public class LogoWidget extends AbstractDescriptionWidget implements ITickingWid
             }
 
             for (int i = 0; i < 20; i++) {
-                var particle = new ExtendedUIParticle(new UIParticle.Texture2D(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/particle/logo_part.png"), 0, 0, 6, 9, 6, 9),
+                var particle = new ExtendedUIParticle(new UIParticle.Texture2D(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/particle/logo_part_" + (random.nextInt(4) + 1) + ".png"), 0, 0, 10, 10, 10, 10),
                         5F, random.nextInt(50, 100), this.getX() + random.nextInt(this.getWidth()), this.getY() + random.nextInt(this.getHeight()), UIParticle.Layer.SCREEN, 10);
 
                 float size = (random.nextFloat() * 0.5F) + 0.75F;
