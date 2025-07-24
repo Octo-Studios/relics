@@ -144,7 +144,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
 
         for (var entry : template.getRankModifiers().entries()) {
             rawLines.add(new LineEntry(Component.literal(""), false));
-            rawLines.add(new LineEntry(Component.translatable("tooltip.relics.description.ability.rank_modifier", entry.getKey())
+            rawLines.add(new LineEntry(Component.translatable("tooltip.relics.description.ability.rank_modifier.condition.rank", entry.getKey())
                     .withStyle(ChatFormatting.BOLD), false));
 
             var description = Component.literal("● ").append(Component.translatable("tooltip.relics." + itemId + ".ability." + ability + ".rank_modifier." + entry.getValue(), (Object[]) tokens));

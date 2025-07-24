@@ -6,8 +6,9 @@ import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScre
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.StatisticContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 
@@ -32,15 +33,27 @@ public class AbilityExperienceContainerWidget extends StatisticContainerWidget {
         var font = this.minecraft.font;
         var maxWidth = 320;
 
-        for (var source : relic.getExperienceSourcesTemplate(player, stack, screen.getSelectedAbility()).getSources().values()) {
-            var description = Component.literal("● ").append(Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + screen.getSelectedAbility() + ".experience_source." + source.getId()));
+        var ability = screen.getSelectedAbility();
+
+        for (var source : relic.getExperienceSourcesTemplate(player, stack, ability).getSources().values()) {
+            var condition = source.getConditionComponent().apply(player, stack, ability, source.getId()).withStyle(ChatFormatting.BOLD);
+            var description = Component.literal("● ").append(source.getDescriptionComponent().apply(player, stack, ability, source.getId()));
 
             if (!source.getCondition().test(player, stack, screen.getSelectedAbility()))
                 description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.CUSTOM_COLOR(0x851b1b)));
 
-            sequences.addAll(font.split(description, maxWidth));
+            var content = new ArrayList<MutableComponent>();
 
-            sequences.addAll(font.split(Component.literal(" "), maxWidth));
+            if (!sequences.isEmpty())
+                content.add(Component.literal(" "));
+
+            if (!condition.equals(Component.empty()))
+                content.add(condition);
+
+            content.add(description);
+
+            for (var entry : content)
+                sequences.addAll(font.split(entry, maxWidth));
         }
 
         return sequences;
