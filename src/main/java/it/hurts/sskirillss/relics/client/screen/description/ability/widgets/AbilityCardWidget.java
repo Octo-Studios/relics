@@ -245,7 +245,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var unlocks = relic.getLockUnlocks(player, stack, this.ability);
 
         var isEnoughLevel = relic.isEnoughLevel(player, stack, this.ability);
-        var isLockUnlocked = relic.isLockUnlocked(player, stack, this.ability);
+        var isLockUnlocked = isEnoughLevel && relic.isLockUnlocked(player, stack, this.ability);
         var isAbilityResearched = relic.isAbilityResearched(player, stack, this.ability);
 
         var canUse = isEnoughLevel && isLockUnlocked && isAbilityResearched;
