@@ -12,6 +12,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
+import java.util.Random;
 
 @ApiStatus.Internal
 public interface IRelicDataHolder {
@@ -86,6 +87,11 @@ public interface IRelicDataHolder {
             return statComponent;
         else if (statData != null) {
             statComponent = StatComponent.EMPTY;
+
+            // TODO: Replace with getMaxQuality
+            statComponent = statComponent.toBuilder()
+                    .initialQuality(new Random().nextInt(11))
+                    .build();
 
             setAbilityComponent(entity, stack, ability, abilityComponent.toBuilder()
                     .stat(stat, statComponent)

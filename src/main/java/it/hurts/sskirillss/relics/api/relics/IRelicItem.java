@@ -2,10 +2,7 @@ package it.hurts.sskirillss.relics.api.relics;
 
 import com.google.common.collect.*;
 import io.netty.util.internal.UnstableApi;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.api.relics.events.RelicExperienceChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelingPointsChangeEvent;
@@ -623,61 +620,42 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         setAbilityLevel(entity, stack, ability, getAbilityLevel(entity, stack, ability) + points);
     }
 
-    default AbilityComponent randomizeAbilityStats(LivingEntity entity, ItemStack stack, String ability) {
-        Map<String, StatTemplate> stats = getAbilityTemplate(entity, stack, ability).getStats();
+    default void randomizeAbilityStats(LivingEntity entity, ItemStack stack, String ability) {
+        var stats = this.getAbilityTemplate(entity, stack, ability).getStats();
 
         var random = entity.getRandom();
 
         double targetQuality;
 
         do {
-            int maxQuality = getAbilityMaxQuality(entity, stack, ability);
-            int maxLuck = 10;
-
-            // Random value in the [-1, 1] range
-            double randomValue = (random.nextDouble() * 2D) - 1D;
-
-            // Luck effect modifier. Lower value = lower chance to get 5 stars
-            double modifier = 5D;
-
-            // Bias based on luck (ranging from -0.5 to 0.5), multiplied by the modifier
-            double bias = ((5 - (maxLuck / 2D)) / maxLuck) * modifier;
-
-            // Apply the bias to randomValue and limit the result within the range [-1, 1]
-            double biasedValue = Math.tanh(randomValue + bias);
-
-            // Convert the biased result to the range [0, maxQuality]
-            double weightedRandom = Math.floor((biasedValue + 1D) / 2D * (maxQuality + 1D));
-
-            // Clamping the value to avoid overflow
-            targetQuality = Mth.clamp(weightedRandom, 0, maxQuality);
+            targetQuality = random.nextInt(this.getAbilityMaxQuality(entity, stack, ability) + 1);
         } while (targetQuality == calculateAbilityQuality(entity, stack, ability));
 
-        double sumQuality = 0;
+        var sumQuality = 0D;
 
-        Map<String, Double> generatedQualities = new HashMap<>();
+        var generatedQualities = new HashMap<String, Double>();
 
-        for (String stat : stats.keySet()) {
-            double randomQuality = MathUtils.randomBetween(random, 0, getStatMaxQuality(entity, stack, ability, stat));
+        for (var stat : stats.keySet()) {
+            var randomQuality = MathUtils.randomBetween(random, 0D, getStatMaxQuality(entity, stack, ability, stat));
 
             generatedQualities.put(stat, randomQuality);
 
             sumQuality += randomQuality;
         }
 
-        double currentAverageQuality = sumQuality / stats.size();
+        var currentAverageQuality = sumQuality / stats.size();
 
         while (Math.abs(currentAverageQuality - targetQuality) > 0.01) {
             if (currentAverageQuality < targetQuality) {
-                String minStat = generatedQualities.entrySet().stream().min(Map.Entry.comparingByValue()).get().getKey();
+                var minStat = generatedQualities.entrySet().stream().min(Map.Entry.comparingByValue()).get().getKey();
 
-                double increment = Math.min((targetQuality - currentAverageQuality) * stats.size(), getStatMaxQuality(entity, stack, ability, minStat) - generatedQualities.get(minStat));
+                var increment = Math.min((targetQuality - currentAverageQuality) * stats.size(), getStatMaxQuality(entity, stack, ability, minStat) - generatedQualities.get(minStat));
 
                 generatedQualities.put(minStat, generatedQualities.get(minStat) + increment);
             } else if (currentAverageQuality > targetQuality) {
-                String maxStat = generatedQualities.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
+                var maxStat = generatedQualities.entrySet().stream().max(Map.Entry.comparingByValue()).get().getKey();
 
-                double decrement = Math.min((currentAverageQuality - targetQuality) * stats.size(), generatedQualities.get(maxStat));
+                var decrement = Math.min((currentAverageQuality - targetQuality) * stats.size(), generatedQualities.get(maxStat));
 
                 generatedQualities.put(maxStat, generatedQualities.get(maxStat) - decrement);
             }
@@ -687,29 +665,12 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
             currentAverageQuality = sumQuality / stats.size();
         }
 
-        for (Map.Entry<String, Double> entry : generatedQualities.entrySet())
-            randomizeStat(entity, stack, ability, entry.getKey(), (int) Math.round(entry.getValue()));
-
-        return getAbilityComponent(entity, stack, ability);
+        for (var entry : generatedQualities.entrySet())
+            this.setStatInitialQuality(entity, stack, ability, entry.getKey(), (int) Math.round(entry.getValue()));
     }
 
-    default StatComponent randomizeStat(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
-        StatTemplate entry = getStatTemplate(entity, stack, ability, stat);
-
-        double minValue = entry.getInitialValue().getKey();
-        double maxValue = entry.getInitialValue().getValue();
-
-        double diff = maxValue - minValue;
-
-        double result = minValue + (diff * ((double) quality / getStatMaxQuality(entity, stack, ability, stat)));
-
-        setStatOverrideValue(entity, stack, ability, stat, result);
-
-        return getStatComponent(entity, stack, ability, stat);
-    }
-
-    default StatComponent randomizeStat(LivingEntity entity, ItemStack stack, String ability, String stat) {
-        return randomizeStat(entity, stack, ability, stat, new Random().nextInt(getStatMaxQuality(entity, stack, ability, stat) + 1));
+    default void randomizeStat(LivingEntity entity, ItemStack stack, String ability, String stat) {
+        this.setStatInitialQuality(entity, stack, ability, stat, entity.getRandom().nextInt(this.getStatMaxQuality(entity, stack, ability, stat) + 1));
     }
 
     default boolean isEnoughLevel(LivingEntity entity, ItemStack stack, String ability) {
@@ -780,7 +741,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
     }
 
     default int getRerollPlayerExperienceCost(LivingEntity entity, ItemStack stack, String ability) {
-        return 50;
+        return 150;
     }
 
     default boolean mayReroll(LivingEntity entity, ItemStack stack, String ability) {

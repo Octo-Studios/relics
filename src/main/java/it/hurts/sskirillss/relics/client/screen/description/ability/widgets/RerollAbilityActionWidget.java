@@ -66,7 +66,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         var newLine = Component.literal(" ");
 
         var currentExperience = EntityUtils.getPlayerTotalExperience(player);
-        var requiredExperience = relic.getUpgradePlayerExperienceCost(player, stack, getAbility());
+        var requiredExperience = relic.getRerollPlayerExperienceCost(player, stack, getAbility());
         var hasExperience = requiredExperience <= currentExperience;
 
         var quality = relic.calculateRelicQuality(player, stack);
