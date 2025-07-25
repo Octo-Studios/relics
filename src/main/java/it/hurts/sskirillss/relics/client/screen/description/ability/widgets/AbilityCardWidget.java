@@ -16,6 +16,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -189,7 +190,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 soundManager.play(SimpleSoundInstance.forUI(SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, 1F));
 
                 if (unlocks >= relic.getMaxLockUnlocks()) {
-                    ClientScheduler.schedule(1, this.screen::rebuildWidgets);
+                    ClientScheduler.schedule(1, this::rebuildActionButtons);
 
                     for (int i = 0; i < 25; i++) {
                         var center = new Vec2(width / 2F, height / 2F);
@@ -200,7 +201,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                         var size = (random.nextFloat() * 0.5F) + 0.75F;
 
-                        particle.setDirection(MathUtils.randomFloat(random) * 0.25F,  -random.nextFloat());
+                        particle.setDirection(MathUtils.randomFloat(random) * 0.25F, -random.nextFloat());
                         particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
                         particle.getTransform().setSize(new Vector2f(size, size));
                         particle.setGravityDirection(0, 1);
@@ -219,6 +220,12 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         } else {
             soundManager.play(SimpleSoundInstance.forUI(SoundEvents.CHAIN_BREAK, 1F));
         }
+    }
+
+    public void rebuildActionButtons() {
+        this.screen.children().removeIf(entry -> entry instanceof AbstractAbilityActionWidget);
+
+        this.screen.initActionButtons();
     }
 
     @Override

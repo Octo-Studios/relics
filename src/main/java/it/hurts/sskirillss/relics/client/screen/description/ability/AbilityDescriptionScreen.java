@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
@@ -84,7 +85,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         if (this.selectedAbility == null)
             this.setSelectedAbility(relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream().findFirst().get());
 
-        var ability = getSelectedAbility();
+        var ability = this.getSelectedAbility();
 
         if (relic.getAbilityTemplate(player, stack, ability) == null)
             return;
@@ -137,12 +138,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             }
         }
 
-        if (relic.isAbilityUpgradeEnabled(player, this.stack, ability))
-            this.upgradeButton = this.addRenderableWidget(new UpgradeAbilityActionWidget(x + 289, y + 63, this));
-        if (relic.isAbilityRerollEnabled(player, this.stack, ability))
-            this.rerollButton = this.addRenderableWidget(new RerollAbilityActionWidget(x + 289, y + 84, this));
-        if (relic.isAbilityResetEnabled(player, this.stack, ability))
-            this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 289, y + 105, this));
+        this.initActionButtons();
 
         var container = subcategory.getContainerWidget(this);
 
@@ -155,6 +151,21 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             this.addRenderableWidget(new AbilityModeWidget(x + 100, y + 53, this, 1));
             this.addRenderableWidget(new AbilityModeWidget(x + 56, y + 53, this, -1));
         }
+    }
+
+    public void initActionButtons() {
+        if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var ability = this.getSelectedAbility();
+        var player = minecraft.player;
+
+        if (relic.isAbilityUpgradeEnabled(player, this.stack, ability))
+            this.upgradeButton = this.addRenderableWidget(new UpgradeAbilityActionWidget(x + 289, y + 63, this));
+        if (relic.isAbilityRerollEnabled(player, this.stack, ability))
+            this.rerollButton = this.addRenderableWidget(new RerollAbilityActionWidget(x + 289, y + 84, this));
+        if (relic.isAbilityResetEnabled(player, this.stack, ability))
+            this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 289, y + 105, this));
     }
 
     @Override
@@ -252,7 +263,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
     }
 
     @Override
-    public it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory getCategory() {
+    public DescriptionCategory getCategory() {
         return DescriptionCategories.getCategory("ability");
     }
 }
