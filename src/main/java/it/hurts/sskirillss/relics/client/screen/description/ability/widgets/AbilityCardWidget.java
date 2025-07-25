@@ -224,8 +224,10 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
     public void rebuildActionButtons() {
         this.screen.children().removeIf(entry -> entry instanceof AbstractAbilityActionWidget);
-
         this.screen.initActionButtons();
+
+        this.screen.children().removeIf(entry -> entry instanceof AbilityModeWidget);
+        this.screen.initModeButtons();
     }
 
     @Override
