@@ -44,7 +44,7 @@ public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerW
             var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(relic.getAbilityMetricComponent(player, stack, screen.getSelectedAbility(), metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));
 
             var availableWidth = maxWidth - font.width(prefix) - font.width(suffix);
-            var repeatCount = availableWidth / dotWidth;
+            var repeatCount = Math.max(0, availableWidth / dotWidth);
             var line = Component.empty().append(prefix).append(dot.repeat(repeatCount)).append(suffix);
 
             sequences.addAll(font.split(line, maxWidth));
