@@ -53,6 +53,13 @@ public interface IRelicDataHolder {
         else if (abilityTemplate != null) {
             abilityComponent = AbilityComponent.EMPTY;
 
+            if (abilityTemplate.getRequiredLevel() <= 0)
+                abilityComponent = abilityComponent.toBuilder()
+                        .lock(LockComponent.builder()
+                                .unlocks(this.getMaxLockUnlocks())
+                                .build())
+                        .build();
+
             setAbilitiesComponent(entity, stack, abilitiesComponent.toBuilder()
                     .ability(ability, abilityComponent)
                     .build());
