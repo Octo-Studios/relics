@@ -30,7 +30,7 @@ public abstract class SimpleDescriptionContainerWidget extends DescriptionContai
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        var lineOffset = 10;
+        var lineOffset = this.minecraft.font.lineHeight + 2;
         var lines = this.getContent();
 
         var scroll = getScrollbar();
@@ -61,6 +61,6 @@ public abstract class SimpleDescriptionContainerWidget extends DescriptionContai
 
     @Override
     public int getContentHeight() {
-        return getContent().size() * 10;
+        return (int) (this.getContent().size() * ((this.minecraft.font.lineHeight + 2) / 2F));
     }
 }

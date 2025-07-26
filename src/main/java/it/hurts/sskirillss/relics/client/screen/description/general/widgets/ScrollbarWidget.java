@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.screen.base.IScrollableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.client.gui.GuiGraphics;
@@ -151,7 +152,7 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
     }
 
     private double getSliderTopY() {
-        var usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT;
+        var usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT - 4;
 
         return this.getY() + SLIDER_OFFSET_Y + (this.scrollPosition * usableTrackHeight);
     }
@@ -162,22 +163,22 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
 
     @Override
     public boolean isLocked() {
-        return container.getContainerHeight() > container.getContentHeight();
+        var unit = (this.minecraft.font.lineHeight + 2) / 2F;
+        var threshold = DescriptionContainerWidget.MAX_LINES * unit;
+
+        return container.getContentHeight() <= threshold;
     }
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
-        if (this.isLocked() || !isMouseOver(mouseX, mouseY) && !((AbstractWidget) container).isHovered())
+        if (this.isLocked() || (!isMouseOver(mouseX, mouseY) && !((AbstractWidget) container).isHovered()))
             return false;
 
-        var contentHeight = container.getContentHeight();
-        var containerHeight = container.getContainerHeight();
-        var maxScrollPixels = Math.max(1, contentHeight - containerHeight);
+        var unit = (this.minecraft.font.lineHeight + 2) / 2F;
+        var extraHeight = container.getContentHeight() - DescriptionContainerWidget.MAX_LINES * unit;
+        var maxScrollPixels = Math.max(1F, extraHeight);
 
-        var lineHeight = minecraft.font.lineHeight / 2;
-        var stepPixels = lineHeight * 2D;
-
-        var scrollDelta = (stepPixels / (double) maxScrollPixels) * scrollY;
+        var scrollDelta = (unit / (double) maxScrollPixels) * scrollY;
 
         this.scrollVelocity -= scrollDelta;
 
