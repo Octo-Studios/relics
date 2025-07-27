@@ -17,7 +17,7 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.Abil
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
-import it.hurts.sskirillss.relics.init.BadgeRegistry;
+import it.hurts.sskirillss.relics.init.RelicsBadges;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -111,7 +111,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         this.addRenderableWidget(new BigAbilityCardWidget(x + 59, y + 43, this));
 
         if (relic.isAbilityUnlocked(player, stack, ability)) {
-            for (AbilityBadge badge : BadgeRegistry.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof AbilityBadge).map(entry -> (AbilityBadge) entry).toList()) {
+            for (AbilityBadge badge : RelicsBadges.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof AbilityBadge).map(entry -> (AbilityBadge) entry).toList()) {
                 if (!badge.isVisible(player, stack, ability))
                     continue;
 

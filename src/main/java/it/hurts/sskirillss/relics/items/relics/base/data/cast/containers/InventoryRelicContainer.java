@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.base.data.cast.containers;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.init.RelicContainerRegistry;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainer;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
@@ -58,7 +58,7 @@ public class InventoryRelicContainer extends RelicContainer {
 
                     CastData castData = abilityData.getCastData();
 
-                    if (castData.getType() == CastType.NONE || !castData.getContainers().contains(RelicContainerRegistry.INVENTORY.get()))
+                    if (castData.getType() == CastType.NONE || !castData.getContainers().contains(RelicsRelicContainer.INVENTORY.get()))
                         continue;
 
                     references.add(new AbilityReference(abilityData.getId(), new InventorySlotReference(slot)));

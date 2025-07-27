@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.mixin;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
-import it.hurts.sskirillss.relics.init.HotkeyRegistry;
+import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -68,7 +68,7 @@ public class ItemMixin {
         tooltip.add(Component.literal(" "));
 
         if (Minecraft.getInstance().screen instanceof AbstractContainerScreen<? extends AbstractContainerMenu>)
-            tooltip.add(Component.translatable("tooltip.relics.researching.info", HotkeyRegistry.RESEARCH_RELIC.getKey().getDisplayName()).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.relics.researching.info", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName()).withStyle(ChatFormatting.GRAY));
 
         tooltip.add(Component.literal(" "));
     }

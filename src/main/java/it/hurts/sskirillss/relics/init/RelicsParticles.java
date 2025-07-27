@@ -13,7 +13,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 @EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class ParticleRegistry {
+public class RelicsParticles {
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(BuiltInRegistries.PARTICLE_TYPE, Relics.MODID);
 
     public static final DeferredHolder<ParticleType<?>, BasicColoredParticle.Type> BASIC_COLORED = PARTICLES.register("basic_colored", BasicColoredParticle.Type::new);

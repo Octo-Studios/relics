@@ -18,7 +18,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.List;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
-public class DataComponentRegistry {
+public class RelicsDataComponents {
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, Relics.MODID);
 
     // TODO: Rename to RELIC_DATA or just RELIC instead of DATA
@@ -119,24 +119,24 @@ public class DataComponentRegistry {
                     .build()
     );
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_PHASE_DURATION = DataComponentRegistry.construct("midnight_mantle/duration", Codec.INT);
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN = DataComponentRegistry.construct("midnight_mantle/invisibility_cooldown", Codec.INT);
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN = DataComponentRegistry.construct("midnight_mantle/constellation_cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_PHASE_DURATION = RelicsDataComponents.construct("midnight_mantle/duration", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN = RelicsDataComponents.construct("midnight_mantle/invisibility_cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN = RelicsDataComponents.construct("midnight_mantle/constellation_cooldown", Codec.INT);
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROLLER_SKATE_DURATION = DataComponentRegistry.construct("roller_skate/duration", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROLLER_SKATE_DURATION = RelicsDataComponents.construct("roller_skate/duration", Codec.INT);
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SPRINGY_BOOT_BOUNCE_COOLDOWN = DataComponentRegistry.construct("springy_boot/bounce_cooldown", Codec.INT);
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SPRINGY_BOOT_LEAPED = DataComponentRegistry.construct("springy_boot/leaped", Codec.BOOL);
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SPRINGY_BOOT_LEAPS = DataComponentRegistry.construct("springy_boot/leaps", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SPRINGY_BOOT_BOUNCE_COOLDOWN = RelicsDataComponents.construct("springy_boot/bounce_cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SPRINGY_BOOT_LEAPED = RelicsDataComponents.construct("springy_boot/leaped", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SPRINGY_BOOT_LEAPS = RelicsDataComponents.construct("springy_boot/leaps", Codec.INT);
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_ACTIVE = DataComponentRegistry.construct("kinetic_belt/active", Codec.BOOL);
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_LANDED = DataComponentRegistry.construct("kinetic_belt/landed", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_ACTIVE = RelicsDataComponents.construct("kinetic_belt/active", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_LANDED = RelicsDataComponents.construct("kinetic_belt/landed", Codec.BOOL);
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_AFFECTED_ENTITIES = DataComponentRegistry.construct("jellyfish_necklace/affected_entities", Codec.list(Codec.STRING));
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_DAMAGED_ENTITIES = DataComponentRegistry.construct("jellyfish_necklace/damaged_entities", Codec.list(Codec.STRING));
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_COOLDOWN = DataComponentRegistry.construct("jellyfish_necklace/cooldown", Codec.INT);
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_DURATION = DataComponentRegistry.construct("jellyfish_necklace/duration", Codec.INT);
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_RINGS = DataComponentRegistry.construct("jellyfish_necklace/rings", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_AFFECTED_ENTITIES = RelicsDataComponents.construct("jellyfish_necklace/affected_entities", Codec.list(Codec.STRING));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_DAMAGED_ENTITIES = RelicsDataComponents.construct("jellyfish_necklace/damaged_entities", Codec.list(Codec.STRING));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_COOLDOWN = RelicsDataComponents.construct("jellyfish_necklace/cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_DURATION = RelicsDataComponents.construct("jellyfish_necklace/duration", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_RINGS = RelicsDataComponents.construct("jellyfish_necklace/rings", Codec.INT);
 
     public static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> construct(String name, Codec<T> codec) {
         return DATA_COMPONENTS.register(name, () -> DataComponentType.<T>builder()

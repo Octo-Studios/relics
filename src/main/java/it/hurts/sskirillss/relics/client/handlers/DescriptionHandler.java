@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.client.handlers;
 import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.init.HotkeyRegistry;
+import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -41,7 +41,7 @@ public class DescriptionHandler {
         ticksCountOld = ticksCount;
 
         var MC = Minecraft.getInstance();
-        var key = HotkeyRegistry.RESEARCH_RELIC.getKey().getValue();
+        var key = RelicsHotkeys.RESEARCH_RELIC.getKey().getValue();
 
         if (key == GLFW.GLFW_KEY_UNKNOWN)
             return;

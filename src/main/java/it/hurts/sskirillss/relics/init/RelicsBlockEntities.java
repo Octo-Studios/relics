@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-public class TileRegistry {
+public class RelicsBlockEntities {
     private static final DeferredRegister<BlockEntityType<?>> TILES = DeferredRegister.create(BuiltInRegistries.BLOCK_ENTITY_TYPE, Relics.MODID);
 
     public static void register(IEventBus bus) {

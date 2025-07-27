@@ -4,7 +4,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityExtenderComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
-import it.hurts.sskirillss.relics.init.DataComponentRegistry;
+import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -17,11 +17,11 @@ import java.util.Random;
 @ApiStatus.Internal
 public interface IRelicDataHolder {
     default RelicComponent getRelicComponent(LivingEntity entity, ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.DATA, RelicComponent.EMPTY);
+        return stack.getOrDefault(RelicsDataComponents.DATA, RelicComponent.EMPTY);
     }
 
     default void setRelicComponent(LivingEntity entity, ItemStack stack, RelicComponent data) {
-        stack.set(DataComponentRegistry.DATA, data);
+        stack.set(RelicsDataComponents.DATA, data);
     }
 
     default LevelingComponent getLevelingData(LivingEntity entity, ItemStack stack) {

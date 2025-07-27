@@ -18,7 +18,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 @EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.GAME)
-public class CommandRegistry {
+public class RelicsCommands {
     private static final DeferredRegister<ArgumentTypeInfo<?, ?>> COMMAND_ARGUMENTS = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, Relics.MODID);
 
     public static final DeferredHolder<ArgumentTypeInfo<?, ?>, ArgumentTypeInfo<?, ?>> ABILITY = COMMAND_ARGUMENTS.register("ability", () -> ArgumentTypeInfos.registerByClass(AbilityArgument.class, SingletonArgumentInfo.contextFree(AbilityArgument::ability)));

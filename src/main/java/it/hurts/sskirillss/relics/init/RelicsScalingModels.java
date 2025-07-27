@@ -8,7 +8,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
-public class ScalingModelRegistry {
+public class RelicsScalingModels {
     public static final DeferredRegister<ScalingModel> UPGRADE_OPERATIONS = DeferredRegister.create(RelicsRegistries.SCALING_MODEL_REGISTRY, Relics.MODID);
 
     /**

@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
-public class RelicContainerRegistry {
+public class RelicsRelicContainer {
     public static final DeferredRegister<RelicContainer> RELIC_CONTAINERS = DeferredRegister.create(RelicsRegistries.RELIC_CONTAINER_REGISTRY, Relics.MODID);
 
     public static final Supplier<RelicContainer> CURIOS = RELIC_CONTAINERS.register("curios", CuriosRelicContainer::new);

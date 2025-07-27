@@ -7,7 +7,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.init.ParticleRegistry;
+import it.hurts.sskirillss.relics.init.RelicsParticles;
 import lombok.Builder;
 import lombok.Data;
 import lombok.Getter;
@@ -274,7 +274,7 @@ public class BasicColoredParticle extends TextureSheetParticle {
         @Nonnull
         @Override
         public ParticleType<Options> getType() {
-            return ParticleRegistry.BASIC_COLORED.get();
+            return RelicsParticles.BASIC_COLORED.get();
         }
 
         public static final MapCodec<Options> CODEC = RecordCodecBuilder.mapCodec(

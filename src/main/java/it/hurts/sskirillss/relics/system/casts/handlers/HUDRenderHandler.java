@@ -8,7 +8,7 @@ import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.init.HotkeyRegistry;
+import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
@@ -378,7 +378,7 @@ public class HUDRenderHandler {
     public static class GeneralEvents {
         @SubscribeEvent(priority = EventPriority.HIGHEST)
         public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
-            if (!HotkeyRegistry.ACTIVE_ABILITIES_LIST.isDown() || REFERENCES.isEmpty())
+            if (!RelicsHotkeys.ACTIVE_ABILITIES_LIST.isDown() || REFERENCES.isEmpty())
                 return;
 
             int current = selectedIndex;
@@ -412,7 +412,7 @@ public class HUDRenderHandler {
             else if (mouseDelta < 0)
                 mouseDelta++;
 
-            if (HotkeyRegistry.ACTIVE_ABILITIES_LIST.isDown()) {
+            if (RelicsHotkeys.ACTIVE_ABILITIES_LIST.isDown()) {
                 AbilityReference ability = getAbilityByIndex(selectedIndex);
 
                 if (ability != null) {

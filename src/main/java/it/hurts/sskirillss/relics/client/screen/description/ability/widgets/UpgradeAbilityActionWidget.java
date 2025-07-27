@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescr
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.init.HotkeyRegistry;
+import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -86,7 +86,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
         var relic = (IRelicItem) stack.getItem();
         var ability = screen.getSelectedAbility();
 
-        var key = HotkeyRegistry.RESEARCH_RELIC.getKey().getValue();
+        var key = RelicsHotkeys.RESEARCH_RELIC.getKey().getValue();
 
         var hasShiftDown = key != GLFW.GLFW_KEY_UNKNOWN && InputConstants.isKeyDown(minecraft.getWindow().getWindow(), key);
 
@@ -129,7 +129,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
 
             description.add(newLine);
 
-            description.add(Component.translatable("relics.description.ability.levelup.auto", HotkeyRegistry.RESEARCH_RELIC.getKey().getDisplayName().getString())
+            description.add(Component.translatable("relics.description.ability.levelup.auto", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName().getString())
                     .withColor(DescriptionUtils.NEUTRAL_COLOR(true)));
         }
 
@@ -139,7 +139,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
             description.add(Component.translatable("relics.description.ability.levelup.description")
                     .withStyle(ChatFormatting.ITALIC));
         else
-            description.add(Component.translatable("relics.general.hold_shift", HotkeyRegistry.RESEARCH_RELIC.getKey().getDisplayName().getString()));
+            description.add(Component.translatable("relics.general.hold_shift", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName().getString()));
 
         return description;
     }

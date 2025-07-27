@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.base.data.cast;
 
-import it.hurts.sskirillss.relics.init.RelicContainerRegistry;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainer;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
@@ -31,7 +31,7 @@ public class CastData {
     public static class CastDataBuilder {
         private Map<String, Pair<PredicateType, BiFunction<Player, ItemStack, Boolean>>> predicates = new HashMap<>();
 
-        private List<RelicContainer> containers = List.of(RelicContainerRegistry.CURIOS.get());
+        private List<RelicContainer> containers = List.of(RelicsRelicContainer.CURIOS.get());
 
         public CastDataBuilder predicate(String id, PredicateType type, BiFunction<Player, ItemStack, Boolean> predicate) {
             predicates.put(id, Pair.of(type, predicate));

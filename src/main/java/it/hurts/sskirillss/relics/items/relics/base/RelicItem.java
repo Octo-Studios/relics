@@ -4,7 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.init.CreativeTabRegistry;
+import it.hurts.sskirillss.relics.init.RelicsCreativeTabs;
 import it.hurts.sskirillss.relics.items.ItemBase;
 import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
 import it.hurts.sskirillss.relics.items.misc.ICreativeTabContent;
@@ -80,7 +80,7 @@ public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicIt
 
     @Override
     public void gatherCreativeTabContent(CreativeContentConstructor constructor) {
-        constructor.entry(CreativeTabRegistry.RELICS_TAB.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS, this);
+        constructor.entry(RelicsCreativeTabs.RELICS_TAB.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS, this);
     }
 
     @Override

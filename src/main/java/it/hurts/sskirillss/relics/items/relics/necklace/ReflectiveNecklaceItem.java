@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.ReflectiveOrbEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
+import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -40,32 +40,32 @@ public class ReflectiveNecklaceItem extends RelicItem {
                                 .stat(StatTemplate.builder("chance")
                                         .initialValue(0.1D, 0.2D)
                                         .thresholdValue(0D, 1D)
-                                        .upgradeModifier(ScalingModelRegistry.RADICAL.get(), 0.135D)
+                                        .upgradeModifier(RelicsScalingModels.RADICAL.get(), 0.135D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 0.558D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.558D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("lifetime")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(ScalingModelRegistry.EXPONENTIAL.get(), 0.053D)
+                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.053D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("piercings")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.162D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.162D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("stun")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.114D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.114D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("bounces")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.471D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.471D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .build())

@@ -11,7 +11,7 @@ import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_ALT;
 import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT_SHIFT;
 
 @EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class HotkeyRegistry {
+public class RelicsHotkeys {
     private static final String CATEGORY = "Relics";
 
     public static final KeyMapping ACTIVE_ABILITIES_LIST = new KeyMapping("key.relics.active_abilities_list", GLFW_KEY_LEFT_ALT, CATEGORY);

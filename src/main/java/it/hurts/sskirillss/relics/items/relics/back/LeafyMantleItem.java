@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.entities.LeavesBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
+import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
@@ -35,8 +35,8 @@ import top.theillusivec4.curios.api.SlotContext;
 import java.util.Comparator;
 import java.util.stream.IntStream;
 
-import static it.hurts.sskirillss.relics.init.DataComponentRegistry.PROGRESS;
-import static it.hurts.sskirillss.relics.init.DataComponentRegistry.TOGGLED;
+import static it.hurts.sskirillss.relics.init.RelicsDataComponents.PROGRESS;
+import static it.hurts.sskirillss.relics.init.RelicsDataComponents.TOGGLED;
 
 public class LeafyMantleItem extends RelicItem {
     @Override
@@ -48,12 +48,12 @@ public class LeafyMantleItem extends RelicItem {
                                 .rankModifier(5, "disappearance")
                                 .stat(StatTemplate.builder("heal")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 0.6279D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.6279D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("absorption")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1619D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1619D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .build())
@@ -62,22 +62,22 @@ public class LeafyMantleItem extends RelicItem {
                                 .rankModifier(1, "piercing")
                                 .stat(StatTemplate.builder("radius")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(ScalingModelRegistry.EXPONENTIAL.get(), 0.0265D)
+                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.0265D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("heal")
                                         .initialValue(0.5D, 1D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 1.1162D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.5D, 1D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 1.1162D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("paralysis")
                                         .initialValue(0.5D, 1D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 1.1162D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())

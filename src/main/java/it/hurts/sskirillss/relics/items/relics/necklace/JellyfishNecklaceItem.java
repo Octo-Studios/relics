@@ -43,12 +43,12 @@ public class JellyfishNecklaceItem extends RelicItem {
                                 .rankModifier(3, "retention")
                                 .stat(StatTemplate.builder("max_health")
                                         .initialValue(0.1D, 0.2D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 0.363D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.363D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("regeneration")
                                         .initialValue(0.15D, 0.35D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 0.46D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.46D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .build())
@@ -60,53 +60,53 @@ public class JellyfishNecklaceItem extends RelicItem {
                                 .stat(StatTemplate.builder("cooldown")
                                         .initialValue(120D, 60D)
                                         .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), -13.953D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), -13.953D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("rings")
                                         .initialValue(1D, 2D)
                                         .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 0.33D)
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.33D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("radius")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.RADICAL.get(), 0.761D)
+                                        .upgradeModifier(RelicsScalingModels.RADICAL.get(), 0.761D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("knockback")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.EXPONENTIAL.get(), 0.047D)
+                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.047D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("paralysis")
                                         .initialValue(0.25D, 0.75D)
-                                        .upgradeModifier(ScalingModelRegistry.EXPONENTIAL.get(), 0.056D)
+                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.056D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("distance")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 4.186D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 4.186D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("bounces")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.21D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.21D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.5D, 2.5D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 4.883D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 4.883D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("damage_modifier")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.EXPONENTIAL.get(), 0.068D)
+                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.068D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("duration")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(ScalingModelRegistry.RADICAL.get(), 4.226D)
+                                        .upgradeModifier(RelicsScalingModels.RADICAL.get(), 4.226D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
@@ -129,11 +129,11 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public int getCooldown(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_COOLDOWN, 0);
+        return stack.getOrDefault(RelicsDataComponents.JELLYFISH_NECKLACE_COOLDOWN, 0);
     }
 
     public void setCooldown(ItemStack stack, int cooldown) {
-        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_COOLDOWN, Math.max(0, cooldown));
+        stack.set(RelicsDataComponents.JELLYFISH_NECKLACE_COOLDOWN, Math.max(0, cooldown));
     }
 
     public void addCooldown(ItemStack stack, int cooldown) {
@@ -141,11 +141,11 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public List<String> getDamagedEntities(ItemStack stack) {
-        return new ArrayList<>(stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_DAMAGED_ENTITIES, new ArrayList<>()));
+        return new ArrayList<>(stack.getOrDefault(RelicsDataComponents.JELLYFISH_NECKLACE_DAMAGED_ENTITIES, new ArrayList<>()));
     }
 
     public void setDamagedEntities(ItemStack stack, List<String> targets) {
-        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_DAMAGED_ENTITIES, targets);
+        stack.set(RelicsDataComponents.JELLYFISH_NECKLACE_DAMAGED_ENTITIES, targets);
     }
 
     public void addDamagedEntities(ItemStack stack, String... targets) {
@@ -165,11 +165,11 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public int getDuration(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_DURATION, 0);
+        return stack.getOrDefault(RelicsDataComponents.JELLYFISH_NECKLACE_DURATION, 0);
     }
 
     public void setDuration(ItemStack stack, int duration) {
-        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_DURATION, Math.max(0, duration));
+        stack.set(RelicsDataComponents.JELLYFISH_NECKLACE_DURATION, Math.max(0, duration));
     }
 
     public void addDuration(ItemStack stack, int duration) {
@@ -177,11 +177,11 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public int getRings(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_RINGS, 0);
+        return stack.getOrDefault(RelicsDataComponents.JELLYFISH_NECKLACE_RINGS, 0);
     }
 
     public void setRings(ItemStack stack, int rings) {
-        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_RINGS, Math.max(0, rings));
+        stack.set(RelicsDataComponents.JELLYFISH_NECKLACE_RINGS, Math.max(0, rings));
     }
 
     public void addRings(ItemStack stack, int rings) {
@@ -189,11 +189,11 @@ public class JellyfishNecklaceItem extends RelicItem {
     }
 
     public List<String> getAffectedEntities(ItemStack stack) {
-        return new ArrayList<>(stack.getOrDefault(DataComponentRegistry.JELLYFISH_NECKLACE_AFFECTED_ENTITIES, new ArrayList<>()));
+        return new ArrayList<>(stack.getOrDefault(RelicsDataComponents.JELLYFISH_NECKLACE_AFFECTED_ENTITIES, new ArrayList<>()));
     }
 
     public void setAffectedEntities(ItemStack stack, List<String> targets) {
-        stack.set(DataComponentRegistry.JELLYFISH_NECKLACE_AFFECTED_ENTITIES, targets);
+        stack.set(RelicsDataComponents.JELLYFISH_NECKLACE_AFFECTED_ENTITIES, targets);
     }
 
     public void addAffectedEntities(ItemStack stack, String... targets) {

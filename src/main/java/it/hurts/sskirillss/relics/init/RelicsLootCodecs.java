@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
-public class LootCodecRegistry {
+public class RelicsLootCodecs {
     public static final DeferredRegister<MapCodec<? extends IGlobalLootModifier>> CODECS = DeferredRegister.create(NeoForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, Relics.MODID);
 
     public static final DeferredHolder<MapCodec<? extends IGlobalLootModifier>, MapCodec<RelicLootModifier>> RELIC_LOOT = CODECS.register("relic_loot", RelicLootModifier.CODEC);

@@ -4,8 +4,8 @@ import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.init.ConfigRegistry;
-import it.hurts.sskirillss.relics.init.LootCodecRegistry;
+import it.hurts.sskirillss.relics.init.RelicsConfigs;
+import it.hurts.sskirillss.relics.init.RelicsLootCodecs;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -53,7 +53,7 @@ public class RelicLootModifier extends LootModifier {
 
         var random = context.getRandom();
 
-        if (random.nextDouble() > ConfigRegistry.LOOT_CONFIG.getRelicGenChance())
+        if (random.nextDouble() > RelicsConfigs.LOOT_CONFIG.getRelicGenChance())
             return generatedLoot;
 
         var pos = new BlockPos((int) vec.x(), (int) vec.y(), (int) vec.z());
@@ -95,7 +95,7 @@ public class RelicLootModifier extends LootModifier {
 
     @Override
     public MapCodec<? extends IGlobalLootModifier> codec() {
-        return LootCodecRegistry.RELIC_LOOT.get();
+        return RelicsLootCodecs.RELIC_LOOT.get();
     }
 
     public static void processRelicCache(IRelicItem relic) {

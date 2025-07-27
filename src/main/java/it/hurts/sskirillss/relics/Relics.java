@@ -19,24 +19,24 @@ public class Relics {
         bus.addListener(this::setupCommon);
 
         RelicsItems.register(bus);
-        TileRegistry.register(bus);
+        RelicsBlockEntities.register(bus);
         RelicsBlocks.register(bus);
         RelicsSounds.register(bus);
-        BadgeRegistry.register(bus);
+        RelicsBadges.register(bus);
         RelicsEntities.register(bus);
         RelicsMobEffects.register(bus);
-        CommandRegistry.register(bus);
-        ParticleRegistry.register(bus);
-        LootCodecRegistry.register(bus);
-        CreativeTabRegistry.register(bus);
-        ScalingModelRegistry.register(bus);
-        DataComponentRegistry.register(bus);
-        RelicContainerRegistry.register(bus);
+        RelicsCommands.register(bus);
+        RelicsParticles.register(bus);
+        RelicsLootCodecs.register(bus);
+        RelicsCreativeTabs.register(bus);
+        RelicsScalingModels.register(bus);
+        RelicsDataComponents.register(bus);
+        RelicsRelicContainer.register(bus);
     }
 
     private void setupCommon(final FMLCommonSetupEvent event) {
-        DispenserBehaviorRegistry.register();
-        ConfigRegistry.register();
+        RelicsDispenserBehaviors.register();
+        RelicsConfigs.register();
 
         InterModComms.sendTo("darkmodeeverywhere", "dme-shaderblacklist", () -> Relics.MODID);
     }

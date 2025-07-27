@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.base.data.leveling;
 
 import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.config.data.LevelingConfigData;
-import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
+import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -30,7 +30,7 @@ public class LevelingTemplate {
 
     @NoArgsConstructor
     public static class LevelingTemplateBuilder {
-        private ScalingModel scalingModel = ScalingModelRegistry.ADDITIVE.get();
+        private ScalingModel scalingModel = RelicsScalingModels.ADDITIVE.get();
         private double initialCost = 100D;
         private double step = 100D;
         private int maxRank = 5;

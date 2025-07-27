@@ -5,7 +5,7 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.init.HotkeyRegistry;
+import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -48,7 +48,7 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
         var relic = (IRelicItem) stack.getItem();
         var ability = screen.getSelectedAbility();
 
-        var key = HotkeyRegistry.RESEARCH_RELIC.getKey().getValue();
+        var key = RelicsHotkeys.RESEARCH_RELIC.getKey().getValue();
 
         var hasShiftDown = key != GLFW.GLFW_KEY_UNKNOWN && InputConstants.isKeyDown(minecraft.getWindow().getWindow(), key);
 
@@ -86,7 +86,7 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
             description.add(Component.translatable("relics.description.ability.reset.description")
                     .withStyle(ChatFormatting.ITALIC));
         else
-            description.add(Component.translatable("relics.general.hold_shift", HotkeyRegistry.RESEARCH_RELIC.getKey().getDisplayName().getString()));
+            description.add(Component.translatable("relics.general.hold_shift", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName().getString()));
 
         return description;
     }

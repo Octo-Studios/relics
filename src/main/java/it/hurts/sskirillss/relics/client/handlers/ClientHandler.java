@@ -1,11 +1,10 @@
-package it.hurts.sskirillss.relics.init;
+package it.hurts.sskirillss.relics.client.handlers;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailRegistry;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
-import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
 import it.hurts.sskirillss.relics.client.gui.layers.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
@@ -18,6 +17,8 @@ import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategor
 import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCategory;
 import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
+import it.hurts.sskirillss.relics.init.RelicsEntities;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -39,7 +40,7 @@ import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 @EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-public class RemoteRegistry {
+public class ClientHandler {
     @SubscribeEvent
     public static void setupClient(final FMLClientSetupEvent event) {
         event.enqueueWork(() -> {

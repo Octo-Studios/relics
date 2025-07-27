@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.badges.ability.base;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
-import it.hurts.sskirillss.relics.init.HotkeyRegistry;
+import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import lombok.Getter;
 import net.minecraft.network.chat.Component;
@@ -26,7 +26,7 @@ public class CastTypeBadge extends AbilityBadge {
 
     @Override
     public List<MutableComponent> getHint(LivingEntity entity, ItemStack stack, String ability) {
-        return Arrays.asList(Component.translatable("tooltip.relics.researching.badge.ability.cast_type.hint", HotkeyRegistry.ACTIVE_ABILITIES_LIST.getKey().getDisplayName()));
+        return Arrays.asList(Component.translatable("tooltip.relics.researching.badge.ability.cast_type.hint", RelicsHotkeys.ACTIVE_ABILITIES_LIST.getKey().getDisplayName()));
     }
 
     @Override

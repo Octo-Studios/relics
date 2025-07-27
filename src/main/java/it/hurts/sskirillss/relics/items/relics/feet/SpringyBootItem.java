@@ -38,27 +38,27 @@ public class SpringyBootItem extends RelicItem {
                                 .rankModifier(5, "shockwave")
                                 .stat(StatTemplate.builder("power")
                                         .initialValue(0.5D, 0.75D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 0.3488D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.3488D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage_modifier")
                                         .initialValue(0.05D, 0.15D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.0667D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0667D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("radius")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(ScalingModelRegistry.LOGARITHMIC.get(), 1.9534D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.9534D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("stun")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.2571D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2571D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .build())
@@ -81,11 +81,11 @@ public class SpringyBootItem extends RelicItem {
     }
 
     public int getBounceCooldown(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.SPRINGY_BOOT_BOUNCE_COOLDOWN, 0);
+        return stack.getOrDefault(RelicsDataComponents.SPRINGY_BOOT_BOUNCE_COOLDOWN, 0);
     }
 
     public void setBounceCooldown(ItemStack stack, int cooldown) {
-        stack.set(DataComponentRegistry.SPRINGY_BOOT_BOUNCE_COOLDOWN, Math.max(0, cooldown));
+        stack.set(RelicsDataComponents.SPRINGY_BOOT_BOUNCE_COOLDOWN, Math.max(0, cooldown));
     }
 
     public void addBounceCooldown(ItemStack stack, int cooldown) {
@@ -94,19 +94,19 @@ public class SpringyBootItem extends RelicItem {
 
 
     public boolean isLeaped(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.SPRINGY_BOOT_LEAPED, false);
+        return stack.getOrDefault(RelicsDataComponents.SPRINGY_BOOT_LEAPED, false);
     }
 
     public void setLeaped(ItemStack stack, boolean leaped) {
-        stack.set(DataComponentRegistry.SPRINGY_BOOT_LEAPED, leaped);
+        stack.set(RelicsDataComponents.SPRINGY_BOOT_LEAPED, leaped);
     }
 
     public int getLeaps(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.SPRINGY_BOOT_LEAPS, 0);
+        return stack.getOrDefault(RelicsDataComponents.SPRINGY_BOOT_LEAPS, 0);
     }
 
     public void setLeaps(ItemStack stack, int leaps) {
-        stack.set(DataComponentRegistry.SPRINGY_BOOT_LEAPS, Math.max(0, leaps));
+        stack.set(RelicsDataComponents.SPRINGY_BOOT_LEAPS, Math.max(0, leaps));
     }
 
     public void addLeaps(ItemStack stack, int leaps) {

@@ -16,7 +16,7 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.Scro
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RankupRelicActionWidget;
-import it.hurts.sskirillss.relics.init.BadgeRegistry;
+import it.hurts.sskirillss.relics.init.RelicsBadges;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -64,7 +64,7 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
 
         this.addRenderableWidget(new BigRelicCardWidget(x + 59, y + 43, this));
 
-        for (RelicBadge badge : BadgeRegistry.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof RelicBadge).map(entry -> (RelicBadge) entry).toList()) {
+        for (RelicBadge badge : RelicsBadges.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof RelicBadge).map(entry -> (RelicBadge) entry).toList()) {
             if (!badge.isVisible(this.minecraft.player, stack))
                 continue;
 

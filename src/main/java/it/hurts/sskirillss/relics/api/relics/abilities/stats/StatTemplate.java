@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.api.relics.abilities.stats;
 import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.config.data.StatConfigData;
 import it.hurts.sskirillss.relics.init.RelicsRegistries;
-import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
+import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -36,7 +36,7 @@ public class StatTemplate {
     public static class StatTemplateBuilder {
         private final String id;
 
-        private Pair<ScalingModel, Double> upgradeModifier = Pair.of(ScalingModelRegistry.ADDITIVE.get(), 1D);
+        private Pair<ScalingModel, Double> upgradeModifier = Pair.of(RelicsScalingModels.ADDITIVE.get(), 1D);
         private Pair<Double, Double> initialValue = Pair.of(0D, 0D);
         private Pair<Double, Double> thresholdValue = Pair.of(Double.MIN_VALUE, Double.MAX_VALUE);
         private Function<Double, ? extends Number> formatValue = Double::doubleValue;

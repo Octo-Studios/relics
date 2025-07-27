@@ -9,7 +9,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
-public class BadgeRegistry {
+public class RelicsBadges {
     public static final DeferredRegister<AbstractBadge> BADGES = DeferredRegister.create(RelicsRegistries.BADGE_REGISTRY, Relics.MODID);
 
     public static final Supplier<AbilityBadge> SILENCE = BADGES.register("silence", SilenceBadge::new);

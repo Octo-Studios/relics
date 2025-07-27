@@ -8,9 +8,9 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
-import it.hurts.sskirillss.relics.init.DataComponentRegistry;
+import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.init.ScalingModelRegistry;
+import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -49,7 +49,7 @@ public class KineticBeltItem extends RelicItem {
                                 .initialMaxLevel(5)
                                 .stat(StatTemplate.builder("amount")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(ScalingModelRegistry.ADDITIVE.get(), 1D)
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 0)))
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -65,18 +65,18 @@ public class KineticBeltItem extends RelicItem {
                                 .stat(StatTemplate.builder("efficiency")
                                         .initialValue(0.25D, 0.35D)
                                         .thresholdValue(0D, 1D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.05D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.05D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("resistance")
                                         .initialValue(0.05D, 0.15D)
                                         .thresholdValue(0D, 0.75D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -126,19 +126,19 @@ public class KineticBeltItem extends RelicItem {
     }
 
     public void setActive(ItemStack stack, boolean active) {
-        stack.set(DataComponentRegistry.KINETIC_BELT_ACTIVE, active);
+        stack.set(RelicsDataComponents.KINETIC_BELT_ACTIVE, active);
     }
 
     public boolean isActive(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.KINETIC_BELT_ACTIVE, false);
+        return stack.getOrDefault(RelicsDataComponents.KINETIC_BELT_ACTIVE, false);
     }
 
     public void setLanded(ItemStack stack, boolean landed) {
-        stack.set(DataComponentRegistry.KINETIC_BELT_LANDED, landed);
+        stack.set(RelicsDataComponents.KINETIC_BELT_LANDED, landed);
     }
 
     public boolean isLanded(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.KINETIC_BELT_LANDED, false);
+        return stack.getOrDefault(RelicsDataComponents.KINETIC_BELT_LANDED, false);
     }
 
     @Override

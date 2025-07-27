@@ -12,7 +12,7 @@ import net.minecraft.world.item.Item;
 
 import java.util.Map;
 
-public class ConfigRegistry {
+public class RelicsConfigs {
     public static final RelicsConfigData RELICS_CONFIG = new RelicsConfigData();
     public static final LootConfigData LOOT_CONFIG = new LootConfigData();
 

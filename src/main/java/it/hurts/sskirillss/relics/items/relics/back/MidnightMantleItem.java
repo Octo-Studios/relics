@@ -59,32 +59,32 @@ public class MidnightMantleItem extends RelicItem {
                                 .rankModifier(1, "switch")
                                 .stat(StatTemplate.builder("attack_damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("attack_speed")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("max_health")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("health_regeneration")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("duration")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("modifier")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .statistic(StatisticTemplate.builder()
@@ -111,18 +111,18 @@ public class MidnightMantleItem extends RelicItem {
                                 .stat(StatTemplate.builder("brightness")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("cooldown")
                                         .thresholdValue(0D, Double.MAX_VALUE)
                                         .initialValue(15D, 10D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.05D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.05D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .statistic(StatisticTemplate.builder()
@@ -141,38 +141,38 @@ public class MidnightMantleItem extends RelicItem {
                                 .rankModifier(5, "stun")
                                 .stat(StatTemplate.builder("stars_amount")
                                         .initialValue(2D, 7D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.05D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.05D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("ability_cooldown")
                                         .thresholdValue(0D, Double.MAX_VALUE)
                                         .initialValue(120D, 180D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), -0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("tremor_duration")
                                         .initialValue(0.25D, 1D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("explosion_radius")
                                         .initialValue(0.5D, 1D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("explosion_damage")
                                         .initialValue(1D, 5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("star_lifetime")
                                         .initialValue(10D, 15D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("stun_duration")
                                         .initialValue(1D, 2.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -185,27 +185,27 @@ public class MidnightMantleItem extends RelicItem {
                                 .stat(StatTemplate.builder("chance")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.025D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.025D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("radius")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("stun")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("bounce_chance")
                                         .initialValue(0.05D, 0.15D)
-                                        .upgradeModifier(ScalingModelRegistry.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -233,11 +233,11 @@ public class MidnightMantleItem extends RelicItem {
     }
 
     public int getInvisibilityCooldown(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN.get(), 0);
+        return stack.getOrDefault(RelicsDataComponents.MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN.get(), 0);
     }
 
     public void setInvisibilityCooldown(ItemStack stack, int cooldown) {
-        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN.get(), cooldown);
+        stack.set(RelicsDataComponents.MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN.get(), cooldown);
     }
 
     public void addInvisibilityCooldown(ItemStack stack, int cooldown) {
@@ -245,11 +245,11 @@ public class MidnightMantleItem extends RelicItem {
     }
 
     public int getConstellationCooldown(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN.get(), 0);
+        return stack.getOrDefault(RelicsDataComponents.MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN.get(), 0);
     }
 
     public void setConstellationCooldown(ItemStack stack, int cooldown) {
-        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN.get(), cooldown);
+        stack.set(RelicsDataComponents.MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN.get(), cooldown);
     }
 
     public void addConstellationCooldown(ItemStack stack, int cooldown) {
@@ -257,11 +257,11 @@ public class MidnightMantleItem extends RelicItem {
     }
 
     public int getPhaseDuration(ItemStack stack) {
-        return stack.getOrDefault(DataComponentRegistry.MIDNIGHT_MANTLE_PHASE_DURATION, 0);
+        return stack.getOrDefault(RelicsDataComponents.MIDNIGHT_MANTLE_PHASE_DURATION, 0);
     }
 
     public void setPhaseDuration(ItemStack stack, int duration) {
-        stack.set(DataComponentRegistry.MIDNIGHT_MANTLE_PHASE_DURATION, Math.max(duration, 0));
+        stack.set(RelicsDataComponents.MIDNIGHT_MANTLE_PHASE_DURATION, Math.max(duration, 0));
     }
 
     public void addPhaseDuration(ItemStack stack, int duration) {
