@@ -119,7 +119,6 @@ public class StarWidget extends AbstractDescriptionWidget implements ITickingWid
             poseStack.mulPose(Axis.ZN.rotationDegrees((time * 0.75F) * (index % 2 == 0 ? 1 : -1)));
 
             GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/research/star.png"), poseStack)
-                    .texSize(17, 136)
                     .patternSize(17, 17)
                     .scale((float) (1F + (Math.sin(time * 0.5F) * 0.1F)))
                     .animation(AnimationData.builder()
