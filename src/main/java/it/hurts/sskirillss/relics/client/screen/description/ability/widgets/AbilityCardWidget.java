@@ -176,7 +176,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     var size = (random.nextFloat() * 0.5F) + 0.75F;
 
                     particle.setColors(new OctoColor(1F, 0.5F + random.nextFloat() * 0.5F, random.nextFloat() * 0.25F, 1F), new OctoColor(1F, 0F, 0F, 1F));
-                    particle.setDirection(MathUtils.randomFloat(random),  -random.nextFloat());
+                    particle.setDirection(MathUtils.randomFloat(random), -random.nextFloat());
                     particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
                     particle.getTransform().setSize(new Vector2f(size, size));
                     particle.setGravity(0.5F + random.nextFloat() * 0.5F);
@@ -283,7 +283,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             GUIRenderer.begin(isLockUnlocked ? DescriptionTextures.SMALL_CARD_RESEARCH_BACKGROUND : DescriptionTextures.SMALL_CARD_LOCK_BACKGROUND, poseStack)
                     .pos(0, -2)
                     .end();
-            }
+        }
 
         GUIRenderer.begin(canBeUpgraded ? canUse ? DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_INACTIVE : canUse ? DescriptionTextures.SMALL_CARD_FRAME_LOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_LOCKED_INACTIVE, poseStack).end();
 
@@ -303,13 +303,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 GUIRenderer.begin(DescriptionTextures.RESEARCH, poseStack)
                         .pos((float) Math.sin(time * 0.25F), (float) Math.cos(time * 0.25F) + 0.5F - 2)
                         .patternSize(16, 16)
-                        .animation(AnimationData.builder()
-                                .frame(0, 2).frame(1, 2)
-                                .frame(2, 2).frame(3, 2)
-                                .frame(4, 2).frame(5, 2)
-                                .frame(6, 2).frame(7, 2)
-                                .frame(8, 2).frame(9, 2)
-                                .frame(10, 2).frame(11, 40))
+                        .animation(AnimationData.construct(160, 16, 2))
                         .end();
             }
         } else {
@@ -336,26 +330,12 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         {
             if (canUse) {
                 if (canUpgrade) {
-                    RenderSystem.setShaderTexture(0, DescriptionTextures.UPGRADE);
-
-                    manager.bindForSetup(DescriptionTextures.UPGRADE);
-
-                    RenderSystem.enableBlend();
-
-                    RenderUtils.renderAnimatedTextureFromCenter(poseStack, 0, -1, 20, 400, 20, 20, 0.9F + ((float) (Math.sin((player.tickCount + partialTick) * 0.25F) * 0.025F)), AnimationData.builder()
-                            .frame(0, 2).frame(1, 2)
-                            .frame(2, 2).frame(3, 2)
-                            .frame(4, 2).frame(5, 2)
-                            .frame(6, 2).frame(7, 2)
-                            .frame(8, 2).frame(9, 2)
-                            .frame(10, 2).frame(11, 2)
-                            .frame(12, 2).frame(13, 2)
-                            .frame(14, 2).frame(15, 2)
-                            .frame(16, 2).frame(17, 2)
-                            .frame(18, 2).frame(19, 2)
-                    );
-
-                    RenderSystem.disableBlend();
+                    GUIRenderer.begin(DescriptionTextures.UPGRADE, poseStack)
+                            .pos(0, -1)
+                            .patternSize(20, 20)
+                            .scale(0.9F + ((float) (Math.sin((player.tickCount + partialTick) * 0.25F) * 0.05F)))
+                            .animation(AnimationData.construct(200, 20, 2))
+                            .end();
                 }
             }
         }

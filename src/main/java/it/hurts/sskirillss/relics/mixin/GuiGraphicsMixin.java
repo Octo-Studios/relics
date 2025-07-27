@@ -64,13 +64,13 @@ public class GuiGraphicsMixin {
             if (!renderedUpgradeIcon && relic.mayUpgrade(player, stack, ability.getId())) {
                 poseStack.pushPose();
 
-                poseStack.translate(x + 9, y, 200);
+                poseStack.translate(x + 9, y - 2, 200);
 
-                poseStack.translate(3.5F, 3.5F, 0);
+                poseStack.translate(4.5F, 4.5F, 0);
 
                 poseStack.mulPose(Axis.ZP.rotation((float) (Math.sin(time * 0.35F) * 0.15F)));
 
-                poseStack.translate(-3.5F, -3.5F, 0);
+                poseStack.translate(-4.5F, -4.5F, 0);
 
                 GUIRenderer.begin(UPGRADE_TEXTURE, poseStack)
                         .color(color, color, color, 1F)
