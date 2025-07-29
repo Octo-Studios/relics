@@ -13,6 +13,7 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -67,6 +68,10 @@ public class ReflectiveNecklaceItem extends RelicItem {
                                         .initialValue(1D, 2D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.471D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 17, 6).star(1, 4, 11).star(2, 16, 17).star(3, 9, 19).star(4, 18, 24).star(5, 4, 27)
+                                        .link(1, 3).link(3, 2).link(3, 4).link(0, 3).link(3, 5)
                                         .build())
                                 .build())
                         .build())
