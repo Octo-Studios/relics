@@ -11,6 +11,7 @@ import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -56,6 +57,10 @@ public class LeafyMantleItem extends RelicItem {
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1619D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 8, 15).star(1, 14, 15).star(2, 2, 17).star(3, 20, 17).star(4, 2, 22).star(5, 11, 22).star(6, 20, 22).star(7, 2, 27).star(8, 20, 27)
+                                        .link(5, 2).link(5, 3).link(5, 4).link(5, 6).link(5, 7).link(5, 8).link(0, 1)
+                                        .build())
                                 .build())
                         .ability(AbilityTemplate.builder("revival")
                                 .requiredLevel(5)
@@ -79,6 +84,10 @@ public class LeafyMantleItem extends RelicItem {
                                         .initialValue(0.5D, 1D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
                                         .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 13, 5).star(1, 2, 14).star(2, 11, 17).star(3, 20, 19).star(4, 8, 28)
+                                        .link(2, 0).link(2, 4).link(2, 1).link(2, 3)
                                         .build())
                                 .build())
                         .build())
