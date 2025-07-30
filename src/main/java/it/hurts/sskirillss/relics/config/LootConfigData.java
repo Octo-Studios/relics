@@ -5,5 +5,5 @@ import lombok.Data;
 
 @Data
 public class LootConfigData implements OctoConfig {
-    private double relicGenChance = 0.33D;
+    private double relicGenChance = 0.2D;
 }
