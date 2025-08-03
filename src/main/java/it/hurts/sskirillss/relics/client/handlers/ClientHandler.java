@@ -6,6 +6,8 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
 import it.hurts.sskirillss.relics.client.gui.layers.*;
+import it.hurts.sskirillss.relics.client.layer.BeltLayer;
+import it.hurts.sskirillss.relics.client.layer.NecklaceLayer;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
@@ -17,6 +19,7 @@ import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategor
 import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCategory;
 import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
+import it.hurts.sskirillss.relics.init.RelicsRelicRenderers;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
@@ -69,11 +72,14 @@ public class ClientHandler {
             }
         });
 
-        CuriosRendererRegistry.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
-        CuriosRendererRegistry.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
-        CuriosRendererRegistry.register(RelicsItems.KINETIC_BELT.get(), KineticBeltRenderer::new);
+//        CuriosRendererRegistry.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
+//        CuriosRendererRegistry.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
         CuriosRendererRegistry.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
         CuriosRendererRegistry.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleRenderer::new);
+
+        RelicsRelicRenderers.register(RelicsItems.KINETIC_BELT.get(), KineticBeltRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
 
         for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
             if (!(item instanceof IRenderableCurio))
@@ -120,13 +126,18 @@ public class ClientHandler {
 
     @SubscribeEvent
     public static void onPlayerRendererRegister(EntityRenderersEvent.AddLayers event) {
-        for (PlayerSkin.Model skinType : event.getSkins()) {
-            EntityRenderer<? extends Player> renderer = event.getSkin(skinType);
+        for (var skinType : event.getSkins()) {
+           var renderer = event.getSkin(skinType);
 
             if (renderer instanceof PlayerRenderer playerRenderer) {
                 playerRenderer.addLayer(new WingsLayer<>(playerRenderer));
+
+                playerRenderer.addLayer(new NecklaceLayer<>(playerRenderer));
+                playerRenderer.addLayer(new BeltLayer<>(playerRenderer));
             }
         }
+
+        RelicsRelicRenderers.init();
     }
 
     @SubscribeEvent

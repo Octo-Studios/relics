@@ -21,7 +21,7 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 import java.util.function.Supplier;
 
-public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends EntityModel<?> & INecklaceModel<T>> implements ICurioRenderer {
+public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends EntityModel<?> & INecklaceModel<T>> implements IRelicRenderer {
     private final M model;
     private final ResourceLocation texture;
 

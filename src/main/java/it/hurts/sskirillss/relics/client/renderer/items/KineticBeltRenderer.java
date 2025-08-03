@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.items.KineticBeltModel;
 import it.hurts.sskirillss.relics.client.models.items.KineticBeltWingsModel;
+import it.hurts.sskirillss.relics.client.renderer.items.base.IRelicRenderer;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,7 @@ import top.theillusivec4.curios.api.client.ICurioRenderer;
 
 import java.awt.*;
 
-public class KineticBeltRenderer implements ICurioRenderer {
+public class KineticBeltRenderer implements IRelicRenderer {
     private final KineticBeltModel model;
 
     public KineticBeltRenderer() {
