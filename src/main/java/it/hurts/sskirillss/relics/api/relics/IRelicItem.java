@@ -306,7 +306,7 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
     default int calculateRelicMaxLevel(LivingEntity entity, ItemStack stack) {
         return this.getRelicTemplate(entity, stack).getAbilities().getAbilities().values().stream()
-                .mapToInt(AbilityTemplate::getInitialMaxLevel)
+                .mapToInt(template -> template.getInitialMaxLevel() * template.getRequiredPoints())
                 .sum();
     }
 
