@@ -141,6 +141,13 @@ public interface IRelicUtilities {
         return current != relic.getRelicLevel(entity, stack);
     }
 
+    default boolean isRelicMaxRank(LivingEntity entity, ItemStack stack) {
+        if (!(this instanceof IRelicItem relic))
+            return false;
+
+        return relic.getRelicRank(entity, stack) >= relic.getLevelingTemplate(entity, stack).getMaxRank();
+    }
+
     default boolean isRelicMaxLevel(LivingEntity entity, ItemStack stack) {
         if (!(this instanceof IRelicItem relic))
             return false;
