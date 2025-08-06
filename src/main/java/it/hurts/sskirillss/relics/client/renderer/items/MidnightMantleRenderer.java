@@ -6,6 +6,7 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.models.items.MidnightMantleFullMoonModel;
 import it.hurts.sskirillss.relics.client.models.items.MidnightMantleModel;
 import it.hurts.sskirillss.relics.client.models.items.MidnightMantleNewMoonModel;
+import it.hurts.sskirillss.relics.client.renderer.items.base.IRelicRenderer;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import net.minecraft.client.Minecraft;
@@ -23,7 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
-public class MidnightMantleRenderer implements ICurioRenderer {
+public class MidnightMantleRenderer implements IRelicRenderer {
     private final MidnightMantleModel model;
 
     public MidnightMantleRenderer() {
