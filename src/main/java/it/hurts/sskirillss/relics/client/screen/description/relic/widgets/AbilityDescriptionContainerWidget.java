@@ -25,6 +25,7 @@ import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 public class AbilityDescriptionContainerWidget extends DescriptionContainerWidget {
+    private static final int TEXT_OFFSET = 2;
     private static final int VERTICAL_PADDING = 1;
 
     public AbilityDescriptionContainerWidget(DescriptionScreen screen) {
@@ -42,7 +43,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
 
         var poseStack = guiGraphics.pose();
 
-        GUIScissors.begin(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        GUIScissors.begin(this.getX(), this.getY() - VERTICAL_PADDING, this.getWidth(), this.getHeight() + VERTICAL_PADDING);
 
         poseStack.pushPose();
 
@@ -54,20 +55,15 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         var scroll = this.getScrollbar();
 
         if (scroll != null) {
-            var rawLineHeight = this.minecraft.font.lineHeight;
-            var rawSpacing = 1;
-            var localLineOffset = rawLineHeight + rawSpacing;
+            var lineStep = this.minecraft.font.lineHeight + 1;
+            var totalLines = layout.size();
+            var overflowLines = Math.max(0, totalLines - MAX_LINES);
 
-            var contentHeightLocal = layout.size() * localLineOffset + 2 * VERTICAL_PADDING;
-
-            var windowHeightLocal = DescriptionContainerWidget.MAX_LINES * localLineOffset;
-
-            var scrollRangeLocal = contentHeightLocal - windowHeightLocal;
-
+            var maxScrollPx = overflowLines * lineStep + VERTICAL_PADDING * 3;
             var offset = scroll.getScrollPosition(partialTick);
-            var shiftY = offset * scrollRangeLocal;
+            var shiftY = offset * maxScrollPx;
 
-            poseStack.translate(0, -(shiftY - VERTICAL_PADDING), 0);
+            poseStack.translate(0, -shiftY, 0);
         }
 
         this.renderJustifiedDescriptionWithStatBoxes(guiGraphics, (this.getX() + 7) * 2, (this.getY() * 2), 320, this.minecraft.font, layout);
@@ -316,6 +312,8 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         var data = constructDescriptionData();
         var lines = layoutJustifiedLines(minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
 
-        return (int) (lines.size() * minecraft.font.lineHeight / 2F + VERTICAL_PADDING);
+        var step = minecraft.font.lineHeight + 1;
+
+        return (lines.size() * step / 2 + VERTICAL_PADDING * 6);
     }
 }
