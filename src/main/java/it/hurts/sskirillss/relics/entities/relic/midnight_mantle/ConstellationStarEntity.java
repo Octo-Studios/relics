@@ -1,23 +1,16 @@
 package it.hurts.sskirillss.relics.entities.relic.midnight_mantle;
 
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.item.midnight_mantle.S2CSyncConstellation;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
@@ -25,7 +18,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector3f;
 
 import java.awt.*;
 import java.util.List;
@@ -33,23 +25,15 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class ConstellationStarEntity extends ThrowableProjectile {
-    private static final EntityDataAccessor<Vector3f> CENTER = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.VECTOR3);
     private static final EntityDataAccessor<Integer> LIFETIME = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> TREMOR = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> STUN = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Float> RADIUS = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> CONSTELLATION_RADIUS = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Float> EXPLOSION_RADIUS = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<String> CONSTELLATION = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Boolean> STUCK = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.BOOLEAN);
-
-    public void setCenter(Vec3 center) {
-        this.getEntityData().set(CENTER, center.toVector3f());
-    }
-
-    public Vec3 getCenter() {
-        return new Vec3(this.getEntityData().get(CENTER));
-    }
 
     public void setLifetime(int lifetime) {
         this.getEntityData().set(LIFETIME, lifetime);
@@ -75,12 +59,20 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         return this.getEntityData().get(STUN);
     }
 
-    public void setRadius(float radius) {
-        this.getEntityData().set(RADIUS, radius);
+    public void setConstellationRadius(float radius) {
+        this.getEntityData().set(CONSTELLATION_RADIUS, radius);
     }
 
-    public float getRadius() {
-        return this.getEntityData().get(RADIUS);
+    public float getConstellationRadius() {
+        return this.getEntityData().get(CONSTELLATION_RADIUS);
+    }
+
+    public void setExplosionRadius(float radius) {
+        this.getEntityData().set(EXPLOSION_RADIUS, radius);
+    }
+
+    public float getExplosionRadius() {
+        return this.getEntityData().get(EXPLOSION_RADIUS);
     }
 
     public void setDamage(float damage) {
@@ -99,14 +91,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         this.setRawConstellation(constellation.stream().map(UUID::toString).collect(Collectors.joining("+")));
     }
 
-    public String getRawConstellation() {
-        return this.getEntityData().get(CONSTELLATION);
-    }
-
-    public List<UUID> getConstellation() {
-        return Arrays.stream(this.getRawConstellation().split("\\+")).map(String::trim).map(UUID::fromString).toList();
-    }
-
     public void setFlawless(boolean flawless) {
         this.getEntityData().set(FLAWLESS, flawless);
     }
@@ -122,10 +106,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
     public boolean isFlawless() {
         return this.getEntityData().get(FLAWLESS);
     }
-
-    @Getter
-    @Setter
-    private List<Integer> clientConstellation = new ArrayList<>();
 
     public ConstellationStarEntity(EntityType<? extends ConstellationStarEntity> type, Level worldIn) {
         super(type, worldIn);
@@ -156,55 +136,30 @@ public class ConstellationStarEntity extends ThrowableProjectile {
                 level.addParticle(data, this.getX() + MathUtils.randomFloat(random) * this.getBbWidth() / 2F, this.getY(), this.getZ() + MathUtils.randomFloat(random) * this.getBbWidth() / 2F, 0, 0.1F + random.nextFloat() * 0.1F, 0);
             }
 
-            var originEntityId = this.getId();
+            var origin = this;
+            var queue = new ArrayDeque<ConstellationStarEntity>();
+            var visited = new HashSet<ConstellationStarEntity>();
 
-            var entityIdQueue = new ArrayDeque<Integer>();
-            var discoveredIds = new HashSet<Integer>();
+            queue.add(origin);
+            visited.add(origin);
 
-            entityIdQueue.add(originEntityId);
-            discoveredIds.add(originEntityId);
+            while (!queue.isEmpty()) {
+                var current = queue.removeFirst();
 
-            if (level.isClientSide()) {
-                while (!entityIdQueue.isEmpty()) {
-                    var currentEntityId = entityIdQueue.removeFirst();
+                var neighbors = level.getEntitiesOfClass(ConstellationStarEntity.class, current.getBoundingBox().inflate(this.getConstellationRadius()));
 
-                    if (!(level.getEntity(currentEntityId) instanceof ConstellationStarEntity foundEntity))
-                        continue;
-
-                    for (var neighborStarId : foundEntity.getClientConstellation())
-                        if (discoveredIds.add(neighborStarId))
-                            entityIdQueue.add(neighborStarId);
-                }
-            } else {
-                var serverLevel = (ServerLevel) level;
-
-                while (!entityIdQueue.isEmpty()) {
-                    var currentEntityId = entityIdQueue.removeFirst();
-
-                    if (!(serverLevel.getEntity(currentEntityId) instanceof ConstellationStarEntity foundEntity))
-                        continue;
-
-                    for (var neighborStarUuid : foundEntity.getConstellation()) {
-                        var entity = serverLevel.getEntity(neighborStarUuid);
-                        if (entity == null)
-                            continue;
-
-                        var id = entity.getId();
-
-                        if (discoveredIds.add(id))
-                            entityIdQueue.add(id);
-                    }
+                for (var star : neighbors) {
+                    if (visited.add(star))
+                        queue.add(star);
                 }
             }
 
-            if (discoveredIds.size() < 2)
+            if (visited.size() < 2)
                 return;
 
-            var sortedIds = new ArrayList<>(discoveredIds);
+            var sortedIds = new ArrayList<>(visited);
 
-            Collections.sort(sortedIds);
-
-            var originIndex = sortedIds.indexOf(originEntityId);
+            var originIndex = sortedIds.indexOf(origin);
 
             var totalStars = sortedIds.size();
             var starEntities = new ConstellationStarEntity[totalStars];
@@ -212,7 +167,7 @@ public class ConstellationStarEntity extends ThrowableProjectile {
             var midYs = new double[totalStars];
 
             for (var i = 0; i < totalStars; i++) {
-                var e = (ConstellationStarEntity) level.getEntity(sortedIds.get(i));
+                var e = sortedIds.get(i);
 
                 starEntities[i] = e;
 
@@ -408,7 +363,7 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         var random = level.getRandom();
         var position = this.position();
 
-        for (var target : level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(this.getRadius()), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID()))) {
+        for (var target : level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(this.getExplosionRadius()), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID()))) {
             target.invulnerableTime = 0;
 
             if (target.hurt(this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), 1 + this.getDamage()))
@@ -462,17 +417,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
     }
 
     @Override
-    public void startSeenByPlayer(ServerPlayer serverPlayer) {
-        super.startSeenByPlayer(serverPlayer);
-
-        if (!(serverPlayer.level() instanceof ServerLevel level))
-            return;
-
-        if (!this.getRawConstellation().isEmpty())
-            NetworkHandler.sendToClient(new S2CSyncConstellation(this.getId(), this.getConstellation().stream().map(level::getEntity).filter(Objects::nonNull).map(Entity::getId).collect(Collectors.toList())), serverPlayer);
-    }
-
-    @Override
     public boolean isPickable() {
         return true;
     }
@@ -484,14 +428,14 @@ public class ConstellationStarEntity extends ThrowableProjectile {
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
-        builder.define(CENTER, Vec3.ZERO.toVector3f());
         builder.define(LIFETIME, 0);
         builder.define(CONSTELLATION, "");
         builder.define(STUCK, false);
         builder.define(FLAWLESS, false);
         builder.define(TREMOR, 0F);
         builder.define(STUN, 0F);
-        builder.define(RADIUS, 0F);
+        builder.define(CONSTELLATION_RADIUS, 0F);
+        builder.define(EXPLOSION_RADIUS, 0F);
         builder.define(DAMAGE, 0F);
     }
 
@@ -500,12 +444,12 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         super.addAdditionalSaveData(tag);
 
         tag.putInt("lifetime", this.getLifetime());
-        tag.putString("constellation", this.getRawConstellation());
         tag.putBoolean("stuck", this.isStuck());
         tag.putBoolean("flawless", this.isFlawless());
         tag.putFloat("tremor", this.getTremor());
         tag.putFloat("stun", this.getStun());
-        tag.putFloat("radius", this.getRadius());
+        tag.putFloat("constellation_radius", this.getConstellationRadius());
+        tag.putFloat("explosion_radius", this.getExplosionRadius());
         tag.putFloat("damage", this.getDamage());
     }
 
@@ -514,12 +458,12 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         super.readAdditionalSaveData(tag);
 
         this.setLifetime(tag.getInt("lifetime"));
-        this.setRawConstellation(tag.getString("constellation"));
         this.setStuck(tag.getBoolean("stuck"));
         this.setFlawless(tag.getBoolean("flawless"));
         this.setTremor(tag.getFloat("tremor"));
         this.setStun(tag.getFloat("stun"));
-        this.setRadius(tag.getFloat("radius"));
+        this.setConstellationRadius(tag.getFloat("constellation_radius"));
+        this.setExplosionRadius(tag.getFloat("explosion_radius"));
         this.setDamage(tag.getFloat("damage"));
     }
 

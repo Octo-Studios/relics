@@ -17,14 +17,10 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
-import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.item.midnight_mantle.S2CSyncConstellation;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -37,6 +33,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingHealEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
@@ -44,10 +41,6 @@ import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import top.theillusivec4.curios.api.SlotContext;
-
-import java.util.ArrayList;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 public class MidnightMantleItem extends RelicItem {
     @Override
@@ -59,32 +52,32 @@ public class MidnightMantleItem extends RelicItem {
                                 .rankModifier(1, "switch")
                                 .stat(StatTemplate.builder("attack_damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("attack_speed")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("max_health")
-                                        .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .initialValue(0.25D, 0.25D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("health_regeneration")
-                                        .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .initialValue(0.25D, 0.25D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("duration")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("modifier")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .statistic(StatisticTemplate.builder()
@@ -111,18 +104,18 @@ public class MidnightMantleItem extends RelicItem {
                                 .stat(StatTemplate.builder("brightness")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0545D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("cooldown")
                                         .thresholdValue(0D, Double.MAX_VALUE)
                                         .initialValue(15D, 10D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.05D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.01636D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .statistic(StatisticTemplate.builder()
@@ -139,40 +132,41 @@ public class MidnightMantleItem extends RelicItem {
                                 .build())
                         .ability(AbilityTemplate.builder("constellation")
                                 .rankModifier(5, "stun")
-                                .stat(StatTemplate.builder("stars_amount")
-                                        .initialValue(2D, 7D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.05D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                .stat(StatTemplate.builder("star_chance")
+                                        .initialValue(0.1D, 0.2D)
+                                        .thresholdValue(0D, 1D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.1739D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 1))
                                         .build())
-                                .stat(StatTemplate.builder("ability_cooldown")
+                                .stat(StatTemplate.builder("constellation_radius")
                                         .thresholdValue(0D, Double.MAX_VALUE)
-                                        .initialValue(120D, 180D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.1D)
+                                        .initialValue(5D, 7D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0468D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("tremor_duration")
                                         .initialValue(0.25D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("explosion_radius")
                                         .initialValue(0.5D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1182D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("explosion_damage")
                                         .initialValue(1D, 5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("star_lifetime")
                                         .initialValue(10D, 15D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1273D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("stun_duration")
                                         .initialValue(1D, 2.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.8632D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -185,27 +179,27 @@ public class MidnightMantleItem extends RelicItem {
                                 .stat(StatTemplate.builder("chance")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.025D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0364D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("radius")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0727D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("stun")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.3455D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("bounce_chance")
                                         .initialValue(0.05D, 0.15D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0424D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -242,18 +236,6 @@ public class MidnightMantleItem extends RelicItem {
 
     public void addInvisibilityCooldown(ItemStack stack, int cooldown) {
         this.setInvisibilityCooldown(stack, this.getInvisibilityCooldown(stack) + cooldown);
-    }
-
-    public int getConstellationCooldown(ItemStack stack) {
-        return stack.getOrDefault(RelicsDataComponents.MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN.get(), 0);
-    }
-
-    public void setConstellationCooldown(ItemStack stack, int cooldown) {
-        stack.set(RelicsDataComponents.MIDNIGHT_MANTLE_CONSTELLATION_COOLDOWN.get(), cooldown);
-    }
-
-    public void addConstellationCooldown(ItemStack stack, int cooldown) {
-        this.setConstellationCooldown(stack, this.getConstellationCooldown(stack) + cooldown);
     }
 
     public int getPhaseDuration(ItemStack stack) {
@@ -340,11 +322,6 @@ public class MidnightMantleItem extends RelicItem {
                     this.addInvisibilityCooldown(stack, -1);
             } else if (this.canHideInTheDarkness(entity, stack))
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
-        }
-
-        if (this.canPlayerUseAbility(entity, stack, "constellation")) {
-            if (this.getConstellationCooldown(stack) > 0)
-                this.addConstellationCooldown(stack, -1);
         }
     }
 
@@ -481,8 +458,8 @@ public class MidnightMantleItem extends RelicItem {
         }
 
         @SubscribeEvent
-        public static void onLivingHurt4(LivingIncomingDamageEvent event) {
-            if (event.getAmount() < 1D || !(event.getSource().getEntity() instanceof LivingEntity source))
+        public static void onLivingHurt4(LivingDamageEvent.Post event) {
+            if (event.getOriginalDamage() < 1D || !(event.getSource().getEntity() instanceof LivingEntity source))
                 return;
 
             var entity = event.getEntity();
@@ -496,94 +473,25 @@ public class MidnightMantleItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "constellation") || relic.getConstellationCooldown(stack) > 0)
+                if (!relic.canPlayerUseAbility(entity, stack, "constellation") || random.nextDouble() > relic.getStatValue(entity, stack, "constellation", "star_chance"))
                     continue;
 
-                var stars = new ArrayList<ConstellationStarEntity>();
-                var targets = new ArrayList<Vec3>();
+                var star = new ConstellationStarEntity(RelicsEntities.CONSTELLATION_STAR.get(), level);
 
-                var count = Math.max(random.nextInt((int) relic.getStatValue(entity, stack, "constellation", "stars_amount")), 2);
-                var radius = 3F + (count * 0.25F);
-                var apexHeight = radius / 3F;
-                var gravity = 0.1F;
+                star.setDeltaMovement(MathUtils.randomFloat(random) * 0.5F, 0.1F + random.nextFloat() * 0.1F, MathUtils.randomFloat(random) * 0.5F);
+                star.setConstellationRadius((float) relic.getStatValue(entity, stack, "constellation", "constellation_radius"));
+                star.setExplosionRadius((float) relic.getStatValue(entity, stack, "constellation", "explosion_radius"));
+                star.setDamage((float) relic.getStatValue(entity, stack, "constellation", "explosion_damage"));
+                star.setTremor((float) relic.getStatValue(entity, stack, "constellation", "tremor_duration"));
+                star.setLifetime((int) relic.getStatValue(entity, stack, "constellation", "star_lifetime"));
+                star.setFlawless(relic.isRelicFlawless(entity, stack));
+                star.setPos(entity.getEyePosition());
+                star.setOwner(entity);
 
-                var startPos = entity.getEyePosition();
-                var groundY = entity.position().y();
-                var centerPos = new Vec3(startPos.x(), groundY, startPos.z());
+                if (relic.isAbilityRankModifierUnlocked(entity, stack, "constellation", "stun"))
+                    star.setStun((int) relic.getStatValue(entity, stack, "constellation", "stun_duration"));
 
-                var minSep = radius / (float) Math.sqrt(count);
-
-                for (var i = 0; i < count; i++) {
-                    Vec3 targetPos = null;
-
-                    for (int step = 0; step < 10; step++) {
-                        var angle = random.nextDouble() * Math.PI * 2;
-
-                        var randomFactor = random.nextDouble();
-                        var radialDistance = radius * Math.sqrt(randomFactor);
-
-                        var tx = centerPos.x() + Math.cos(angle) * radialDistance;
-                        var tz = centerPos.z() + Math.sin(angle) * radialDistance;
-
-                        final var candidate = new Vec3(tx, groundY, tz);
-
-                        if (targets.stream().noneMatch(tp -> tp.distanceTo(candidate) < minSep)) {
-                            targetPos = candidate;
-
-                            break;
-                        }
-                    }
-
-                    if (targetPos == null)
-                        continue;
-
-                    targets.add(targetPos);
-
-                    var deltaXZ = targetPos.subtract(startPos).multiply(1, 0, 1);
-                    var distanceXZ = deltaXZ.length();
-                    var directionXZ = deltaXZ.normalize();
-
-                    var startY = startPos.y();
-                    var deltaY = groundY - startY;
-                    var heightDiffToApex = (Math.max(startY, groundY) + apexHeight) - startY;
-                    var flightTime = Math.sqrt((4 * heightDiffToApex - 2 * deltaY) / gravity);
-
-                    var verticalVelocity = (deltaY + 0.5 * gravity * flightTime * flightTime) / flightTime;
-                    var horizontalSpeed = distanceXZ / flightTime;
-                    var motion = new Vec3(directionXZ.x() * horizontalSpeed, verticalVelocity, directionXZ.z() * horizontalSpeed);
-
-                    var star = new ConstellationStarEntity(RelicsEntities.CONSTELLATION_STAR.get(), level);
-
-                    star.setDamage((float) relic.getStatValue(entity, stack, "constellation", "explosion_damage"));
-                    star.setRadius((float) relic.getStatValue(entity, stack, "constellation", "explosion_radius"));
-                    star.setTremor((float) relic.getStatValue(entity, stack, "constellation", "tremor_duration"));
-                    star.setLifetime((int) relic.getStatValue(entity, stack, "constellation", "star_lifetime"));
-                    star.setFlawless(relic.isRelicFlawless(entity, stack));
-                    star.setDeltaMovement(motion);
-                    star.setCenter(centerPos);
-                    star.setPos(startPos);
-                    star.setOwner(entity);
-
-                    if (relic.isAbilityRankModifierUnlocked(entity, stack, "constellation", "stun"))
-                        star.setStun((int) relic.getStatValue(entity, stack, "constellation", "stun_duration"));
-
-                    level.addFreshEntity(star);
-
-                    stars.add(star);
-                }
-
-                var uuids = stars.stream()
-                        .map(Entity::getUUID)
-                        .toList();
-
-                for (var star : stars) {
-                    star.setConstellation(uuids);
-
-                    if (level instanceof ServerLevel serverLevel)
-                        NetworkHandler.sendToClientsTrackingEntity(new S2CSyncConstellation(star.getId(), star.getConstellation().stream().map(serverLevel::getEntity).filter(Objects::nonNull).map(Entity::getId).collect(Collectors.toList())), star);
-                }
-
-                relic.setConstellationCooldown(stack, (int) (relic.getStatValue(entity, stack, "constellation", "ability_cooldown") * 20));
+                level.addFreshEntity(star);
             }
         }
 
