@@ -24,16 +24,16 @@ public abstract class SimpleDescriptionContainerWidget extends DescriptionContai
 
         var poseStack = guiGraphics.pose();
 
-        GUIScissors.begin(getX(), getY(), getWidth(), getHeight());
+        GUIScissors.begin(this.getX(), this.getY(), this.getWidth(), this.getHeight() + 1);
 
         poseStack.pushPose();
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        var lineOffset = this.minecraft.font.lineHeight + 2;
+        var lineOffset = this.minecraft.font.lineHeight + 1;
         var lines = this.getContent();
 
-        var scroll = getScrollbar();
+        var scroll = this.getScrollbar();
 
         if (scroll != null) {
             var offset = scroll.getScrollPosition(partialTick);

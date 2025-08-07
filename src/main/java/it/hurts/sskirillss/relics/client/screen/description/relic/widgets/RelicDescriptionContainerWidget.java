@@ -25,7 +25,7 @@ public class RelicDescriptionContainerWidget extends DescriptionContainerWidget 
 
         var poseStack = guiGraphics.pose();
 
-        GUIScissors.begin(getX(), getY(), getWidth(), getHeight());
+        GUIScissors.begin(this.getX(), this.getY(), this.getWidth(), this.getHeight() + 1);
 
         poseStack.pushPose();
 
