@@ -8,6 +8,7 @@ import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategorie
 import it.hurts.sskirillss.relics.client.gui.layers.*;
 import it.hurts.sskirillss.relics.client.layer.BackLayer;
 import it.hurts.sskirillss.relics.client.layer.BeltLayer;
+import it.hurts.sskirillss.relics.client.layer.FeetLayer;
 import it.hurts.sskirillss.relics.client.layer.NecklaceLayer;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
@@ -73,10 +74,8 @@ public class ClientHandler {
             }
         });
 
-//        CuriosRendererRegistry.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
-//        CuriosRendererRegistry.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
-        CuriosRendererRegistry.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
-
+        RelicsRelicRenderers.register(RelicsItems.ROLLER_SKATES.get(), RollerSkateRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.KINETIC_BELT.get(), KineticBeltRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
@@ -118,6 +117,7 @@ public class ClientHandler {
         event.registerLayerDefinition(SpringyBootModel.LAYER, SpringyBootModel::constructLayerDefinition);
         event.registerLayerDefinition(MidnightMantleModel.LAYER, MidnightMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(LeafyMantleModel.LAYER, LeafyMantleModel::constructLayerDefinition);
+        event.registerLayerDefinition(RollerSkateModel.LAYER, RollerSkateModel::constructLayerDefinition);
 
         for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
             if (!(item instanceof IRenderableCurio renderable))
@@ -138,6 +138,7 @@ public class ClientHandler {
                 playerRenderer.addLayer(new NecklaceLayer<>(playerRenderer));
                 playerRenderer.addLayer(new BeltLayer<>(playerRenderer));
                 playerRenderer.addLayer(new BackLayer<>(playerRenderer));
+                playerRenderer.addLayer(new FeetLayer<>(playerRenderer));
             }
         }
 
