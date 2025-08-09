@@ -79,6 +79,12 @@ public class MetricTemplate {
             return this;
         }
 
+        public MetricTemplateBuilder abilityRankModifierVisibilityCondition(String rankModifier) {
+            this.visibilityCondition((entity, stack, ability) -> ability.isEmpty() || ((IRelicItem) stack.getItem()).isAbilityRankModifierUnlocked(entity, stack, ability.get(), rankModifier));
+
+            return this;
+        }
+
         public MetricTemplate build() {
             return new MetricTemplate(id, formatValue, component, visibilityCondition);
         }

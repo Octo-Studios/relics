@@ -1,7 +1,9 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -77,6 +79,22 @@ public class ReflectiveNecklaceItem extends RelicItem {
                                         .source(ExperienceSourceTemplate.builder("impact")
                                                 .build())
                                         .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("total_orbs")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("total_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("total_stun")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .abilityRankModifierVisibilityCondition("stun")
+                                                .build())
+                                        .metric(MetricTemplate.builder("total_bounces")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .abilityRankModifierVisibilityCondition("bounce")
+                                                .build())
+                                        .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 17, 6).star(1, 4, 11).star(2, 16, 17).star(3, 9, 19).star(4, 18, 24).star(5, 4, 27)
                                         .link(1, 3).link(3, 2).link(3, 4).link(0, 3).link(3, 5)
@@ -140,6 +158,8 @@ public class ReflectiveNecklaceItem extends RelicItem {
 
                     if (relic.canAddRelicExperience(entity, stack, "reflection", "construct"))
                         relic.addRelicExperience(entity, stack, "reflection", "construct", orbDamage * 0.1D);
+
+                    relic.addAbilityMetricValue(entity, stack, "reflection", "total_orbs", 1);
                 }
             }
 

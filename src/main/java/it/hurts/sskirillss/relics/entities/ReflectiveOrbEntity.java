@@ -261,6 +261,9 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
         this.bounced = true;
         this.takeBounces = true;
 
+        if (stack.getItem() instanceof ReflectiveNecklaceItem relic && this.getOwner() instanceof LivingEntity owner)
+            relic.addAbilityMetricValue(owner, stack, "reflection", "total_bounces", 1);
+
         return true;
     }
 
@@ -278,8 +281,15 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
             if (stun > 0)
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (stun * 20), 0, false, false));
 
-            if (stack.getItem() instanceof ReflectiveNecklaceItem relic && relic.canAddRelicExperience(entity, stack, "reflection", "impact"))
+            if (stack.getItem() instanceof ReflectiveNecklaceItem relic) {
+                relic.addAbilityMetricValue(entity, stack, "reflection", "total_damage", this.getDamage());
+
+                if (stun > 0)
+                    relic.addAbilityMetricValue(entity, stack, "reflection", "total_stun", stun);
+
+                if (relic.canAddRelicExperience(entity, stack, "reflection", "impact"))
                     relic.addRelicExperience(entity, stack, "reflection", "impact", 1);
+            }
         }
 
         this.impactedEntities.add(entity.getStringUUID());
