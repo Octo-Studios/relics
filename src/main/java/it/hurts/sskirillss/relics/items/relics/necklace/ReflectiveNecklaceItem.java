@@ -4,6 +4,8 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.ReflectiveOrbEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
@@ -69,6 +71,12 @@ public class ReflectiveNecklaceItem extends RelicItem {
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.6857D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("construct")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("impact")
+                                                .build())
+                                        .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 17, 6).star(1, 4, 11).star(2, 16, 17).star(3, 9, 19).star(4, 18, 24).star(5, 4, 27)
                                         .link(1, 3).link(3, 2).link(3, 4).link(0, 3).link(3, 5)
@@ -95,7 +103,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
     @EventBusSubscriber(modid = Relics.MODID)
     public static class CommonEvents {
         @SubscribeEvent
-        public static void onEntityHurt(LivingDamageEvent.Pre event) {
+        public static void onLivingDamage(LivingDamageEvent.Pre event) {
             var source = event.getSource().getEntity();
             var damage = event.getOriginalDamage();
             var entity = event.getEntity();
@@ -110,15 +118,17 @@ public class ReflectiveNecklaceItem extends RelicItem {
                     if (level.getRandom().nextDouble() > relic.getStatValue(entity, stack, "reflection", "chance"))
                         continue;
 
+                    var orbDamage = Math.clamp((float) (damage * relic.getStatValue(entity, stack, "reflection", "damage")), Float.MIN_VALUE, Float.MAX_VALUE);
+
                     var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
 
                     orb.setPiercings(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "piercing") ? (int) relic.getStatValue(entity, stack, "reflection", "piercings") : 0);
                     orb.setBounces(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "bounce") ? (int) relic.getStatValue(entity, stack, "reflection", "bounces") : 0);
                     orb.setStun(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "stun") ? (int) relic.getStatValue(entity, stack, "reflection", "stun") : 0);
-                    orb.setDamage(Math.clamp((float) (damage * relic.getStatValue(entity, stack, "reflection", "damage")), Float.MIN_VALUE, Float.MAX_VALUE));
                     orb.setLifetime((int) (relic.getStatValue(entity, stack, "reflection", "lifetime") * 20));
                     orb.setFlawless(relic.isRelicFlawless(entity, stack));
                     orb.setPos(entity.getEyePosition());
+                    orb.setDamage(orbDamage);
                     orb.setOwner(entity);
 
                     if (source != null)
@@ -127,6 +137,9 @@ public class ReflectiveNecklaceItem extends RelicItem {
                         orb.setDeltaMovement(MathUtils.randomFloat(random) * 0.5D, 0.5D + random.nextFloat() * 0.25D, MathUtils.randomFloat(random) * 0.5D);
 
                     level.addFreshEntity(orb);
+
+                    if (relic.canAddRelicExperience(entity, stack, "reflection", "construct"))
+                        relic.addRelicExperience(entity, stack, "reflection", "construct", orbDamage * 0.1D);
                 }
             }
 

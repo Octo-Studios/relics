@@ -113,6 +113,8 @@
   "tooltip.relics.reflective_necklace.ability.reflection.rank_modifier.piercing": "Сфера более не исчезает при столкновении с первой попавшейся целью, а прошивает до %4$s целей на своём пути.",
   "tooltip.relics.reflective_necklace.ability.reflection.rank_modifier.stun": "При нанесении целям урона сфера также оглушает их на %5$s секунд.",
   "tooltip.relics.reflective_necklace.ability.reflection.rank_modifier.bounce": "Сфера отскакивает до %6$s раз от твёрдых поверхностей или при удалении от носителя реликвии более чем на 16 блоков.",
+  "tooltip.relics.reflective_necklace.ability.reflection.experience_source.construct": "+1 единица опыта за каждые 10% от максимального здоровья носителя реликвии в виде урона в порождённой сфере.",
+  "tooltip.relics.reflective_necklace.ability.reflection.experience_source.impact": "+1 единица опыта за каждое нанесение урона сферой.",
 
   "item.relics.jellyfish_necklace": "Медузное ожерелье",
   "tooltip.relics.jellyfish_necklace.description": "Обвившаяся вокруг шеи, как ожившее украшение, медуза не увядает даже вдали от родной стихии. Её полупрозрачный купол мягко пульсирует, перетекая оттенками морской глади, а тонкие щупальца то едва колышутся, то сжимаются, высвобождая искры электричества. Пока носитель погружён в воду, она ценой собственной силы питает его жизнью и здоровьем. Но стоит врагу приблизиться - щупальца вспыхивают ослепительным разрядом, и электрическая волна сметает всё на своём пути.",

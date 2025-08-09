@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -15,6 +16,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -36,6 +38,9 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Float> STUN = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> BOUNCES = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.BOOLEAN);
+
+    @Getter
+    private ItemStack stack = ItemStack.EMPTY;
 
     private boolean bounced = false;
     private boolean takeBounces = false;
@@ -272,6 +277,9 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
 
             if (stun > 0)
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (stun * 20), 0, false, false));
+
+            if (stack.getItem() instanceof ReflectiveNecklaceItem relic && relic.canAddRelicExperience(entity, stack, "reflection", "impact"))
+                    relic.addRelicExperience(entity, stack, "reflection", "impact", 1);
         }
 
         this.impactedEntities.add(entity.getStringUUID());
