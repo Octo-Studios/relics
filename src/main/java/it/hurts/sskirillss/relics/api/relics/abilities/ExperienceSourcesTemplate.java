@@ -7,12 +7,13 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExperienceSourcesTemplate {
-    private final Map<String, ExperienceSourceTemplate> sources;
+    private final LinkedHashMap<String, ExperienceSourceTemplate> sources;
 
     public static StatisticTemplateBuilder builder() {
         return new StatisticTemplateBuilder();
@@ -24,7 +25,7 @@ public class ExperienceSourcesTemplate {
 
     @NoArgsConstructor
     public static class StatisticTemplateBuilder {
-        private Map<String, ExperienceSourceTemplate> sources = new HashMap<>();
+        private LinkedHashMap<String, ExperienceSourceTemplate> sources = new LinkedHashMap<>();
 
         private StatisticTemplateBuilder(ExperienceSourcesTemplate base) {
             this.sources = base.getSources();
