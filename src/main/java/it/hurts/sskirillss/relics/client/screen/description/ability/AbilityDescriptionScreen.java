@@ -69,6 +69,9 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
                     .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
                     .toList();
 
+            if (this.selectedAbility == null)
+                this.setSelectedAbility(abilities.getFirst());
+
             this.setPageOld(abilities.indexOf(getSelectedAbility()) / 5);
         }
     }
@@ -81,9 +84,6 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             return;
 
         var player = minecraft.player;
-
-        if (this.selectedAbility == null)
-            this.setSelectedAbility(relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream().findFirst().get());
 
         var ability = this.getSelectedAbility();
 
