@@ -96,7 +96,7 @@ public class MidnightMantleItem extends RelicItem {
                                         .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 6, 10).star(1, 16, 10).star(2, 6, 21).star(3, 16, 21)
-                                        .link(0, 1).link(1, 3).link(3, 2).link(2, 1)
+                                        .link(0, 1).link(1, 3).link(3, 2).link(2, 0)
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("invisibility")
