@@ -4,6 +4,8 @@ import io.netty.buffer.ByteBuf;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.entities.RollerSparkEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
+import it.hurts.sskirillss.relics.items.relics.feet.RollerSkateItem;
+import it.hurts.sskirillss.relics.misc.stream_codec.ExtendedStreamCodec;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.network.codec.ByteBufCodecs;
@@ -13,12 +15,16 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.joml.Vector3f;
+import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.UUID;
 
 @Data
 @AllArgsConstructor
 public class C2SCreateSpark implements CustomPacketPayload {
+    private final String identifier;
+    private final int index;
+
     private final Vector3f pos;
     private final Vector3f motion;
     private final String owner;
@@ -28,7 +34,9 @@ public class C2SCreateSpark implements CustomPacketPayload {
 
     public static final Type<C2SCreateSpark> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "roller_skate/create_spark"));
 
-    public static final StreamCodec<ByteBuf, C2SCreateSpark> STREAM_CODEC = StreamCodec.composite(
+    public static final StreamCodec<ByteBuf, C2SCreateSpark> STREAM_CODEC = ExtendedStreamCodec.composite(
+            ByteBufCodecs.STRING_UTF8, C2SCreateSpark::getIdentifier,
+            ByteBufCodecs.INT, C2SCreateSpark::getIndex,
             ByteBufCodecs.VECTOR3F, C2SCreateSpark::getPos,
             ByteBufCodecs.VECTOR3F, C2SCreateSpark::getMotion,
             ByteBufCodecs.STRING_UTF8, C2SCreateSpark::getOwner,
@@ -48,19 +56,26 @@ public class C2SCreateSpark implements CustomPacketPayload {
             var player = ctx.player();
             var level = player.level();
 
-            var spark = new RollerSparkEntity(RelicsEntities.ROLLER_SPARK.get(), level);
+            CuriosApi.getCuriosInventory(player).flatMap(inventory -> inventory.findCurio(this.getIdentifier(), this.getIndex())).ifPresent(slot -> {
+                var stack = slot.stack();
+                var relic = (RollerSkateItem) stack.getItem();
 
-            spark.setDeltaMovement(this.motion.x(), this.motion.y(), this.motion.z());
-            spark.setPos(this.pos.x(), this.pos.y(), this.pos.z());
-            spark.setFlawless(this.flawless);
-            spark.setDamage(this.damage);
-            spark.setIgnite(this.ignite);
+                var spark = new RollerSparkEntity(RelicsEntities.ROLLER_SPARK.get(), level);
 
-            if (level instanceof ServerLevel serverLevel)
-                spark.setOwner(serverLevel.getEntity(UUID.fromString(this.owner)));
+                spark.setDeltaMovement(this.motion.x(), this.motion.y(), this.motion.z());
+                spark.setPos(this.pos.x(), this.pos.y(), this.pos.z());
+                spark.setFlawless(this.flawless);
+                spark.setDamage(this.damage);
+                spark.setIgnite(this.ignite);
+                spark.setStack(stack);
 
-            level.addFreshEntity(spark);
+                if (level instanceof ServerLevel serverLevel)
+                    spark.setOwner(serverLevel.getEntity(UUID.fromString(this.owner)));
+
+                level.addFreshEntity(spark);
+
+                relic.addAbilityMetricValue(player, stack, "skating", "sparks_created", 1);
+            });
         });
     }
-
 }

@@ -3,7 +3,9 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.EntityBlockSpeedFactorEvent;
 import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
+import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
@@ -23,6 +25,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -62,6 +65,23 @@ public class RollerSkateItem extends RelicItem {
                                         .initialValue(1D, 2D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
                                         .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("distance_traveled")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("damage_resisted")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("sparks_created")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("damage_dealt")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("ignite_duration")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
                                         .build())
                                 .build())
                         .build())
@@ -104,6 +124,8 @@ public class RollerSkateItem extends RelicItem {
         if (entity.isSprinting() && entity.onGround() && !entity.isInLiquid() && !entity.isFallFlying()) {
             if (duration < this.getMaxDuration())
                 this.addDuration(stack, 1);
+            else
+                this.addAbilityMetricValue(entity, stack, "skating", "distance_traveled", entity.position().distanceTo(new Vec3(entity.xOld, entity.yOld, entity.zOld)));
         } else if (duration > 0)
             this.addDuration(stack, -1);
 
@@ -151,10 +173,8 @@ public class RollerSkateItem extends RelicItem {
                             var deltaY = 0.2F + random.nextFloat() * 0.2F * speed;
                             var deltaZ = -directionZ * force + directionX * offset;
 
-                            NetworkHandler.sendToServer(new C2SCreateSpark(entity.position().toVector3f(), new Vector3f(deltaX, deltaY, deltaZ), entity.getStringUUID(),
-                                    (float) (this.getStatValue(entity, stack, "skating", "damage") * speed),
-                                    (float) (this.getStatValue(entity, stack, "skating", "ignite") * speed),
-                                    this.isRelicFlawless(entity, stack)));
+                            NetworkHandler.sendToServer(new C2SCreateSpark(slotContext.identifier(), slotContext.index(), entity.position().toVector3f(), new Vector3f(deltaX, deltaY, deltaZ), entity.getStringUUID(),
+                                    (float) (this.getStatValue(entity, stack, "skating", "damage") * speed), (float) (this.getStatValue(entity, stack, "skating", "ignite") * speed), this.isRelicFlawless(entity, stack)));
                         }
                     }
                 }
@@ -223,7 +243,11 @@ public class RollerSkateItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "skating") || !relic.isAbilityRankModifierUnlocked(entity, stack, "skating", "resistance") || duration <= 0)
                     continue;
 
-                event.setNewDamage((float) (original * (relic.getStatValue(entity, stack, "skating", "resistance") / relic.getMaxDuration() * duration)));
+                var damage = (float) (original * (relic.getStatValue(entity, stack, "skating", "resistance") / relic.getMaxDuration() * duration));
+
+                event.setNewDamage(damage);
+
+                relic.addAbilityMetricValue(entity, stack, "skating", "damage_resisted", original - damage);
             }
         }
     }

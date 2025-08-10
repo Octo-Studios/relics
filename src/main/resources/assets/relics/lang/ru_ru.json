@@ -187,6 +187,11 @@
   "tooltip.relics.roller_skate.ability.skating.rank_modifier.step_height": "Увеличивает высоту шага во время бега на %2$s блоков.",
   "tooltip.relics.roller_skate.ability.skating.rank_modifier.resistance": "По мере увеличения скорости передвижения также увеличивает и сопротивление входящему урону вплоть до %3$s%%.",
   "tooltip.relics.roller_skate.ability.skating.rank_modifier.sparkling": "Во время дрифта разбрасывает искры, наносящие %4$s единиц урона и поджигающие цели на %5$s секунд за единицу скорости носителя реликвии в момент их появления.",
+  "tooltip.relics.roller_skate.ability.skating.statistic.distance_traveled": "Преодолено расстояния посредством катания",
+  "tooltip.relics.roller_skate.ability.skating.statistic.damage_resisted": "Снижено урона во время катания",
+  "tooltip.relics.roller_skate.ability.skating.statistic.sparks_created": "Создано искр при дрифте",
+  "tooltip.relics.roller_skate.ability.skating.statistic.damage_dealt": "Нанесено урона искрами",
+  "tooltip.relics.roller_skate.ability.skating.statistic.ignite_duration": "Продолжительность поджога от искр",
 
   "item.relics.midnight_mantle": "Полуночная мантия",
   "tooltip.relics.midnight_mantle.description": "Сотканная из теней и звёздного света, эта мантия - реликвия забытых лунных жрецов, что черпали силу не из лунного света, но из бесконечно изменчивого неба. Говорят, ткань её меняется вместе с фазами Луны: то холодна, как безмолвная ночь в новую Луну, то пульсирует глухим светом полнолуния. Те же, кто осмелился надеть её, рассказывают о чувствах, будто стали частью тьмы, скользящей меж миров; что их сила расла и убывала вместе с Луной. Клянутся, что перед лицом угрозы мантия откликалась быстрее них самих: мерцающие звёзды рассыпались из-под рукавов, а небеса отвечали на угрозу испепеляющими вспышками света.",

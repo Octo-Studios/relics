@@ -1,6 +1,9 @@
 package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
+import it.hurts.sskirillss.relics.items.relics.feet.RollerSkateItem;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -8,6 +11,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -19,6 +23,10 @@ public class RollerSparkEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(RollerSparkEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> IGNITE = SynchedEntityData.defineId(RollerSparkEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(RollerSparkEntity.class, EntityDataSerializers.BOOLEAN);
+
+    @Getter
+    @Setter
+    private ItemStack stack = ItemStack.EMPTY;
 
     public void setDamage(float damage) {
         this.getEntityData().set(DAMAGE, damage);
@@ -89,10 +97,22 @@ public class RollerSparkEntity extends ThrowableProjectile {
 
         entity.invulnerableTime = 0;
 
+        var damage = this.getDamage();
+
         if (entity.hurt(this.level().damageSources().thrown(owner, this), this.getDamage())) {
-            entity.setRemainingFireTicks((int) (this.getIgnite() * 20));
+            var ignite = this.getIgnite();
+
+            if (ignite > 0)
+                entity.setRemainingFireTicks((int) (ignite * 20));
 
             this.discard();
+
+            if (stack.getItem() instanceof RollerSkateItem relic) {
+                relic.addAbilityMetricValue(owner, stack, "skating", "damage_dealt", damage);
+
+                if (ignite > 0)
+                    relic.addAbilityMetricValue(owner, stack, "skating", "ignite_duration", ignite);
+            }
         }
     }
 
