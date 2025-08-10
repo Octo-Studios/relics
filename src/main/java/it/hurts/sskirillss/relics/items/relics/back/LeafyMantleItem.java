@@ -1,6 +1,8 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
+import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
@@ -57,6 +59,14 @@ public class LeafyMantleItem extends RelicItem {
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1619D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("hide_duration")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(MetricTemplate.builder("heal_amount")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 8, 15).star(1, 14, 15).star(2, 2, 17).star(3, 20, 17).star(4, 2, 22).star(5, 11, 22).star(6, 20, 22).star(7, 2, 27).star(8, 20, 27)
                                         .link(5, 2).link(5, 3).link(5, 4).link(5, 6).link(5, 7).link(5, 8).link(0, 1)
@@ -84,6 +94,20 @@ public class LeafyMantleItem extends RelicItem {
                                         .initialValue(0.5D, 1D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
                                         .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("leaves_consumed")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("damage_negated")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("damage_dealt")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("paralysis_duration")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 13, 5).star(1, 2, 14).star(2, 11, 17).star(3, 20, 19).star(4, 8, 28)
@@ -135,7 +159,6 @@ public class LeafyMantleItem extends RelicItem {
             return;
 
         var level = entity.getCommandSenderWorld();
-        var random = level.getRandom();
 
         var progress = this.getCurrentProgress(stack);
         var hiding = this.isHiding(stack);
@@ -156,15 +179,23 @@ public class LeafyMantleItem extends RelicItem {
                     entity.setAbsorptionAmount(absorption);
                 }
             }
-
             if (progress < this.getMaxProgress())
                 this.addCurrentProgress(stack, 1);
 
             if (this.isAbilityRankModifierUnlocked(entity, stack, "camouflage", "disappearance"))
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
 
-            if (entity.tickCount % 20 == 0)
-                entity.heal((float) this.getStatValue(entity, stack, "camouflage", "heal"));
+            if (entity.tickCount % 20 == 0) {
+                if (entity.getHealth() < entity.getMaxHealth()) {
+                    var heal = (float) this.getStatValue(entity, stack, "camouflage", "heal");
+
+                    entity.heal(heal);
+
+                    this.addAbilityMetricValue(entity, stack, "camouflage", "heal_amount", heal);
+                }
+
+                this.addAbilityMetricValue(entity, stack, "camouflage", "hide_duration", 1);
+            }
 
             if (entity instanceof LocalPlayer player && player.input.jumping) {
                 var motion = player.getDeltaMovement();
@@ -240,6 +271,11 @@ public class LeafyMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "revival"))
                     continue;
 
+                if (diff > 0)
+                    break;
+
+                relic.addAbilityMetricValue(entity, stack, "revival", "damage_negated", Math.abs(diff));
+
                 var radius = (int) Math.ceil(relic.getStatValue(entity, stack, "revival", "radius"));
                 var heal = (float) relic.getStatValue(entity, stack, "revival", "heal");
 
@@ -278,10 +314,13 @@ public class LeafyMantleItem extends RelicItem {
                         leaves.setTarget(entity);
                         leaves.setOwner(entity);
                         leaves.setDamage(heal);
+                        leaves.setStack(stack);
 
                         level.addFreshEntity(leaves);
 
                         level.destroyBlock(pos, false);
+
+                        relic.addAbilityMetricValue(entity, stack, "revival", "leaves_consumed", 1);
                     });
 
                     blocks++;

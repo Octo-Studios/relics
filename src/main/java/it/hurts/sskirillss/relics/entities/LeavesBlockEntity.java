@@ -3,10 +3,14 @@ package it.hurts.sskirillss.relics.entities;
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
+import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
+import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -19,6 +23,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,6 +42,10 @@ public class LeavesBlockEntity extends ThrowableProjectile implements ITargetabl
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(LeavesBlockEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> PARALYSIS = SynchedEntityData.defineId(LeavesBlockEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(LeavesBlockEntity.class, EntityDataSerializers.BOOLEAN);
+
+    @Getter
+    @Setter
+    private ItemStack stack = ItemStack.EMPTY;
 
     public BlockState getBlockState() {
         return this.getEntityData().get(BLOCK_STATE);
@@ -123,6 +132,13 @@ public class LeavesBlockEntity extends ThrowableProjectile implements ITargetabl
 
             if (paralysis > 0)
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, false));
+
+            if (stack.getItem() instanceof LeafyMantleItem relic) {
+                relic.addAbilityMetricValue(entity, stack, "revival", "damage_dealt", this.getDamage());
+
+                if (paralysis > 0)
+                    relic.addAbilityMetricValue(entity, stack, "revival", "paralysis_duration", paralysis);
+            }
         }
 
         this.impactedEntities.add(entity.getStringUUID());
