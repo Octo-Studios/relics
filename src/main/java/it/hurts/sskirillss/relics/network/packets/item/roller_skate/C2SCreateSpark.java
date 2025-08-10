@@ -75,6 +75,9 @@ public class C2SCreateSpark implements CustomPacketPayload {
                 level.addFreshEntity(spark);
 
                 relic.addAbilityMetricValue(player, stack, "skating", "sparks_created", 1);
+
+                if (relic.canAddRelicExperience(player, stack, "skating", "creating_sparks"))
+                    relic.addRelicExperience(player, stack, "skating", "creating_sparks", 1);
             });
         });
     }

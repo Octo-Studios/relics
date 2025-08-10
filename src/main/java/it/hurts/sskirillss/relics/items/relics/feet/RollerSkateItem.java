@@ -8,6 +8,8 @@ import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
@@ -83,6 +85,19 @@ public class RollerSkateItem extends RelicItem {
                                                 .formatValue((value) -> MathUtils.formatTime(value.intValue()))
                                                 .build())
                                         .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("skating")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("resisting_damage")
+                                                .rankModifierCondition("resistance")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("creating_sparks")
+                                                .rankModifierCondition("sparkling")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("spark_hit")
+                                                .rankModifierCondition("sparkling")
+                                                .build())
+                                        .build())
                                 .build())
                         .build())
                 .leveling(LevelingTemplate.builder()
@@ -124,8 +139,19 @@ public class RollerSkateItem extends RelicItem {
         if (entity.isSprinting() && entity.onGround() && !entity.isInLiquid() && !entity.isFallFlying()) {
             if (duration < this.getMaxDuration())
                 this.addDuration(stack, 1);
-            else
-                this.addAbilityMetricValue(entity, stack, "skating", "distance_traveled", entity.position().distanceTo(new Vec3(entity.xOld, entity.yOld, entity.zOld)));
+            else {
+                var pos = entity.position();
+                var oldPos = new Vec3(entity.xOld, entity.yOld, entity.zOld);
+
+                var distance = pos.distanceTo(oldPos);
+
+                if (distance > 0.1F) {
+                    if (this.canAddRelicExperience(entity, stack, "skating", "skating"))
+                        this.addRelicExperience(entity, stack, "skating", "skating", 1D / 20D);
+
+                    this.addAbilityMetricValue(entity, stack, "skating", "distance_traveled", distance);
+                }
+            }
         } else if (duration > 0)
             this.addDuration(stack, -1);
 
@@ -244,10 +270,14 @@ public class RollerSkateItem extends RelicItem {
                     continue;
 
                 var damage = (float) (original * (relic.getStatValue(entity, stack, "skating", "resistance") / relic.getMaxDuration() * duration));
+                var diff = original - damage;
 
                 event.setNewDamage(damage);
 
-                relic.addAbilityMetricValue(entity, stack, "skating", "damage_resisted", original - damage);
+                relic.addAbilityMetricValue(entity, stack, "skating", "damage_resisted", diff);
+
+                if (relic.canAddRelicExperience(entity, stack, "skating", "resisting_damage"))
+                    relic.addRelicExperience(entity, stack, "skating", "resisting_damage", diff);
             }
         }
     }
