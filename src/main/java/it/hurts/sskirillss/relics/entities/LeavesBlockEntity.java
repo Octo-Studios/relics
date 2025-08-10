@@ -136,6 +136,9 @@ public class LeavesBlockEntity extends ThrowableProjectile implements ITargetabl
             if (stack.getItem() instanceof LeafyMantleItem relic) {
                 relic.addAbilityMetricValue(entity, stack, "revival", "damage_dealt", this.getDamage());
 
+                if (relic.canAddRelicExperience(entity, stack, "revival", "leaves_impact"))
+                    relic.addRelicExperience(entity, stack, "revival", "leaves_impact", 1);
+
                 if (paralysis > 0)
                     relic.addAbilityMetricValue(entity, stack, "revival", "paralysis_duration", paralysis);
             }

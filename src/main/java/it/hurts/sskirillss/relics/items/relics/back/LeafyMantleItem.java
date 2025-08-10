@@ -5,6 +5,8 @@ import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.LeavesBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
@@ -67,6 +69,12 @@ public class LeafyMantleItem extends RelicItem {
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
                                         .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("hiding")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("healing")
+                                                .build())
+                                        .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 8, 15).star(1, 14, 15).star(2, 2, 17).star(3, 20, 17).star(4, 2, 22).star(5, 11, 22).star(6, 20, 22).star(7, 2, 27).star(8, 20, 27)
                                         .link(5, 2).link(5, 3).link(5, 4).link(5, 6).link(5, 7).link(5, 8).link(0, 1)
@@ -107,6 +115,13 @@ public class LeafyMantleItem extends RelicItem {
                                                 .build())
                                         .metric(MetricTemplate.builder("paralysis_duration")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("consuming_leaves")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("leaves_impact")
+                                                .rankModifierCondition("piercing")
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -192,7 +207,13 @@ public class LeafyMantleItem extends RelicItem {
                     entity.heal(heal);
 
                     this.addAbilityMetricValue(entity, stack, "camouflage", "heal_amount", heal);
+
+                    if (this.canAddRelicExperience(entity, stack, "camouflage", "healing"))
+                        this.addRelicExperience(entity, stack, "camouflage", "healing", 1);
                 }
+
+                if (this.canAddRelicExperience(entity, stack, "camouflage", "hiding"))
+                    this.addRelicExperience(entity, stack, "camouflage", "hiding", 1);
 
                 this.addAbilityMetricValue(entity, stack, "camouflage", "hide_duration", 1);
             }
@@ -321,6 +342,9 @@ public class LeafyMantleItem extends RelicItem {
                         level.destroyBlock(pos, false);
 
                         relic.addAbilityMetricValue(entity, stack, "revival", "leaves_consumed", 1);
+
+                        if (relic.canAddRelicExperience(entity, stack, "revival", "consuming_leaves"))
+                            relic.addRelicExperience(entity, stack, "revival", "consuming_leaves", 1);
                     });
 
                     blocks++;
