@@ -148,6 +148,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
                     orb.setPos(entity.getEyePosition());
                     orb.setDamage(orbDamage);
                     orb.setOwner(entity);
+                    orb.setStack(stack);
 
                     if (source != null)
                         orb.setDeltaMovement(entity.position().subtract(source.position()).normalize().add(MathUtils.randomFloat(random) * 0.5D, 0, MathUtils.randomFloat(random) * 0.5D));

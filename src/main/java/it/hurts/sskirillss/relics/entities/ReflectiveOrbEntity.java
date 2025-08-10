@@ -6,6 +6,7 @@ import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -40,6 +41,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(ReflectiveOrbEntity.class, EntityDataSerializers.BOOLEAN);
 
     @Getter
+    @Setter
     private ItemStack stack = ItemStack.EMPTY;
 
     private boolean bounced = false;
