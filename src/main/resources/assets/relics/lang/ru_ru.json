@@ -149,8 +149,8 @@
   "tooltip.relics.kinetic_belt.ability.gliding.experience_source.strike": "+1 единица опыта за каждую дополнительную единицу урона от модификатора.",
   "tooltip.relics.kinetic_belt.ability.gliding.experience_source.resistance": "+1 единица опыта за каждую единицу заблокированного урона благодаря модификатору.",
   "tooltip.relics.kinetic_belt.ability.gliding.statistic.duration": "Время планирования",
-  "tooltip.relics.kinetic_belt.ability.gliding.statistic.resistance": "Заблокировано урона",
-  "tooltip.relics.kinetic_belt.ability.gliding.statistic.damage": "Нанесено дополнительного урона",
+  "tooltip.relics.kinetic_belt.ability.gliding.statistic.resistance": "Заблокировано урона во время планирования",
+  "tooltip.relics.kinetic_belt.ability.gliding.statistic.damage": "Нанесено дополнительного урона во время планирования",
 
   "item.relics.springy_boot": "Пружинный ботинок",
   "tooltip.relics.springy_boot.description": "В основе этого сапога - искусно сконструированные пружины, что сжимают силу каждого шага и высвобождают её в нужный миг, бросая носителя прочь от любой поверхности. Каждое приземление становится упругим отскоком, не наносящим вреда телу, но способным в умелых руках обернуться сокрушительной ударной волной.",
