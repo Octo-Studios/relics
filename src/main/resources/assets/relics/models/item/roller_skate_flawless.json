@@ -1,7 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "relics:item/roller_skates_0"
+        "layer0": "relics:item/roller_skate_flawless"
     }
 }
-

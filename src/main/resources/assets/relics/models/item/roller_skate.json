@@ -1,0 +1,9 @@
+{
+  "parent": "item/generated",
+    "textures": {
+        "layer0": "relics:item/roller_skate"
+    },
+    "overrides": [
+        { "predicate": { "relics:flawless": 1 }, "model": "relics:item/roller_skate_flawless" }
+    ]
+}

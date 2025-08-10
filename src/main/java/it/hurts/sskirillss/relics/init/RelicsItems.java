@@ -42,7 +42,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> REFLECTIVE_NECKLACE = ITEMS.register("reflective_necklace", ReflectiveNecklaceItem::new);
     public static final DeferredHolder<Item, RelicItem> JELLYFISH_NECKLACE = ITEMS.register("jellyfish_necklace", JellyfishNecklaceItem::new);
     public static final DeferredHolder<Item, RelicItem> MIDNIGHT_MANTLE = ITEMS.register("midnight_mantle", MidnightMantleItem::new);
-    public static final DeferredHolder<Item, RelicItem> ROLLER_SKATES = ITEMS.register("roller_skates", RollerSkateItem::new);
+    public static final DeferredHolder<Item, RelicItem> ROLLER_SKATES = ITEMS.register("roller_skate", RollerSkateItem::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
