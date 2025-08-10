@@ -177,13 +177,6 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
     }
 
     @Override
-    public void tick() {
-        super.tick();
-
-        this.stack = DescriptionUtils.gatherRelicStack(Minecraft.getInstance().player, slot);
-    }
-
-    @Override
     public void renderBackground(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.renderBackground(guiGraphics, pMouseX, pMouseY, pPartialTick);
 

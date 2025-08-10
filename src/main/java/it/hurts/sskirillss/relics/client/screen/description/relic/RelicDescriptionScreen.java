@@ -82,20 +82,6 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
     }
 
     @Override
-    public void rebuildWidgets() {
-        stack = DescriptionUtils.gatherRelicStack(minecraft.player, slot);
-
-        super.rebuildWidgets();
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-
-        stack = DescriptionUtils.gatherRelicStack(minecraft.player, slot);
-    }
-
-    @Override
     public void renderBackground(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         super.renderBackground(guiGraphics, pMouseX, pMouseY, pPartialTick);
 

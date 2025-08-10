@@ -30,7 +30,8 @@ public class AbilityExperienceDescriptionSubcategory extends DescriptionSubcateg
             return false;
 
         var relic = (IRelicItem) stack.getItem();
+        var ability = screen.getSelectedAbility();
 
-        return !relic.getAbilityTemplate(entity, stack, screen.getSelectedAbility()).getExperienceSources().getSources().isEmpty();
+        return relic.canPlayerUseAbility(entity, stack, ability) && !relic.getAbilityTemplate(entity, stack, ability).getExperienceSources().getSources().isEmpty();
     }
 }

@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
 import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import lombok.Getter;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Player;
@@ -30,7 +31,21 @@ public class SimpleDescriptionScreen extends Screen implements IRelicScreenProvi
         this.slot = slot;
         this.screen = screen;
 
-        stack = DescriptionUtils.gatherRelicStack(player, slot);
+        this.stack = DescriptionUtils.gatherRelicStack(player, slot);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        var player = Minecraft.getInstance().player;
+
+        if (player != null) {
+            this.stack = DescriptionUtils.gatherRelicStack(player, this.slot);
+
+            if (this.screen instanceof DescriptionScreen subScreen)
+                subScreen.stack = DescriptionUtils.gatherRelicStack(player, this.slot);
+        }
     }
 
     @Override
