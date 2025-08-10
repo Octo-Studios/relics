@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+    "textures": {
+        "layer0": "relics:item/springy_boot_flawless"
+    }
+}

@@ -2,5 +2,8 @@
   "parent": "item/generated",
     "textures": {
         "layer0": "relics:item/springy_boot"
-    }
+    },
+    "overrides": [
+        { "predicate": { "relics:flawless": 1 }, "model": "relics:item/springy_boot_flawless" }
+    ]
 }
