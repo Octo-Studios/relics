@@ -26,8 +26,8 @@ public class RelicStatisticContainerWidget extends SimpleDescriptionContainerWid
         var player = this.minecraft.player;
         var font = this.minecraft.font;
         var maxWidth = 320;
-        var dot = ". ";
-        var dotWidth = font.width(dot);
+        var dot = ".";
+        var dotWidth = Math.max(1, font.width(dot));
 
         for (var metric : relic.getRelicStatisticTemplate(player, stack).getMetrics().values()) {
             var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, Optional.empty())).append(Component.literal(" "));
@@ -37,11 +37,31 @@ public class RelicStatisticContainerWidget extends SimpleDescriptionContainerWid
 
             var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(relic.getRelicMetricComponent(player, stack, metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));
 
-            var availableWidth = maxWidth - font.width(prefix) - font.width(suffix);
-            var repeatCount = availableWidth / dotWidth;
-            var line = prefix.append(dot.repeat(repeatCount)).append(suffix);
+            var suffixWidth = font.width(suffix);
+            var limit = Math.max(0, maxWidth - suffixWidth);
+            var lines = font.split(prefix, limit);
 
-            sequences.addAll(font.split(line, maxWidth));
+            for (var i = 0; i < lines.size(); i++) {
+                var line = lines.get(i);
+
+                if (i < lines.size() - 1)
+                    sequences.add(line);
+                else {
+                    var avail = Math.max(0, maxWidth - font.width(line) - suffixWidth);
+                    var dotsCount = Math.max(0, avail / dotWidth);
+                    var dots = dotsCount > 0 ? FormattedCharSequence.forward(dot.repeat(dotsCount), Style.EMPTY) : FormattedCharSequence.EMPTY;
+                    var seq = FormattedCharSequence.composite(line, dots, suffix.getVisualOrderText());
+
+                    while (font.width(seq) > maxWidth && dotsCount > 0) {
+                        dotsCount--;
+
+                        dots = dotsCount > 0 ? FormattedCharSequence.forward(dot.repeat(dotsCount), Style.EMPTY) : FormattedCharSequence.EMPTY;
+                        seq = FormattedCharSequence.composite(line, dots, suffix.getVisualOrderText());
+                    }
+
+                    sequences.add(seq);
+                }
+            }
         }
 
         return sequences;

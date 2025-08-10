@@ -4,7 +4,6 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.SimpleDescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import net.minecraft.ChatFormatting;
@@ -33,21 +32,42 @@ public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerW
         var font = this.minecraft.font;
         var maxWidth = 320;
         var dot = ".";
-        var dotWidth = font.width(dot);
+        var dotWidth = Math.max(1, font.width(dot));
+        var selected = Optional.of(screen.getSelectedAbility());
 
         for (var metric : relic.getAbilityStatisticTemplate(player, stack, screen.getSelectedAbility()).getMetrics().values()) {
-            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, Optional.of(screen.getSelectedAbility()))).append(Component.literal(" "));
+            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, selected)).append(Component.literal(" "));
 
-            if (!metric.getVisibilityCondition().test(player, stack, Optional.of(screen.getSelectedAbility())))
+            if (!metric.getVisibilityCondition().test(player, stack, selected))
                 prefix = ScreenUtils.randomizeAllCharacters(prefix, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
 
             var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(relic.getAbilityMetricComponent(player, stack, screen.getSelectedAbility(), metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));
 
-            var availableWidth = maxWidth - font.width(prefix) - font.width(suffix);
-            var repeatCount = Math.max(0, availableWidth / dotWidth);
-            var line = Component.empty().append(prefix).append(dot.repeat(repeatCount)).append(suffix);
+            var suffixWidth = font.width(suffix);
+            var limit = Math.max(0, maxWidth - suffixWidth);
+            var lines = font.split(prefix, limit);
 
-            sequences.addAll(font.split(line, maxWidth));
+            for (var i = 0; i < lines.size(); i++) {
+                var line = lines.get(i);
+
+                if (i < lines.size() - 1)
+                    sequences.add(line);
+                else {
+                    var avail = Math.max(0, maxWidth - font.width(line) - suffixWidth);
+                    var dotsCount = Math.max(0, avail / dotWidth);
+                    var dots = dotsCount > 0 ? FormattedCharSequence.forward(dot.repeat(dotsCount), Style.EMPTY) : FormattedCharSequence.EMPTY;
+                    var seq = FormattedCharSequence.composite(line, dots, suffix.getVisualOrderText());
+
+                    while (font.width(seq) > maxWidth && dotsCount > 0) {
+                        dotsCount--;
+
+                        dots = dotsCount > 0 ? FormattedCharSequence.forward(dot.repeat(dotsCount), Style.EMPTY) : FormattedCharSequence.EMPTY;
+                        seq = FormattedCharSequence.composite(line, dots, suffix.getVisualOrderText());
+                    }
+
+                    sequences.add(seq);
+                }
+            }
         }
 
         return sequences;
