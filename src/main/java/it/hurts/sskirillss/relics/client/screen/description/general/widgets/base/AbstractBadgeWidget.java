@@ -5,19 +5,19 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.badges.base.AbstractBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.sounds.SoundManager;
 
 public abstract class AbstractBadgeWidget extends AbstractDescriptionWidget implements IHoverableWidget {
     @Getter
-    private IRelicScreenProvider provider;
+    private DescriptionScreen screen;
 
-    public AbstractBadgeWidget(int x, int y, IRelicScreenProvider provider, AbstractBadge badge) {
+    public AbstractBadgeWidget(int x, int y, DescriptionScreen screen, AbstractBadge badge) {
         super(x, y, 16, 16);
 
-        this.provider = provider;
+        this.screen = screen;
     }
 
     public abstract AbstractBadge getBadge();
@@ -45,10 +45,10 @@ public abstract class AbstractBadgeWidget extends AbstractDescriptionWidget impl
             poseStack.translate(-(width / 2F), -(height / 2F), 0);
         }
 
-        guiGraphics.blit(getBadge().getIconTexture(minecraft.player, provider.getStack()), 0, 0, 0, 0, width, height, width, height);
+        guiGraphics.blit(getBadge().getIconTexture(minecraft.player, screen.getStack()), 0, 0, 0, 0, width, height, width, height);
 
         if (isHovered)
-            guiGraphics.blit(getBadge().getOutlineTexture(minecraft.player, provider.getStack()), 0, 0, 0, 0, width, height, width, height);
+            guiGraphics.blit(getBadge().getOutlineTexture(minecraft.player, screen.getStack()), 0, 0, 0, 0, width, height, width, height);
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 

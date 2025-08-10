@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.base;
 
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
@@ -12,9 +11,8 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
-// TODO: Get rid of IRelicScreenProvider, use DescriptionScreen instead
 @OnlyIn(Dist.CLIENT)
-public class SimpleDescriptionScreen extends Screen implements IRelicScreenProvider, IAutoScaledScreen {
+public class SimpleDescriptionScreen extends Screen implements IAutoScaledScreen {
     public final Screen screen;
 
     @Getter

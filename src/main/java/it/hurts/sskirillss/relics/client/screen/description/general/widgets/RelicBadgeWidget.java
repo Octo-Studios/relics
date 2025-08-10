@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.badges.base.RelicBadge;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import net.minecraft.ChatFormatting;
@@ -20,7 +20,7 @@ import java.util.List;
 public class RelicBadgeWidget extends AbstractBadgeWidget {
     private final RelicBadge badge;
 
-    public RelicBadgeWidget(int x, int y, IRelicScreenProvider provider, RelicBadge badge) {
+    public RelicBadgeWidget(int x, int y, DescriptionScreen provider, RelicBadge badge) {
         super(x, y, provider, badge);
 
         this.badge = badge;
@@ -33,7 +33,7 @@ public class RelicBadgeWidget extends AbstractBadgeWidget {
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        ItemStack stack = getProvider().getStack();
+        ItemStack stack = getScreen().getStack();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;

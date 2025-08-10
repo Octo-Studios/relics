@@ -4,11 +4,12 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
-import it.hurts.sskirillss.relics.client.screen.base.IRelicScreenProvider;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.DeathScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -21,8 +22,8 @@ public class AbilityBadgeWidget extends AbstractBadgeWidget {
     private final AbilityBadge badge;
     private final String ability;
 
-    public AbilityBadgeWidget(int x, int y, IRelicScreenProvider provider, AbilityBadge badge, String ability) {
-        super(x, y, provider, badge);
+    public AbilityBadgeWidget(int x, int y, DescriptionScreen screen, AbilityBadge badge, String ability) {
+        super(x, y, screen, badge);
 
         this.badge = badge;
         this.ability = ability;
@@ -35,7 +36,7 @@ public class AbilityBadgeWidget extends AbstractBadgeWidget {
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        ItemStack stack = getProvider().getStack();
+        ItemStack stack = getScreen().getStack();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
