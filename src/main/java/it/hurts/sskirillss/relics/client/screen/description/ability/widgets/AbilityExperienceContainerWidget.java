@@ -13,6 +13,8 @@ import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class AbilityExperienceContainerWidget extends SimpleDescriptionContainerWidget {
@@ -35,25 +37,46 @@ public class AbilityExperienceContainerWidget extends SimpleDescriptionContainer
 
         var ability = screen.getSelectedAbility();
 
-        for (var source : relic.getExperienceSourcesTemplate(player, stack, ability).getSources().values()) {
-            var condition = source.getConditionComponent().apply(player, stack, ability, source.getId()).withStyle(ChatFormatting.BOLD);
-            var description = Component.literal("● ").append(source.getDescriptionComponent().apply(player, stack, ability, source.getId()));
+        var group = new LinkedHashMap<String, List<MutableComponent>>();
+        var conditions = new HashMap<String, MutableComponent>();
 
-            if (!source.getCondition().test(player, stack, screen.getSelectedAbility()))
-                description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
+        relic.getExperienceSourcesTemplate(player, stack, ability).getSources().values().forEach(source -> {
+            var condition = source.getConditionComponent()
+                    .apply(player, stack, ability, source.getId())
+                    .withStyle(ChatFormatting.BOLD);
 
-            var content = new ArrayList<MutableComponent>();
+            var key = condition.getString().trim();
 
-            if (!sequences.isEmpty())
-                content.add(Component.literal(" "));
+            var description = Component.literal("● ")
+                    .append(source.getDescriptionComponent().apply(player, stack, ability, source.getId()));
 
-            if (!condition.equals(Component.empty()))
-                content.add(condition);
+            if (!source.getCondition().test(player, stack, ability))
+                description = ScreenUtils.randomizeAllCharacters(description, this.hashCode())
+                        .withStyle(Style.EMPTY
+                                .withFont(ScreenUtils.ILLAGER_ALT_FONT)
+                                .withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
 
-            content.add(description);
+            group.computeIfAbsent(key, k -> new ArrayList<>()).add(description);
 
-            for (var entry : content)
-                sequences.addAll(font.split(entry, maxWidth));
+            if (!key.isBlank() && !conditions.containsKey(key))
+                conditions.put(key, condition);
+        });
+
+        var firstGroup = true;
+
+        for (var entry : group.entrySet()) {
+            if (!firstGroup)
+                sequences.addAll(font.split(Component.literal(" "), maxWidth));
+
+            firstGroup = false;
+
+            var key = entry.getKey();
+
+            if (!key.isBlank() && conditions.containsKey(key) && !conditions.get(key).equals(Component.empty()))
+                sequences.addAll(font.split(conditions.get(key), maxWidth));
+
+            for (var desc : entry.getValue())
+                sequences.addAll(font.split(desc, maxWidth));
         }
 
         return sequences;
