@@ -76,18 +76,23 @@ public class SpringyBootItem extends RelicItem {
                                                 .build())
                                         .metric(MetricTemplate.builder("additional_damage")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .abilityRankModifierVisibilityCondition("strike")
                                                 .build())
                                         .metric(MetricTemplate.builder("shockwaves_amount")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .abilityRankModifierVisibilityCondition("shockwave")
                                                 .build())
                                         .metric(MetricTemplate.builder("shockwave_targets")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .abilityRankModifierVisibilityCondition("shockwave")
                                                 .build())
                                         .metric(MetricTemplate.builder("shockwave_damage")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .abilityRankModifierVisibilityCondition("shockwave")
                                                 .build())
                                         .metric(MetricTemplate.builder("shockwave_stun")
                                                 .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .abilityRankModifierVisibilityCondition("shockwave")
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -186,27 +191,33 @@ public class SpringyBootItem extends RelicItem {
             if (level.isClientSide())
                 return;
 
+            var power = 0D;
+
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
                 var relic = (SpringyBootItem) stack.getItem();
 
                 if (!relic.canPlayerUseAbility(entity, stack, "bounce") || relic.isLeaped(stack) || relic.getBounceCooldown(stack) > 0 || !entity.isShiftKeyDown())
                     continue;
 
+                power += relic.getStatValue(entity, stack, "bounce", "power");
+
+                relic.addAbilityMetricValue(entity, stack, "bounce", "primary_bounces", 1);
+
+                relic.setLeaped(stack, true);
+                relic.addBounceCooldown(stack, 5);
+            }
+
+            if (power > 0D) {
                 var lookAngle = entity.getLookAngle();
 
                 if (lookAngle.y() < 0F)
                     lookAngle = new Vec3(lookAngle.x(), 0F, lookAngle.z());
 
-                var motion = lookAngle.multiply(-1F, 1F, -1F).add(0F, 0.5F, 0F).normalize().scale(relic.getStatValue(entity, stack, "bounce", "power"));
+                var motion = lookAngle.multiply(-1F, 1F, -1F).add(0F, 0.5F, 0F).normalize().scale(power);
 
                 NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(entity.getId(), motion.toVector3f()), entity);
 
-                relic.setLeaped(stack, true);
-                relic.addBounceCooldown(stack, 5);
-
                 level.playSound(null, entity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.MASTER, 5F, 0.5F);
-
-                relic.addAbilityMetricValue(entity, stack, "bounce", "primary_bounces", 1);
             }
         }
 
@@ -215,18 +226,30 @@ public class SpringyBootItem extends RelicItem {
             if (!(event.getSource().getEntity() instanceof LivingEntity entity))
                 return;
 
+            var totalModifier = 0D;
+            var totalLeaps = 0;
+
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
                 var relic = (SpringyBootItem) stack.getItem();
 
                 if (!relic.canPlayerUseAbility(entity, stack, "bounce") || !relic.isLeaped(stack) || !relic.isAbilityRankModifierUnlocked(entity, stack, "bounce", "strike"))
                     continue;
 
-                var damage = event.getNewDamage() * relic.getLeaps(stack) * relic.getStatValue(entity, stack, "bounce", "damage_modifier");
+                var leaps = relic.getLeaps(stack);
 
-                event.setNewDamage((float) (event.getNewDamage() + damage));
+                if (totalLeaps < leaps)
+                    totalLeaps = leaps;
 
-                relic.addAbilityMetricValue(entity, stack, "bounce", "additional_damage", damage);
+                var modifier = relic.getStatValue(entity, stack, "bounce", "damage_modifier");
+
+                totalModifier += modifier;
+
+                relic.addAbilityMetricValue(entity, stack, "bounce", "additional_damage", event.getNewDamage() * leaps * modifier);
             }
+
+            var damage = event.getNewDamage() * totalLeaps * totalModifier;
+
+            event.setNewDamage((float) (event.getNewDamage() + damage));
         }
     }
 }
