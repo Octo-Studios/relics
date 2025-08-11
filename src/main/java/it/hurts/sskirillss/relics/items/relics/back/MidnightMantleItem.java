@@ -371,7 +371,9 @@ public class MidnightMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "phase") || !relic.getAbilityMode(entity, stack, "phase").equals("new_moon"))
                     continue;
 
-                event.setAmount((float) (event.getAmount() + (event.getAmount() * relic.getModeEffectiveness(entity, stack))));
+                var heal = event.getAmount() * (1D + relic.getStatValue(entity, stack, "phase", "health_regeneration") * relic.getModeEffectiveness(entity, stack));
+
+                event.setAmount((float) (event.getAmount() + heal));
             }
         }
 
