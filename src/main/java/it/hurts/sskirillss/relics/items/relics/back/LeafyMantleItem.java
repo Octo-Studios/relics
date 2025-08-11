@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
@@ -23,6 +24,7 @@ import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -35,6 +37,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.Comparator;
@@ -185,17 +188,8 @@ public class LeafyMantleItem extends RelicItem {
                 .anyMatch(pos -> level.getBlockState(pos).is(BlockTags.LEAVES));
 
         if (inLeaves) {
-            if (!hiding) {
+            if (!hiding)
                 this.setHiding(stack, true);
-
-                if (this.isAbilityRankModifierUnlocked(entity, stack, "camouflage", "absorption")) {
-                    var absorption = (float) this.getStatValue(entity, stack, "camouflage", "absorption");
-
-                    EntityUtils.resetAttribute(entity, stack, Attributes.MAX_ABSORPTION, absorption, AttributeModifier.Operation.ADD_VALUE);
-
-                    entity.setAbsorptionAmount(absorption);
-                }
-            }
             if (progress < this.getMaxProgress())
                 this.addCurrentProgress(stack, 1);
 
@@ -249,11 +243,41 @@ public class LeafyMantleItem extends RelicItem {
 
         var entity = slotContext.entity();
 
-        EntityUtils.removeAttribute(entity, stack, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE);
+        EntityUtils.removeAttribute(entity, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE, CommonEvents.ATTRIBUTE);
     }
 
     @EventBusSubscriber
     public static class CommonEvents {
+        public static final ResourceLocation ATTRIBUTE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "leafy_mantle/absorption");
+
+        @SubscribeEvent
+        public static void onLivingTick(EntityTickEvent.Post event) {
+            if (!(event.getEntity() instanceof LivingEntity entity) || entity.level().isClientSide())
+                return;
+
+            var total = 0F;
+
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
+                var relic = (LeafyMantleItem) stack.getItem();
+
+                if (!relic.isHiding(stack))
+                    continue;
+
+                if (relic.canPlayerUseAbility(entity, stack, "camouflage") && relic.isAbilityRankModifierUnlocked(entity, stack, "camouflage", "absorption"))
+                    total += (float) relic.getStatValue(entity, stack, "camouflage", "absorption");
+            }
+
+            var current = entity.getAbsorptionAmount();
+            var cap = Math.max(current, total);
+
+            if (cap > 0F) {
+                EntityUtils.resetAttribute(entity, Attributes.MAX_ABSORPTION, cap, AttributeModifier.Operation.ADD_VALUE, ATTRIBUTE);
+
+                if (current < total)
+                    entity.setAbsorptionAmount(total);
+            }
+        }
+
         @SubscribeEvent
         public static void onLivingIncomingDamage(LivingIncomingDamageEvent event) {
             if (!event.getSource().is(DamageTypeTags.IS_FALL))

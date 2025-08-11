@@ -23,6 +23,7 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.SlotResult;
 
 import javax.annotation.Nullable;
@@ -128,45 +129,57 @@ public class EntityUtils {
         return entity == null ? null : new EntityHitResult(entity, vector3d);
     }
 
-    private static ResourceLocation getAttributeId(ItemStack stack, Attribute attribute) {
+    public static ResourceLocation getAttributeId(ItemStack stack, Attribute attribute) {
         return ResourceLocation.fromNamespaceAndPath(Relics.MODID, BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute).getPath());
     }
 
-    public static boolean hasAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder) {
-        var attribute = attributeHolder.value();
-        var id = getAttributeId(stack, attribute);
+    public static boolean hasAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, ResourceLocation id) {
         var instance = entity.getAttribute(attributeHolder);
 
         return instance != null && instance.hasModifier(id);
     }
 
-    public static void applyAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
-        var id = getAttributeId(stack, attributeHolder.value());
+    public static boolean hasAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder) {
+        return hasAttribute(entity, attributeHolder,  getAttributeId(stack, attributeHolder.value()));
+    }
+
+    public static void applyAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation, ResourceLocation id) {
         var instance = entity.getAttribute(attributeHolder);
 
-        if (hasAttribute(entity, stack, attributeHolder))
+        if (hasAttribute(entity, attributeHolder, id))
             return;
 
         instance.addTransientModifier(new AttributeModifier(id, value, operation));
     }
 
-    public static void removeAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, AttributeModifier.Operation operation) {
-        var id = getAttributeId(stack, attributeHolder.value());
+    public static void applyAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
+        applyAttribute(entity, attributeHolder, value, operation, getAttributeId(stack, attributeHolder.value()));
+    }
+
+    public static void removeAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, AttributeModifier.Operation operation, ResourceLocation id) {
         var instance = entity.getAttribute(attributeHolder);
 
-        if (!hasAttribute(entity, stack, attributeHolder))
+        if (!hasAttribute(entity, attributeHolder, id))
             return;
 
         instance.removeModifier(new AttributeModifier(id, instance.getValue(), operation));
     }
 
-    public static void resetAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
+    public static void removeAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, AttributeModifier.Operation operation) {
+        removeAttribute(entity, attributeHolder, operation, getAttributeId(stack, attributeHolder.value()));
+    }
+
+    public static void resetAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation, ResourceLocation id) {
         var attribute = entity.getAttribute(attributeHolder);
 
         if (attribute == null || attribute.getValue() != value) {
-            EntityUtils.removeAttribute(entity, stack, attributeHolder, operation);
-            EntityUtils.applyAttribute(entity, stack, attributeHolder, value, operation);
+            EntityUtils.removeAttribute(entity, attributeHolder, operation, id);
+            EntityUtils.applyAttribute(entity, attributeHolder, value, operation, id);
         }
+    }
+
+    public static void resetAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
+        resetAttribute(entity, attributeHolder, value, operation, getAttributeId(stack, attributeHolder.value()));
     }
 
     public static ItemStack findEquippedCurio(Entity entity, Item item) {
