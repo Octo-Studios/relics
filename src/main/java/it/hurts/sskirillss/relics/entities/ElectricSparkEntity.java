@@ -2,9 +2,12 @@ package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
+import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -13,6 +16,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -31,6 +35,10 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
     private static final EntityDataAccessor<Float> DISTANCE = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Float> DAMAGE_MODIFIER = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.BOOLEAN);
+
+    @Getter
+    @Setter
+    private ItemStack stack = ItemStack.EMPTY;
 
     private Set<String> bouncedTargets = new HashSet<>();
 
@@ -160,13 +168,22 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
             currentTarget.invulnerableTime = 0;
 
             var damage = this.getDamage();
+            var owner = this.getOwner();
 
-            if (currentTarget.hurt(level.damageSources().thrown(this, this.getOwner()), damage + (currentTarget.isInLiquid() || currentTarget.isInRain() ? damage * this.getDamageModifier() : 0F))) {
+            if (currentTarget.hurt(level.damageSources().thrown(this, owner), damage + (currentTarget.isInLiquid() || currentTarget.isInRain() ? damage * this.getDamageModifier() : 0F))) {
                 this.bouncedTargets.add(currentTarget.getStringUUID());
                 this.lastTarget = currentTarget;
 
                 this.setTarget(null);
                 this.setBounces(this.getBounces() - 1);
+
+                if (!level.isClientSide()) {
+                    if (stack.getItem() instanceof JellyfishNecklaceItem relic && owner instanceof LivingEntity entity) {
+                        relic.addAbilityMetricValue(entity, stack, "shock", "arcs_bounces", 1);
+
+                        relic.addAbilityMetricValue(entity, stack, "shock", "arcs_damage", damage);
+                    }
+                }
             } else {
                 this.blacklistedTargets.add(currentTarget.getStringUUID());
 

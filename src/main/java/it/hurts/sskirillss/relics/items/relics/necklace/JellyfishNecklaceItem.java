@@ -1,7 +1,9 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
 import com.google.common.collect.Lists;
+import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
@@ -51,6 +53,11 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .initialValue(0.15D, 0.35D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.4604D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("health_regenerated")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 11, 10).star(1, 3, 9).star(2, 19, 9).star(3, 2, 16).star(4, 11, 16).star(5, 20, 16).star(6, 11, 24)
@@ -113,6 +120,27 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .initialValue(2.5D, 5D)
                                         .upgradeModifier(RelicsScalingModels.RADICAL.get(), 4.2258D)
                                         .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("rings_accumulated")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("rings_paralysis")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("arcs_spawned")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("arcs_bounces")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("arcs_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("hit_paralysis")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .abilityRankModifierVisibilityCondition("charge")
+                                                .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 11, 4).star(1, 4, 11).star(2, 11, 11).star(3, 18, 11).star(4, 11, 18).star(5, 6, 21).star(6, 16, 21).star(7, 5, 24).star(8, 17, 24).star(9, 4, 27).star(10, 18, 27).star(11, 8, 29).star(12, 14, 29)
@@ -266,6 +294,9 @@ public class JellyfishNecklaceItem extends RelicItem {
                 else {
                     this.addRings(stack, 1);
                     this.setCooldown(stack, maxCooldown * 20);
+
+                    if (!level.isClientSide())
+                        this.addAbilityMetricValue(entity, stack, "shock", "rings_accumulated", 1);
                 }
             }
 
@@ -285,8 +316,13 @@ public class JellyfishNecklaceItem extends RelicItem {
                 for (var target : level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(0.5F).inflate(radius), predicate)) {
                     var diff = target.position().add(0, target.getBbHeight() / 2D, 0).subtract(entity.position());
                     var knockback = 0.5D * this.getStatValue(entity, stack, "shock", "knockback");
+                    var paralysis = this.getStatValue(entity, stack, "shock", "paralysis");
 
-                    target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (this.getStatValue(entity, stack, "shock", "paralysis") * 20), 0, false, true));
+                    target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, true));
+
+                    if (!level.isClientSide())
+                        this.addAbilityMetricValue(entity, stack, "shock", "rings_paralysis", paralysis);
+
                     target.setDeltaMovement(diff.normalize().multiply(knockback, knockback / 2F, knockback));
 
                     var spark = new ElectricSparkEntity(RelicsEntities.ELECTRIC_SPARK.get(), level);
@@ -299,10 +335,14 @@ public class JellyfishNecklaceItem extends RelicItem {
                     spark.setFlawless(this.isRelicFlawless(entity, stack));
                     spark.setTarget(target);
                     spark.setOwner(entity);
+                    spark.setStack(stack);
 
                     level.addFreshEntity(spark);
 
                     this.addAffectedEntities(stack, target.getStringUUID());
+
+                    if (!level.isClientSide())
+                        this.addAbilityMetricValue(entity, stack, "shock", "arcs_spawned", 1);
                 }
 
                 this.addRings(stack, -1);
@@ -365,7 +405,12 @@ public class JellyfishNecklaceItem extends RelicItem {
                     if (!relic.canPlayerUseAbility(entity, stack, "regeneration"))
                         continue;
 
-                    event.setAmount((float) (event.getAmount() + (event.getAmount() * relic.getStatValue(entity, stack, "regeneration", "regeneration"))));
+                    var health = event.getAmount() * relic.getStatValue(entity, stack, "regeneration", "regeneration");
+
+                    event.setAmount((float) (event.getAmount() + health));
+
+                    if (!level.isClientSide())
+                        relic.addAbilityMetricValue(entity, stack, "regeneration", "health_regenerated", health);
                 }
             }
         }
@@ -374,6 +419,8 @@ public class JellyfishNecklaceItem extends RelicItem {
         public static void onLivingHurt(LivingDamageEvent.Pre event) {
             if (!(event.getSource().getDirectEntity() instanceof LivingEntity entity))
                 return;
+
+            var level = entity.level();
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {
                 var relic = (JellyfishNecklaceItem) stack.getItem();
@@ -392,7 +439,12 @@ public class JellyfishNecklaceItem extends RelicItem {
                 var uuid = target.getStringUUID();
 
                 if (!targets.contains(uuid)) {
-                    target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (relic.getStatValue(entity, stack, "shock", "paralysis") * 20), 0, false, false));
+                    var paralysis = relic.getStatValue(entity, stack, "shock", "paralysis");
+
+                    target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, false));
+
+                    if (!level.isClientSide())
+                        relic.addAbilityMetricValue(entity, stack, "shock", "hit_paralysis", paralysis);
 
                     relic.addDamagedEntities(stack, uuid);
                 }
