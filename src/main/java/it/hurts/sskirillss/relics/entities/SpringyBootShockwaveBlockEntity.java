@@ -47,13 +47,18 @@ public class SpringyBootShockwaveBlockEntity extends ShockwaveBlockEntity {
                     if (stun > 0)
                         livingEntity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, stun, 0, false, false));
 
-                    if (this.getStack().getItem() instanceof SpringyBootItem relic) {
-                        relic.addAbilityMetricValue(livingEntity, this.getStack(), "bounce", "shockwave_targets", 1);
+                    var stack = this.getStack();
 
-                        relic.addAbilityMetricValue(livingEntity, this.getStack(), "bounce", "shockwave_damage", damage);
+                    if (stack.getItem() instanceof SpringyBootItem relic) {
+                        relic.addAbilityMetricValue(livingEntity, stack, "bounce", "shockwave_targets", 1);
+
+                        if (relic.canAddRelicExperience(livingEntity, stack, "bounce", "shockwave_hit"))
+                            relic.addRelicExperience(livingEntity, stack, "bounce", "shockwave_hit", 1);
+
+                        relic.addAbilityMetricValue(livingEntity, stack, "bounce", "shockwave_damage", damage);
 
                         if (stun > 0)
-                            relic.addAbilityMetricValue(livingEntity, this.getStack(), "bounce", "shockwave_stun", stun / 20D);
+                            relic.addAbilityMetricValue(livingEntity, stack, "bounce", "shockwave_stun", stun / 20D);
                     }
                 }
             }

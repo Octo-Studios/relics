@@ -5,6 +5,8 @@ import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -63,6 +65,19 @@ public class SpringyBootItem extends RelicItem {
                                         .initialValue(0.25D, 0.5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2571D)
                                         .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("bounce")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("strike")
+                                                .rankModifierCondition("strike")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("create_shockwave")
+                                                .rankModifierCondition("shockwave")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("shockwave_hit")
+                                                .rankModifierCondition("shockwave")
+                                                .build())
                                         .build())
                                 .statistic(StatisticTemplate.builder()
                                         .metric(MetricTemplate.builder("bounce_duration")
@@ -244,7 +259,12 @@ public class SpringyBootItem extends RelicItem {
 
                 totalModifier += modifier;
 
-                relic.addAbilityMetricValue(entity, stack, "bounce", "additional_damage", event.getNewDamage() * leaps * modifier);
+                var damage = event.getNewDamage() * leaps * modifier;
+
+                relic.addAbilityMetricValue(entity, stack, "bounce", "additional_damage", damage);
+
+                if (relic.canAddRelicExperience(entity, stack, "bounce", "strike"))
+                    relic.addRelicExperience(entity, stack, "bounce", "strike", damage);
             }
 
             var damage = event.getNewDamage() * totalLeaps * totalModifier;

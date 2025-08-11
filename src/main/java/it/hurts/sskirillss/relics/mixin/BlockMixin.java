@@ -90,7 +90,12 @@ public class BlockMixin {
                             relic.addBounceCooldown(stack, 5);
                             relic.addLeaps(stack, 1);
 
-                            relic.addAbilityMetricValue(livingEntity, stack, "bounce", "secondary_bounces", 1);
+                            if (!level.isClientSide()) {
+                                if (relic.canAddRelicExperience(livingEntity, stack, "bounce", "bounce"))
+                                    relic.addRelicExperience(livingEntity, stack, "bounce", "bounce", 1);
+
+                                relic.addAbilityMetricValue(livingEntity, stack, "bounce", "secondary_bounces", 1);
+                            }
 
                             speed = Math.abs(speed);
 
@@ -102,26 +107,28 @@ public class BlockMixin {
                                 if (relic.isAbilityRankModifierUnlocked(livingEntity, stack, "bounce", "shockwave")) {
                                     var delayTicks = waveIndex * 20;
 
-                                    var center0 = livingEntity.blockPosition();
-                                    var verticalSpeed0 = Math.abs(livingEntity.getKnownMovement().y());
-                                    var radius0 = (int) Math.min(25, Math.round((1 + relic.getStatValue(livingEntity, stack, "bounce", "radius")) * verticalSpeed0));
-                                    var damage0 = (float) relic.getStatValue(livingEntity, stack, "bounce", "damage");
-                                    var stun0 = (int) relic.getStatValue(livingEntity, stack, "bounce", "stun") * 20;
-                                    var stack0 = stack.copy();
+                                    var center = livingEntity.blockPosition();
+                                    var verticalSpeed = Math.abs(livingEntity.getKnownMovement().y());
+                                    var radius = (int) Math.min(25, Math.round((1 + relic.getStatValue(livingEntity, stack, "bounce", "radius")) * verticalSpeed));
+                                    var damage = (float) relic.getStatValue(livingEntity, stack, "bounce", "damage");
+                                    var stun = (int) relic.getStatValue(livingEntity, stack, "bounce", "stun") * 20;
+
+                                    if (relic.canAddRelicExperience(livingEntity, stack, "bounce", "create_shockwave"))
+                                        relic.addRelicExperience(livingEntity, stack, "bounce", "create_shockwave", radius);
 
                                     ServerScheduler.schedule(delayTicks, () -> {
-                                        relic.addAbilityMetricValue(livingEntity, stack0, "bounce", "shockwaves_amount", 1);
+                                        relic.addAbilityMetricValue(livingEntity, stack, "bounce", "shockwaves_amount", 1);
 
                                         var poses = new ArrayList<BlockPos>();
 
-                                        for (var i = -radius0; i <= radius0; i++) {
-                                            var r1 = (int) Mth.sqrt(radius0 * radius0 - i * i);
+                                        for (var i = -radius; i <= radius; i++) {
+                                            var r1 = (int) Mth.sqrt(radius * radius - i * i);
 
                                             for (var j = -r1; j <= r1; j++)
-                                                poses.add(center0.offset(i, 0, j));
+                                                poses.add(center.offset(i, 0, j));
                                         }
 
-                                        for (var step = 0; step <= radius0; step++) {
+                                        for (var step = 0; step <= radius; step++) {
                                             var finalStep = step;
 
                                             ServerScheduler.schedule(finalStep, () -> {
@@ -129,14 +136,14 @@ public class BlockMixin {
                                                 var localRandom = new Random();
 
                                                 poses.stream().filter(pos -> {
-                                                    var dx = pos.getX() - center0.getX();
-                                                    var dz = pos.getZ() - center0.getZ();
+                                                    var dx = pos.getX() - center.getX();
+                                                    var dz = pos.getZ() - center.getZ();
 
                                                     var dist = Math.hypot(dx, dz);
 
                                                     return dist >= finalStep && dist < finalStep + 1;
                                                 }).forEach(entryPos -> {
-                                                    var centerY = center0.getY();
+                                                    var centerY = center.getY();
                                                     var maxOffset = 8;
 
                                                     var groundY = WorldUtils.findSurfaceY(level, entryPos.getX(), entryPos.getZ(), centerY, maxOffset);
@@ -150,15 +157,15 @@ public class BlockMixin {
                                                     var surfacePos = new BlockPos(entryPos.getX(), groundY, entryPos.getZ());
                                                     var shockwave = new SpringyBootShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
 
-                                                    shockwave.setDamage(damage0);
-                                                    shockwave.setStun(stun0);
+                                                    shockwave.setDamage(damage);
+                                                    shockwave.setStun(stun);
                                                     shockwave.setPos(surfacePos.getX() + 0.5F, surfacePos.getY(), surfacePos.getZ() + 0.5F);
                                                     shockwave.setBlockState(level.getBlockState(surfacePos));
                                                     shockwave.setDeltaMovement(0, height, 0);
                                                     shockwave.setOwner(livingEntity);
                                                     shockwave.setCenter(surfacePos);
                                                     shockwave.setKnockback(1F);
-                                                    shockwave.setStack(stack0);
+                                                    shockwave.setStack(stack);
 
                                                     level.addFreshEntity(shockwave);
 
