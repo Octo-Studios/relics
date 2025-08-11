@@ -182,6 +182,9 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
                         relic.addAbilityMetricValue(entity, stack, "shock", "arcs_bounces", 1);
 
                         relic.addAbilityMetricValue(entity, stack, "shock", "arcs_damage", damage);
+
+                        if (relic.canAddRelicExperience(entity, stack, "shock", "arcs_bouncing"))
+                            relic.addRelicExperience(entity, stack, "shock", "arcs_bouncing", 1);
                     }
                 }
             } else {

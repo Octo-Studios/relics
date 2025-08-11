@@ -6,6 +6,8 @@ import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.ElectricSparkEntity;
 import it.hurts.sskirillss.relics.init.*;
@@ -53,6 +55,10 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .initialValue(0.15D, 0.35D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.4604D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("health_regeneration")
+                                                .build())
                                         .build())
                                 .statistic(StatisticTemplate.builder()
                                         .metric(MetricTemplate.builder("health_regenerated")
@@ -120,6 +126,15 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .initialValue(2.5D, 5D)
                                         .upgradeModifier(RelicsScalingModels.RADICAL.get(), 4.2258D)
                                         .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("rings_accumulating")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("arcs_bouncing")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("hit_paralysis")
+                                                .rankModifierCondition("charge")
+                                                .build())
                                         .build())
                                 .statistic(StatisticTemplate.builder()
                                         .metric(MetricTemplate.builder("rings_accumulated")
@@ -295,8 +310,12 @@ public class JellyfishNecklaceItem extends RelicItem {
                     this.addRings(stack, 1);
                     this.setCooldown(stack, maxCooldown * 20);
 
-                    if (!level.isClientSide())
+                    if (!level.isClientSide()) {
                         this.addAbilityMetricValue(entity, stack, "shock", "rings_accumulated", 1);
+
+                        if (this.canAddRelicExperience(entity, stack, "shock", "rings_accumulating"))
+                            this.addRelicExperience(entity, stack, "shock", "rings_accumulating", 1);
+                    }
                 }
             }
 
@@ -409,8 +428,12 @@ public class JellyfishNecklaceItem extends RelicItem {
 
                     event.setAmount((float) (event.getAmount() + health));
 
-                    if (!level.isClientSide())
+                    if (!level.isClientSide()) {
                         relic.addAbilityMetricValue(entity, stack, "regeneration", "health_regenerated", health);
+
+                        if (relic.canAddRelicExperience(entity, stack, "regeneration", "health_regeneration"))
+                            relic.addRelicExperience(entity, stack, "regeneration", "health_regeneration", health);
+                    }
                 }
             }
         }
@@ -443,8 +466,12 @@ public class JellyfishNecklaceItem extends RelicItem {
 
                     target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, false));
 
-                    if (!level.isClientSide())
+                    if (!level.isClientSide()) {
                         relic.addAbilityMetricValue(entity, stack, "shock", "hit_paralysis", paralysis);
+
+                        if (relic.canAddRelicExperience(entity, stack, "shock", "hit_paralysis"))
+                            relic.addRelicExperience(entity, stack, "shock", "hit_paralysis", paralysis);
+                    }
 
                     relic.addDamagedEntities(stack, uuid);
                 }
