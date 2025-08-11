@@ -85,8 +85,8 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("paralysis")
-                                        .initialValue(0.25D, 0.75D)
-                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.0557D)
+                                        .initialValue(1D, 2.5D)
+                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.0404D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("distance")
@@ -100,8 +100,8 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("damage")
-                                        .initialValue(0.5D, 2.5D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 4.8835D)
+                                        .initialValue(2.5D, 5D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 4.1858D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("damage_modifier")
@@ -229,7 +229,7 @@ public class JellyfishNecklaceItem extends RelicItem {
         if (this.canPlayerUseAbility(entity, stack, "regeneration")) {
             var multiplier = (float) this.getStatValue(entity, stack, "regeneration", "max_health");
 
-            if (entity.isInLiquid()) {
+            if (entity.isInLiquid() || entity.isInRain()) {
                 var boostedMaxHealth = entity.getMaxHealth() * multiplier;
 
                 EntityUtils.resetAttribute(entity, stack, Attributes.MAX_HEALTH, multiplier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
@@ -277,12 +277,12 @@ public class JellyfishNecklaceItem extends RelicItem {
                 return !uuid.equals(entity.getStringUUID()) && !affectedEntities.contains(uuid);
             };
 
-            var collidedEntities = level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox(), predicate);
+            var collidedEntities = level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(0.5F), predicate);
 
             if (rings > 0 && !collidedEntities.isEmpty()) {
                 var radius = this.getStatValue(entity, stack, "shock", "radius");
 
-                for (var target : level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(radius), predicate)) {
+                for (var target : level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(0.5F).inflate(radius), predicate)) {
                     var diff = target.position().add(0, target.getBbHeight() / 2D, 0).subtract(entity.position());
                     var knockback = 0.5D * this.getStatValue(entity, stack, "shock", "knockback");
 
@@ -358,16 +358,15 @@ public class JellyfishNecklaceItem extends RelicItem {
             if (!level.hasChunkAt(pos) || !level.isLoaded(pos))
                 return;
 
-            if (!entity.isInLiquid())
-                return;
+            if (entity.isInLiquid() || entity.isInRain()) {
+                for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {
+                    var relic = (JellyfishNecklaceItem) stack.getItem();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {
-                var relic = (JellyfishNecklaceItem) stack.getItem();
+                    if (!relic.canPlayerUseAbility(entity, stack, "regeneration"))
+                        continue;
 
-                if (!relic.canPlayerUseAbility(entity, stack, "regeneration"))
-                    continue;
-
-                event.setAmount((float) (event.getAmount() + (event.getAmount() * relic.getStatValue(entity, stack, "regeneration", "regeneration"))));
+                    event.setAmount((float) (event.getAmount() + (event.getAmount() * relic.getStatValue(entity, stack, "regeneration", "regeneration"))));
+                }
             }
         }
 

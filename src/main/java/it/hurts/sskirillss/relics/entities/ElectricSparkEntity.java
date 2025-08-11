@@ -161,7 +161,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
             var damage = this.getDamage();
 
-            if (currentTarget.hurt(level.damageSources().thrown(this, this.getOwner()), damage + (currentTarget.isInLiquid() ? damage * this.getDamageModifier() : 0F))) {
+            if (currentTarget.hurt(level.damageSources().thrown(this, this.getOwner()), damage + (currentTarget.isInLiquid() || currentTarget.isInRain() ? damage * this.getDamageModifier() : 0F))) {
                 this.bouncedTargets.add(currentTarget.getStringUUID());
                 this.lastTarget = currentTarget;
 
