@@ -9,7 +9,10 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import lombok.SneakyThrows;
 import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +35,10 @@ public class AbilityArgument implements ArgumentType<String> {
     @Override
     @SneakyThrows
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        var player = Minecraft.getInstance().player;
-
-        if (player == null || !(player.getMainHandItem().getItem() instanceof IRelicItem relic))
+        if (!(context.getSource() instanceof CommandSourceStack stack) || !(stack.getEntity() instanceof ServerPlayer player) || !(player.getMainHandItem().getItem() instanceof IRelicItem relic))
             return Suggestions.empty();
 
-        List<String> result = new ArrayList<>(relic.getRelicTemplate(player, player.getMainHandItem()).getAbilities().getAbilities().keySet());
+        var result = new ArrayList<>(relic.getRelicTemplate(player, player.getMainHandItem()).getAbilities().getAbilities().keySet());
 
         result.add("all");
 

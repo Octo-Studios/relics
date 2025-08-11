@@ -37,8 +37,6 @@ public class BasicColoredParticle extends TextureSheetParticle {
     private float oldQuadSize;
     private float currentQuadSize;
 
-    private final Vector3f startPos;
-
     public BasicColoredParticle(ClientLevel world, double x, double y, double z, double velocityX, double velocityY, double velocityZ, Constructor constructor) {
         super(world, x, y, z, velocityX, velocityY, velocityZ);
 
@@ -58,50 +56,6 @@ public class BasicColoredParticle extends TextureSheetParticle {
         this.xd = velocityX;
         this.yd = velocityY;
         this.zd = velocityZ;
-
-        this.startPos = new Vector3f((float) x, (float) y, (float) z);
-    }
-
-    private Vector3f samplePosition(float t) {
-        var pathPoints = constructor.getPathPoints();
-
-        int n = pathPoints.size();
-        if (n == 0) return new Vector3f((float) x, (float) y, (float) z);
-        if (n == 1) return pathPoints.get(0);
-        float f = t * (n - 1);
-        int i = Math.min((int) Math.floor(f), n - 2);
-        float lt = f - i;
-        Vector3f p0 = pathPoints.get(Math.max(i - 1, 0));
-        Vector3f p1 = pathPoints.get(i);
-        Vector3f p2 = pathPoints.get(i + 1);
-        Vector3f p3 = pathPoints.get(Math.min(i + 2, n - 1));
-        float tt = lt, uu = 1 - tt;
-        float tt2 = tt * tt, uu2 = uu * uu, tt3 = tt2 * tt, uu3 = uu2 * uu;
-        return new Vector3f(p0).mul(-0.5f * tt3 + tt2 - 0.5f * tt)
-                .add(new Vector3f(p1).mul(1.5f * tt3 - 2.5f * tt2 + 1f))
-                .add(new Vector3f(p2).mul(-1.5f * tt3 + 2.0f * tt2 + 0.5f * tt))
-                .add(new Vector3f(p3).mul(0.5f * tt3 - 0.5f * tt2));
-    }
-
-    private Color sampleColor(float t) {
-        var colorStops = constructor.getColorStops();
-
-        if (colorStops == null || colorStops.isEmpty()) {
-            return constructor.getColor();
-        }
-        int m = colorStops.size();
-        if (m == 1) {
-            return colorStops.get(0);
-        }
-        float f = t * (m - 1);
-        int i = Math.min((int) Math.floor(f), m - 2);
-        float lt = f - i;
-        Color a = colorStops.get(i), b = colorStops.get(i + 1);
-        int r = (int) Mth.lerp(lt, a.getRed(), b.getRed());
-        int g = (int) Mth.lerp(lt, a.getGreen(), b.getGreen());
-        int bl = (int) Mth.lerp(lt, a.getBlue(), b.getBlue());
-        int al = (int) Mth.lerp(lt, a.getAlpha(), b.getAlpha());
-        return new Color(r, g, bl, al);
     }
 
     @Override
@@ -116,24 +70,10 @@ public class BasicColoredParticle extends TextureSheetParticle {
         oRoll = roll;
         roll += constructor.getRoll();
 
-        float t = age / (float) lifetime;
-        Color c = sampleColor(t);
-        setColor(c.getRed() / 255f,
-                c.getGreen() / 255f,
-                c.getBlue() / 255f);
-        setAlpha(c.getAlpha() / 255f);
+        var color = this.constructor.getColor();
 
-        var pathPoints = constructor.getPathPoints();
-
-        if (pathPoints != null && pathPoints.size() >= 2) {
-            Vector3f rel = samplePosition(t);
-            Vector3f target = new Vector3f(startPos).add(rel);
-            Vector3f cur = new Vector3f((float) x, (float) y, (float) z);
-            Vector3f d = target.sub(cur, new Vector3f());
-            xd = d.x();
-            yd = d.y();
-            zd = d.z();
-        }
+        setColor(color.getRed() / 255F, color.getGreen() / 255F, color.getBlue() / 255F);
+        setAlpha(color.getAlpha() / 255f);
 
         move(xd, yd, zd);
 
@@ -218,12 +158,6 @@ public class BasicColoredParticle extends TextureSheetParticle {
 
         @Builder.Default
         private float scaleModifier = 1F;
-
-        @Builder.Default
-        private List<Vector3f> pathPoints = List.of();
-
-        @Builder.Default
-        private List<Color> colorStops = List.of();
 
         public static class ConstructorBuilder {
             private Color color = new Color(0xFFFFFFFF, true);

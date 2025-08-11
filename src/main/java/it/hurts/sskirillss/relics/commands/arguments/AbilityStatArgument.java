@@ -12,7 +12,9 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import lombok.SneakyThrows;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.server.level.ServerPlayer;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,9 +37,7 @@ public class AbilityStatArgument implements ArgumentType<String> {
     @Override
     @SneakyThrows
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        LocalPlayer player = Minecraft.getInstance().player;
-
-        if (player == null || !(player.getMainHandItem().getItem() instanceof IRelicItem relic))
+        if (!(context.getSource() instanceof CommandSourceStack stack) || !(stack.getEntity() instanceof ServerPlayer player) || !(player.getMainHandItem().getItem() instanceof IRelicItem relic))
             return Suggestions.empty();
 
         String ability = StringArgumentType.getString(context, "ability");

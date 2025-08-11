@@ -31,6 +31,8 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -218,10 +220,12 @@ public class LeafyMantleItem extends RelicItem {
                 this.addAbilityMetricValue(entity, stack, "camouflage", "hide_duration", 1);
             }
 
-            if (entity instanceof LocalPlayer player && player.input.jumping) {
-                var motion = player.getDeltaMovement();
+            if (level.isClientSide()) {
+                if (entity instanceof LocalPlayer player && player.input.jumping) {
+                    var motion = player.getDeltaMovement();
 
-                player.setDeltaMovement(motion.x(), 0.25F, motion.z());
+                    player.setDeltaMovement(motion.x(), 0.25F, motion.z());
+                }
             }
         } else {
             if (hiding)
