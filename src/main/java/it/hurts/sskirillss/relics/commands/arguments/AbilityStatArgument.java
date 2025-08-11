@@ -8,16 +8,13 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import lombok.SneakyThrows;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class AbilityStatArgument implements ArgumentType<String> {
@@ -35,20 +32,26 @@ public class AbilityStatArgument implements ArgumentType<String> {
     }
 
     @Override
-    @SneakyThrows
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        if (!(context.getSource() instanceof CommandSourceStack stack) || !(stack.getEntity() instanceof ServerPlayer player) || !(player.getMainHandItem().getItem() instanceof IRelicItem relic))
+        return context.getSource() instanceof ClientSuggestionProvider ? this.constructSuggestions(context, builder) : Suggestions.empty();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public <S> CompletableFuture<Suggestions> constructSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        var player = Minecraft.getInstance().player;
+
+        if (player == null || !(player.getMainHandItem().getItem() instanceof IRelicItem relic))
             return Suggestions.empty();
 
-        String ability = StringArgumentType.getString(context, "ability");
+        var ability = StringArgumentType.getString(context, "ability");
 
-        List<String> result = new ArrayList<>();
+        var result = new ArrayList<String>();
 
         if (ability.equals("all")) {
-            for (AbilityTemplate abilityEntry : relic.getRelicTemplate(player, player.getMainHandItem()).getAbilities().getAbilities().values())
+            for (var abilityEntry : relic.getRelicTemplate(player, player.getMainHandItem()).getAbilities().getAbilities().values())
                 result.addAll(abilityEntry.getStats().keySet());
         } else {
-            AbilityTemplate data = relic.getAbilityTemplate(player, player.getMainHandItem(), ability);
+            var data = relic.getAbilityTemplate(player, player.getMainHandItem(), ability);
 
             if (data == null)
                 return Suggestions.empty();

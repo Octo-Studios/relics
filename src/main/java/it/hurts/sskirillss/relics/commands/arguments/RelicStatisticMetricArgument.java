@@ -2,21 +2,18 @@ package it.hurts.sskirillss.relics.commands.arguments;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;
-import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import lombok.SneakyThrows;
 import net.minecraft.client.Minecraft;
-import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public class RelicStatisticMetricArgument implements ArgumentType<String> {
@@ -34,9 +31,15 @@ public class RelicStatisticMetricArgument implements ArgumentType<String> {
     }
 
     @Override
-    @SneakyThrows
     public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-        if (!(context.getSource() instanceof CommandSourceStack sourceStack) || !(sourceStack.getEntity() instanceof ServerPlayer player))
+        return context.getSource() instanceof ClientSuggestionProvider ? this.constructSuggestions(context, builder) : Suggestions.empty();
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public <S> CompletableFuture<Suggestions> constructSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+        var player = Minecraft.getInstance().player;
+
+        if (player == null)
             return Suggestions.empty();
 
         var stack = player.getMainHandItem();
