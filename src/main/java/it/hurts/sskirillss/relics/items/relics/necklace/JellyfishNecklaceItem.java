@@ -448,7 +448,7 @@ public class JellyfishNecklaceItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {
                 var relic = (JellyfishNecklaceItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "shock") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled")
+                if (!relic.canPlayerUseAbility(entity, stack, "shock") || relic.getAbilityMode(entity, stack, "shock").equals("disabled")
                         || !relic.isAbilityRankModifierUnlocked(entity, stack, "shock", "charge"))
                     continue;
 
