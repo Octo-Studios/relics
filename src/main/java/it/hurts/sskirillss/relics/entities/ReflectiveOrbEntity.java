@@ -177,6 +177,9 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
 
             this.takeBounces = false;
 
+            if (stack.getItem() instanceof ReflectiveNecklaceItem relic && this.getOwner() instanceof LivingEntity owner)
+                relic.addAbilityMetricValue(owner, stack, "reflection", "total_bounces", 1);
+
             if (this.spawnBounceParticles) {
                 var up = Math.abs(normal.y) < 0.99 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
 
@@ -262,9 +265,6 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
 
         this.bounced = true;
         this.takeBounces = true;
-
-        if (stack.getItem() instanceof ReflectiveNecklaceItem relic && this.getOwner() instanceof LivingEntity owner)
-            relic.addAbilityMetricValue(owner, stack, "reflection", "total_bounces", 1);
 
         return true;
     }
