@@ -15,6 +15,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.neoforged.neoforge.server.command.EnumArgument;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -69,6 +71,7 @@ public class RelicsCommand {
                                     relic.getAbilitiesTemplate(player, stack).getAbilities().forEach((abilityId, abilityTemplate) -> {
                                         relic.setAbilityResearched(player, stack, abilityId, false);
                                         relic.setAbilityLevel(player, stack, abilityId, 0);
+                                        relic.setResearchLinks(player, stack, abilityId, new HashMap<>());
 
                                         if (!relic.isEnoughLevel(player, stack, abilityId))
                                             relic.setLockUnlocks(player, stack, abilityId, 0);

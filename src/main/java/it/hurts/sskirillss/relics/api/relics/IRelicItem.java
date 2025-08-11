@@ -507,18 +507,22 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
                 .collect(MultimapBuilder.hashKeys().arrayListValues()::build, (multimap, entry) -> multimap.putAll(Integer.parseInt(entry.getKey()), entry.getValue()), Multimap::putAll);
     }
 
+    default void setResearchLinks(LivingEntity entity, ItemStack stack, String ability, Map<String, List<Integer>> links) {
+        setResearchComponent(entity, stack, ability, getResearchComponent(entity, stack, ability).toBuilder()
+                .links(links)
+                .build());
+    }
+
     default void addResearchLink(LivingEntity entity, ItemStack stack, String ability, int from, int to) {
         var links = getResearchLinks(entity, stack, ability);
 
         links.put(from, to);
 
-        setResearchComponent(entity, stack, ability, getResearchComponent(entity, stack, ability).toBuilder()
-                .links(links.asMap().entrySet().stream()
+        setResearchLinks(entity, stack, ability, links.asMap().entrySet().stream()
                         .collect(Collectors.toMap(
                                 entry -> String.valueOf(entry.getKey()),
                                 entry -> new ArrayList<>(entry.getValue())
-                        )))
-                .build());
+                        )));
     }
 
     default void removeResearchLink(LivingEntity entity, ItemStack stack, String ability, int from, int to) {
