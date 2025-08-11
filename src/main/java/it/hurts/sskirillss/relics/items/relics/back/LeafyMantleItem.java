@@ -31,8 +31,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -114,9 +112,11 @@ public class LeafyMantleItem extends RelicItem {
                                                 .build())
                                         .metric(MetricTemplate.builder("damage_dealt")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .abilityRankModifierVisibilityCondition("piercing")
                                                 .build())
                                         .metric(MetricTemplate.builder("paralysis_duration")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .abilityRankModifierVisibilityCondition("piercing")
                                                 .build())
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -204,20 +204,24 @@ public class LeafyMantleItem extends RelicItem {
 
             if (entity.tickCount % 20 == 0) {
                 if (entity.getHealth() < entity.getMaxHealth()) {
-                    var heal = (float) this.getStatValue(entity, stack, "camouflage", "heal");
+                    var heal = (float) Math.min(this.getStatValue(entity, stack, "camouflage", "heal"), entity.getMaxHealth() - entity.getHealth());
 
                     entity.heal(heal);
 
-                    this.addAbilityMetricValue(entity, stack, "camouflage", "heal_amount", heal);
+                    if (!level.isClientSide()) {
+                        this.addAbilityMetricValue(entity, stack, "camouflage", "heal_amount", heal);
 
-                    if (this.canAddRelicExperience(entity, stack, "camouflage", "healing"))
-                        this.addRelicExperience(entity, stack, "camouflage", "healing", 1);
+                        if (this.canAddRelicExperience(entity, stack, "camouflage", "healing"))
+                            this.addRelicExperience(entity, stack, "camouflage", "healing", heal);
+                    }
                 }
 
-                if (this.canAddRelicExperience(entity, stack, "camouflage", "hiding"))
-                    this.addRelicExperience(entity, stack, "camouflage", "hiding", 1);
+                if (!level.isClientSide()) {
+                    if (this.canAddRelicExperience(entity, stack, "camouflage", "hiding"))
+                        this.addRelicExperience(entity, stack, "camouflage", "hiding", 1);
 
-                this.addAbilityMetricValue(entity, stack, "camouflage", "hide_duration", 1);
+                    this.addAbilityMetricValue(entity, stack, "camouflage", "hide_duration", 1);
+                }
             }
 
             if (level.isClientSide()) {
@@ -299,7 +303,8 @@ public class LeafyMantleItem extends RelicItem {
                 if (diff > 0)
                     break;
 
-                relic.addAbilityMetricValue(entity, stack, "revival", "damage_negated", Math.abs(diff));
+                if (!level.isClientSide())
+                    relic.addAbilityMetricValue(entity, stack, "revival", "damage_negated", Math.abs(diff));
 
                 var radius = (int) Math.ceil(relic.getStatValue(entity, stack, "revival", "radius"));
                 var heal = (float) relic.getStatValue(entity, stack, "revival", "heal");
@@ -334,6 +339,7 @@ public class LeafyMantleItem extends RelicItem {
 
                         leaves.setParalysis((float) relic.getStatValue(entity, stack, "revival", "paralysis"));
                         leaves.setDeltaMovement(perpendicular.scale(0.5F + random.nextFloat()));
+                        leaves.setFlawless(relic.isRelicFlawless(entity, stack));
                         leaves.setPos(posVec.x(), posVec.y(), posVec.z());
                         leaves.setBlockState(level.getBlockState(pos));
                         leaves.setTarget(entity);
@@ -345,10 +351,12 @@ public class LeafyMantleItem extends RelicItem {
 
                         level.destroyBlock(pos, false);
 
-                        relic.addAbilityMetricValue(entity, stack, "revival", "leaves_consumed", 1);
+                        if (!level.isClientSide()) {
+                            relic.addAbilityMetricValue(entity, stack, "revival", "leaves_consumed", 1);
 
-                        if (relic.canAddRelicExperience(entity, stack, "revival", "consuming_leaves"))
-                            relic.addRelicExperience(entity, stack, "revival", "consuming_leaves", 1);
+                            if (relic.canAddRelicExperience(entity, stack, "revival", "consuming_leaves"))
+                                relic.addRelicExperience(entity, stack, "revival", "consuming_leaves", 1);
+                        }
                     });
 
                     blocks++;

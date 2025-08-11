@@ -125,9 +125,11 @@ public class LeavesBlockEntity extends ThrowableProjectile implements ITargetabl
                 || (!(this.getOwner() instanceof LivingEntity owner) || entity.getStringUUID().equals(owner.getStringUUID())))
             return;
 
+        var level = this.level();
+
         entity.invulnerableTime = 0;
 
-        if (entity.hurt(this.level().damageSources().thrown(owner, this), this.getDamage())) {
+        if (entity.hurt(level.damageSources().thrown(owner, this), this.getDamage())) {
             var paralysis = this.getParalysis();
 
             if (paralysis > 0)
@@ -136,7 +138,7 @@ public class LeavesBlockEntity extends ThrowableProjectile implements ITargetabl
             if (stack.getItem() instanceof LeafyMantleItem relic) {
                 relic.addAbilityMetricValue(entity, stack, "revival", "damage_dealt", this.getDamage());
 
-                if (relic.canAddRelicExperience(entity, stack, "revival", "leaves_impact"))
+                if (!level.isClientSide() && relic.canAddRelicExperience(entity, stack, "revival", "leaves_impact"))
                     relic.addRelicExperience(entity, stack, "revival", "leaves_impact", 1);
 
                 if (paralysis > 0)
