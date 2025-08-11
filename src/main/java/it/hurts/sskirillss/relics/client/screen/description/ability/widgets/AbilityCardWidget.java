@@ -34,6 +34,7 @@ import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
@@ -87,6 +88,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
     public void onPress() {
         var player = minecraft.player;
         var stack = screen.getStack();
+        var random = player.getRandom();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
@@ -117,8 +119,6 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
                 NetworkHandler.sendToServer(new C2SPacketAbilityUnlock(screen.container, screen.slot, ability, unlocks));
 
-                var random = player.getRandom();
-
                 var overshootFactor = 0.035F * unlocks;
                 var overshoot = 1F + overshootFactor;
 
@@ -141,7 +141,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                         .setTransitionType(TransitionType.QUAD);
 
                 var initialRotation = this.getClickZRotation();
-                var rotationBase = 0.035F * unlocks;
+                var rotationBase = 0.025F * unlocks;
                 var amplitude = random.nextBoolean() ? rotationBase : -rotationBase;
                 var decay = 0.75F;
                 var segmentDuration = 0.2D;
@@ -218,6 +218,54 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 }
             }
         } else {
+            var overshootFactor = 0.035F;
+            var overshoot = 1F + overshootFactor;
+
+            var tween = Tween.create().setParallel(true);
+
+            tween.tweenMethod(this::setClickYSqueeze, this.getClickYSqueeze(), overshoot, 0.08D)
+                    .setEaseType(EaseType.EASE_OUT)
+                    .setTransitionType(TransitionType.QUAD);
+            tween.tweenMethod(this::setClickXSqueeze, this.getClickXSqueeze(), overshoot, 0.08D)
+                    .setEaseType(EaseType.EASE_OUT)
+                    .setTransitionType(TransitionType.QUAD);
+
+            tween.tweenMethod(this::setClickYSqueeze, overshoot, 1F, 0.12D)
+                    .setDelay(0.04D)
+                    .setEaseType(EaseType.EASE_IN)
+                    .setTransitionType(TransitionType.QUAD);
+            tween.tweenMethod(this::setClickXSqueeze, overshoot, 1F, 0.12D)
+                    .setDelay(0.04D)
+                    .setEaseType(EaseType.EASE_IN)
+                    .setTransitionType(TransitionType.QUAD);
+
+            var initialRotation = this.getClickZRotation();
+            var rotationBase = 0.025F;
+            var amplitude = random.nextBoolean() ? rotationBase : -rotationBase;
+            var decay = 0.75F;
+            var segmentDuration = 0.25D;
+            var delay = 0D;
+            var lastTarget = initialRotation;
+
+            for (var i = 0; i < 10; i++) {
+                var nextTarget = (i % 2 == 0 ? amplitude : -amplitude);
+
+                tween.tweenMethod(this::setClickZRotation, lastTarget, nextTarget, segmentDuration)
+                        .setDelay(delay)
+                        .setEaseType(i == 0 ? EaseType.EASE_OUT : EaseType.EASE_IN_OUT)
+                        .setTransitionType(TransitionType.QUAD);
+
+                lastTarget = nextTarget;
+                delay += segmentDuration;
+                amplitude *= decay;
+            }
+
+            tween.tweenMethod(this::setClickZRotation, lastTarget, 0f, segmentDuration)
+                    .setDelay(delay)
+                    .setEaseType(EaseType.EASE_IN);
+
+            tween.start();
+
             soundManager.play(SimpleSoundInstance.forUI(SoundEvents.CHAIN_BREAK, 1F));
         }
     }
