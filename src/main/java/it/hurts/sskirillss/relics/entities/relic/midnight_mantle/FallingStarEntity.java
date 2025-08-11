@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.entities.relic.midnight_mantle;
 
+import it.hurts.sskirillss.relics.entities.MidnightMantleShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.entities.ShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
@@ -238,7 +239,7 @@ public class FallingStarEntity extends ThrowableProjectile {
 
                     var surfacePos = new BlockPos(entryPos.getX(), groundY, entryPos.getZ());
 
-                    var shockwave = new ShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
+                    var shockwave = new MidnightMantleShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
 
                     shockwave.setPos(surfacePos.getX() + 0.5F, surfacePos.getY(), surfacePos.getZ() + 0.5F);
                     shockwave.setBlockState(level.getBlockState(surfacePos));

@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import it.hurts.sskirillss.relics.entities.ShockwaveBlockEntity;
+import it.hurts.sskirillss.relics.entities.SpringyBootShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
@@ -83,6 +84,8 @@ public class BlockMixin {
                         relic.addBounceCooldown(stack, 5);
                         relic.addLeaps(stack, 1);
 
+                        relic.addAbilityMetricValue(livingEntity, stack, "bounce", "secondary_bounces", 1);
+
                         speed = Math.abs(speed);
 
                         level.playSound(null, livingEntity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.clamp(0.5F + speed * 0.5F, 0.5F, 2F), (float) Math.max(0.1F, 2F - speed * 0.75F));
@@ -91,6 +94,8 @@ public class BlockMixin {
                             NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(livingEntity.getId(), motion.multiply(1F, -1F, 1F).toVector3f()), livingEntity);
                         else {
                             if (relic.isAbilityRankModifierUnlocked(livingEntity, stack, "bounce", "shockwave")) {
+                                relic.addAbilityMetricValue(livingEntity, stack, "bounce", "shockwaves_amount", 1);
+
                                 var verticalSpeed = Math.abs(livingEntity.getKnownMovement().y());
 
                                 var center = livingEntity.blockPosition();
@@ -134,7 +139,7 @@ public class BlockMixin {
 
                                             var surfacePos = new BlockPos(entryPos.getX(), groundY, entryPos.getZ());
 
-                                            var shockwave = new ShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
+                                            var shockwave = new SpringyBootShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
 
                                             shockwave.setDamage((float) relic.getStatValue(livingEntity, stack, "bounce", "damage"));
                                             shockwave.setStun((int) relic.getStatValue(livingEntity, stack, "bounce", "stun") * 20);
@@ -144,6 +149,7 @@ public class BlockMixin {
                                             shockwave.setOwner(livingEntity);
                                             shockwave.setCenter(surfacePos);
                                             shockwave.setKnockback(1F);
+                                            shockwave.setStack(stack);
 
                                             level.addFreshEntity(shockwave);
 

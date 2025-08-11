@@ -1,6 +1,8 @@
 package it.hurts.sskirillss.relics.items.relics.feet;
 
+import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
@@ -62,6 +64,32 @@ public class SpringyBootItem extends RelicItem {
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2571D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("bounce_duration")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(MetricTemplate.builder("primary_bounces")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("secondary_bounces")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("additional_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("shockwaves_amount")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("shockwave_targets")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("shockwave_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("shockwave_stun")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 6, 11).star(1, 16, 13).star(2, 11, 22).star(3, 20, 23).star(4, 2, 24).star(5, 6, 29).star(6, 18, 29)
                                         .link(5, 4).link(4, 2).link(2, 3).link(3, 6).link(2, 0).link(2, 1)
@@ -97,7 +125,6 @@ public class SpringyBootItem extends RelicItem {
         this.setBounceCooldown(stack, this.getBounceCooldown(stack) + cooldown);
     }
 
-
     public boolean isLeaped(ItemStack stack) {
         return stack.getOrDefault(RelicsDataComponents.SPRINGY_BOOT_LEAPED, false);
     }
@@ -131,6 +158,9 @@ public class SpringyBootItem extends RelicItem {
         var cooldown = this.getBounceCooldown(stack);
         var leaped = this.isLeaped(stack);
         var leaps = this.getLeaps(stack);
+
+        if (entity.tickCount % 20 == 0 && (leaped || leaps > 0))
+            this.addAbilityMetricValue(entity, stack, "bounce", "bounce_duration", 1);
 
         if (cooldown > 0)
             this.addBounceCooldown(stack, -1);
@@ -175,6 +205,8 @@ public class SpringyBootItem extends RelicItem {
                 relic.addBounceCooldown(stack, 5);
 
                 level.playSound(null, entity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.MASTER, 5F, 0.5F);
+
+                relic.addAbilityMetricValue(entity, stack, "bounce", "primary_bounces", 1);
             }
         }
 
@@ -189,7 +221,11 @@ public class SpringyBootItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "bounce") || !relic.isLeaped(stack) || !relic.isAbilityRankModifierUnlocked(entity, stack, "bounce", "strike"))
                     continue;
 
-                event.setNewDamage((float) (event.getNewDamage() + (event.getNewDamage() * relic.getLeaps(stack) * relic.getStatValue(entity, stack, "bounce", "damage_modifier"))));
+                var damage = event.getNewDamage() * relic.getLeaps(stack) * relic.getStatValue(entity, stack, "bounce", "damage_modifier");
+
+                event.setNewDamage((float) (event.getNewDamage() + damage));
+
+                relic.addAbilityMetricValue(entity, stack, "bounce", "additional_damage", damage);
             }
         }
     }

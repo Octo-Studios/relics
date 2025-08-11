@@ -1,6 +1,9 @@
 package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
+import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
@@ -14,6 +17,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,6 +28,10 @@ public class ShockwaveBlockEntity extends Projectile {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ShockwaveBlockEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> STUN = SynchedEntityData.defineId(ShockwaveBlockEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> KNOCKBACK = SynchedEntityData.defineId(ShockwaveBlockEntity.class, EntityDataSerializers.FLOAT);
+
+    @Getter
+    @Setter
+    private ItemStack stack = ItemStack.EMPTY;
 
     public BlockState getBlockState() {
         return this.getEntityData().get(BLOCK_STATE);
@@ -82,6 +90,10 @@ public class ShockwaveBlockEntity extends Projectile {
         if (this.tickCount >= 20)
             this.discard();
 
+        processTargets();
+    }
+
+    public void processTargets() {
         var level = this.level();
         var center = this.getCenter().getCenter();
 
@@ -93,8 +105,14 @@ public class ShockwaveBlockEntity extends Projectile {
             entity.setDeltaMovement(motion);
 
             if (entity instanceof LivingEntity livingEntity) {
-                if (livingEntity.hurt(level.damageSources().explosion(owner, this), this.getDamage()))
-                    livingEntity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, this.getStun(), 0, false, false));
+                var damage = this.getDamage();
+
+                if (livingEntity.hurt(level.damageSources().explosion(owner, this), damage)) {
+                    var stun = this.getStun();
+
+                    if (stun > 0)
+                        livingEntity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, stun, 0, false, false));
+                }
             }
         }
     }
