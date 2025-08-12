@@ -18,6 +18,7 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
@@ -99,6 +100,10 @@ public class RollerSkateItem extends RelicItem {
                                         .source(ExperienceSourceTemplate.builder("spark_hit")
                                                 .rankModifierCondition("sparkling")
                                                 .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 3, 7).star(1, 13, 9).star(2, 6, 16).star(3, 16, 18).star(4, 9, 25).star(5, 15, 29)
+                                        .link(5, 4).link(4, 2).link(2, 0).link(2, 1).link(4, 3)
                                         .build())
                                 .build())
                         .build())
