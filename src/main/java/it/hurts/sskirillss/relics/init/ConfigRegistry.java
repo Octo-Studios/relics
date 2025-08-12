@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.init;
 
-import it.hurts.octostudios.octolib.modules.config.ConfigManager;
+import it.hurts.octostudios.octolib.module.config.ConfigManager;
 import it.hurts.sskirillss.relics.config.LootConfigData;
 import it.hurts.sskirillss.relics.config.RelicsConfigData;
 import it.hurts.sskirillss.relics.config.data.RelicConfigData;

@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.octostudios.octolib.modules.particles.OctoRenderManager;
-import it.hurts.octostudios.octolib.modules.particles.trail.TrailProvider;
+import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
 import it.hurts.sskirillss.relics.init.EntityRegistry;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
@@ -20,6 +19,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -29,7 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetableEntity, TrailProvider {
+public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetableEntity {
     private static final EntityDataAccessor<Integer> MAX_BOUNCES = SynchedEntityData.defineId(ShadowGlaiveEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> BOUNCES = SynchedEntityData.defineId(ShadowGlaiveEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ShadowGlaiveEntity.class, EntityDataSerializers.FLOAT);
@@ -180,13 +181,6 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
     }
 
     @Override
-    public void onAddedToLevel() {
-        super.onAddedToLevel();
-
-        OctoRenderManager.registerProvider(this);
-    }
-
-    @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(MAX_BOUNCES, 10);
         builder.define(BOUNCES, 0);
@@ -234,43 +228,50 @@ public class ShadowGlaiveEntity extends ThrowableProjectile implements ITargetab
         this.currentTarget = target;
     }
 
-    @Override
-    public Vec3 getTrailPosition(float partialTicks) {
-        return getPosition(partialTicks).add(getDeltaMovement().scale(-1));
-    }
+    @OnlyIn(Dist.CLIENT)
+    public static class TrailProvider extends EntityTrailProvider<ShadowGlaiveEntity> {
+        public TrailProvider(ShadowGlaiveEntity entity) {
+            super(entity);
+        }
 
-    @Override
-    public int getTrailUpdateFrequency() {
-        return 1;
-    }
+        @Override
+        public Vec3 getTrailPosition(float partialTicks) {
+            return entity.getPosition(partialTicks).add(entity.getDeltaMovement().scale(-1));
+        }
 
-    @Override
-    public boolean isTrailAlive() {
-        return isAlive();
-    }
+        @Override
+        public int getTrailUpdateFrequency() {
+            return 1;
+        }
 
-    @Override
-    public boolean isTrailGrowing() {
-        return getKnownMovement().length() >= 0.1F;
-    }
+        @Override
+        public boolean isTrailAlive() {
+            return entity.isAlive();
+        }
 
-    @Override
-    public int getTrailMaxLength() {
-        return 5;
-    }
+        @Override
+        public boolean isTrailGrowing() {
+            return entity.getKnownMovement().length() >= 0.1F;
+        }
 
-    @Override
-    public int getTrailFadeInColor() {
-        return 0xFFFF00FF;
-    }
+        @Override
+        public int getTrailMaxLength() {
+            return 5;
+        }
 
-    @Override
-    public int getTrailFadeOutColor() {
-        return 0x800000FF;
-    }
+        @Override
+        public int getTrailFadeInColor() {
+            return 0xFFFF00FF;
+        }
 
-    @Override
-    public double getTrailScale() {
-        return 0.15F;
+        @Override
+        public int getTrailFadeOutColor() {
+            return 0x800000FF;
+        }
+
+        @Override
+        public double getTrailScale() {
+            return 0.15F;
+        }
     }
 }

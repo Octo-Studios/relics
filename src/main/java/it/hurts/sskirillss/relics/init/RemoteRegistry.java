@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.init;
 
+import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailRegistry;
 import it.hurts.sskirillss.relics.client.gui.layers.ActiveAbilitiesLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.InfoTileLayer;
 import it.hurts.sskirillss.relics.client.gui.layers.LeafyRingHideLayer;
@@ -9,6 +10,10 @@ import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
 import it.hurts.sskirillss.relics.client.renderer.tiles.ResearchingTableRenderer;
+import it.hurts.sskirillss.relics.entities.DeathEssenceEntity;
+import it.hurts.sskirillss.relics.entities.LifeEssenceEntity;
+import it.hurts.sskirillss.relics.entities.ShadowGlaiveEntity;
+import it.hurts.sskirillss.relics.entities.SporeEntity;
 import it.hurts.sskirillss.relics.items.relics.InfiniteHamItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
@@ -105,6 +110,11 @@ public class RemoteRegistry {
 
             CuriosRendererRegistry.register(item, CurioRenderer::new);
         }
+
+        EntityTrailRegistry.registerProvider(EntityRegistry.DEATH_ESSENCE.get(), DeathEssenceEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(EntityRegistry.LIFE_ESSENCE.get(), LifeEssenceEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(EntityRegistry.SHADOW_GLAIVE.get(), ShadowGlaiveEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(EntityRegistry.SPORE.get(), SporeEntity.TrailProvider::new);
     }
 
     @SubscribeEvent

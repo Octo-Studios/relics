@@ -88,7 +88,7 @@ dependencies {
 
     implementation 'top.theillusivec4.curios:curios-neoforge:9.3.1+1.21.1'
 
-    implementation "it.hurts.octostudios.octolib:octolib-neoforge:0.5.0.1+1.21"
+    implementation "it.hurts.octostudios.octolib:octolib-neoforge:0.6.0.1+1.21"
 
     implementation "dev.architectury:architectury-neoforge:13.0.6"
 
