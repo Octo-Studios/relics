@@ -4,6 +4,7 @@ import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractPlateWidget;
+import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -15,9 +16,9 @@ import net.minecraft.world.item.ItemStack;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RankPlateWidget extends AbstractPlateWidget {
-    public RankPlateWidget(int x, int y, DescriptionScreen screen) {
-        super(x, y, screen, "rank");
+public class RelicProgressPlateWidget extends AbstractPlateWidget {
+    public RelicProgressPlateWidget(int x, int y, DescriptionScreen provider) {
+        super(x, y, provider, "progress");
     }
 
     @Override
@@ -34,7 +35,7 @@ public class RankPlateWidget extends AbstractPlateWidget {
 
         var time = player.tickCount + pPartialTick;
 
-        if (!relic.isRelicMaxRank(player, stack))
+        if (!relic.isRelicFlawless(player, stack))
             return;
 
         poseStack.pushPose();
@@ -54,7 +55,7 @@ public class RankPlateWidget extends AbstractPlateWidget {
 
             var length = 0.85F + ((i % 2 == 0 ? Math.sin(time * 0.25F) : Math.cos(time * 0.25F)) * 0.1F);
 
-            RenderUtils.renderFlatBeam(guiGraphics, pPartialTick, (float) length, 0.45F, 0xFF00FFFF, 0x000000FF);
+            RenderUtils.renderFlatBeam(guiGraphics, pPartialTick, (float) length, 0.45F, 0xFFFFFF00, 0x00FF0000);
 
             poseStack.popPose();
         }
@@ -71,12 +72,12 @@ public class RankPlateWidget extends AbstractPlateWidget {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return entries;
 
-        entries.add(Component.literal("").append(Component.translatable("relics.description.researching.general.relic_rank.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicRank(minecraft.player, stack)));
+        entries.add(Component.literal("").append(Component.translatable("relics.description.researching.general.relic_progress.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.calculateRelicProgress(minecraft.player, stack) * 100D, 1) + "%"));
 
         entries.add(Component.literal(" "));
 
         if (Screen.hasShiftDown())
-            entries.add(Component.translatable("relics.description.researching.general.relic_rank.extra_info").withStyle(ChatFormatting.ITALIC));
+            entries.add(Component.translatable("relics.description.researching.general.relic_progress.extra_info").withStyle(ChatFormatting.ITALIC));
         else
             entries.add(Component.translatable("relics.description.researching.general.extra_info"));
 
@@ -85,6 +86,6 @@ public class RankPlateWidget extends AbstractPlateWidget {
 
     @Override
     public String getValue(ItemStack stack) {
-        return String.valueOf(stack.getItem() instanceof IRelicItem relic ? relic.getRelicRank(minecraft.player, stack) : 0);
+        return stack.getItem() instanceof IRelicItem relic ? (MathUtils.round(relic.calculateRelicProgress(minecraft.player, stack) * 100, 1) + "%").replace(".0", "") : "";
     }
 }

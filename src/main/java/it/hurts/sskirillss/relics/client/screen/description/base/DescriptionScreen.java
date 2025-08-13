@@ -62,9 +62,9 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
         if (((IRelicItem) stack.getItem()).isSomethingWrongWithLevelingPoints(minecraft.player, stack))
             this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
-        this.addRenderableWidget(new ProgressPlateWidget(this.x + 313, this.y + 77, this));
+        this.addRenderableWidget(new RelicProgressPlateWidget(this.x + 313, this.y + 77, this));
         this.addRenderableWidget(new RankPlateWidget(this.x + 313, this.y + 102, this));
-        this.addRenderableWidget(new PointsPlateWidget(this.x + 313, this.y + 127, this));
+        this.addRenderableWidget(new LevelingPointsPlateWidget(this.x + 313, this.y + 127, this));
         this.addRenderableWidget(new PlayerExperiencePlateWidget(this.x + 313, this.y + 152, this));
     }
 

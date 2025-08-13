@@ -2,9 +2,9 @@ package it.hurts.sskirillss.relics.client.screen.description.general.widgets.bas
 
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
-import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -12,10 +12,15 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 
-public abstract class AbstractPlateWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
+import java.util.ArrayList;
+import java.util.List;
+
+public abstract class AbstractPlateWidget extends AbstractDescriptionWidget implements IHoverableWidget {
     @Getter
     private DescriptionScreen screen;
     @Getter
@@ -74,6 +79,52 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
 
     public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
 
+    }
+
+    @Override
+    public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+        var poseStack = guiGraphics.pose();
+
+        var tooltip = new ArrayList<FormattedCharSequence>();
+
+        var maxWidth = 150;
+        var renderWidth = 0;
+
+        var entries = this.getHoverTooltip();
+
+        if (entries.isEmpty())
+            return;
+
+        for (var entry : entries) {
+            int entryWidth = (minecraft.font.width(entry) / 2);
+
+            if (entryWidth > renderWidth)
+                renderWidth = Math.min(entryWidth + 2, maxWidth);
+
+            tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
+        }
+
+        poseStack.pushPose();
+
+        poseStack.translate(0F, 0F, 100);
+
+        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, mouseX - 9 - (renderWidth / 2), mouseY);
+
+        poseStack.scale(0.5F, 0.5F, 0.5F);
+
+        var yOff = 0;
+
+        for (FormattedCharSequence entry : tooltip) {
+            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
+
+            yOff += 5;
+        }
+
+        poseStack.popPose();
+    }
+
+    public List<MutableComponent> getHoverTooltip() {
+        return new ArrayList<>();
     }
 
     @Override

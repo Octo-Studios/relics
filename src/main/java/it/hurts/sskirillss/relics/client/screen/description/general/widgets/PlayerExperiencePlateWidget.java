@@ -1,24 +1,19 @@
 package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 
-import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractPlateWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
-import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PlayerExperiencePlateWidget extends AbstractPlateWidget {
@@ -28,12 +23,10 @@ public class PlayerExperiencePlateWidget extends AbstractPlateWidget {
 
     @Override
     public void renderContent(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        LocalPlayer player = minecraft.player;
+        var barWidth = 52;
+        var barHeight = 2;
 
-        int barWidth = 52;
-        int barHeight = 2;
-
-        PoseStack poseStack = guiGraphics.pose();
+        var poseStack = guiGraphics.pose();
 
         poseStack.pushPose();
 
@@ -53,63 +46,21 @@ public class PlayerExperiencePlateWidget extends AbstractPlateWidget {
     }
 
     @Override
-    public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        ItemStack stack = getScreen().getStack();
+    public List<MutableComponent> getHoverTooltip() {
+        var experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
-        if (!(stack.getItem() instanceof IRelicItem relic))
-            return;
+        var entries = new ArrayList<MutableComponent>();
 
-        PoseStack poseStack = guiGraphics.pose();
+        entries.add(Component.literal("").append(Component.translatable("relics.description.researching.general.player_experience.title_1").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" ").append(Component.translatable("relics.description.researching.general.player_experience.title_2", experience, EntityUtils.getLevelFromTotalExperience(experience))));
 
-        List<FormattedCharSequence> tooltip = Lists.newArrayList();
-
-        int maxWidth = 150;
-        int renderWidth = 0;
-
-        long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
-
-        List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("relics.description.researching.general.player_experience.title").withStyle(ChatFormatting.BOLD)
-                        .withStyle(ChatFormatting.UNDERLINE)).append(" " + experience + " (" +  EntityUtils.getLevelFromTotalExperience(experience) + ")"),
-                Component.literal(" ")
-        );
+        entries.add(Component.literal(" "));
 
         if (Screen.hasShiftDown())
             entries.add(Component.translatable("relics.description.researching.general.player_experience.extra_info").withStyle(ChatFormatting.ITALIC));
         else
             entries.add(Component.translatable("relics.description.researching.general.extra_info"));
 
-        for (MutableComponent entry : entries) {
-            int entryWidth = (minecraft.font.width(entry) / 2);
-
-            if (entryWidth > renderWidth)
-                renderWidth = Math.min(entryWidth + 2, maxWidth);
-
-            tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
-        }
-
-        poseStack.pushPose();
-
-        poseStack.translate(0F, 0F, 100);
-
-        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, mouseX - 9 - (renderWidth / 2), mouseY);
-
-        poseStack.scale(0.5F, 0.5F, 0.5F);
-
-        int yOff = 0;
-
-        for (FormattedCharSequence entry : tooltip) {
-            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
-
-            yOff += 5;
-        }
-
-        poseStack.popPose();
-    }
-
-    @Override
-    public void onTick() {
-
+        return entries;
     }
 
     @Override
