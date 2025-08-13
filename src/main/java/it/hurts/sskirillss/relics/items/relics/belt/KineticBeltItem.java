@@ -25,12 +25,9 @@ import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -145,18 +142,6 @@ public class KineticBeltItem extends RelicItem {
         return stack.getOrDefault(RelicsDataComponents.KINETIC_BELT_LANDED, false);
     }
 
-    public double getFallDamageModifier(ItemStack stack) {
-        return stack.getOrDefault(RelicsDataComponents.KINETIC_BELT_FALL_DAMAGE_MODIFIER, 1D);
-    }
-
-    public void setFallDamageModifier(ItemStack stack, double fallDamageModifier) {
-        stack.set(RelicsDataComponents.KINETIC_BELT_FALL_DAMAGE_MODIFIER, fallDamageModifier);
-    }
-
-    public void addFallDamageModifier(ItemStack stack, double fallDamageModifier) {
-        this.setFallDamageModifier(stack, this.getFallDamageModifier(stack) + fallDamageModifier);
-    }
-
     @Override
     public RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
         return RelicSlotModifier.builder()
@@ -200,36 +185,20 @@ public class KineticBeltItem extends RelicItem {
                 this.setLanded(stack, true);
         }
 
-        var velocity = entity.getDeltaMovement();
-        var previousMultiplier = (float) this.getFallDamageModifier(stack);
+        var motion = entity.getDeltaMovement();
+        var verticalMotion = (float) -motion.y;
 
-        if (entity.onGround() || velocity.y >= 0D || entity.fallDistance <= 0F)
-            this.setFallDamageModifier(stack, 0F);
-        else {
-            var minFallSpeed = 0.25F;
-            var maxFallSpeed = 7.5F;
-            var increaseRate = 0.06F;
-            var decreaseRate = 0.06F;
-            var smoothing = 0.35F;
+        var minVy = 0.25F;
+        var maxVy = 7.5F;
+        var baseSlowFactor = Math.clamp((maxVy - verticalMotion) / (maxVy - minVy), 0F, 1F);
 
-            var verticalSpeed = (float) -velocity.y;
-            var normalizedSpeed = Math.clamp((verticalSpeed - minFallSpeed) / (maxFallSpeed - minFallSpeed), 0F, 1F);
+        var slowFactor = (float) Math.sqrt(baseSlowFactor);
 
-            var slowFallFactor = (float) Math.sqrt(1F - normalizedSpeed);
-            var fastFallFactor = (float) Math.sqrt(normalizedSpeed);
+        var maxReductionPerTick = 1F;
 
-            var previousReductionProgress = Math.clamp(1F - previousMultiplier, 0F, 1F);
+        var reduction = maxReductionPerTick * slowFactor;
 
-            var targetReductionProgress = isActive
-                    ? Math.clamp(previousReductionProgress + increaseRate * slowFallFactor - decreaseRate * fastFallFactor, 0F, 1F)
-                    : Math.clamp(previousReductionProgress - decreaseRate * (0.5F + 0.5F * slowFallFactor), 0F, 1F);
-
-            var reductionProgress = previousReductionProgress + (targetReductionProgress - previousReductionProgress) * smoothing;
-
-            var newDamageMultiplier = 1F - reductionProgress;
-
-            this.setFallDamageModifier(stack, Math.clamp(newDamageMultiplier, 0F, 1F));
-        }
+        entity.fallDistance = Math.max(entity.fallDistance - reduction, 0.1F);
 
         if (isActive) {
             if (entity.tickCount % 20 == 0) {
@@ -283,23 +252,7 @@ public class KineticBeltItem extends RelicItem {
     @EventBusSubscriber
     public static class CommonEvents {
         @SubscribeEvent
-        public static void onLivingFall1(LivingFallEvent event) {
-            var entity = event.getEntity();
-
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
-                var relic = (KineticBeltItem) stack.getItem();
-
-                if (!relic.canPlayerUseAbility(entity, stack, "gliding") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled"))
-                    continue;
-
-                event.setDamageMultiplier((float) (event.getDamageMultiplier() * relic.getFallDamageModifier(stack)));
-
-                break;
-            }
-        }
-
-        @SubscribeEvent
-        public static void onLivingFall2(LivingFallEvent event) {
+        public static void onLivingFall(LivingFallEvent event) {
             var entity = event.getEntity();
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {

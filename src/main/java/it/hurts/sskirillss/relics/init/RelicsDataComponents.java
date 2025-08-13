@@ -131,7 +131,6 @@ public class RelicsDataComponents {
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_ACTIVE = RelicsDataComponents.construct("kinetic_belt/active", Codec.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> KINETIC_BELT_LANDED = RelicsDataComponents.construct("kinetic_belt/landed", Codec.BOOL);
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> KINETIC_BELT_FALL_DAMAGE_MODIFIER = RelicsDataComponents.construct("kinetic_belt/fall_damage_modifier", Codec.DOUBLE);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_AFFECTED_ENTITIES = RelicsDataComponents.construct("jellyfish_necklace/affected_entities", Codec.list(Codec.STRING));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<String>>> JELLYFISH_NECKLACE_DAMAGED_ENTITIES = RelicsDataComponents.construct("jellyfish_necklace/damaged_entities", Codec.list(Codec.STRING));
