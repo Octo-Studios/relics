@@ -262,11 +262,15 @@ public class ConstellationStarEntity extends ThrowableProjectile {
 
                 var crossed = false;
 
-                for (var ent : level.getEntitiesOfClass(LivingEntity.class, segmentBox, ent -> ent != this.getOwner())) {
-                    if (ent.getBoundingBox().clip(a, b).isPresent()) {
+                for (var entity : level.getEntitiesOfClass(LivingEntity.class, segmentBox, entity -> entity != this.getOwner())) {
+                    if (entity.getBoundingBox().clip(a, b).isPresent()) {
                         crossed = true;
 
-                        ent.addEffect(new MobEffectInstance(RelicsMobEffects.TREMOR, (int) (this.getTremor() * 20), 0));
+                        entity.addEffect(new MobEffectInstance(RelicsMobEffects.TREMOR, (int) (this.getTremor() * 20), 0));
+
+                        if (entity.tickCount % 20 == 0 && stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner
+                                && relic.canAddRelicExperience(entity, stack, "constellation", "star_creation"))
+                            relic.addRelicExperience(owner, stack, "constellation", "star_tremor", 1);
                     }
                 }
 
@@ -379,8 +383,12 @@ public class ConstellationStarEntity extends ThrowableProjectile {
             if (target.hurt(this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), damage)) {
                 target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (this.getStun() * 20), 0));
 
-                if (stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner)
+                if (stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner) {
                     relic.addAbilityMetricValue(owner, stack, "constellation", "star_damage", damage);
+
+                    if (relic.canAddRelicExperience(owner, stack, "invisibility", "star_damage"))
+                        relic.addRelicExperience(owner, stack, "invisibility", "star_damage", damage);
+                }
             }
         }
 

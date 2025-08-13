@@ -6,6 +6,8 @@ import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.ConstellationStarEntity;
 import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.FallingStarEntity;
@@ -80,6 +82,12 @@ public class MidnightMantleItem extends RelicItem {
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("health_regeneration")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("damage_dealing")
+                                                .build())
+                                        .build())
                                 .statistic(StatisticTemplate.builder()
                                         .metric(MetricTemplate.builder("duration_new_moon")
                                                 .formatValue((value) -> MathUtils.formatTime(value.intValue()))
@@ -117,6 +125,13 @@ public class MidnightMantleItem extends RelicItem {
                                         .initialValue(0.25D, 0.5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("being_invisible")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("additional_damage")
+                                                .rankModifierCondition("strike")
+                                                .build())
                                         .build())
                                 .statistic(StatisticTemplate.builder()
                                         .metric(MetricTemplate.builder("duration")
@@ -174,6 +189,14 @@ public class MidnightMantleItem extends RelicItem {
                                         .star(0, 17, 4).star(1, 5, 9).star(2, 20, 15).star(3, 6, 20)
                                         .link(0, 1).link(1, 2).link(2, 3)
                                         .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("star_creation")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("star_tremor")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("star_damage")
+                                                .build())
+                                        .build())
                                 .statistic(StatisticTemplate.builder()
                                         .metric(MetricTemplate.builder("total_stars")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
@@ -214,6 +237,15 @@ public class MidnightMantleItem extends RelicItem {
                                 .research(ResearchTemplate.builder()
                                         .star(0, 11, 4).star(1, 3, 11).star(2, 11, 11).star(3, 19, 11).star(4, 11, 18).star(5, 17, 21).star(6, 12, 23).star(7, 8, 26)
                                         .link(2, 0).link(2, 1).link(2, 3).link(2, 4).link(0, 3).link(3, 4).link(4, 1).link(1, 0).link(4, 6).link(6, 5).link(6, 7)
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("star_creation")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("shockwave_hit")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("star_bounce")
+                                                .rankModifierCondition("bounce")
+                                                .build())
                                         .build())
                                 .statistic(StatisticTemplate.builder()
                                         .metric(MetricTemplate.builder("total_stars")
@@ -353,8 +385,12 @@ public class MidnightMantleItem extends RelicItem {
             } else if (this.canHideInTheDarkness(entity, stack)) {
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
 
-                if (entity.tickCount % 20 == 0)
+                if (entity.tickCount % 20 == 0) {
                     this.addAbilityMetricValue(entity, stack, "invisibility", "duration", 1);
+
+                    if (this.canAddRelicExperience(entity, stack, "invisibility", "being_invisible"))
+                        this.addRelicExperience(entity, stack, "invisibility", "being_invisible", 1);
+                }
             }
         }
     }
@@ -409,8 +445,12 @@ public class MidnightMantleItem extends RelicItem {
 
                 event.setAmount((float) (event.getAmount() + heal));
 
-                if (!entity.level().isClientSide())
+                if (!entity.level().isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "phase", "health_regeneration", heal);
+
+                    if (relic.canAddRelicExperience(entity, stack, "phase", "health_regeneration"))
+                        relic.addRelicExperience(entity, stack, "phase", "health_regeneration", heal);
+                }
             }
         }
 
@@ -429,8 +469,12 @@ public class MidnightMantleItem extends RelicItem {
 
                 event.setAmount((float) (event.getAmount() + damage));
 
-                if (!entity.level().isClientSide())
+                if (!entity.level().isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "phase", "additional_damage", damage);
+
+                    if (relic.canAddRelicExperience(entity, stack, "phase", "additional_damage"))
+                        relic.addRelicExperience(entity, stack, "phase", "additional_damage", damage);
+                }
             }
         }
 
@@ -450,8 +494,12 @@ public class MidnightMantleItem extends RelicItem {
 
                 event.setAmount((float) (event.getAmount() + damage));
 
-                if (!entity.level().isClientSide())
+                if (!entity.level().isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "invisibility", "additional_damage", damage);
+
+                    if (relic.canAddRelicExperience(entity, stack, "invisibility", "additional_damage"))
+                        relic.addRelicExperience(entity, stack, "invisibility", "additional_damage", damage);
+                }
 
                 relic.setInvisibilityCooldown(stack, (int) relic.getStatValue(entity, stack, "invisibility", "cooldown"));
             }
@@ -543,8 +591,12 @@ public class MidnightMantleItem extends RelicItem {
 
                 level.addFreshEntity(star);
 
-                if (!level.isClientSide())
+                if (!level.isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "constellation", "total_stars", 1);
+
+                    if (relic.canAddRelicExperience(entity, stack, "constellation", "star_creation"))
+                        relic.addRelicExperience(entity, stack, "constellation", "star_creation", 1);
+                }
             }
         }
 
@@ -591,8 +643,12 @@ public class MidnightMantleItem extends RelicItem {
 
                 level.addFreshEntity(star);
 
-                if (!level.isClientSide())
+                if (!level.isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "starfall", "total_stars", 1);
+
+                    if (relic.canAddRelicExperience(entity, stack, "starfall", "star_creation"))
+                        relic.addRelicExperience(entity, stack, "starfall", "star_creation", 1);
+                }
             }
         }
     }
