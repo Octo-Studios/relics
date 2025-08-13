@@ -13,6 +13,7 @@ import it.hurts.octostudios.octolib.util.OctoColor;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
@@ -50,7 +51,9 @@ import net.minecraft.world.phys.Vec2;
 import org.joml.Vector2f;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     private final AbilityDescriptionScreen screen;
@@ -104,6 +107,13 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 if (isAbilityResearched) {
                     if (!screen.getSelectedAbility().equals(ability)) {
                         screen.setSelectedAbility(ability);
+
+                        var subcategories = DescriptionSubcategories.getSubcategories().values().stream()
+                                .filter(subcategory -> subcategory.shouldAppear(this.screen, player, stack))
+                                .toList();
+
+                        if (!subcategories.contains(screen.getSubcategory()))
+                            screen.setSubcategory(DescriptionSubcategories.getSubcategory("ability_description"));
 
                         screen.rebuildWidgets();
 
