@@ -176,7 +176,7 @@
   "relics.description.springy_boot.ability.bounce.rank_modifier.shockwave": "При приседе во время приземления создается ударная волна с радиусом в %3$s блоков, наносящая %4$s единиц урона и оглушающая на %5$s секунд за единицу вертикальной скорости носителя реликвии в момент приземления.",
   "relics.description.springy_boot.ability.bounce.experience_source.bounce": "+1 единица опыта за каждый совершённый отскок.",
   "relics.description.springy_boot.ability.bounce.experience_source.strike": "+1 единица опыта за каждую дополнительную единицу урона, нанесённую во время прыжков или отскоков.",
-  "relics.description.springy_boot.ability.bounce.experience_source.create_shockwave": "+1 единица опыта за за единицу радиуса каждой созданной ударной волны.",
+  "relics.description.springy_boot.ability.bounce.experience_source.create_shockwave": "+1 единица опыта за единицу радиуса каждой созданной ударной волны.",
   "relics.description.springy_boot.ability.bounce.experience_source.shockwave_hit": "+1 единица опыта за каждую цель, поражённую ударной волной.",
   "relics.description.springy_boot.ability.bounce.statistic.bounce_duration": "Проведено времени в прыжках и отскоках",
   "relics.description.springy_boot.ability.bounce.statistic.primary_bounces": "Совершено прыжков",
