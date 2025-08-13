@@ -30,7 +30,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -153,18 +152,14 @@ public class RollerSkateItem extends RelicItem {
         if (entity.isSprinting() && entity.onGround() && !entity.isInLiquid() && !entity.isFallFlying()) {
             if (duration < this.getMaxDuration())
                 this.addDuration(stack, 1);
-            else {
-                var pos = entity.position();
-                var oldPos = new Vec3(entity.xOld, entity.yOld, entity.zOld);
 
-                var distance = pos.distanceTo(oldPos);
+            var movement = entity.getKnownMovement().multiply(1, 0, 1).length();
 
-                if (distance > 0.1F) {
-                    if (this.canAddRelicExperience(entity, stack, "skating", "skating"))
-                        this.addRelicExperience(entity, stack, "skating", "skating", 1D / 20D);
+            if (movement > 0F) {
+                if (this.canAddRelicExperience(entity, stack, "skating", "skating"))
+                    this.addRelicExperience(entity, stack, "skating", "skating", 1D / 20D);
 
-                    this.addAbilityMetricValue(entity, stack, "skating", "distance_traveled", distance);
-                }
+                this.addAbilityMetricValue(entity, stack, "skating", "distance_traveled", movement);
             }
         } else if (duration > 0)
             this.addDuration(stack, -1);
