@@ -90,16 +90,16 @@ public class BlockMixin {
                             relic.addBounceCooldown(stack, 5);
                             relic.addLeaps(stack, 1);
 
-                            if (!level.isClientSide()) {
-                                if (relic.canAddRelicExperience(livingEntity, stack, "bounce", "bounce"))
-                                    relic.addRelicExperience(livingEntity, stack, "bounce", "bounce", 1);
-
-                                relic.addAbilityMetricValue(livingEntity, stack, "bounce", "secondary_bounces", 1);
-                            }
-
                             speed = Math.abs(speed);
 
                             if (!livingEntity.isShiftKeyDown()) {
+                                if (!level.isClientSide()) {
+                                    if (relic.canAddRelicExperience(livingEntity, stack, "bounce", "bounce"))
+                                        relic.addRelicExperience(livingEntity, stack, "bounce", "bounce", 1);
+
+                                    relic.addAbilityMetricValue(livingEntity, stack, "bounce", "secondary_bounces", 1);
+                                }
+
                                 level.playSound(null, livingEntity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.clamp(0.5F + speed * 0.5F, 0.5F, 2F), (float) Math.max(0.1F, 2F - speed * 0.75F));
 
                                 NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(livingEntity.getId(), motion.multiply(1F, -1F, 1F).toVector3f()), livingEntity);
