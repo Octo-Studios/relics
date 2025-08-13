@@ -278,7 +278,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                 EntityUtils.resetAttribute(entity, stack, Attributes.MAX_HEALTH, multiplier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
                 EntityUtils.removeAttribute(entity, stack, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE);
 
-                entity.heal(Math.min(entity.getAbsorptionAmount(), boostedMaxHealth));
+                entity.setHealth(entity.getHealth() + Math.min(entity.getAbsorptionAmount(), boostedMaxHealth));
             } else {
                 EntityUtils.removeAttribute(entity, stack, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
@@ -424,7 +424,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                     if (!relic.canPlayerUseAbility(entity, stack, "regeneration"))
                         continue;
 
-                    var health = event.getAmount() * relic.getStatValue(entity, stack, "regeneration", "regeneration");
+                    var health = Math.min(entity.getMaxHealth(), event.getAmount() * relic.getStatValue(entity, stack, "regeneration", "regeneration"));
 
                     event.setAmount((float) (event.getAmount() + health));
 
