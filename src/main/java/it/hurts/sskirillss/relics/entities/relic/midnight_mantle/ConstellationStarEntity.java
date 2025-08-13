@@ -1,9 +1,12 @@
 package it.hurts.sskirillss.relics.entities.relic.midnight_mantle;
 
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
+import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -14,6 +17,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
@@ -34,6 +38,10 @@ public class ConstellationStarEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<String> CONSTELLATION = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.STRING);
     private static final EntityDataAccessor<Boolean> STUCK = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(ConstellationStarEntity.class, EntityDataSerializers.BOOLEAN);
+
+    @Getter
+    @Setter
+    private ItemStack stack = ItemStack.EMPTY;
 
     public void setLifetime(int lifetime) {
         this.getEntityData().set(LIFETIME, lifetime);
@@ -366,8 +374,14 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         for (var target : level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(this.getExplosionRadius()), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID()))) {
             target.invulnerableTime = 0;
 
-            if (target.hurt(this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), 1 + this.getDamage()))
+            var damage = 1 + this.getDamage();
+
+            if (target.hurt(this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), damage)) {
                 target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (this.getStun() * 20), 0));
+
+                if (stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner)
+                    relic.addAbilityMetricValue(owner, stack, "constellation", "star_damage", damage);
+            }
         }
 
         var ringParticleCount = 100 + random.nextInt(50);

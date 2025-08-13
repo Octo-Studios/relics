@@ -4,12 +4,15 @@ import it.hurts.sskirillss.relics.entities.MidnightMantleShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.entities.ShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
+import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.WorldUtils;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -18,7 +21,9 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -34,6 +39,10 @@ public class FallingStarEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.FLOAT);
     private static final EntityDataAccessor<Integer> STUN = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.BOOLEAN);
+
+    @Getter
+    @Setter
+    private ItemStack stack = ItemStack.EMPTY;
 
     public void setBounceChance(float bounceChance) {
         this.getEntityData().set(BOUNCE_CHANCE, bounceChance);
@@ -246,6 +255,7 @@ public class FallingStarEntity extends ThrowableProjectile {
                     shockwave.setDeltaMovement(0, height, 0);
                     shockwave.setDamage(this.getDamage());
                     shockwave.setOwner(this.getOwner());
+                    shockwave.setStack(this.getStack());
                     shockwave.setStun(this.getStun());
                     shockwave.setCenter(surfacePos);
                     shockwave.setKnockback(0.75F);
@@ -289,6 +299,11 @@ public class FallingStarEntity extends ThrowableProjectile {
 
                 this.bounced = true;
                 this.bounces++;
+
+                var stack = this.getStack();
+
+                if (stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner)
+                    relic.addAbilityMetricValue(owner, stack, "starfall", "star_bounces", 1);
             } else
                 this.discard();
         } else

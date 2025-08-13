@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
+import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -28,14 +29,14 @@ public class MidnightMantleShockwaveBlockEntity extends ShockwaveBlockEntity {
                     if (stun > 0)
                         livingEntity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, stun, 0, false, false));
 
-//                    if (this.getStack().getItem() instanceof MidnightMantleItem relic) {
-//                        relic.addAbilityMetricValue(livingEntity, this.getStack(), "bounce", "shockwave_targets", 1);
-//
-//                        relic.addAbilityMetricValue(livingEntity, this.getStack(), "bounce", "shockwave_damage", damage);
-//
-//                        if (stun > 0)
-//                            relic.addAbilityMetricValue(livingEntity, this.getStack(), "bounce", "shockwave_stun", stun);
-//                    }
+                    if (this.getStack().getItem() instanceof MidnightMantleItem relic) {
+                        relic.addAbilityMetricValue(livingEntity, this.getStack(), "starfall", "shockwave_targets", 1);
+
+                        relic.addAbilityMetricValue(livingEntity, this.getStack(), "starfall", "shockwave_damage", damage);
+
+                        if (stun > 0)
+                            relic.addAbilityMetricValue(livingEntity, this.getStack(), "starfall", "shockwave_stun", stun);
+                    }
                 }
             }
         }

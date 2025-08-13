@@ -124,6 +124,7 @@ public class MidnightMantleItem extends RelicItem {
                                                 .build())
                                         .metric(MetricTemplate.builder("additional_damage")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .abilityRankModifierVisibilityCondition("strike")
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -173,6 +174,14 @@ public class MidnightMantleItem extends RelicItem {
                                         .star(0, 17, 4).star(1, 5, 9).star(2, 20, 15).star(3, 6, 20)
                                         .link(0, 1).link(1, 2).link(2, 3)
                                         .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("total_stars")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("star_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .build())
                                 .build())
                         .ability(AbilityTemplate.builder("starfall")
                                 .rankModifier(7, "bounce")
@@ -205,6 +214,24 @@ public class MidnightMantleItem extends RelicItem {
                                 .research(ResearchTemplate.builder()
                                         .star(0, 11, 4).star(1, 3, 11).star(2, 11, 11).star(3, 19, 11).star(4, 11, 18).star(5, 17, 21).star(6, 12, 23).star(7, 8, 26)
                                         .link(2, 0).link(2, 1).link(2, 3).link(2, 4).link(0, 3).link(3, 4).link(4, 1).link(1, 0).link(4, 6).link(6, 5).link(6, 7)
+                                        .build())
+                                .statistic(StatisticTemplate.builder()
+                                        .metric(MetricTemplate.builder("total_stars")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("shockwave_targets")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("shockwave_damage")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(MetricTemplate.builder("shockwave_stun")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(MetricTemplate.builder("star_bounces")
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .abilityRankModifierVisibilityCondition("bounce")
+                                                .build())
                                         .build())
                                 .build())
                         .build())
@@ -301,6 +328,9 @@ public class MidnightMantleItem extends RelicItem {
             var mode = this.getAbilityMode(entity, stack, "phase");
 
             if (!mode.isEmpty()) {
+                if (entity.tickCount % 20 == 0)
+                    this.addAbilityMetricValue(entity, stack, "phase", "duration_" + mode, 1);
+
                 var totalEffectiveness = this.getModeEffectiveness(entity, stack);
 
                 var attackEffectiveness = mode.equals("full_moon") ? totalEffectiveness : 0D;
@@ -320,8 +350,12 @@ public class MidnightMantleItem extends RelicItem {
             if (cooldown > 0) {
                 if (level.getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(16)).stream().noneMatch(mob -> mob.getTarget() == entity && mob.hasLineOfSight(entity)))
                     this.addInvisibilityCooldown(stack, -1);
-            } else if (this.canHideInTheDarkness(entity, stack))
+            } else if (this.canHideInTheDarkness(entity, stack)) {
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
+
+                if (entity.tickCount % 20 == 0)
+                    this.addAbilityMetricValue(entity, stack, "invisibility", "duration", 1);
+            }
         }
     }
 
@@ -374,6 +408,9 @@ public class MidnightMantleItem extends RelicItem {
                 var heal = event.getAmount() * (1D + relic.getStatValue(entity, stack, "phase", "health_regeneration") * relic.getModeEffectiveness(entity, stack));
 
                 event.setAmount((float) (event.getAmount() + heal));
+
+                if (!entity.level().isClientSide())
+                    relic.addAbilityMetricValue(entity, stack, "phase", "health_regeneration", heal);
             }
         }
 
@@ -388,7 +425,12 @@ public class MidnightMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "phase") || !relic.getAbilityMode(entity, stack, "phase").equals("full_moon"))
                     continue;
 
-                event.setAmount((float) (event.getAmount() * (1F + (relic.getStatValue(entity, stack, "phase", "attack_damage") * relic.getModeEffectiveness(entity, stack)))));
+                var damage = event.getAmount() * relic.getStatValue(entity, stack, "phase", "attack_damage") * relic.getModeEffectiveness(entity, stack);
+
+                event.setAmount((float) (event.getAmount() + damage));
+
+                if (!entity.level().isClientSide())
+                    relic.addAbilityMetricValue(entity, stack, "phase", "additional_damage", damage);
             }
         }
 
@@ -404,7 +446,12 @@ public class MidnightMantleItem extends RelicItem {
                         || relic.getInvisibilityCooldown(stack) > 0 || !relic.canHideInTheDarkness(entity, stack))
                     continue;
 
-                event.setAmount((float) (event.getAmount() * (1F + relic.getStatValue(entity, stack, "invisibility", "damage"))));
+                var damage = event.getAmount() * relic.getStatValue(entity, stack, "invisibility", "damage");
+
+                event.setAmount((float) (event.getAmount() + damage));
+
+                if (!entity.level().isClientSide())
+                    relic.addAbilityMetricValue(entity, stack, "invisibility", "additional_damage", damage);
 
                 relic.setInvisibilityCooldown(stack, (int) relic.getStatValue(entity, stack, "invisibility", "cooldown"));
             }
@@ -489,11 +536,15 @@ public class MidnightMantleItem extends RelicItem {
                 star.setFlawless(relic.isRelicFlawless(entity, stack));
                 star.setPos(entity.getEyePosition());
                 star.setOwner(entity);
+                star.setStack(stack);
 
                 if (relic.isAbilityRankModifierUnlocked(entity, stack, "constellation", "stun"))
                     star.setStun((int) relic.getStatValue(entity, stack, "constellation", "stun_duration"));
 
                 level.addFreshEntity(star);
+
+                if (!level.isClientSide())
+                    relic.addAbilityMetricValue(entity, stack, "constellation", "total_stars", 1);
             }
         }
 
@@ -532,12 +583,16 @@ public class MidnightMantleItem extends RelicItem {
                 star.setFlawless(relic.isRelicFlawless(entity, stack));
                 star.setDeltaMovement(motion);
                 star.setOwner(entity);
+                star.setStack(stack);
                 star.setPos(pos);
 
                 if (relic.isAbilityRankModifierUnlocked(entity, stack, "starfall", "bounce"))
                     star.setBounceChance((float) relic.getStatValue(entity, stack, "starfall", "bounce_chance"));
 
                 level.addFreshEntity(star);
+
+                if (!level.isClientSide())
+                    relic.addAbilityMetricValue(entity, stack, "starfall", "total_stars", 1);
             }
         }
     }
