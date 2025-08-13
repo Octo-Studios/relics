@@ -38,7 +38,7 @@
   "relics.description.researching.general.player_experience.extra_info": "Опыт игрока из \"ванильного\" Minecraft. Получается при убийстве мобов, добыче руды, плавке предметов и т.п.",
 
   "relics.description.researching.general.relic_progress.title": "Прогресс развития реликвии:",
-  "relics.description.researching.general.relic_progress.extra_info": "Демонстрирует насколько реликвия близка в своим предельным возможностям. Определяется качеством и уровнем реликвии и способностей.",
+  "relics.description.researching.general.relic_progress.extra_info": "Демонстрирует насколько реликвия близка к своим предельным возможностям. Определяется качеством и уровнем реликвии и способностей.",
 
   "relics.description.researching.general.relic_rank.title": "Ранг реликвии:",
   "relics.description.researching.general.relic_rank.extra_info": "Получается при ручном повышении ранга реликвии, сбрасывая при этом весь прогресс её улучшения, но взамен повышая её максимальный уровень.",
