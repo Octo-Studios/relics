@@ -60,7 +60,7 @@ public class RelicBadgeWidget extends AbstractBadgeWidget {
             if (Screen.hasShiftDown())
                 entries.addAll(hint.stream().map(entry -> entry.withStyle(ChatFormatting.ITALIC)).toList());
             else
-                entries.add(Component.translatable("tooltip.relics.researching.general.extra_info"));
+                entries.add(Component.translatable("relics.description.researching.general.extra_info"));
         }
 
         for (MutableComponent entry : entries) {

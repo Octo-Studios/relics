@@ -35,7 +35,7 @@ public class RelicTemplate {
         private StatisticTemplate statistic = StatisticTemplate.builder()
                 .metric(MetricTemplate.builder("retention_time")
                         .formatValue((value) -> MathUtils.formatTime(value.intValue()))
-                        .component((entity, stack, optional) -> Component.translatable("tooltip.relics.statistic.relic.retention_time"))
+                        .component((entity, stack, optional) -> Component.translatable("relics.description.statistic.relic.retention_time"))
                         .build())
                 .build();
         private LevelingTemplate leveling = LevelingTemplate.builder().build();

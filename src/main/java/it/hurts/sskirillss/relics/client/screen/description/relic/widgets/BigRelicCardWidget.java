@@ -248,15 +248,15 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevel(minecraft.player, stack) + "/" + relic.calculateRelicMaxLevel(minecraft.player, stack)),
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.calculateRelicQuality(minecraft.player, stack) / 2F, 1) + "/" + relic.getRelicMaxQuality(minecraft.player, stack) / 2),
+                Component.literal("").append(Component.translatable("relics.description.researching.relic.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevel(minecraft.player, stack) + "/" + relic.calculateRelicMaxLevel(minecraft.player, stack)),
+                Component.literal("").append(Component.translatable("relics.description.researching.relic.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.calculateRelicQuality(minecraft.player, stack) / 2F, 1) + "/" + relic.getRelicMaxQuality(minecraft.player, stack) / 2),
                 Component.literal(" ")
         );
 
         if (Screen.hasShiftDown())
-            entries.add(Component.translatable("tooltip.relics.researching.relic.info.extra_info").withStyle(ChatFormatting.ITALIC));
+            entries.add(Component.translatable("relics.description.researching.relic.info.extra_info").withStyle(ChatFormatting.ITALIC));
         else
-            entries.add(Component.translatable("tooltip.relics.researching.general.extra_info"));
+            entries.add(Component.translatable("relics.description.researching.general.extra_info"));
 
         for (MutableComponent entry : entries) {
             int entryWidth = (minecraft.font.width(entry) / 2);

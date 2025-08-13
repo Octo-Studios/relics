@@ -137,24 +137,24 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
         int requiredExperience = relic.getResearchHintPlayerExperienceCost(minecraft.player, screen.stack, screen.ability) * (Screen.hasShiftDown() ? relic.getResearchTemplate(minecraft.player, screen.stack, screen.ability).getLinks().size() : 1);
         long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
-        MutableComponent negativeStatus = Component.translatable("tooltip.relics.relic.status.negative");
-        MutableComponent positiveStatus = Component.translatable("tooltip.relics.relic.status.positive");
+        MutableComponent negativeStatus = Component.translatable("relics.description.relic.status.negative");
+        MutableComponent positiveStatus = Component.translatable("relics.description.relic.status.positive");
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.translatable("tooltip.relics.researching.research.hint.description").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
+                Component.translatable("relics.description.researching.research.hint.description").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE),
                 Component.literal(" ")
         );
 
         boolean hasExperience = requiredExperience <= experience;
 
         if (relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability))
-            entries.add(Component.translatable("tooltip.relics.researching.research.hint.locked"));
+            entries.add(Component.translatable("relics.description.researching.research.hint.locked"));
         else {
-            entries.add(Component.translatable("tooltip.relics.researching.research.hint.cost", requiredExperience,
+            entries.add(Component.translatable("relics.description.researching.research.hint.cost", requiredExperience,
                     hasExperience ? EntityUtils.calculateExperienceLevelLoss(minecraft.player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience),
                     hasExperience ? positiveStatus : negativeStatus));
             entries.add(Component.literal(" "));
-            entries.add(Component.literal("▶ ").append(Component.translatable("tooltip.relics.researching.research.hint.quick")));
+            entries.add(Component.literal("▶ ").append(Component.translatable("relics.description.researching.research.hint.quick")));
         }
 
         for (MutableComponent entry : entries) {

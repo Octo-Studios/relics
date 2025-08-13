@@ -71,14 +71,14 @@ public class ProgressPlateWidget extends AbstractPlateWidget {
 //        int renderWidth = 0;
 //
 //        List<MutableComponent> entries = Lists.newArrayList(
-//                Component.literal("").append(Component.translatable("tooltip.relics.researching.general.leveling_point.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevelingPoints(minecraft.player, stack)),
+//                Component.literal("").append(Component.translatable("relics.description.researching.general.leveling_point.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevelingPoints(minecraft.player, stack)),
 //                Component.literal(" ")
 //        );
 //
 //        if (Screen.hasShiftDown())
-//            entries.add(Component.translatable("tooltip.relics.researching.general.leveling_point.extra_info").withStyle(ChatFormatting.ITALIC));
+//            entries.add(Component.translatable("relics.description.researching.general.leveling_point.extra_info").withStyle(ChatFormatting.ITALIC));
 //        else
-//            entries.add(Component.translatable("tooltip.relics.researching.general.extra_info"));
+//            entries.add(Component.translatable("relics.description.researching.general.extra_info"));
 //
 //        for (MutableComponent entry : entries) {
 //            int entryWidth = (minecraft.font.width(entry) / 2);

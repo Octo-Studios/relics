@@ -130,7 +130,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         }).toList();
 
         var itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
-        var key = "tooltip.relics." + itemId + ".ability." + ability + "." + (relic.getAbilityTemplate(player, stack, ability).getModes().isEmpty() ? "description" : relic.getAbilityMode(player, stack, ability) + ".description");
+        var key = "relics.description." + itemId + ".ability." + ability + "." + (relic.getAbilityTemplate(player, stack, ability).getModes().isEmpty() ? "description" : relic.getAbilityMode(player, stack, ability) + ".description");
         var tokens = IntStream.rangeClosed(1, dynamicComponents.size()).mapToObj(i -> "%" + i + "$s").toArray(String[]::new);
         var descriptionComponent = Component.translatable(key, (Object[]) tokens);
 
@@ -140,10 +140,10 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
 
         for (var entry : template.getRankModifiers().entries()) {
             rawLines.add(new LineEntry(Component.literal(""), false));
-            rawLines.add(new LineEntry(Component.translatable("tooltip.relics.description.ability.rank_modifier.condition.rank", entry.getKey())
+            rawLines.add(new LineEntry(Component.translatable("relics.description.description.ability.rank_modifier.condition.rank", entry.getKey())
                     .withStyle(ChatFormatting.BOLD), false));
 
-            var description = Component.literal("● ").append(Component.translatable("tooltip.relics." + itemId + ".ability." + ability + ".rank_modifier." + entry.getValue(), (Object[]) tokens));
+            var description = Component.literal("● ").append(Component.translatable("relics.description." + itemId + ".ability." + ability + ".rank_modifier." + entry.getValue(), (Object[]) tokens));
 
             if (relic.getRelicRank(player, stack) < entry.getKey())
                 description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));

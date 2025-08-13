@@ -69,15 +69,15 @@ public class PlayerExperiencePlateWidget extends AbstractPlateWidget {
         long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.general.player_experience.title").withStyle(ChatFormatting.BOLD)
+                Component.literal("").append(Component.translatable("relics.description.researching.general.player_experience.title").withStyle(ChatFormatting.BOLD)
                         .withStyle(ChatFormatting.UNDERLINE)).append(" " + experience + " (" +  EntityUtils.getLevelFromTotalExperience(experience) + ")"),
                 Component.literal(" ")
         );
 
         if (Screen.hasShiftDown())
-            entries.add(Component.translatable("tooltip.relics.researching.general.player_experience.extra_info").withStyle(ChatFormatting.ITALIC));
+            entries.add(Component.translatable("relics.description.researching.general.player_experience.extra_info").withStyle(ChatFormatting.ITALIC));
         else
-            entries.add(Component.translatable("tooltip.relics.researching.general.extra_info"));
+            entries.add(Component.translatable("relics.description.researching.general.extra_info"));
 
         for (MutableComponent entry : entries) {
             int entryWidth = (minecraft.font.width(entry) / 2);

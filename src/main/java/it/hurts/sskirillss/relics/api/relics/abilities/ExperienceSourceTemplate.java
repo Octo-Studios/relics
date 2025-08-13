@@ -38,7 +38,7 @@ public class ExperienceSourceTemplate {
         private String id;
 
         private TriPredicate<LivingEntity, ItemStack, String> condition = (entity, stack, ability) -> true;
-        private QuadFunction<LivingEntity, ItemStack, String, String, MutableComponent> descriptionComponent = (entity, stack, ability, source) -> Component.translatable("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".experience_source." + source);
+        private QuadFunction<LivingEntity, ItemStack, String, String, MutableComponent> descriptionComponent = (entity, stack, ability, source) -> Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".experience_source." + source);
         private QuadFunction<LivingEntity, ItemStack, String, String, MutableComponent> conditionComponent = (entity, stack, ability, source) -> Component.empty();
 
         private ExperienceSourceTemplateBuilder(String id) {
@@ -72,7 +72,7 @@ public class ExperienceSourceTemplate {
                     .filter(entry -> entry.getValue().equals(rankModifier))
                     .map(Map.Entry::getKey)
                     .findFirst()
-                    .map(integer -> Component.translatable("tooltip.relics.description.ability.experience_source.condition.rank", integer)).orElseGet(Component::empty);
+                    .map(integer -> Component.translatable("relics.description.description.ability.experience_source.condition.rank", integer)).orElseGet(Component::empty);
 
             return this;
         }

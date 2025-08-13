@@ -633,7 +633,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         List<FormattedCharSequence> tooltip = Lists.newArrayList();
 
-        var title = Component.translatableWithFallback("tooltip.relics." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability);
+        var title = Component.translatableWithFallback("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability);
 
         int maxWidth = 110;
         int renderWidth = Math.min((minecraft.font.width(title.withStyle(ChatFormatting.BOLD)) / 2) + 4, maxWidth);
@@ -648,21 +648,21 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (level < requiredLevel) {
             entries.add(Component.literal(" "));
 
-            entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.card.low_level", Component.literal(String.valueOf(requiredLevel)).withStyle(ChatFormatting.BOLD))));
+            entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.low_level", Component.literal(String.valueOf(requiredLevel)).withStyle(ChatFormatting.BOLD))));
         } else {
             if (!relic.isLockUnlocked(player, stack, ability)) {
                 entries.add(Component.literal(" "));
 
-                entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.card.ready_to_unlock", Component.literal(String.valueOf(relic.getMaxLockUnlocks() - relic.getLockUnlocks(player, stack, ability))).withStyle(ChatFormatting.BOLD))));
+                entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.ready_to_unlock", Component.literal(String.valueOf(relic.getMaxLockUnlocks() - relic.getLockUnlocks(player, stack, ability))).withStyle(ChatFormatting.BOLD))));
             } else {
                 if (!relic.isAbilityResearched(player, stack, ability)) {
                     entries.add(Component.literal(" "));
 
-                    entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.card.unresearched")));
+                    entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.unresearched")));
                 } else if (relic.mayPlayerUpgrade(player, stack, ability)) {
                     entries.add(Component.literal(" "));
 
-                    entries.add(Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.card.ready_to_upgrade")));
+                    entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.ready_to_upgrade")));
                 }
             }
         }

@@ -26,7 +26,7 @@ public class CastTypeBadge extends AbilityBadge {
 
     @Override
     public List<MutableComponent> getHint(LivingEntity entity, ItemStack stack, String ability) {
-        return Arrays.asList(Component.translatable("tooltip.relics.researching.badge.ability.cast_type.hint", RelicsHotkeys.ACTIVE_ABILITIES_LIST.getKey().getDisplayName()));
+        return Arrays.asList(Component.translatable("relics.description.researching.badge.ability.cast_type.hint", RelicsHotkeys.ACTIVE_ABILITIES_LIST.getKey().getDisplayName()));
     }
 
     @Override

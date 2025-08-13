@@ -68,7 +68,7 @@ public class ItemMixin {
         tooltip.add(Component.literal(" "));
 
         if (Minecraft.getInstance().screen instanceof AbstractContainerScreen<? extends AbstractContainerMenu>)
-            tooltip.add(Component.translatable("tooltip.relics.researching.info", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName()).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("relics.description.researching.info", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName()).withStyle(ChatFormatting.GRAY));
 
         tooltip.add(Component.literal(" "));
     }

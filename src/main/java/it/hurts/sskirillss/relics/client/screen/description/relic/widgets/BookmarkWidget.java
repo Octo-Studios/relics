@@ -105,7 +105,7 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.translatable("tooltip.relics.researching.bookmarks." + this.getId()).withStyle(ChatFormatting.BOLD)
+                Component.translatable("relics.description.researching.bookmarks." + this.getId()).withStyle(ChatFormatting.BOLD)
         );
 
         for (MutableComponent entry : entries) {

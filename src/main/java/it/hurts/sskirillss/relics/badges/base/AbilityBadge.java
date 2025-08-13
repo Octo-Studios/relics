@@ -17,11 +17,11 @@ public abstract non-sealed class AbilityBadge extends AbstractBadge {
     }
 
     public MutableComponent getTitle(LivingEntity entity, ItemStack stack, String ability) {
-        return Component.translatable("tooltip.relics.researching.badge.ability." + getId() + ".title");
+        return Component.translatable("relics.description.researching.badge.ability." + getId() + ".title");
     }
 
     public List<MutableComponent> getDescription(LivingEntity entity, ItemStack stack, String ability) {
-        return Arrays.asList(Component.translatable("tooltip.relics.researching.badge.ability." + getId() + ".description"));
+        return Arrays.asList(Component.translatable("relics.description.researching.badge.ability." + getId() + ".description"));
     }
 
     public List<MutableComponent> getHint(LivingEntity entity, ItemStack stack, String ability) {

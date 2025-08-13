@@ -131,7 +131,7 @@ public class HUDRenderHandler {
 
         String registryName = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
 
-        MutableComponent name = Component.translatable("tooltip.relics." + registryName + ".ability." + selectedAbility.getId());
+        MutableComponent name = Component.translatable("relics.description." + registryName + ".ability." + selectedAbility.getId());
 
         guiGraphics.drawString(MC.font, name, x - MC.font.width(name) / 2, y - 38, 0xFFFFFF, true);
 
@@ -156,7 +156,7 @@ public class HUDRenderHandler {
 
             poseStack.scale(0.5F, 0.5F, 0.5F);
 
-            guiGraphics.drawString(MC.font, Component.translatable("tooltip.relics." + registryName + ".ability." + selectedAbility.getId() + ".predicate." + predicateName).withStyle(isCompleted ? ChatFormatting.STRIKETHROUGH : ChatFormatting.RESET), (x + 7) * 2, (y - 2 + yOff) * 2, isCompleted ? 0xbeffb8 : 0xf17f9c, true);
+            guiGraphics.drawString(MC.font, Component.translatable("relics.description." + registryName + ".ability." + selectedAbility.getId() + ".predicate." + predicateName).withStyle(isCompleted ? ChatFormatting.STRIKETHROUGH : ChatFormatting.RESET), (x + 7) * 2, (y - 2 + yOff) * 2, isCompleted ? 0xbeffb8 : 0xf17f9c, true);
 
             poseStack.scale(2F, 2F, 2F);
 

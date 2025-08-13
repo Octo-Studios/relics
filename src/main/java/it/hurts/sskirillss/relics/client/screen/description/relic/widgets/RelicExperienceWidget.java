@@ -131,15 +131,15 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
         var experience = String.valueOf(MathUtils.round(relic.getRelicExperience(minecraft.player, screen.getStack()), 1));
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("tooltip.relics.researching.relic.experience.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE))
+                Component.literal("").append(Component.translatable("relics.description.researching.relic.experience.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE))
                         .append(" " + (relic.isRelicMaxLevel(minecraft.player, screen.getStack()) ? "MAX" : (experience.endsWith(".0") ? experience.replace(".0", "") : experience) + "/" + relic.getTotalRelicExperienceBetweenLevels(minecraft.player, screen.getStack(), level, level + 1))),
                 Component.literal(" ")
         );
 
         if (Screen.hasShiftDown())
-            entries.add(Component.translatable("tooltip.relics.researching.relic.experience.extra_info").withStyle(ChatFormatting.ITALIC));
+            entries.add(Component.translatable("relics.description.researching.relic.experience.extra_info").withStyle(ChatFormatting.ITALIC));
         else
-            entries.add(Component.translatable("tooltip.relics.researching.general.extra_info"));
+            entries.add(Component.translatable("relics.description.researching.general.extra_info"));
 
         for (MutableComponent entry : entries) {
             var entryWidth = (minecraft.font.width(entry) / 2);

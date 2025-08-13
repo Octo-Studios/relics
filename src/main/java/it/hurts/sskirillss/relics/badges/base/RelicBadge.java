@@ -17,11 +17,11 @@ public abstract non-sealed class RelicBadge extends AbstractBadge {
     }
 
     public MutableComponent getTitle(LivingEntity entity, ItemStack stack) {
-        return Component.translatable("tooltip.relics.researching.badge.relic." + getId() + ".title");
+        return Component.translatable("relics.description.researching.badge.relic." + getId() + ".title");
     }
 
     public List<MutableComponent> getDescription(LivingEntity entity, ItemStack stack) {
-        return Arrays.asList(Component.translatable("tooltip.relics.researching.badge.relic." + getId() + ".description"));
+        return Arrays.asList(Component.translatable("relics.description.researching.badge.relic." + getId() + ".description"));
     }
 
     public List<MutableComponent> getHint(LivingEntity entity, ItemStack stack) {
