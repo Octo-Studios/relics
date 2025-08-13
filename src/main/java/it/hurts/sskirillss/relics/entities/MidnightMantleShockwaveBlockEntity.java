@@ -40,7 +40,7 @@ public class MidnightMantleShockwaveBlockEntity extends ShockwaveBlockEntity {
                         relic.addAbilityMetricValue(livingOwner, stack, "starfall", "shockwave_damage", damage);
 
                         if (stun > 0)
-                            relic.addAbilityMetricValue(livingOwner, stack, "starfall", "shockwave_stun", stun);
+                            relic.addAbilityMetricValue(livingOwner, stack, "starfall", "shockwave_stun", stun / 20F);
                     }
                 }
             }

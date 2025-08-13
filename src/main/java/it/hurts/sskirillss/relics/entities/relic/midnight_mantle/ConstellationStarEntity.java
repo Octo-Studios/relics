@@ -378,16 +378,21 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         for (var target : level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(this.getExplosionRadius()), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID()))) {
             target.invulnerableTime = 0;
 
-            var damage = 1 + this.getDamage();
+            var damage = this.getDamage();
 
             if (target.hurt(this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), damage)) {
-                target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (this.getStun() * 20), 0));
+                var stun = this.getStun();
+
+                target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (stun * 20), 0));
 
                 if (stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner) {
                     relic.addAbilityMetricValue(owner, stack, "constellation", "star_damage", damage);
 
-                    if (relic.canAddRelicExperience(owner, stack, "invisibility", "star_damage"))
-                        relic.addRelicExperience(owner, stack, "invisibility", "star_damage", damage);
+                    if (relic.canAddRelicExperience(owner, stack, "constellation", "star_damage"))
+                        relic.addRelicExperience(owner, stack, "constellation", "star_damage", damage);
+
+                    if (stun > 0)
+                        relic.addAbilityMetricValue(owner, stack, "constellation", "star_stun", stun);
                 }
             }
         }

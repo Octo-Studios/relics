@@ -108,6 +108,7 @@ public class MidnightMantleItem extends RelicItem {
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("invisibility")
+                                .requiredLevel(5)
                                 .rankModifier(3, "strike")
                                 .stat(StatTemplate.builder("brightness")
                                         .thresholdValue(0D, 1D)
@@ -129,7 +130,7 @@ public class MidnightMantleItem extends RelicItem {
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("being_invisible")
                                                 .build())
-                                        .source(ExperienceSourceTemplate.builder("additional_damage")
+                                        .source(ExperienceSourceTemplate.builder("damage_dealing")
                                                 .rankModifierCondition("strike")
                                                 .build())
                                         .build())
@@ -147,6 +148,7 @@ public class MidnightMantleItem extends RelicItem {
                                         .link(3, 1).link(3, 2).link(3, 4).link(3, 5).link(1, 4).link(4, 5).link(5, 2).link(2, 1).link(1, 0).link(5, 6).build())
                                 .build())
                         .ability(AbilityTemplate.builder("constellation")
+                                .requiredLevel(10)
                                 .rankModifier(5, "stun")
                                 .stat(StatTemplate.builder("star_chance")
                                         .initialValue(0.1D, 0.2D)
@@ -204,9 +206,13 @@ public class MidnightMantleItem extends RelicItem {
                                         .metric(MetricTemplate.builder("star_damage")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
+                                        .metric(MetricTemplate.builder("star_stun")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("starfall")
+                                .requiredLevel(15)
                                 .rankModifier(7, "bounce")
                                 .stat(StatTemplate.builder("chance")
                                         .thresholdValue(0D, 1D)
@@ -255,7 +261,7 @@ public class MidnightMantleItem extends RelicItem {
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .build())
                                         .metric(MetricTemplate.builder("shockwave_damage")
-                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 1)))
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
                                         .metric(MetricTemplate.builder("shockwave_stun")
                                                 .formatValue((value) -> MathUtils.formatTime(value.intValue()))
@@ -441,7 +447,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "phase") || !relic.getAbilityMode(entity, stack, "phase").equals("new_moon"))
                     continue;
 
-                var heal = event.getAmount() * (1D + relic.getStatValue(entity, stack, "phase", "health_regeneration") * relic.getModeEffectiveness(entity, stack));
+                var heal = event.getAmount() * relic.getStatValue(entity, stack, "phase", "health_regeneration") * relic.getModeEffectiveness(entity, stack);
 
                 event.setAmount((float) (event.getAmount() + heal));
 
@@ -472,8 +478,8 @@ public class MidnightMantleItem extends RelicItem {
                 if (!entity.level().isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "phase", "additional_damage", damage);
 
-                    if (relic.canAddRelicExperience(entity, stack, "phase", "additional_damage"))
-                        relic.addRelicExperience(entity, stack, "phase", "additional_damage", damage);
+                    if (relic.canAddRelicExperience(entity, stack, "phase", "damage_dealing"))
+                        relic.addRelicExperience(entity, stack, "phase", "damage_dealing", damage);
                 }
             }
         }
@@ -497,8 +503,8 @@ public class MidnightMantleItem extends RelicItem {
                 if (!entity.level().isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "invisibility", "additional_damage", damage);
 
-                    if (relic.canAddRelicExperience(entity, stack, "invisibility", "additional_damage"))
-                        relic.addRelicExperience(entity, stack, "invisibility", "additional_damage", damage);
+                    if (relic.canAddRelicExperience(entity, stack, "invisibility", "damage_dealing"))
+                        relic.addRelicExperience(entity, stack, "invisibility", "damage_dealing", damage);
                 }
 
                 relic.setInvisibilityCooldown(stack, (int) relic.getStatValue(entity, stack, "invisibility", "cooldown"));
