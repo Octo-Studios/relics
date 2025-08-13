@@ -122,16 +122,16 @@ public interface IRelicDataHolder {
     }
 
     default void addStatInitialQuality(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
-        setStatOverrideValue(entity, stack, ability, stat, getStatInitialQuality(entity, stack, ability, stat) + quality);
+        setStatInitialQuality(entity, stack, ability, stat, getStatInitialQuality(entity, stack, ability, stat) + quality);
     }
 
     default Optional<Double> getStatOverrideValue(LivingEntity entity, ItemStack stack, String ability, String stat) {
         return getStatComponent(entity, stack, ability, stat).getOverrideValue();
     }
 
-    default void setStatOverrideValue(LivingEntity entity, ItemStack stack, String ability, String stat, double value) {
+    default void setStatOverrideValue(LivingEntity entity, ItemStack stack, String ability, String stat, @Nullable Double value) {
         setStatComponent(entity, stack, ability, stat, getStatComponent(entity, stack, ability, stat).toBuilder()
-                .overrideValue(Optional.of(value))
+                .overrideValue(value == null ?  Optional.empty() : Optional.of(value))
                 .build());
     }
 

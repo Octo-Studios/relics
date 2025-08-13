@@ -56,6 +56,9 @@ public interface IRelicUtilities {
 
         var statComponent = relic.getStatComponent(entity, stack, ability, stat);
 
+        if (statComponent == null)
+            return 0;
+
         var optional = statComponent.getOverrideValue();
 
         if (optional.isEmpty())

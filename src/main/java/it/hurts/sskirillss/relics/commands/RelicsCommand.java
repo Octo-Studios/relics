@@ -16,7 +16,6 @@ import net.minecraft.world.InteractionHand;
 import net.neoforged.neoforge.server.command.EnumArgument;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -296,10 +295,10 @@ public class RelicsCommand {
                                 )
                         )
                         .then(Commands.literal("stat")
-                                .then(Commands.argument("action", EnumArgument.enumArgument(CommandAction.class))
+                                .then(Commands.argument("action", EnumArgument.enumArgument(CommandActionWithReset.class))
                                         .then(Commands.argument("ability", AbilityArgument.ability())
                                                 .then(Commands.argument("stat", AbilityStatArgument.abilityStat())
-                                                        .then(Commands.argument("value", DoubleArgumentType.doubleArg())
+                                                        .then(Commands.argument("override", DoubleArgumentType.doubleArg())
                                                                 .executes(ctx -> {
                                                                     var player = ctx.getSource().getPlayerOrException();
                                                                     var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
@@ -310,17 +309,18 @@ public class RelicsCommand {
                                                                         return 0;
                                                                     }
 
-                                                                    var action = ctx.getArgument("action", CommandAction.class);
+                                                                    var action = ctx.getArgument("action", CommandActionWithReset.class);
                                                                     var ability = AbilityArgument.getAbility(ctx, "ability");
                                                                     var stat = AbilityStatArgument.getAbilityStat(ctx, "stat");
-                                                                    var value = DoubleArgumentType.getDouble(ctx, "value");
+                                                                    var override = DoubleArgumentType.getDouble(ctx, "override");
 
                                                                     Stream.of(ability.equals("all") ? relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().toArray(new String[0]) : new String[]{ability})
                                                                             .forEach(abilityEntry -> (stat.equals("all") ? relic.getAbilityTemplate(player, stack, abilityEntry).getStats().keySet().stream() : Stream.of(stat))
                                                                                     .forEach(statEntry -> relic.setStatOverrideValue(player, stack, abilityEntry, statEntry, switch (action) {
-                                                                                                case SET -> value;
-                                                                                                case ADD -> relic.getOrCalculateStatValue(player, stack, abilityEntry, statEntry) + value;
-                                                                                                case TAKE -> relic.getOrCalculateStatValue(player, stack, abilityEntry, statEntry) - value;
+                                                                                                case SET -> override;
+                                                                                                case ADD -> relic.getOrCalculateStatValue(player, stack, abilityEntry, statEntry) + override;
+                                                                                                case TAKE -> relic.getOrCalculateStatValue(player, stack, abilityEntry, statEntry) - override;
+                                                                                                case RESET -> null;
                                                                                             })
                                                                                     )
                                                                             );
@@ -402,5 +402,12 @@ public class RelicsCommand {
         SET,
         ADD,
         TAKE
+    }
+
+    public enum CommandActionWithReset {
+        SET,
+        ADD,
+        TAKE,
+        RESET
     }
 }

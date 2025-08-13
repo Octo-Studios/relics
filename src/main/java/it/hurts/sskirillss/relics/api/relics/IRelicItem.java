@@ -519,10 +519,10 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
         links.put(from, to);
 
         setResearchLinks(entity, stack, ability, links.asMap().entrySet().stream()
-                        .collect(Collectors.toMap(
-                                entry -> String.valueOf(entry.getKey()),
-                                entry -> new ArrayList<>(entry.getValue())
-                        )));
+                .collect(Collectors.toMap(
+                        entry -> String.valueOf(entry.getKey()),
+                        entry -> new ArrayList<>(entry.getValue())
+                )));
     }
 
     default void removeResearchLink(LivingEntity entity, ItemStack stack, String ability, int from, int to) {
@@ -669,8 +669,14 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
             currentAverageQuality = sumQuality / stats.size();
         }
 
-        for (var entry : generatedQualities.entrySet())
-            this.setStatInitialQuality(entity, stack, ability, entry.getKey(), (int) Math.round(entry.getValue()));
+        for (var entry : generatedQualities.entrySet()) {
+            var stat = entry.getKey();
+
+            if (this.getStatOverrideValue(entity, stack, ability, stat).isPresent())
+                this.setStatOverrideValue(entity, stack, ability, stat, null);
+
+            this.setStatInitialQuality(entity, stack, ability, stat, (int) Math.round(entry.getValue()));
+        }
     }
 
     default void randomizeStat(LivingEntity entity, ItemStack stack, String ability, String stat) {
