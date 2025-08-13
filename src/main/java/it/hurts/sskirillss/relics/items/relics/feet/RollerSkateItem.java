@@ -272,9 +272,9 @@ public class RollerSkateItem extends RelicItem {
         @SubscribeEvent
         public static void onLivingDamage(LivingDamageEvent.Pre event) {
             var entity = event.getEntity();
-            var original = event.getOriginalDamage();
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.ROLLER_SKATES.get())) {
+                var original = event.getOriginalDamage();
                 var relic = (RollerSkateItem) stack.getItem();
 
                 var duration = relic.getDuration(stack);
@@ -282,15 +282,14 @@ public class RollerSkateItem extends RelicItem {
                 if (!relic.canPlayerUseAbility(entity, stack, "skating") || !relic.isAbilityRankModifierUnlocked(entity, stack, "skating", "resistance") || duration <= 0)
                     continue;
 
-                var damage = (float) (original * (relic.getStatValue(entity, stack, "skating", "resistance") / relic.getMaxDuration() * duration));
-                var diff = original - damage;
+                var modifier = (float) (original * (relic.getStatValue(entity, stack, "skating", "resistance") * ((float) duration / relic.getMaxDuration())));
 
-                event.setNewDamage(damage);
+                event.setNewDamage(original - modifier);
 
-                relic.addAbilityMetricValue(entity, stack, "skating", "damage_resisted", diff);
+                relic.addAbilityMetricValue(entity, stack, "skating", "damage_resisted", modifier);
 
                 if (relic.canAddRelicExperience(entity, stack, "skating", "resisting_damage"))
-                    relic.addRelicExperience(entity, stack, "skating", "resisting_damage", diff);
+                    relic.addRelicExperience(entity, stack, "skating", "resisting_damage", modifier);
             }
         }
     }
