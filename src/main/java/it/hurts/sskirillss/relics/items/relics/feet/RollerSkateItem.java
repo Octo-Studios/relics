@@ -206,7 +206,7 @@ public class RollerSkateItem extends RelicItem {
                         for (int i = 0; i < count; i++) {
                             var force = ((0.25F + random.nextFloat() * 0.25F) * speed) * 2F;
 
-                            var offset = (random.nextFloat() - 0.5F) * 0.15F;
+                            var offset = MathUtils.randomFloat(random) * 0.35F;
 
                             var deltaX = -directionX * force + (-directionZ) * offset;
                             var deltaY = 0.2F + random.nextFloat() * 0.2F * speed;

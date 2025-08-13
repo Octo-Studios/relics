@@ -216,7 +216,7 @@
   "relics.description.roller_skate.ability.skating.rank_modifier.sparkling": "Во время дрифта разбрасывает искры, наносящие %4$s единиц урона и поджигающие цели на %5$s секунд за единицу скорости носителя реликвии в момент их появления.",
   "relics.description.roller_skate.ability.skating.experience_source.skating": "+1 единица опыта за каждую секунду катания на максимальной скорости.",
   "relics.description.roller_skate.ability.skating.experience_source.resisting_damage": "+1 единица опыта за каждую единицу урона, сниженную посредством катания.",
-  "relics.description.roller_skate.ability.skating.experience_source.creating_sparks": "+1 единица опыта за каждую созданную искру.",
+  "relics.description.roller_skate.ability.skating.experience_source.creating_sparks": "+1 единица опыта за каждые 10 созданных искр.",
   "relics.description.roller_skate.ability.skating.experience_source.spark_hit": "+1 единица опыта за каждое попадание искрой в цель.",
   "relics.description.roller_skate.ability.skating.statistic.distance_traveled": "Преодолено расстояния посредством катания",
   "relics.description.roller_skate.ability.skating.statistic.damage_resisted": "Снижено урона во время катания",
