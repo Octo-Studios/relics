@@ -99,11 +99,11 @@ public class BlockMixin {
 
                             speed = Math.abs(speed);
 
-                            level.playSound(null, livingEntity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.clamp(0.5F + speed * 0.5F, 0.5F, 2F), (float) Math.max(0.1F, 2F - speed * 0.75F));
+                            if (!livingEntity.isShiftKeyDown()) {
+                                level.playSound(null, livingEntity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.clamp(0.5F + speed * 0.5F, 0.5F, 2F), (float) Math.max(0.1F, 2F - speed * 0.75F));
 
-                            if (!livingEntity.isShiftKeyDown())
                                 NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(livingEntity.getId(), motion.multiply(1F, -1F, 1F).toVector3f()), livingEntity);
-                            else {
+                            } else {
                                 if (relic.isAbilityRankModifierUnlocked(livingEntity, stack, "bounce", "shockwave")) {
                                     var delayTicks = waveIndex * 20;
 
