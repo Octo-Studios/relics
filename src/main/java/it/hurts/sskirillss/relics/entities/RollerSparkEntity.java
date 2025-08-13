@@ -101,9 +101,12 @@ public class RollerSparkEntity extends ThrowableProjectile {
 
         if (entity.hurt(this.level().damageSources().thrown(owner, this), this.getDamage())) {
             var ignite = this.getIgnite();
+            var toApply = (int) (ignite * 20);
+            var current = entity.getRemainingFireTicks();
+            var diff = toApply - current;
 
             if (ignite > 0)
-                entity.setRemainingFireTicks((int) (ignite * 20));
+                entity.setRemainingFireTicks(Math.max(toApply, current));
 
             this.discard();
 
@@ -113,8 +116,8 @@ public class RollerSparkEntity extends ThrowableProjectile {
                 if (relic.canAddRelicExperience(owner, stack, "skating", "spark_hit"))
                     relic.addRelicExperience(owner, stack, "skating", "spark_hit", 1);
 
-                if (ignite > 0)
-                    relic.addAbilityMetricValue(owner, stack, "skating", "ignite_duration", ignite);
+                if (diff > 0)
+                    relic.addAbilityMetricValue(owner, stack, "skating", "ignite_duration", diff / 20F);
             }
         }
     }
