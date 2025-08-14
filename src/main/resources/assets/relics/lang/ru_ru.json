@@ -105,8 +105,9 @@
   "relics.description.ability.reset.min_level": "Способность уже достигла своего минимального уровня и его сброс сейчас не требуется!",
   "relics.description.ability.reset.description": "Сбрасывает уровень способности до минимального, возвращая распределённые очки улучшения.",
 
-  "relics.description.description.ability.rank_modifier.condition.rank": "Начиная с %1$s ранга:",
-  "relics.description.description.ability.experience_source.condition.rank": "Начиная с %1$s ранга:",
+  "relics.description.ability.rank_modifier.condition.rank": "Начиная с %1$s ранга:",
+  "relics.description.ability.experience_source.condition.rank": "Начиная с %1$s ранга:",
+  "relics.description.ability.statistic.condition.rank": "Начиная с %1$s ранга:",
 
   "relics.description.statistic.relic.retention_time": "Время владения реликвией",
 

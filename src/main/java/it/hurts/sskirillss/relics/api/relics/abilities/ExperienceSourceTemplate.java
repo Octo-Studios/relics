@@ -81,7 +81,7 @@ public class ExperienceSourceTemplate {
                     .filter(entry -> entry.getValue().equals(rankModifier))
                     .map(Map.Entry::getKey)
                     .findFirst()
-                    .map(integer -> Component.translatable("relics.description.description.ability.experience_source.condition.rank", integer)).orElseGet(Component::empty);
+                    .map(integer -> Component.translatable("relics.description.ability.experience_source.condition.rank", integer)).orElseGet(Component::empty);
 
             return this.visibilityState((entity, stack, ability, source) -> ((IRelicItem) stack.getItem()).isAbilityRankModifierUnlocked(entity, stack, ability, rankModifier) ? VisibilityState.VISIBLE : state);
         }

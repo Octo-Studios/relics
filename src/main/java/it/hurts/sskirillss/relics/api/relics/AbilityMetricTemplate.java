@@ -5,20 +5,24 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Map;
 import java.util.function.Function;
 
 @Data
 public class AbilityMetricTemplate extends MetricTemplate {
-    private final Function3<LivingEntity, ItemStack, String, Component> component;
+    private final Function3<LivingEntity, ItemStack, String, Component> descriptionComponent;
+    private final Function3<LivingEntity, ItemStack, String, MutableComponent> conditionComponent;
     private final Function3<LivingEntity, ItemStack, String, VisibilityState> visibilityState;
 
-    private AbilityMetricTemplate(String id, Function<Double, ? extends String> formatValue, Function3<LivingEntity, ItemStack, String, Component> component, Function3<LivingEntity, ItemStack, String, VisibilityState> visibilityState) {
+    private AbilityMetricTemplate(String id, Function<Double, ? extends String> formatValue, Function3<LivingEntity, ItemStack, String, Component> descriptionComponent, Function3<LivingEntity, ItemStack, String, MutableComponent> conditionComponent, Function3<LivingEntity, ItemStack, String, VisibilityState> visibilityState) {
         super(id, formatValue);
 
-        this.component = component;
+        this.descriptionComponent = descriptionComponent;
+        this.conditionComponent = conditionComponent;
         this.visibilityState = visibilityState;
     }
 
@@ -35,7 +39,8 @@ public class AbilityMetricTemplate extends MetricTemplate {
         private String id;
 
         private Function<Double, ? extends String> formatValue = String::valueOf;
-        private Function3<LivingEntity, ItemStack, String, Component> component = (entity, stack, ability) -> Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".statistic." + this.id);
+        private Function3<LivingEntity, ItemStack, String, Component> descriptionComponent = (entity, stack, ability) -> Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".statistic." + this.id);
+        private Function3<LivingEntity, ItemStack, String, MutableComponent> conditionComponent = (entity, stack, ability) -> Component.empty();
         private Function3<LivingEntity, ItemStack, String, VisibilityState> visibilityState = (entity, stack, ability) -> VisibilityState.VISIBLE;
 
         private MetricTemplateBuilder(String id) {
@@ -46,7 +51,8 @@ public class AbilityMetricTemplate extends MetricTemplate {
             this.id = base.getId();
 
             this.formatValue = base.getFormatValue();
-            this.component = base.getComponent();
+            this.descriptionComponent = base.getDescriptionComponent();
+            this.conditionComponent = base.getConditionComponent();
             this.visibilityState = base.getVisibilityState();
         }
 
@@ -62,8 +68,8 @@ public class AbilityMetricTemplate extends MetricTemplate {
             return this;
         }
 
-        public MetricTemplateBuilder component(Function3<LivingEntity, ItemStack, String, Component> component) {
-            this.component = component;
+        public MetricTemplateBuilder descriptionComponent(Function3<LivingEntity, ItemStack, String, Component> descriptionComponent) {
+            this.descriptionComponent = descriptionComponent;
 
             return this;
         }
@@ -84,6 +90,12 @@ public class AbilityMetricTemplate extends MetricTemplate {
         }
 
         public MetricTemplateBuilder rankModifierVisibilityState(String rankModifier, VisibilityState state) {
+            this.conditionComponent = (entity, stack, ability) -> ((IRelicItem) stack.getItem()).getAbilityTemplate(entity, stack, ability).getRankModifiers().entries().stream()
+                    .filter(entry -> entry.getValue().equals(rankModifier))
+                    .map(Map.Entry::getKey)
+                    .findFirst()
+                    .map(integer -> Component.translatable("relics.description.ability.statistic.condition.rank", integer)).orElseGet(Component::empty);
+
             return this.visibilityState((entity, stack, ability) -> ((IRelicItem) stack.getItem()).isAbilityRankModifierUnlocked(entity, stack, ability, rankModifier) ? VisibilityState.VISIBLE : state);
         }
 
@@ -92,7 +104,7 @@ public class AbilityMetricTemplate extends MetricTemplate {
         }
 
         public AbilityMetricTemplate build() {
-            return new AbilityMetricTemplate(id, formatValue, component, visibilityState);
+            return new AbilityMetricTemplate(id, formatValue, descriptionComponent, conditionComponent, visibilityState);
         }
     }
 }

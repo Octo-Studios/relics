@@ -9,12 +9,14 @@ import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.Simple
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Optional;
 
 public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerWidget {
     public AbilityStatisticContainerWidget(DescriptionScreen screen) {
@@ -27,14 +29,20 @@ public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerW
             return new ArrayList<>();
 
         var sequences = new ArrayList<FormattedCharSequence>();
+
         var stack = this.getScreen().getStack();
         var relic = (IRelicItem) stack.getItem();
         var player = this.minecraft.player;
         var font = this.minecraft.font;
         var maxWidth = 320;
+
         var dot = ".";
         var dotWidth = Math.max(1, font.width(dot));
+
         var ability = screen.getSelectedAbility();
+
+        var group = new LinkedHashMap<String, List<List<FormattedCharSequence>>>();
+        var conditions = new HashMap<String, MutableComponent>();
 
         for (var metric : relic.getAbilityStatisticTemplate(player, stack, ability).getMetrics().values()) {
             var state = metric.getVisibilityState().apply(player, stack, ability);
@@ -42,38 +50,84 @@ public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerW
             if (state == VisibilityState.HIDDEN)
                 continue;
 
-            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, ability)).append(Component.literal(" "));
+            var condition = metric.getConditionComponent()
+                    .apply(player, stack, ability)
+                    .withStyle(ChatFormatting.BOLD);
+            var key = condition.getString().trim();
+
+            var prefix = Component.literal("● ")
+                    .append(metric.getDescriptionComponent().apply(player, stack, ability))
+                    .append(Component.literal(" "));
 
             if (state == VisibilityState.OBFUSCATED)
-                prefix = ScreenUtils.randomizeAllCharacters(prefix, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
+                prefix = ScreenUtils.randomizeAllCharacters(prefix, this.hashCode())
+                        .withStyle(Style.EMPTY
+                                .withFont(ScreenUtils.ILLAGER_ALT_FONT)
+                                .withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
 
-            var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(relic.getAbilityMetricComponent(player, stack, ability, metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));
+            var metricLines = new ArrayList<FormattedCharSequence>();
 
-            var suffixWidth = font.width(suffix);
-            var limit = Math.max(0, maxWidth - suffixWidth);
-            var lines = font.split(prefix, limit);
+            if (state == VisibilityState.OBFUSCATED) {
+                var lines = font.split(prefix, maxWidth);
+                metricLines.addAll(lines);
+            } else {
+                var suffix = Component.literal(" ")
+                        .append(Component.literal(metric.getFormatValue()
+                                        .apply(relic.getAbilityMetricComponent(player, stack, ability, metric.getId()).getValue()))
+                                .withStyle(ChatFormatting.BOLD));
 
-            for (var i = 0; i < lines.size(); i++) {
-                var line = lines.get(i);
+                var suffixWidth = font.width(suffix);
+                var limit = Math.max(0, maxWidth - suffixWidth);
+                var lines = font.split(prefix, limit);
 
-                if (i < lines.size() - 1)
-                    sequences.add(line);
-                else {
-                    var avail = Math.max(0, maxWidth - font.width(line) - suffixWidth);
-                    var dotsCount = Math.max(0, avail / dotWidth);
-                    var dots = dotsCount > 0 ? FormattedCharSequence.forward(dot.repeat(dotsCount), Style.EMPTY) : FormattedCharSequence.EMPTY;
-                    var seq = FormattedCharSequence.composite(line, dots, suffix.getVisualOrderText());
+                for (var i = 0; i < lines.size(); i++) {
+                    var line = lines.get(i);
 
-                    while (font.width(seq) > maxWidth && dotsCount > 0) {
-                        dotsCount--;
+                    if (i < lines.size() - 1)
+                        metricLines.add(line);
+                    else {
+                        var avail = Math.max(0, maxWidth - font.width(line) - suffixWidth);
+                        var dotsCount = Math.max(0, avail / dotWidth);
+                        var dots = dotsCount > 0
+                                ? FormattedCharSequence.forward(dot.repeat(dotsCount), Style.EMPTY)
+                                : FormattedCharSequence.EMPTY;
 
-                        dots = dotsCount > 0 ? FormattedCharSequence.forward(dot.repeat(dotsCount), Style.EMPTY) : FormattedCharSequence.EMPTY;
-                        seq = FormattedCharSequence.composite(line, dots, suffix.getVisualOrderText());
+                        var seq = FormattedCharSequence.composite(line, dots, suffix.getVisualOrderText());
+
+                        while (font.width(seq) > maxWidth && dotsCount > 0) {
+                            dotsCount--;
+                            dots = dotsCount > 0
+                                    ? FormattedCharSequence.forward(dot.repeat(dotsCount), Style.EMPTY)
+                                    : FormattedCharSequence.EMPTY;
+                            seq = FormattedCharSequence.composite(line, dots, suffix.getVisualOrderText());
+                        }
+
+                        metricLines.add(seq);
                     }
-
-                    sequences.add(seq);
                 }
             }
+
+            group.computeIfAbsent(key, k -> new ArrayList<>()).add(metricLines);
+
+            if (!key.isBlank() && !conditions.containsKey(key))
+                conditions.put(key, condition);
+        }
+
+        var firstGroup = true;
+
+        for (var entry : group.entrySet()) {
+            if (!firstGroup)
+                sequences.addAll(font.split(Component.literal(" "), maxWidth));
+
+            firstGroup = false;
+
+            var key = entry.getKey();
+
+            if (!key.isBlank() && conditions.containsKey(key) && !conditions.get(key).equals(Component.empty()))
+                sequences.addAll(font.split(conditions.get(key), maxWidth));
+
+            for (var metricLines : entry.getValue())
+                sequences.addAll(metricLines);
         }
 
         return sequences;
