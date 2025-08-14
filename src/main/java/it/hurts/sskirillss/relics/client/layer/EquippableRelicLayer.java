@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.init.RelicsRelicRenderers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,12 +21,7 @@ public abstract class EquippableRelicLayer<T extends LivingEntity, M extends Ent
 
     @Override
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
-        var player = Minecraft.getInstance().player;
-
-        if (player == null)
-            return;
-
-        CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
+        CuriosApi.getCuriosInventory(livingEntity).ifPresent(handler -> {
             for (var slot : handler.findCurios(slot)) {
                 if (!slot.slotContext().visible())
                     continue;
