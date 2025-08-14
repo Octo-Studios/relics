@@ -270,6 +270,20 @@
 
   "block.relics.phantom_block": "Блок фантомного моста",
 
+  "entity.relics.falling_star": "Падающая звезда",
+  "entity.relics.constellation_star": "Звезда созвездия",
+  "entity.relics.roller_spark": "Роликовая искра",
+  "entity.relics.electric_spark": "Электрическая искра",
+  "entity.relics.reflective_orb": "Сфера отражённого урона",
+  "entity.relics.shadow_glaive": "Теневая глефа",
+  "entity.relics.shockwave_block": "Сегмент ударной волны",
+  "entity.relics.leaves_block": "Лиственный снаряд",
+  "entity.relics.life_essence": "Эссенция жизни",
+  "entity.relics.death_essence": "Эссенция смерти",
+  "entity.relics.spore": "Спора",
+  "entity.relics.relic_experience_orb": "Сфера опыта реликвии",
+  "entity.relics.thrown_relic_experience_bottle": "Брошенный пузырёк опыта реликвии",
+
   "effect.relics.stun": "Оглушение",
   "effect.relics.paralysis": "Паралич",
   "effect.relics.confusion": "Запутывание",
