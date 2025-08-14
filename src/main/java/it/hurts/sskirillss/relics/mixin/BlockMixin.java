@@ -94,8 +94,7 @@ public class BlockMixin {
 
                             if (!livingEntity.isShiftKeyDown()) {
                                 if (!level.isClientSide()) {
-                                    if (relic.canAddRelicExperience(livingEntity, stack, "bounce", "bounce"))
-                                        relic.addRelicExperience(livingEntity, stack, "bounce", "bounce", 1);
+                                    relic.addRelicExperience(livingEntity, stack, "bounce", "bounce", 1);
 
                                     relic.addAbilityMetricValue(livingEntity, stack, "bounce", "secondary_bounces", 1);
                                 }
@@ -113,8 +112,7 @@ public class BlockMixin {
                                     var damage = (float) relic.getStatValue(livingEntity, stack, "bounce", "damage");
                                     var stun = (int) relic.getStatValue(livingEntity, stack, "bounce", "stun") * 20;
 
-                                    if (relic.canAddRelicExperience(livingEntity, stack, "bounce", "create_shockwave"))
-                                        relic.addRelicExperience(livingEntity, stack, "bounce", "create_shockwave", radius);
+                                    relic.addRelicExperience(livingEntity, stack, "bounce", "create_shockwave", radius);
 
                                     ServerScheduler.schedule(delayTicks, () -> {
                                         relic.addAbilityMetricValue(livingEntity, stack, "bounce", "shockwaves_amount", 1);

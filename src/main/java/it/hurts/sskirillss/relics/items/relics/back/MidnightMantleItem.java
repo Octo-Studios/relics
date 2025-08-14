@@ -1,7 +1,10 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
 import it.hurts.sskirillss.relics.api.events.leveling.AbilityModeSwitchEvent;
-import it.hurts.sskirillss.relics.api.relics.*;
+import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -82,8 +85,10 @@ public class MidnightMantleItem extends RelicItem {
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("health_regeneration")
+                                                .modeVisibilityState("full_moon", VisibilityState.HIDDEN)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("damage_dealing")
+                                                .modeVisibilityState("new_moon", VisibilityState.HIDDEN)
                                                 .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -133,7 +138,7 @@ public class MidnightMantleItem extends RelicItem {
                                         .source(ExperienceSourceTemplate.builder("being_invisible")
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("damage_dealing")
-                                                .rankModifierCondition("strike")
+                                                .rankModifierVisibilityState("strike", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -252,7 +257,7 @@ public class MidnightMantleItem extends RelicItem {
                                         .source(ExperienceSourceTemplate.builder("shockwave_hit")
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("star_bounce")
-                                                .rankModifierCondition("bounce")
+                                                .rankModifierVisibilityState("bounce", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -396,8 +401,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (entity.tickCount % 20 == 0) {
                     this.addAbilityMetricValue(entity, stack, "invisibility", "duration", 1);
 
-                    if (this.canAddRelicExperience(entity, stack, "invisibility", "being_invisible"))
-                        this.addRelicExperience(entity, stack, "invisibility", "being_invisible", 1);
+                    this.addRelicExperience(entity, stack, "invisibility", "being_invisible", 1);
                 }
             }
         }
@@ -456,8 +460,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (!entity.level().isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "phase", "health_regeneration", heal);
 
-                    if (relic.canAddRelicExperience(entity, stack, "phase", "health_regeneration"))
-                        relic.addRelicExperience(entity, stack, "phase", "health_regeneration", heal);
+                    relic.addRelicExperience(entity, stack, "phase", "health_regeneration", heal);
                 }
             }
         }
@@ -480,8 +483,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (!entity.level().isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "phase", "additional_damage", damage);
 
-                    if (relic.canAddRelicExperience(entity, stack, "phase", "damage_dealing"))
-                        relic.addRelicExperience(entity, stack, "phase", "damage_dealing", damage);
+                    relic.addRelicExperience(entity, stack, "phase", "damage_dealing", damage);
                 }
             }
         }
@@ -505,8 +507,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (!entity.level().isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "invisibility", "additional_damage", damage);
 
-                    if (relic.canAddRelicExperience(entity, stack, "invisibility", "damage_dealing"))
-                        relic.addRelicExperience(entity, stack, "invisibility", "damage_dealing", damage);
+                    relic.addRelicExperience(entity, stack, "invisibility", "damage_dealing", damage);
                 }
 
                 relic.setInvisibilityCooldown(stack, (int) relic.getStatValue(entity, stack, "invisibility", "cooldown"));
@@ -602,8 +603,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (!level.isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "constellation", "total_stars", 1);
 
-                    if (relic.canAddRelicExperience(entity, stack, "constellation", "star_creation"))
-                        relic.addRelicExperience(entity, stack, "constellation", "star_creation", 1);
+                    relic.addRelicExperience(entity, stack, "constellation", "star_creation", 1);
                 }
             }
         }
@@ -654,8 +654,7 @@ public class MidnightMantleItem extends RelicItem {
                 if (!level.isClientSide()) {
                     relic.addAbilityMetricValue(entity, stack, "starfall", "total_stars", 1);
 
-                    if (relic.canAddRelicExperience(entity, stack, "starfall", "star_creation"))
-                        relic.addRelicExperience(entity, stack, "starfall", "star_creation", 1);
+                    relic.addRelicExperience(entity, stack, "starfall", "star_creation", 1);
                 }
             }
         }

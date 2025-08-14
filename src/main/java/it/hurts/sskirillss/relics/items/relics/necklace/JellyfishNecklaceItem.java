@@ -1,7 +1,10 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
 import com.google.common.collect.Lists;
-import it.hurts.sskirillss.relics.api.relics.*;
+import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -127,38 +130,41 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("rings_accumulating")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("arcs_bouncing")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("hit_paralysis")
-                                                .rankModifierCondition("charge")
+                                                .rankModifierVisibilityState("charge", VisibilityState.OBFUSCATED)
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
                                         .metric(AbilityMetricTemplate.builder("rings_accumulated")
-                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("rings_paralysis")
-                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("arcs_spawned")
-                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("arcs_bounces")
-                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("arcs_damage")
-                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("hit_paralysis")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
-                                                .rankModifierVisibilityState("charge", VisibilityState.OBFUSCATED)
                                                 .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .rankModifierVisibilityState("charge", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -317,8 +323,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                     if (!level.isClientSide()) {
                         this.addAbilityMetricValue(entity, stack, "shock", "rings_accumulated", 1);
 
-                        if (this.canAddRelicExperience(entity, stack, "shock", "rings_accumulating"))
-                            this.addRelicExperience(entity, stack, "shock", "rings_accumulating", 1);
+                        this.addRelicExperience(entity, stack, "shock", "rings_accumulating", 1);
                     }
                 }
             }
@@ -435,8 +440,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                     if (!level.isClientSide()) {
                         relic.addAbilityMetricValue(entity, stack, "regeneration", "health_regenerated", health);
 
-                        if (relic.canAddRelicExperience(entity, stack, "regeneration", "health_regeneration"))
-                            relic.addRelicExperience(entity, stack, "regeneration", "health_regeneration", health);
+                        relic.addRelicExperience(entity, stack, "regeneration", "health_regeneration", health);
                     }
                 }
             }
@@ -473,8 +477,7 @@ public class JellyfishNecklaceItem extends RelicItem {
                     if (!level.isClientSide()) {
                         relic.addAbilityMetricValue(entity, stack, "shock", "hit_paralysis", paralysis);
 
-                        if (relic.canAddRelicExperience(entity, stack, "shock", "hit_paralysis"))
-                            relic.addRelicExperience(entity, stack, "shock", "hit_paralysis", paralysis);
+                        relic.addRelicExperience(entity, stack, "shock", "hit_paralysis", paralysis);
                     }
 
                     relic.addDamagedEntities(stack, uuid);

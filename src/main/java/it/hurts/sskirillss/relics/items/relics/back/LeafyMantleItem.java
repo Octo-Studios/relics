@@ -1,7 +1,10 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.relics.*;
+import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -124,7 +127,7 @@ public class LeafyMantleItem extends RelicItem {
                                         .source(ExperienceSourceTemplate.builder("consuming_leaves")
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("leaves_impact")
-                                                .rankModifierCondition("piercing")
+                                                .rankModifierVisibilityState("piercing", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -203,14 +206,12 @@ public class LeafyMantleItem extends RelicItem {
                     if (!level.isClientSide()) {
                         this.addAbilityMetricValue(entity, stack, "camouflage", "heal_amount", heal);
 
-                        if (this.canAddRelicExperience(entity, stack, "camouflage", "healing"))
-                            this.addRelicExperience(entity, stack, "camouflage", "healing", heal);
+                        this.addRelicExperience(entity, stack, "camouflage", "healing", heal);
                     }
                 }
 
                 if (!level.isClientSide()) {
-                    if (this.canAddRelicExperience(entity, stack, "camouflage", "hiding"))
-                        this.addRelicExperience(entity, stack, "camouflage", "hiding", 1);
+                    this.addRelicExperience(entity, stack, "camouflage", "hiding", 1);
 
                     this.addAbilityMetricValue(entity, stack, "camouflage", "hide_duration", 1);
                 }
@@ -376,8 +377,7 @@ public class LeafyMantleItem extends RelicItem {
                         if (!level.isClientSide()) {
                             relic.addAbilityMetricValue(entity, stack, "revival", "leaves_consumed", 1);
 
-                            if (relic.canAddRelicExperience(entity, stack, "revival", "consuming_leaves"))
-                                relic.addRelicExperience(entity, stack, "revival", "consuming_leaves", 1);
+                            relic.addRelicExperience(entity, stack, "revival", "consuming_leaves", 1);
                         }
                     });
 

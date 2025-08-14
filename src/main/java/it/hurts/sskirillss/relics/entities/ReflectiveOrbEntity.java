@@ -289,8 +289,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
                 if (stun > 0)
                     relic.addAbilityMetricValue(entity, stack, "reflection", "total_stun", stun);
 
-                if (relic.canAddRelicExperience(entity, stack, "reflection", "impact"))
-                    relic.addRelicExperience(entity, stack, "reflection", "impact", 1);
+                relic.addRelicExperience(entity, stack, "reflection", "impact", 1);
             }
         }
 

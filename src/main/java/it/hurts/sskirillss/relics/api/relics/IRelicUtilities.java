@@ -235,13 +235,4 @@ public interface IRelicUtilities {
 
         return true;
     }
-
-    default boolean canAddRelicExperience(LivingEntity entity, ItemStack stack, String ability, String experienceSource) {
-        if (!(this instanceof IRelicItem relic))
-            return false;
-
-        relic.getRelicTemplate(entity, stack).getAbilities().getAbilities().get(ability).getExperienceSources().getSources().get(experienceSource).getCondition().test(entity, stack, ability);
-
-        return relic.getExperienceSourceTemplate(entity, stack, ability, experienceSource).getCondition().test(entity, stack, ability);
-    }
 }

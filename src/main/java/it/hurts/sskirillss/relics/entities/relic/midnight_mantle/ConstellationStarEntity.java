@@ -268,8 +268,7 @@ public class ConstellationStarEntity extends ThrowableProjectile {
 
                         entity.addEffect(new MobEffectInstance(RelicsMobEffects.TREMOR, (int) (this.getTremor() * 20), 0));
 
-                        if (entity.tickCount % 20 == 0 && stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner
-                                && relic.canAddRelicExperience(entity, stack, "constellation", "star_creation"))
+                        if (entity.tickCount % 20 == 0 && stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner)
                             relic.addRelicExperience(owner, stack, "constellation", "star_tremor", 1);
                     }
                 }
@@ -388,8 +387,7 @@ public class ConstellationStarEntity extends ThrowableProjectile {
                 if (stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner) {
                     relic.addAbilityMetricValue(owner, stack, "constellation", "star_damage", damage);
 
-                    if (relic.canAddRelicExperience(owner, stack, "constellation", "star_damage"))
-                        relic.addRelicExperience(owner, stack, "constellation", "star_damage", damage);
+                    relic.addRelicExperience(owner, stack, "constellation", "star_damage", damage);
 
                     if (stun > 0)
                         relic.addAbilityMetricValue(owner, stack, "constellation", "star_stun", stun);

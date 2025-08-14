@@ -1,6 +1,9 @@
 package it.hurts.sskirillss.relics.items.relics.belt;
 
-import it.hurts.sskirillss.relics.api.relics.*;
+import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -80,12 +83,15 @@ public class KineticBeltItem extends RelicItem {
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("gliding")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("strike")
-                                                .rankModifierCondition("strike")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .rankModifierVisibilityState("strike", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("resistance")
-                                                .rankModifierCondition("resistance")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .rankModifierVisibilityState("resistance", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -205,8 +211,7 @@ public class KineticBeltItem extends RelicItem {
             if (entity.tickCount % 20 == 0) {
                 this.addAbilityMetricValue(entity, stack, "gliding", "duration", 1);
 
-                if (this.canAddRelicExperience(entity, stack, "gliding", "gliding"))
-                    this.addRelicExperience(entity, stack, "gliding", "gliding", 1);
+                this.addRelicExperience(entity, stack, "gliding", "gliding", 1);
             }
 
             if (!hasAttribute)
@@ -285,8 +290,8 @@ public class KineticBeltItem extends RelicItem {
 
                     var additional = original * relic.getStatValue(entity, stack, "gliding", "damage");
 
-                    if (relic.canAddRelicExperience(entity, stack, "gliding", "strike"))
-                        relic.addRelicExperience(entity, stack, "gliding", "strike", additional);
+                    relic.addRelicExperience(entity, stack, "gliding", "strike", additional);
+
                     relic.addAbilityMetricValue(entity, stack, "gliding", "damage", additional);
 
                     event.setNewDamage((float) (original + additional));
@@ -302,8 +307,8 @@ public class KineticBeltItem extends RelicItem {
 
                 var additional = original * relic.getStatValue(entity, stack, "gliding", "resistance");
 
-                if (relic.canAddRelicExperience(entity, stack, "gliding", "resistance"))
-                    relic.addRelicExperience(entity, stack, "gliding", "resistance", additional);
+                relic.addRelicExperience(entity, stack, "gliding", "resistance", additional);
+
                 relic.addAbilityMetricValue(entity, stack, "gliding", "resistance", additional);
 
                 event.setNewDamage((float) (original - additional));

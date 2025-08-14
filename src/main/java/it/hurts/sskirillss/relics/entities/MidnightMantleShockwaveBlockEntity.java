@@ -2,7 +2,6 @@ package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
-import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -34,8 +33,7 @@ public class MidnightMantleShockwaveBlockEntity extends ShockwaveBlockEntity {
                     if (stack.getItem() instanceof MidnightMantleItem relic && owner instanceof LivingEntity livingOwner) {
                         relic.addAbilityMetricValue(livingOwner, stack, "starfall", "shockwave_targets", 1);
 
-                        if (relic.canAddRelicExperience(livingOwner, stack, "starfall", "shockwave_hit"))
-                            relic.addRelicExperience(livingOwner, stack, "starfall", "shockwave_hit", 1);
+                        relic.addRelicExperience(livingOwner, stack, "starfall", "shockwave_hit", 1);
 
                         relic.addAbilityMetricValue(livingOwner, stack, "starfall", "shockwave_damage", damage);
 

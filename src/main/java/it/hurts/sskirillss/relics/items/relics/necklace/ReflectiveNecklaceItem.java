@@ -1,7 +1,10 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.relics.*;
+import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -155,8 +158,7 @@ public class ReflectiveNecklaceItem extends RelicItem {
 
                     level.addFreshEntity(orb);
 
-                    if (relic.canAddRelicExperience(entity, stack, "reflection", "construct"))
-                        relic.addRelicExperience(entity, stack, "reflection", "construct", orbDamage * 0.1D);
+                    relic.addRelicExperience(entity, stack, "reflection", "construct", orbDamage * 0.1D);
 
                     relic.addAbilityMetricValue(entity, stack, "reflection", "total_orbs", 1);
                 }

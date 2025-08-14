@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -40,7 +41,12 @@ public class AbilityExperienceContainerWidget extends SimpleDescriptionContainer
         var group = new LinkedHashMap<String, List<MutableComponent>>();
         var conditions = new HashMap<String, MutableComponent>();
 
-        relic.getExperienceSourcesTemplate(player, stack, ability).getSources().values().forEach(source -> {
+        for (var source : relic.getExperienceSourcesTemplate(player, stack, ability).getSources().values()) {
+            var state = source.getVisibilityState().apply(player, stack, ability, source.getId());
+
+            if (state == VisibilityState.HIDDEN)
+                continue;
+
             var condition = source.getConditionComponent()
                     .apply(player, stack, ability, source.getId())
                     .withStyle(ChatFormatting.BOLD);
@@ -50,7 +56,7 @@ public class AbilityExperienceContainerWidget extends SimpleDescriptionContainer
             var description = Component.literal("● ")
                     .append(source.getDescriptionComponent().apply(player, stack, ability, source.getId()));
 
-            if (!source.getCondition().test(player, stack, ability))
+            if (state == VisibilityState.OBFUSCATED)
                 description = ScreenUtils.randomizeAllCharacters(description, this.hashCode())
                         .withStyle(Style.EMPTY
                                 .withFont(ScreenUtils.ILLAGER_ALT_FONT)
@@ -60,7 +66,7 @@ public class AbilityExperienceContainerWidget extends SimpleDescriptionContainer
 
             if (!key.isBlank() && !conditions.containsKey(key))
                 conditions.put(key, condition);
-        });
+        }
 
         var firstGroup = true;
 

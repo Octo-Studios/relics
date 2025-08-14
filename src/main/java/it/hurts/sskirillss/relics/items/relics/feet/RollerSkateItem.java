@@ -3,7 +3,10 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.EntityBlockSpeedFactorEvent;
 import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
-import it.hurts.sskirillss.relics.api.relics.*;
+import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -93,13 +96,13 @@ public class RollerSkateItem extends RelicItem {
                                         .source(ExperienceSourceTemplate.builder("skating")
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("resisting_damage")
-                                                .rankModifierCondition("resistance")
+                                                .rankModifierVisibilityState("resistance", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("creating_sparks")
-                                                .rankModifierCondition("sparkling")
+                                                .rankModifierVisibilityState("sparkling", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("spark_hit")
-                                                .rankModifierCondition("sparkling")
+                                                .rankModifierVisibilityState("sparkling", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -158,8 +161,7 @@ public class RollerSkateItem extends RelicItem {
             var movement = entity.getKnownMovement().multiply(1, 0, 1).length();
 
             if (movement > 0F) {
-                if (this.canAddRelicExperience(entity, stack, "skating", "skating"))
-                    this.addRelicExperience(entity, stack, "skating", "skating", 1D / 20D);
+                this.addRelicExperience(entity, stack, "skating", "skating", 1D / 20D);
 
                 this.addAbilityMetricValue(entity, stack, "skating", "distance_traveled", movement);
             }
@@ -286,8 +288,7 @@ public class RollerSkateItem extends RelicItem {
 
                 relic.addAbilityMetricValue(entity, stack, "skating", "damage_resisted", modifier);
 
-                if (relic.canAddRelicExperience(entity, stack, "skating", "resisting_damage"))
-                    relic.addRelicExperience(entity, stack, "skating", "resisting_damage", modifier);
+                relic.addRelicExperience(entity, stack, "skating", "resisting_damage", modifier);
             }
         }
     }

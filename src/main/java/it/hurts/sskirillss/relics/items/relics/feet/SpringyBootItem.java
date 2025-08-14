@@ -1,6 +1,9 @@
 package it.hurts.sskirillss.relics.items.relics.feet;
 
-import it.hurts.sskirillss.relics.api.relics.*;
+import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -68,13 +71,13 @@ public class SpringyBootItem extends RelicItem {
                                         .source(ExperienceSourceTemplate.builder("bounce")
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("strike")
-                                                .rankModifierCondition("strike")
+                                                .rankModifierVisibilityState("strike", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("create_shockwave")
-                                                .rankModifierCondition("shockwave")
+                                                .rankModifierVisibilityState("shockwave", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("shockwave_hit")
-                                                .rankModifierCondition("shockwave")
+                                                .rankModifierVisibilityState("shockwave", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -261,8 +264,7 @@ public class SpringyBootItem extends RelicItem {
 
                 relic.addAbilityMetricValue(entity, stack, "bounce", "additional_damage", damage);
 
-                if (relic.canAddRelicExperience(entity, stack, "bounce", "strike"))
-                    relic.addRelicExperience(entity, stack, "bounce", "strike", damage);
+                relic.addRelicExperience(entity, stack, "bounce", "strike", damage);
             }
 
             var damage = event.getNewDamage() * totalLeaps * totalModifier;
