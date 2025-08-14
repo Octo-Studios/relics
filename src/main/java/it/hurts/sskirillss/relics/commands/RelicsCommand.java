@@ -295,7 +295,7 @@ public class RelicsCommand {
                                 )
                         )
                         .then(Commands.literal("stat")
-                                .then(Commands.argument("action", EnumArgument.enumArgument(CommandActionWithReset.class))
+                                .then(Commands.argument("action", EnumArgument.enumArgument(CommandAction.class))
                                         .then(Commands.argument("ability", AbilityArgument.ability())
                                                 .then(Commands.argument("stat", AbilityStatArgument.abilityStat())
                                                         .then(Commands.argument("override", DoubleArgumentType.doubleArg())
@@ -309,7 +309,7 @@ public class RelicsCommand {
                                                                         return 0;
                                                                     }
 
-                                                                    var action = ctx.getArgument("action", CommandActionWithReset.class);
+                                                                    var action = ctx.getArgument("action", CommandAction.class);
                                                                     var ability = AbilityArgument.getAbility(ctx, "ability");
                                                                     var stat = AbilityStatArgument.getAbilityStat(ctx, "stat");
                                                                     var override = DoubleArgumentType.getDouble(ctx, "override");
@@ -320,7 +320,6 @@ public class RelicsCommand {
                                                                                                 case SET -> override;
                                                                                                 case ADD -> relic.getOrCalculateStatValue(player, stack, abilityEntry, statEntry) + override;
                                                                                                 case TAKE -> relic.getOrCalculateStatValue(player, stack, abilityEntry, statEntry) - override;
-                                                                                                case RESET -> null;
                                                                                             })
                                                                                     )
                                                                             );
@@ -402,12 +401,5 @@ public class RelicsCommand {
         SET,
         ADD,
         TAKE
-    }
-
-    public enum CommandActionWithReset {
-        SET,
-        ADD,
-        TAKE,
-        RESET
     }
 }
