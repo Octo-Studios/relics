@@ -94,9 +94,9 @@ public class MidnightMantleRenderer implements IRelicRenderer {
             poseStack.mulPose(Axis.ZP.rotation(tiltZ));
 
             if (mode.equals("new_moon"))
-                new MidnightMantleNewMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.eyes(FlawlessUtils.getTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_new_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                new MidnightMantleNewMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(FlawlessUtils.getTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_new_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
             else if (mode.equals("full_moon"))
-                new MidnightMantleFullMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.eyes(FlawlessUtils.getTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_full_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+                new MidnightMantleFullMoonModel<>().renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(FlawlessUtils.getTexture(player, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_moon_full_moon.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
             poseStack.popPose();
         }
