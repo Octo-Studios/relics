@@ -48,9 +48,6 @@
   "relics.description.researching.relic.card.ready_to_unlock": "Способность готова к разблокировке! Кликов осталось: %1$s",
   "relics.description.researching.relic.card.ready_to_upgrade": "Способность готова к улучшению!",
 
-  "relics.description.researching.relic.gem.low_level": "Для разблокировки источника получения опыта необходимо повысить уровень реликвии до %1$s!",
-  "relics.description.researching.relic.gem.locked_ability": "Для разблокировки источника получения опыта необходимо разблокировать и исследовать связанную способность!",
-
   "relics.description.researching.tab.relic": "Реликвия",
   "relics.description.researching.tab.ability": "Способности",
   "relics.description.researching.tab.experience": "Источники получения опыта",
