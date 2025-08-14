@@ -215,6 +215,7 @@ public class MidnightMantleItem extends RelicItem {
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("star_stun")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .rankModifierVisibilityState("stun", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .build())
@@ -596,7 +597,7 @@ public class MidnightMantleItem extends RelicItem {
                 star.setStack(stack);
 
                 if (relic.isAbilityRankModifierUnlocked(entity, stack, "constellation", "stun"))
-                    star.setStun((int) relic.getStatValue(entity, stack, "constellation", "stun_duration"));
+                    star.setStun((float) relic.getStatValue(entity, stack, "constellation", "stun_duration"));
 
                 level.addFreshEntity(star);
 
