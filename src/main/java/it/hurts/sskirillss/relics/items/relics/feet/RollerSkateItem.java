@@ -3,9 +3,7 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.EntityBlockSpeedFactorEvent;
 import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
-import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
-import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.*;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -70,25 +68,25 @@ public class RollerSkateItem extends RelicItem {
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .statistic(StatisticTemplate.builder()
-                                        .metric(MetricTemplate.builder("distance_traveled")
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("distance_traveled")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
-                                        .metric(MetricTemplate.builder("damage_resisted")
+                                        .metric(AbilityMetricTemplate.builder("damage_resisted")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
-                                                .abilityRankModifierVisibilityCondition("resistance")
+                                                .rankModifierVisibilityState("resistance", VisibilityState.OBFUSCATED)
                                                 .build())
-                                        .metric(MetricTemplate.builder("sparks_created")
+                                        .metric(AbilityMetricTemplate.builder("sparks_created")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
-                                                .abilityRankModifierVisibilityCondition("sparkling")
+                                                .rankModifierVisibilityState("sparkling", VisibilityState.OBFUSCATED)
                                                 .build())
-                                        .metric(MetricTemplate.builder("damage_dealt")
+                                        .metric(AbilityMetricTemplate.builder("damage_dealt")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
-                                                .abilityRankModifierVisibilityCondition("sparkling")
+                                                .rankModifierVisibilityState("sparkling", VisibilityState.OBFUSCATED)
                                                 .build())
-                                        .metric(MetricTemplate.builder("ignite_duration")
+                                        .metric(AbilityMetricTemplate.builder("ignite_duration")
                                                 .formatValue((value) -> MathUtils.formatTime(value.intValue()))
-                                                .abilityRankModifierVisibilityCondition("sparkling")
+                                                .rankModifierVisibilityState("sparkling", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()

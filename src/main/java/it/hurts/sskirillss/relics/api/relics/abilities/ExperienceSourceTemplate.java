@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.api.relics.abilities;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.misc.function.QuadFunction;
+import it.hurts.sskirillss.relics.misc.function.Function4;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -22,8 +22,8 @@ public class ExperienceSourceTemplate {
 
     private final TriPredicate<LivingEntity, ItemStack, String> condition;
 
-    private final QuadFunction<LivingEntity, ItemStack, String, String, MutableComponent> descriptionComponent;
-    private final QuadFunction<LivingEntity, ItemStack, String, String, MutableComponent> conditionComponent;
+    private final Function4<LivingEntity, ItemStack, String, String, MutableComponent> descriptionComponent;
+    private final Function4<LivingEntity, ItemStack, String, String, MutableComponent> conditionComponent;
 
     public static ExperienceSourceTemplateBuilder builder(String id) {
         return new ExperienceSourceTemplateBuilder(id);
@@ -38,8 +38,8 @@ public class ExperienceSourceTemplate {
         private String id;
 
         private TriPredicate<LivingEntity, ItemStack, String> condition = (entity, stack, ability) -> true;
-        private QuadFunction<LivingEntity, ItemStack, String, String, MutableComponent> descriptionComponent = (entity, stack, ability, source) -> Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".experience_source." + source);
-        private QuadFunction<LivingEntity, ItemStack, String, String, MutableComponent> conditionComponent = (entity, stack, ability, source) -> Component.empty();
+        private Function4<LivingEntity, ItemStack, String, String, MutableComponent> descriptionComponent = (entity, stack, ability, source) -> Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".experience_source." + source);
+        private Function4<LivingEntity, ItemStack, String, String, MutableComponent> conditionComponent = (entity, stack, ability, source) -> Component.empty();
 
         private ExperienceSourceTemplateBuilder(String id) {
             this.id = id;

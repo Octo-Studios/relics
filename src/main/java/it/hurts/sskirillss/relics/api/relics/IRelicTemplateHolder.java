@@ -184,12 +184,12 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link StatisticTemplate} from the default relic template, without context overrides.
+     * Returns the {@link RelicStatisticTemplate} from the default relic template, without context overrides.
      *
-     * @return the default {@link StatisticTemplate}
+     * @return the default {@link RelicStatisticTemplate}
      */
     @ApiStatus.Internal
-    default StatisticTemplate getDefaultStatisticTemplate() {
+    default RelicStatisticTemplate getDefaultStatisticTemplate() {
         return getDefaultRelicTemplate().getStatistic();
     }
 
@@ -288,15 +288,15 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Returns the {@link StatisticTemplate} from the contextual relic template.
+     * Returns the {@link RelicStatisticTemplate} from the contextual relic template.
      *
      * @param entity the holder of the item
      * @param stack  the item stack instance
-     * @return the contextual {@link StatisticTemplate}
+     * @return the contextual {@link RelicStatisticTemplate}
      */
     @ApiStatus.Obsolete
     @ApiStatus.NonExtendable
-    default StatisticTemplate getRelicStatisticTemplate(LivingEntity entity, ItemStack stack) {
+    default RelicStatisticTemplate getRelicStatisticTemplate(LivingEntity entity, ItemStack stack) {
         return this.getRelicTemplate(entity, stack).getStatistic();
     }
 
@@ -316,7 +316,7 @@ public interface IRelicTemplateHolder {
 
     @ApiStatus.Obsolete
     @ApiStatus.NonExtendable
-    default StatisticTemplate getAbilityStatisticTemplate(LivingEntity entity, ItemStack stack, String ability) {
+    default AbilityStatisticTemplate getAbilityStatisticTemplate(LivingEntity entity, ItemStack stack, String ability) {
         return this.getAbilityTemplate(entity, stack, ability).getStatistic();
     }
 

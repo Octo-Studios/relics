@@ -15,7 +15,7 @@ import net.minecraft.network.chat.Component;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RelicTemplate {
     private final AbilitiesTemplate abilities;
-    private final StatisticTemplate statistic;
+    private final RelicStatisticTemplate statistic;
     private final LevelingTemplate leveling;
     private final StyleTemplate style;
     private final LootTemplate loot;
@@ -32,10 +32,10 @@ public class RelicTemplate {
     public static class RelicTemplateBuilder {
         private AbilitiesTemplate abilities = AbilitiesTemplate.builder().build();
         @Deprecated // TODO: Replace with relic data construction event
-        private StatisticTemplate statistic = StatisticTemplate.builder()
-                .metric(MetricTemplate.builder("retention_time")
+        private RelicStatisticTemplate statistic = RelicStatisticTemplate.builder()
+                .metric(RelicMetricTemplate.builder("retention_time")
                         .formatValue((value) -> MathUtils.formatTime(value.intValue()))
-                        .component((entity, stack, optional) -> Component.translatable("relics.description.statistic.relic.retention_time"))
+                        .component((entity, stack) -> Component.translatable("relics.description.statistic.relic.retention_time"))
                         .build())
                 .build();
         private LevelingTemplate leveling = LevelingTemplate.builder().build();
@@ -56,7 +56,7 @@ public class RelicTemplate {
             return this;
         }
 
-        public RelicTemplateBuilder statistic(StatisticTemplate statistic) {
+        public RelicTemplateBuilder statistic(RelicStatisticTemplate statistic) {
             this.statistic = statistic;
 
             return this;

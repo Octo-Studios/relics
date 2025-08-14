@@ -15,30 +15,30 @@ import java.util.Map;
 public class ExperienceSourcesTemplate {
     private final LinkedHashMap<String, ExperienceSourceTemplate> sources;
 
-    public static StatisticTemplateBuilder builder() {
-        return new StatisticTemplateBuilder();
+    public static ExperienceSourcesTemplateBuilder builder() {
+        return new ExperienceSourcesTemplateBuilder();
     }
 
-    public StatisticTemplateBuilder toBuilder() {
-        return new StatisticTemplateBuilder(this);
+    public ExperienceSourcesTemplateBuilder toBuilder() {
+        return new ExperienceSourcesTemplateBuilder(this);
     }
 
     @NoArgsConstructor
-    public static class StatisticTemplateBuilder {
+    public static class ExperienceSourcesTemplateBuilder {
         private LinkedHashMap<String, ExperienceSourceTemplate> sources = new LinkedHashMap<>();
 
-        private StatisticTemplateBuilder(ExperienceSourcesTemplate base) {
+        private ExperienceSourcesTemplateBuilder(ExperienceSourcesTemplate base) {
             this.sources = base.getSources();
         }
 
-        public StatisticTemplateBuilder source(ExperienceSourceTemplate source) {
+        public ExperienceSourcesTemplateBuilder source(ExperienceSourceTemplate source) {
             this.sources.put(source.getId(), source);
 
             return this;
         }
 
         @UnstableApi
-        public StatisticTemplateBuilder source(String source) {
+        public ExperienceSourcesTemplateBuilder source(String source) {
             return this.source(ExperienceSourceTemplate.builder(source).build());
         }
 

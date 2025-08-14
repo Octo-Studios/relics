@@ -1,9 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
 import com.google.common.collect.Lists;
-import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
-import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.*;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -60,8 +58,8 @@ public class JellyfishNecklaceItem extends RelicItem {
                                         .source(ExperienceSourceTemplate.builder("health_regeneration")
                                                 .build())
                                         .build())
-                                .statistic(StatisticTemplate.builder()
-                                        .metric(MetricTemplate.builder("health_regenerated")
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("health_regenerated")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
                                         .build())
@@ -136,25 +134,31 @@ public class JellyfishNecklaceItem extends RelicItem {
                                                 .rankModifierCondition("charge")
                                                 .build())
                                         .build())
-                                .statistic(StatisticTemplate.builder()
-                                        .metric(MetricTemplate.builder("rings_accumulated")
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("rings_accumulated")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
-                                        .metric(MetricTemplate.builder("rings_paralysis")
+                                        .metric(AbilityMetricTemplate.builder("rings_paralysis")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
-                                        .metric(MetricTemplate.builder("arcs_spawned")
+                                        .metric(AbilityMetricTemplate.builder("arcs_spawned")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
-                                        .metric(MetricTemplate.builder("arcs_bounces")
+                                        .metric(AbilityMetricTemplate.builder("arcs_bounces")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
-                                        .metric(MetricTemplate.builder("arcs_damage")
+                                        .metric(AbilityMetricTemplate.builder("arcs_damage")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
-                                        .metric(MetricTemplate.builder("hit_paralysis")
+                                        .metric(AbilityMetricTemplate.builder("hit_paralysis")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
-                                                .abilityRankModifierVisibilityCondition("charge")
+                                                .rankModifierVisibilityState("charge", VisibilityState.OBFUSCATED)
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()

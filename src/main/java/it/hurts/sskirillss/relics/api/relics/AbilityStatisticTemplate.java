@@ -6,14 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.Map;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class StatisticTemplate {
-    private final LinkedHashMap<String, MetricTemplate> metrics;
+public class AbilityStatisticTemplate {
+    private final LinkedHashMap<String, AbilityMetricTemplate> metrics;
 
     public static StatisticTemplateBuilder builder() {
         return new StatisticTemplateBuilder();
@@ -25,25 +23,24 @@ public class StatisticTemplate {
 
     @NoArgsConstructor
     public static class StatisticTemplateBuilder {
-        private LinkedHashMap<String, MetricTemplate> metrics = new LinkedHashMap<>();
+        private LinkedHashMap<String, AbilityMetricTemplate> metrics = new LinkedHashMap<>();
 
-        private StatisticTemplateBuilder(StatisticTemplate base) {
+        private StatisticTemplateBuilder(AbilityStatisticTemplate base) {
             this.metrics = base.getMetrics();
         }
 
-        public StatisticTemplateBuilder metric(MetricTemplate metric) {
+        public StatisticTemplateBuilder metric(AbilityMetricTemplate metric) {
             this.metrics.put(metric.getId(), metric);
 
             return this;
         }
 
-        @UnstableApi
         public StatisticTemplateBuilder metric(String metric) {
-            return this.metric(MetricTemplate.builder(metric).build());
+            return this.metric(AbilityMetricTemplate.builder(metric).build());
         }
 
-        public StatisticTemplate build() {
-            return new StatisticTemplate(metrics);
+        public AbilityStatisticTemplate build() {
+            return new AbilityStatisticTemplate(metrics);
         }
     }
 }

@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
@@ -30,9 +31,14 @@ public class RelicStatisticContainerWidget extends SimpleDescriptionContainerWid
         var dotWidth = Math.max(1, font.width(dot));
 
         for (var metric : relic.getRelicStatisticTemplate(player, stack).getMetrics().values()) {
-            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, Optional.empty())).append(Component.literal(" "));
+            var state = metric.getVisibilityState().apply(player, stack);
 
-            if (!metric.getVisibilityCondition().test(player, stack, Optional.empty()))
+            if (state == VisibilityState.HIDDEN)
+                continue;
+
+            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack)).append(Component.literal(" "));
+
+            if (state == VisibilityState.OBFUSCATED)
                 prefix = ScreenUtils.randomizeAllCharacters(prefix, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
 
             var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(relic.getRelicMetricComponent(player, stack, metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));

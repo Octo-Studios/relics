@@ -1,9 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
-import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.*;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -64,11 +62,11 @@ public class LeafyMantleItem extends RelicItem {
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1619D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .statistic(StatisticTemplate.builder()
-                                        .metric(MetricTemplate.builder("hide_duration")
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("hide_duration")
                                                 .formatValue((value) -> MathUtils.formatTime(value.intValue()))
                                                 .build())
-                                        .metric(MetricTemplate.builder("heal_amount")
+                                        .metric(AbilityMetricTemplate.builder("heal_amount")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
                                         .build())
@@ -106,20 +104,20 @@ public class LeafyMantleItem extends RelicItem {
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .statistic(StatisticTemplate.builder()
-                                        .metric(MetricTemplate.builder("leaves_consumed")
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("leaves_consumed")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .build())
-                                        .metric(MetricTemplate.builder("damage_negated")
+                                        .metric(AbilityMetricTemplate.builder("damage_negated")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
-                                        .metric(MetricTemplate.builder("damage_dealt")
+                                        .metric(AbilityMetricTemplate.builder("damage_dealt")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
-                                                .abilityRankModifierVisibilityCondition("piercing")
+                                                .rankModifierVisibilityState("piercing", VisibilityState.OBFUSCATED)
                                                 .build())
-                                        .metric(MetricTemplate.builder("paralysis_duration")
+                                        .metric(AbilityMetricTemplate.builder("paralysis_duration")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
-                                                .abilityRankModifierVisibilityCondition("piercing")
+                                                .rankModifierVisibilityState("piercing", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()

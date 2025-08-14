@@ -1,8 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.belt;
 
-import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
-import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.*;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -90,17 +88,20 @@ public class KineticBeltItem extends RelicItem {
                                                 .rankModifierCondition("resistance")
                                                 .build())
                                         .build())
-                                .statistic(StatisticTemplate.builder()
-                                        .metric(MetricTemplate.builder("duration")
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("duration")
                                                 .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
-                                        .metric(MetricTemplate.builder("damage")
+                                        .metric(AbilityMetricTemplate.builder("damage")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
-                                                .abilityRankModifierVisibilityCondition("strike")
+                                                .rankModifierVisibilityState("strike", VisibilityState.OBFUSCATED)
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
-                                        .metric(MetricTemplate.builder("resistance")
+                                        .metric(AbilityMetricTemplate.builder("resistance")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
-                                                .abilityRankModifierVisibilityCondition("resistance")
+                                                .rankModifierVisibilityState("resistance", VisibilityState.OBFUSCATED)
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()

@@ -13,15 +13,15 @@ import lombok.Data;
 public class RelicComponent {
     private final AbilitiesComponent abilities;
     private final LevelingComponent leveling;
-    private final StatisticComponent statistic;
+    private final RelicStatisticComponent statistic;
 
-    public static final RelicComponent EMPTY = new RelicComponent(AbilitiesComponent.EMPTY, LevelingComponent.EMPTY, StatisticComponent.EMPTY);
+    public static final RelicComponent EMPTY = new RelicComponent(AbilitiesComponent.EMPTY, LevelingComponent.EMPTY, RelicStatisticComponent.EMPTY);
 
     public static final Codec<RelicComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     AbilitiesComponent.CODEC.fieldOf("abilities").forGetter(RelicComponent::getAbilities),
                     LevelingComponent.CODEC.fieldOf("leveling").forGetter(RelicComponent::getLeveling),
-                    StatisticComponent.CODEC.fieldOf("statistic").forGetter(RelicComponent::getStatistic)
+                    RelicStatisticComponent.CODEC.fieldOf("statistic").forGetter(RelicComponent::getStatistic)
             ).apply(instance, RelicComponent::new)
     );
 }

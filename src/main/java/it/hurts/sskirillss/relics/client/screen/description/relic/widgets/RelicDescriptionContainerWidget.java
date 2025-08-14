@@ -32,7 +32,7 @@ public class RelicDescriptionContainerWidget extends DescriptionContainerWidget 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
         var lineOffset = this.minecraft.font.lineHeight + 1;
-        var lines = RelicDescriptionScreen.justifyStyledText(Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".description"), 320, minecraft.font);
+        var lines = RelicDescriptionScreen.justifyStyledText(Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".description"), 320);
 
         var scroll = getScrollbar();
 
@@ -57,6 +57,6 @@ public class RelicDescriptionContainerWidget extends DescriptionContainerWidget 
 
     @Override
     public int getContentHeight() {
-        return (int) (RelicDescriptionScreen.justifyStyledText(Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".description"), 320, this.minecraft.font).size() * (this.minecraft.font.lineHeight + 1) / 2F);
+        return (int) (RelicDescriptionScreen.justifyStyledText(Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(this.getScreen().getStack().getItem()).getPath() + ".description"), 320).size() * (this.minecraft.font.lineHeight + 1) / 2F);
     }
 }

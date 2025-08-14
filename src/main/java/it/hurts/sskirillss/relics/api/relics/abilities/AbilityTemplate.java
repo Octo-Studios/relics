@@ -4,8 +4,8 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
@@ -35,7 +35,7 @@ public class AbilityTemplate {
     private final int requiredPoints;
     private final CastData castData;
     private final ResearchTemplate researchTemplate;
-    private final StatisticTemplate statistic;
+    private final AbilityStatisticTemplate statistic;
     private final List<String> modes;
     private final ExperienceSourcesTemplate experienceSources;
     private final Multimap<Integer, String> rankModifiers;
@@ -69,7 +69,7 @@ public class AbilityTemplate {
         private int requiredPoints = 1;
         private CastData castData = CastData.builder().build();
         private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
-        private StatisticTemplate statistic = StatisticTemplate.builder().build();
+        private AbilityStatisticTemplate statistic = AbilityStatisticTemplate.builder().build();
         private List<String> modes = new ArrayList<>();
         private ExperienceSourcesTemplate experienceSources = ExperienceSourcesTemplate.builder().build();
         private Multimap<Integer, String> rankModifiers = LinkedHashMultimap.create();
@@ -149,7 +149,7 @@ public class AbilityTemplate {
             return this;
         }
 
-        public AbilityTemplateBuilder statistic(StatisticTemplate statistic) {
+        public AbilityTemplateBuilder statistic(AbilityStatisticTemplate statistic) {
             this.statistic = statistic;
 
             return this;

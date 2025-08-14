@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -33,15 +34,20 @@ public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerW
         var maxWidth = 320;
         var dot = ".";
         var dotWidth = Math.max(1, font.width(dot));
-        var selected = Optional.of(screen.getSelectedAbility());
+        var ability = screen.getSelectedAbility();
 
-        for (var metric : relic.getAbilityStatisticTemplate(player, stack, screen.getSelectedAbility()).getMetrics().values()) {
-            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, selected)).append(Component.literal(" "));
+        for (var metric : relic.getAbilityStatisticTemplate(player, stack, ability).getMetrics().values()) {
+            var state = metric.getVisibilityState().apply(player, stack, ability);
 
-            if (!metric.getVisibilityCondition().test(player, stack, selected))
+            if (state == VisibilityState.HIDDEN)
+                continue;
+
+            var prefix = Component.literal("● ").append(metric.getComponent().apply(player, stack, ability)).append(Component.literal(" "));
+
+            if (state == VisibilityState.OBFUSCATED)
                 prefix = ScreenUtils.randomizeAllCharacters(prefix, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
 
-            var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(relic.getAbilityMetricComponent(player, stack, screen.getSelectedAbility(), metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));
+            var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(relic.getAbilityMetricComponent(player, stack, ability, metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));
 
             var suffixWidth = font.width(suffix);
             var limit = Math.max(0, maxWidth - suffixWidth);

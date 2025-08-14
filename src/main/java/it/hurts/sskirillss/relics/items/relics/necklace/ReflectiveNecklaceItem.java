@@ -1,9 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.relics.MetricTemplate;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
-import it.hurts.sskirillss.relics.api.relics.StatisticTemplate;
+import it.hurts.sskirillss.relics.api.relics.*;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
@@ -79,20 +77,20 @@ public class ReflectiveNecklaceItem extends RelicItem {
                                         .source(ExperienceSourceTemplate.builder("impact")
                                                 .build())
                                         .build())
-                                .statistic(StatisticTemplate.builder()
-                                        .metric(MetricTemplate.builder("total_orbs")
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("total_orbs")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .build())
-                                        .metric(MetricTemplate.builder("total_damage")
+                                        .metric(AbilityMetricTemplate.builder("total_damage")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
-                                        .metric(MetricTemplate.builder("total_stun")
+                                        .metric(AbilityMetricTemplate.builder("total_stun")
                                                 .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
-                                                .abilityRankModifierVisibilityCondition("stun")
+                                                .rankModifierVisibilityState("stun", VisibilityState.OBFUSCATED)
                                                 .build())
-                                        .metric(MetricTemplate.builder("total_bounces")
+                                        .metric(AbilityMetricTemplate.builder("total_bounces")
                                                 .formatValue((value) -> String.valueOf((int) MathUtils.round(value, 0)))
-                                                .abilityRankModifierVisibilityCondition("bounce")
+                                                .rankModifierVisibilityState("bounce", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()

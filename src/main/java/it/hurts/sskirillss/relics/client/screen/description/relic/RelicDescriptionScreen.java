@@ -106,7 +106,8 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
         poseStack.popPose();
     }
 
-    public static List<FormattedCharSequence> justifyStyledText(Component text, int maxWidth, Font font) {
+    public static List<FormattedCharSequence> justifyStyledText(Component text, int maxWidth) {
+        var font = Minecraft.getInstance().font;
         var splitter = font.getSplitter();
         var words = new ArrayList<FormattedText>();
         text.visit((style, str) -> {

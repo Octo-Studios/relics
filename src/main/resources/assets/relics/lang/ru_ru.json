@@ -108,7 +108,7 @@
   "relics.description.description.ability.rank_modifier.condition.rank": "Начиная с %1$s ранга:",
   "relics.description.description.ability.experience_source.condition.rank": "Начиная с %1$s ранга:",
 
-  "relics.description.statistic.relic.retention_time": "Время удержания реликвии",
+  "relics.description.statistic.relic.retention_time": "Время владения реликвией",
 
   "item.relics.reflective_necklace": "Отражающее ожерелье",
   "relics.description.reflective_necklace.description": "Старые легенды рассказывают о мастере-ювелире, что умел запирать в кристаллах саму ярость битвы. Это ожерелье - одно из немногих его творений: гладкие грани камня впитывают силу удара, и хранят её, пока владелец не решит вернуть её врагу. В умелых руках ожерелье становится не просто защитой, а оружием, способным обратить любую враждебную силу против её хозяина.",
@@ -234,10 +234,10 @@
   "relics.description.midnight_mantle.ability.phase.rank_modifier.switch": "Смена режима способности на %5$s секунд повысит его эффективность на %6$s%%.",
   "relics.description.midnight_mantle.ability.phase.experience_source.health_regeneration": "+1 единица опыта за каждую единицу дополнительного урона, нанесённого в режиме Полнолуния.",
   "relics.description.midnight_mantle.ability.phase.experience_source.damage_dealing": "+1 единица опыта за каждую единицу дополнительного здоровья, восстановленного в режиме Новолуния.",
-  "relics.description.midnight_mantle.ability.phase.statistic.duration_new_moon": "Проведено времени в режиме Новолуния",
-  "relics.description.midnight_mantle.ability.phase.statistic.duration_full_moon": "Проведено времени в режиме Полнолуния",
-  "relics.description.midnight_mantle.ability.phase.statistic.additional_damage": "Нанесено дополнительного урона в режиме Полнолуния",
-  "relics.description.midnight_mantle.ability.phase.statistic.health_regeneration": "Исцелено дополнительного здоровья в режиме Новолуния",
+  "relics.description.midnight_mantle.ability.phase.statistic.duration_new_moon": "Проведено времени в режиме",
+  "relics.description.midnight_mantle.ability.phase.statistic.duration_full_moon": "Проведено времени в режиме",
+  "relics.description.midnight_mantle.ability.phase.statistic.additional_damage": "Нанесено дополнительного урона",
+  "relics.description.midnight_mantle.ability.phase.statistic.health_regeneration": "Исцелено дополнительного здоровья",
   "relics.description.midnight_mantle.ability.invisibility": "Тень",
   "relics.description.midnight_mantle.ability.invisibility.description": "При уровне освещённости ниже %1$s%% маскирует носителя реликвии в тени, наделяя его эффектом исчезновения. При выходе из тени повторное срабатывание способности невозможно на %2$s секунд, а также до тех пор, пока все цели в радиусе 16 блоков не потеряют носителя реликвии из виду.",
   "relics.description.midnight_mantle.ability.invisibility.rank_modifier.strike": "Атака из тени наносит повышенный на %3$s%% урон.",

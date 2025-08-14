@@ -390,7 +390,7 @@ public class AbilityResearchScreen extends DescriptionScreen {
             description.add(Component.translatable("relics.description.ability.research.rule_3.description"));
 
             for (var component : description) {
-                for (var line : RelicDescriptionScreen.justifyStyledText(component, 180, minecraft.font)) {
+                for (var line : RelicDescriptionScreen.justifyStyledText(component, 180)) {
                     guiGraphics.drawString(minecraft.font, line, 0, yOff, DescriptionUtils.TEXT_COLOR, false);
 
                     yOff += 10;
