@@ -21,6 +21,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -420,10 +421,13 @@ public class JellyfishNecklaceItem extends RelicItem {
             var entity = event.getEntity();
             var level = entity.level();
 
-            var pos = entity.blockPosition();
+            var box = entity.getBoundingBox();
+
+            var min = BlockPos.containing(Math.floor(box.minX) - 1, Math.floor(box.minY), Math.floor(box.minZ) - 1);
+            var max = BlockPos.containing(Math.floor(box.maxX) + 1, Math.floor(entity.getEyeY()) + 1, Math.floor(box.maxZ) + 1);
 
             // WHY!? (cuz of thread locks lol)
-            if (!level.hasChunkAt(pos) || !level.isLoaded(pos))
+            if (!level.hasChunksAt(min, max))
                 return;
 
             if (entity.isInLiquid() || entity.isInRain()) {
