@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.init;
 
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.items.RelicExperienceBottleItem;
+import it.hurts.sskirillss.relics.items.relics.ChorusStaffItem;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -43,6 +44,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> JELLYFISH_NECKLACE = ITEMS.register("jellyfish_necklace", JellyfishNecklaceItem::new);
     public static final DeferredHolder<Item, RelicItem> MIDNIGHT_MANTLE = ITEMS.register("midnight_mantle", MidnightMantleItem::new);
     public static final DeferredHolder<Item, RelicItem> ROLLER_SKATES = ITEMS.register("roller_skate", RollerSkateItem::new);
+    public static final DeferredHolder<Item, RelicItem> CHORUS_STAFF = ITEMS.register("chorus_staff", ChorusStaffItem::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);

@@ -138,6 +138,8 @@ public class RelicsDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_DURATION = RelicsDataComponents.construct("jellyfish_necklace/duration", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_RINGS = RelicsDataComponents.construct("jellyfish_necklace/rings", Codec.INT);
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CHORUS_STAFF_CHARGE = RelicsDataComponents.construct("chorus_staff/charge", Codec.INT);
+
     public static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> construct(String name, Codec<T> codec) {
         return DATA_COMPONENTS.register(name, () -> DataComponentType.<T>builder()
                 .persistent(codec)

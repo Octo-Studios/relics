@@ -1,0 +1,21 @@
+{
+  "parent": "neoforge:item/default",
+  "base": {
+    "parent": "relics:item/chorus_staff_3d"
+  },
+  "textures": {
+    "particle": "relics:item/chorus_staff"
+  },
+  "loader": "neoforge:separate_transforms",
+  "perspectives": {
+    "ground": {
+      "parent": "relics:item/chorus_staff_2d"
+    },
+    "gui": {
+      "parent": "relics:item/chorus_staff_2d"
+    },
+    "fixed": {
+      "parent": "relics:item/chorus_staff_2d"
+    }
+  }
+}

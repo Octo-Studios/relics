@@ -264,6 +264,9 @@
   "relics.description.midnight_mantle.ability.starfall.statistic.shockwave_stun": "Время оглушения ударной волной от звезды",
   "relics.description.midnight_mantle.ability.starfall.statistic.star_bounces": "Отскоков звёзд",
 
+  "item.relics.chorus_staff": "Хорусовый посох",
+  "relics.description.chorus_staff.description": "",
+
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
 
   "block.relics.phantom_block": "Блок фантомного моста",
