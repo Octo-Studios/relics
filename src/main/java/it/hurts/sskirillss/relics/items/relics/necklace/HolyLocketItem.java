@@ -37,6 +37,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -276,18 +277,29 @@ public class HolyLocketItem extends RelicItem implements IRenderableCurio {
 
         @SubscribeEvent
         public static void onLivingHeal(LivingHealEvent event) {
+            var entity = event.getEntity();
+            var level = entity.level();
+
+            var box = entity.getBoundingBox();
+
+            var min = BlockPos.containing(Math.floor(box.minX) - 1, Math.floor(box.minY), Math.floor(box.minZ) - 1);
+            var max = BlockPos.containing(Math.floor(box.maxX) + 1, Math.floor(entity.getEyeY()) + 1, Math.floor(box.maxZ) + 1);
+
+            // WHY!? (cuz of thread locks lol)
+            if (!level.hasChunksAt(min, max))
+                return;
+
             if (event.getAmount() <= 0.5F)
                 return;
 
             if (event.getEntity() instanceof Player player) {
                 ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.HOLY_LOCKET.get());
-                Level level = player.getCommandSenderWorld();
 
                 if (!(stack.getItem() instanceof HolyLocketItem relic) || NBTUtils.getBoolean(stack, TAG_TOGGLED, true))
                     return;
 
                 for (LivingEntity target : level.getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(relic.getAbilityValue(stack, "belief", "radius"))).stream()
-                        .filter(player::hasLineOfSight).sorted(Comparator.comparing(entity -> entity.position().distanceTo(player.position()))).limit((int) relic.getAbilityValue(stack, "belief", "count")).toList()) {
+                        .filter(player::hasLineOfSight).sorted(Comparator.comparing(possibleTarget -> possibleTarget.position().distanceTo(player.position()))).limit((int) relic.getAbilityValue(stack, "belief", "count")).toList()) {
                     if (target.getStringUUID().equals(player.getStringUUID()))
                         continue;
 
@@ -309,9 +321,6 @@ public class HolyLocketItem extends RelicItem implements IRenderableCurio {
                     relic.addCharge(stack, 1);
                 }
             } else {
-                LivingEntity entity = event.getEntity();
-                Level level = entity.getCommandSenderWorld();
-
                 for (ServerPlayer playerSearched : level.getEntitiesOfClass(ServerPlayer.class, event.getEntity().getBoundingBox().inflate(32))) {
                     ItemStack stack = EntityUtils.findEquippedCurio(playerSearched, ItemRegistry.HOLY_LOCKET.get());
 
