@@ -25,6 +25,7 @@ import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -230,6 +231,18 @@ public class HolyLocketItem extends RelicItem {
 
         @SubscribeEvent
         public static void onLivingHeal(LivingHealEvent event) {
+            var entity = event.getEntity();
+            var level = entity.level();
+
+            var box = entity.getBoundingBox();
+
+            var min = BlockPos.containing(Math.floor(box.minX) - 1, Math.floor(box.minY), Math.floor(box.minZ) - 1);
+            var max = BlockPos.containing(Math.floor(box.maxX) + 1, Math.floor(entity.getEyeY()) + 1, Math.floor(box.maxZ) + 1);
+
+            // WHY!? (cuz of thread locks lol)
+            if (!level.hasChunksAt(min, max))
+                return;
+
             var amount = event.getAmount();
 
             if (amount <= 0.5F)
@@ -239,8 +252,6 @@ public class HolyLocketItem extends RelicItem {
 
             var maxDistance = item.getRelativeStatValue("faith", "radius", item.getStatData("faith", "radius").getInitialValue().getValue(), item.getLevelingData().getMaxLevel());
 
-            var entity = event.getEntity();
-            var level = entity.getCommandSenderWorld();
             var random = level.getRandom();
 
             var targets = 0;
