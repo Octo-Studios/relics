@@ -264,6 +264,21 @@
   "relics.description.midnight_mantle.ability.starfall.statistic.shockwave_stun": "Shockwave Stun Time from Star",
   "relics.description.midnight_mantle.ability.starfall.statistic.star_bounces": "Star Bounces",
 
+  "item.relics.chorus_staff": "Chorus Staff",
+  "relics.description.chorus_staff.description": "A branch of the peculiar chorus, stolen from the distant End islands. After many years it still holds the power of teleportation: one swing and the body vanishes, only to reappear in another unknown place.",
+  "relics.description.chorus_staff.ability.blink": "Teleportation",
+  "relics.description.chorus_staff.ability.blink.description": "When used, teleports the relic bearer forward up to %1$s blocks, consuming 1 unit from an internal buffer of %2$s units. The buffer regenerates automatically by 1 unit every %3$s seconds.",
+  "relics.description.chorus_staff.ability.blink.rank_modifier.safe_fall": "Landing after teleportation does not deal fall damage.",
+  "relics.description.chorus_staff.ability.blink.rank_modifier.ascent": "Using teleportation while looking at a block within reach teleports the player to that block instead of forward. If there are other blocks above the target, the remaining teleportation distance is used to find a safe location.",
+  "relics.description.chorus_staff.ability.blink.rank_modifier.flicker": "When teleporting, all nearby targets briefly lose sight of the player.",
+  "relics.description.chorus_staff.ability.blink.experience_source.blink": "+1 experience point for each teleport performed.",
+  "relics.description.chorus_staff.ability.blink.experience_source.safe_fall": "+1 experience point for each safe landing after teleportation.",
+  "relics.description.chorus_staff.ability.blink.experience_source.flicker": "+1 experience point for each target that lost sight of the relic bearer during teleportation.",
+  "relics.description.chorus_staff.ability.blink.statistic.blinks_amount": "Total Teleports",
+  "relics.description.chorus_staff.ability.blink.statistic.distance_traveled": "Distance Traveled via Teleportation",
+  "relics.description.chorus_staff.ability.blink.statistic.targets": "Targets that lost sight of the relic bearer during teleportation",
+  "relics.description.chorus_staff.ability.blink.statistic.safe_falls": "Safe Landings after Teleportation",
+
   "item.relics.relic_experience_bottle": "Relic Experience Bottle",
 
   "block.relics.phantom_block": "Phantom Bridge Block",

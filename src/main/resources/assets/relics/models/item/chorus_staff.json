@@ -1,21 +1,10 @@
 {
-  "parent": "neoforge:item/default",
-  "base": {
-    "parent": "relics:item/chorus_staff_3d"
-  },
-  "textures": {
-    "particle": "relics:item/chorus_staff"
-  },
-  "loader": "neoforge:separate_transforms",
-  "perspectives": {
-    "ground": {
-      "parent": "relics:item/chorus_staff_2d"
+  "parent": "item/generated",
+    "textures": {
+        "layer0": "relics:item/chorus_staff"
     },
-    "gui": {
-      "parent": "relics:item/chorus_staff_2d"
-    },
-    "fixed": {
-      "parent": "relics:item/chorus_staff_2d"
-    }
-  }
+    "overrides": [
+        { "predicate": { "relics:flawless": 0 }, "model": "relics:item/chorus_staff_non_flawless" },
+        { "predicate": { "relics:flawless": 1 }, "model": "relics:item/chorus_staff_flawless" }
+    ]
 }

@@ -1,30 +1,45 @@
 package it.hurts.sskirillss.relics.items.relics;
 
-import it.hurts.sskirillss.relics.api.events.common.ContainerSlotClickEvent;
+import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.init.RelicsCreativeTabs;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
+import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
+import it.hurts.sskirillss.relics.items.misc.ICreativeTabContent;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
+import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -32,25 +47,63 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 
 import java.awt.*;
 
-public class ChorusStaffItem extends RelicItem {
+public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("blink")
+                                .rankModifier(1, "flicker")
+                                .rankModifier(3, "safe_fall")
+                                .rankModifier(5, "ascent")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("distance")
                                         .initialValue(10D, 15D)
-                                        .upgradeModifier(RelicsScalingModels.RADICAL.get(), 0.1268D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("max_charge")
-                                        .initialValue(10D, 15D)
-                                        .upgradeModifier(RelicsScalingModels.RADICAL.get(), 0.1268D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .initialValue(3D, 5D)
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .build())
+                                .stat(StatTemplate.builder("cooldown")
+                                        .initialValue(30D, 15D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.019D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source("blink")
+                                        .source(ExperienceSourceTemplate.builder("flicker")
+                                                .rankModifierVisibilityState("flicker", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("safe_fall")
+                                                .rankModifierVisibilityState("safe_fall", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("blinks_amount")
+                                                .formatValue((value) -> String.valueOf(value.intValue()))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("distance_traveled")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("targets")
+                                                .formatValue((value) -> String.valueOf(value.intValue()))
+                                                .rankModifierVisibilityState("flicker", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("safe_falls")
+                                                .formatValue((value) -> String.valueOf(value.intValue()))
+                                                .rankModifierVisibilityState("safe_fall", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 14, 4).star(1, 8, 6).star(2, 19, 13).star(3, 12, 14).star(4, 3, 15).star(5, 7, 22).star(6, 14, 22).star(7, 7, 28)
+                                        .link(7, 5).link(5, 4).link(5, 6).link(5, 3).link(3, 2).link(3, 1).link(3, 0)
                                         .build())
                                 .build())
                         .build())
@@ -60,13 +113,13 @@ public class ChorusStaffItem extends RelicItem {
                         .build())
                 .style(StyleTemplate.builder()
                         .tooltip(TooltipData.builder()
-                                .borderTop(0xff00baff)
-                                .borderBottom(0xff0090a9)
+                                .borderTop(0xff3c1230)
+                                .borderBottom(0xff544d20)
                                 .textured(true)
                                 .build())
                         .build())
                 .loot(LootTemplate.builder()
-                        .entry(LootEntries.NETHER_LIKE, LootEntries.THE_NETHER)
+                        .entry(LootEntries.END_LIKE, LootEntries.THE_END)
                         .build())
                 .build();
     }
@@ -76,20 +129,31 @@ public class ChorusStaffItem extends RelicItem {
     }
 
     public int getCharge(LivingEntity entity, ItemStack stack) {
-        return Math.clamp(stack.getOrDefault(RelicsDataComponents.CHARGE, 0), 0, this.getMaxCharge(entity, stack));
+        return Math.clamp(stack.getOrDefault(RelicsDataComponents.CHORUS_STAFF_CHARGE, 0), 0, this.getMaxCharge(entity, stack));
     }
 
     public void setCharge(LivingEntity entity, ItemStack stack, int charge) {
-        stack.set(RelicsDataComponents.CHARGE, Math.clamp(charge, 0, this.getMaxCharge(entity, stack)));
+        stack.set(RelicsDataComponents.CHORUS_STAFF_CHARGE, Math.clamp(charge, 0, this.getMaxCharge(entity, stack)));
     }
 
     public void addCharge(LivingEntity entity, ItemStack stack, int charge) {
         this.setCharge(entity, stack, this.getCharge(entity, stack) + charge);
     }
 
+    public void setSafeFall(ItemStack stack, boolean state) {
+        stack.set(RelicsDataComponents.CHORUS_STAFF_SAFE_FALL, state);
+    }
+
+    public boolean shouldSafeFall(ItemStack stack) {
+        return stack.getOrDefault(RelicsDataComponents.CHORUS_STAFF_SAFE_FALL, false);
+    }
+
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
+
+        if (!this.canPlayerUseAbility(player, stack, "blink"))
+            return InteractionResultHolder.pass(stack);
 
         var radius = this.getStatValue(player, stack, "blink", "distance");
 
@@ -102,7 +166,13 @@ public class ChorusStaffItem extends RelicItem {
 
         var impulse = Vec3.ZERO;
 
-        if (hit.getType() == HitResult.Type.BLOCK && hit.getLocation().distanceTo(eyePos) <= radius) {
+        var charge = this.getCharge(player, stack);
+
+        if (charge <= 0)
+            return InteractionResultHolder.pass(stack);
+
+        if (this.isAbilityRankModifierUnlocked(player, stack, "blink", "ascent")
+                && hit.getType() == HitResult.Type.BLOCK && hit.getLocation().distanceTo(eyePos) <= radius) {
             var current = hit.getBlockPos();
 
             var maxUp = (int) Math.floor(radius - eyePos.distanceTo(hit.getLocation()));
@@ -115,6 +185,7 @@ public class ChorusStaffItem extends RelicItem {
 
                 if (level.isEmptyBlock(feet) && level.isEmptyBlock(head)) {
                     feetPos = feet;
+
                     break;
                 }
             }
@@ -134,70 +205,162 @@ public class ChorusStaffItem extends RelicItem {
             impulse = lookAngle.scale(1.25 + extra);
         }
 
-        if (level.isClientSide) {
-            var random = level.getRandom();
+        var random = level.getRandom();
 
-            var shift = player.getBbHeight() / 2F;
-            var from = player.position().add(0F, shift, 0F);
-            var to = destination.add(0F, shift, 0F);
+        var shift = player.getBbHeight() / 2F;
+        var from = player.position().add(0F, shift, 0F);
+        var to = destination.add(0F, shift, 0F);
 
-            var direction = to.subtract(from);
-            var dist = Math.max(0.001, direction.length());
-
-            var forward = direction.scale(1.0 / dist);
-            var up = Math.abs(forward.y) < 0.99 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
-            var right = forward.cross(up).normalize();
-            var binormal = forward.cross(right).normalize();
-
-            var pointCount = (int) Math.round(dist);
-            var points = new Vec3[pointCount];
-
-            for (int i = 0; i < pointCount; i++) {
-                var t = i / (float) (pointCount - 1);
-
-                var base = new Vec3(Mth.lerp(t, from.x, to.x), Mth.lerp(t, from.y, to.y), Mth.lerp(t, from.z, to.z));
-                var wobble = 1F + 0.5F * (float) Math.sin(t * Math.PI);
-
-                var ox = (random.nextFloat() - 0.5F) * wobble;
-                var oy = (random.nextFloat() - 0.5F) * wobble;
-
-                points[i] = base.add(right.scale(ox)).add(binormal.scale(oy));
-            }
-
-            var segments = 12;
-
-            for (int i = 0; i < pointCount - 1; i++) {
-                var p0 = points[i];
-                var p1 = points[i + 1];
-
-                for (int s = 0; s <= segments; s++) {
-                    var t = s / (float) segments;
-
-                    var px = Mth.lerp(t, p0.x, p1.x);
-                    var py = Mth.lerp(t, p0.y, p1.y);
-                    var pz = Mth.lerp(t, p0.z, p1.z);
-
-                    level.addParticle(ParticleUtils.constructSimpleSpark(new Color(155 + random.nextInt(100), 80, 255), 1F, 3, 0.5F), px, py, pz, 0F, 0F, 0F);
-                }
-            }
-        }
+        level.playSound(player, new BlockPos((int) from.x(), (int) from.y(), (int) from.z()), SoundEvents.ENDERMAN_TELEPORT, SoundSource.MASTER, 1F, 1F);
+        level.playSound(player, new BlockPos((int) to.x(), (int) to.y(), (int) to.z()), SoundEvents.ENDERMAN_TELEPORT, SoundSource.MASTER, 1F, 1F);
 
         if (!level.isClientSide) {
+            ServerScheduler.schedule(1, () -> {
+                var direction = to.subtract(from);
+                var dist = Math.max(0.001, direction.length());
+
+                var forward = direction.scale(1.0 / dist);
+                var up = Math.abs(forward.y) < 0.99 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
+                var right = forward.cross(up).normalize();
+                var binormal = forward.cross(right).normalize();
+
+                var pointCount = (int) Math.round(dist);
+                var points = new Vec3[pointCount];
+
+                for (int i = 0; i < pointCount; i++) {
+                    var t = i / (float) (pointCount - 1);
+
+                    var base = new Vec3(Mth.lerp(t, from.x, to.x), Mth.lerp(t, from.y, to.y), Mth.lerp(t, from.z, to.z));
+                    var wobble = 1F + 0.5F * (float) Math.sin(t * Math.PI);
+
+                    var ox = (random.nextFloat() - 0.5F) * wobble;
+                    var oy = (random.nextFloat() - 0.5F) * wobble;
+
+                    points[i] = base.add(right.scale(ox)).add(binormal.scale(oy));
+                }
+
+                var segments = 12;
+
+                for (int i = 0; i < pointCount - 1; i++) {
+                    var p0 = points[i];
+                    var p1 = points[i + 1];
+
+                    for (int s = 0; s <= segments; s++) {
+                        var t = s / (float) segments;
+
+                        var px = Mth.lerp(t, p0.x, p1.x);
+                        var py = Mth.lerp(t, p0.y, p1.y);
+                        var pz = Mth.lerp(t, p0.z, p1.z);
+
+                        if (level instanceof ServerLevel serverLevel)
+                            serverLevel.sendParticles(ParticleUtils.constructSimpleSpark(FlawlessUtils.getColor(player, stack, new Color(155 + random.nextInt(100), 80, 255)), 1F, 3, 0.5F), px, py, pz, 1, 0, 0, 0, 0);
+                    }
+                }
+            });
+
             if (player instanceof ServerPlayer serverPlayer) {
                 serverPlayer.teleportTo((ServerLevel) level, destination.x, destination.y, destination.z, player.getYRot(), player.getXRot());
+
                 serverPlayer.fallDistance = 0;
+
                 NetworkHandler.sendToClient(new S2CSetEntityMotion(player.getId(), impulse.toVector3f()), serverPlayer);
+
+                var finalImpulse = impulse;
+
+                ServerScheduler.schedule(1, () -> NetworkHandler.sendToClient(new S2CSetEntityMotion(player.getId(), finalImpulse.toVector3f()), serverPlayer));
+
+                this.addCharge(player, stack, -1);
+
+                this.addRelicExperience(player, stack, "blink", "blink", 1);
+
+                this.addAbilityMetricValue(player, stack, "blink", "blinks_amount", 1);
+                this.addAbilityMetricValue(player, stack, "blink", "distance_traveled", from.distanceTo(to));
+
+                if (this.isAbilityRankModifierUnlocked(player, stack, "blink", "safe_fall"))
+                    this.setSafeFall(stack, true);
+
+                if (this.isAbilityRankModifierUnlocked(player, stack, "blink", "flicker")) {
+                    for (var mob : level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(32))) {
+                        if (mob.getTarget() == player) {
+                            mob.setTarget(null);
+
+                            this.addRelicExperience(player, stack, "blink", "flicker", 1);
+
+                            this.addAbilityMetricValue(player, stack, "blink", "targets", 1);
+                        }
+                    }
+                }
             }
         }
 
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+
+        if (level.isClientSide() || !(entity instanceof LivingEntity livingEntity) || livingEntity.tickCount % ((int) this.getStatValue(livingEntity, stack, "blink", "cooldown") * 20) != 0
+                || this.getCharge(livingEntity, stack) >= this.getMaxCharge(livingEntity, stack))
+            return;
+
+        this.addCharge(livingEntity, stack, 1);
+    }
+
+    @Override
+    public void gatherCreativeTabContent(CreativeContentConstructor constructor) {
+        var stack = this.getDefaultInstance();
+
+        this.setCharge(null, stack, this.getMaxCharge(null, stack));
+
+        constructor.entry(RelicsCreativeTabs.RELICS_TAB.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS, stack);
+    }
+
+    @Override
+    public int getBarColor(ItemStack stack) {
+        return Mth.hsvToRgb(Math.max(0F, (float) this.getCharge(null, stack) / this.getMaxCharge(null, stack)) / 3F, 1F, 1F);
+    }
+
+    @Override
+    public int getBarWidth(ItemStack stack) {
+        return (int) Math.ceil((13F * this.getCharge(null, stack)) / this.getMaxCharge(null, stack));
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack stack) {
+        return this.getCharge(null, stack) < this.getMaxCharge(null, stack);
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return this.getMaxCharge(null, stack);
+    }
+
     @EventBusSubscriber
     public static class CommonEvents {
         @SubscribeEvent
-        public static void onSlotClick(ContainerSlotClickEvent event) {
+        public static void onLivingFall(LivingFallEvent event) {
+            if (!(event.getEntity() instanceof Player player))
+                return;
 
+            var inventory = player.getInventory();
+
+            for (int i = 0; i < inventory.getContainerSize(); i++) {
+                var stack = inventory.getItem(i);
+
+                if (stack.getItem() instanceof ChorusStaffItem relic) {
+                    if (!relic.isAbilityRankModifierUnlocked(player, stack, "blink", "safe_fall") || !relic.shouldSafeFall(stack))
+                        continue;
+
+                    relic.setSafeFall(stack, false);
+
+                    relic.addRelicExperience(player, stack, "blink", "blink", 1);
+
+                    relic.addAbilityMetricValue(player, stack, "blink", "safe_falls", 1);
+
+                    event.setDamageMultiplier(0F);
+                }
+            }
         }
     }
 }

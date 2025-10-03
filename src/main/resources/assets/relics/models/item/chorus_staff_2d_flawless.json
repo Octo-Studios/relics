@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "relics:item/chorus_staff"
+        "layer0": "relics:item/chorus_staff_flawless"
     }
 }

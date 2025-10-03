@@ -265,7 +265,20 @@
   "relics.description.midnight_mantle.ability.starfall.statistic.star_bounces": "Отскоков звёзд",
 
   "item.relics.chorus_staff": "Хорусовый посох",
-  "relics.description.chorus_staff.description": "",
+  "relics.description.chorus_staff.description": "Ветвь причудливого хоруса, похищенная из дальних островов Края. Спустя годы она всё так же таит в себе силу телепортации: один взмах - и тело исчезает, чтобы тут же появиться в ином, доселе неведомом месте.",
+  "relics.description.chorus_staff.ability.blink": "Телепортация",
+  "relics.description.chorus_staff.ability.blink.description": "При использовании телепортирует носителя реликвии вперёд на расстояние до %1$s блоков, расходуя 1 единицу из внутреннего буфера объемом в %2$s единиц. Буфер автоматически регенерирует по 1 единице каждые %3$s секунд.",
+  "relics.description.chorus_staff.ability.blink.rank_modifier.safe_fall": "Приземление после телепортации не наносит урона от падения.",
+  "relics.description.chorus_staff.ability.blink.rank_modifier.ascent": "Использование телепортации глядя на блок в пределах зоны досягаемости вместо телепортации вперед телепортирует игрока на этот блок. Если над целевым блоком есть другие блоки, остаток от расстояния телепортации будет использован на поиск безопасной локации.",
+  "relics.description.chorus_staff.ability.blink.rank_modifier.flicker": "При использовании телепортации все цели поблизости на долю секунды теряют игрока из виду.",
+  "relics.description.chorus_staff.ability.blink.experience_source.blink": "+1 единица опыта за каждую секунду катания.",
+  "relics.description.chorus_staff.ability.blink.experience_source.blink": "+1 единица опыта за каждую совершённую телепортацию.",
+  "relics.description.chorus_staff.ability.blink.experience_source.safe_fall": "+1 единица опыта за каждое безопасное приземление после телепортации.",
+  "relics.description.chorus_staff.ability.blink.experience_source.flicker": "+1 единица опыта за каждую цель, потерявшую носителя реликвии из виду при телепортации.",
+  "relics.description.chorus_staff.ability.blink.statistic.blinks_amount": "Всего телепортаций",
+  "relics.description.chorus_staff.ability.blink.statistic.distance_traveled": "Преодолено расстояния посредством телепортации",
+  "relics.description.chorus_staff.ability.blink.statistic.targets": "Целей, потерявших носителя реликвии из виду во время телепортации",
+  "relics.description.chorus_staff.ability.blink.statistic.safe_falls": "Безопасных приземлений после телепортации",
 
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
 

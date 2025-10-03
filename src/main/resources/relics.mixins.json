@@ -21,6 +21,7 @@
   "client": [
     "CameraMixin",
     "GuiGraphicsMixin",
+    "ItemRendererMixin",
     "KeyboardHandlerMixin",
     "LivingEntityRendererMixin",
     "MouseHandlerMixin",

@@ -1,0 +1,21 @@
+{
+  "parent": "neoforge:item/default",
+  "base": {
+    "parent": "relics:item/chorus_staff_3d_flawless"
+  },
+  "textures": {
+    "particle": "relics:item/chorus_staff"
+  },
+  "loader": "neoforge:separate_transforms",
+  "perspectives": {
+    "ground": {
+      "parent": "relics:item/chorus_staff_2d_flawless"
+    },
+    "gui": {
+      "parent": "relics:item/chorus_staff_2d_flawless"
+    },
+    "fixed": {
+      "parent": "relics:item/chorus_staff_2d_flawless"
+    }
+  }
+}
