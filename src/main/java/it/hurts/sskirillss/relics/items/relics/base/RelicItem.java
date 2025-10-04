@@ -27,7 +27,7 @@ import top.theillusivec4.curios.api.type.capability.ICurioItem;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicItem, ICreativeTabContent {
+public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicItem {
     public RelicItem(Item.Properties properties) {
         super(properties);
     }
@@ -76,11 +76,6 @@ public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicIt
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged) {
         return slotChanged;
-    }
-
-    @Override
-    public void gatherCreativeTabContent(CreativeContentConstructor constructor) {
-        constructor.entry(RelicsCreativeTabs.RELICS_TAB.get(), CreativeModeTab.TabVisibility.PARENT_AND_SEARCH_TABS, this);
     }
 
     @Override

@@ -5,36 +5,29 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
-import it.hurts.sskirillss.relics.client.gui.layers.*;
-import it.hurts.sskirillss.relics.client.layer.BackLayer;
-import it.hurts.sskirillss.relics.client.layer.BeltLayer;
-import it.hurts.sskirillss.relics.client.layer.FeetLayer;
-import it.hurts.sskirillss.relics.client.layer.NecklaceLayer;
+import it.hurts.sskirillss.relics.client.gui.layers.ActiveAbilitiesLayer;
+import it.hurts.sskirillss.relics.client.gui.layers.InfoTileLayer;
+import it.hurts.sskirillss.relics.client.gui.layers.LeafyMantleHideLayer;
+import it.hurts.sskirillss.relics.client.gui.layers.StunEffectLayer;
+import it.hurts.sskirillss.relics.client.layer.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
-import it.hurts.sskirillss.relics.client.models.items.base.CurioModel;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.*;
-import it.hurts.sskirillss.relics.client.renderer.items.items.CurioRenderer;
 import it.hurts.sskirillss.relics.description_categories.AbilityDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCategory;
 import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
-import it.hurts.sskirillss.relics.init.RelicsRelicRenderers;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
+import it.hurts.sskirillss.relics.init.RelicsRelicRenderers;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
-import it.hurts.sskirillss.relics.items.relics.base.IRenderableCurio;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -42,7 +35,6 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import top.theillusivec4.curios.api.client.CuriosRendererRegistry;
 
 @EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientHandler {
@@ -81,13 +73,7 @@ public class ClientHandler {
         RelicsRelicRenderers.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.LEAFY_MANTLE.get(), LeafyMantleRenderer::new);
-
-        for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
-            if (!(item instanceof IRenderableCurio))
-                continue;
-
-            CuriosRendererRegistry.register(item, CurioRenderer::new);
-        }
+        RelicsRelicRenderers.register(RelicsItems.PIGLIN_MASK.get(), PiglinMaskRenderer::new);
 
         EntityTrailRegistry.registerProvider(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.ELECTRIC_SPARK.get(), ElectricSparkEntity.TrailProvider::new);
@@ -118,27 +104,20 @@ public class ClientHandler {
         event.registerLayerDefinition(MidnightMantleModel.LAYER, MidnightMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(LeafyMantleModel.LAYER, LeafyMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(RollerSkateModel.LAYER, RollerSkateModel::constructLayerDefinition);
-
-        for (Item item : BuiltInRegistries.ITEM.stream().toList()) {
-            if (!(item instanceof IRenderableCurio renderable))
-                continue;
-
-            event.registerLayerDefinition(CurioModel.getLayerLocation(item), renderable::constructLayerDefinition);
-        }
+        event.registerLayerDefinition(PiglinMaskModel.LAYER, PiglinMaskModel::constructLayerDefinition);
     }
 
     @SubscribeEvent
     public static void onPlayerRendererRegister(EntityRenderersEvent.AddLayers event) {
         for (var skinType : event.getSkins()) {
-           var renderer = event.getSkin(skinType);
+            if (event.getSkin(skinType) instanceof PlayerRenderer renderer) {
+                renderer.addLayer(new WingsLayer<>(renderer));
 
-            if (renderer instanceof PlayerRenderer playerRenderer) {
-                playerRenderer.addLayer(new WingsLayer<>(playerRenderer));
-
-                playerRenderer.addLayer(new NecklaceLayer<>(playerRenderer));
-                playerRenderer.addLayer(new BeltLayer<>(playerRenderer));
-                playerRenderer.addLayer(new BackLayer<>(playerRenderer));
-                playerRenderer.addLayer(new FeetLayer<>(playerRenderer));
+                renderer.addLayer(new NecklaceLayer<>(renderer));
+                renderer.addLayer(new BeltLayer<>(renderer));
+                renderer.addLayer(new BackLayer<>(renderer));
+                renderer.addLayer(new FeetLayer<>(renderer));
+                renderer.addLayer(new HeadLayer<>(renderer));
             }
         }
 

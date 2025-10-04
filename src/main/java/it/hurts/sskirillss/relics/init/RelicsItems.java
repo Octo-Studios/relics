@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.init;
 
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.items.GoldenToothItem;
 import it.hurts.sskirillss.relics.items.RelicExperienceBottleItem;
 import it.hurts.sskirillss.relics.items.relics.ChorusStaffItem;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
@@ -9,6 +10,7 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
 import it.hurts.sskirillss.relics.items.relics.feet.RollerSkateItem;
 import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
+import it.hurts.sskirillss.relics.items.relics.head.PiglinMaskItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -21,6 +23,7 @@ public class RelicsItems {
     public static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, Relics.MODID);
 
     public static final DeferredHolder<Item, Item> RELIC_EXPERIENCE_BOTTLE = ITEMS.register("relic_experience_bottle", RelicExperienceBottleItem::new);
+    public static final DeferredHolder<Item, Item> GOLDEN_TOOTH = ITEMS.register("golden_tooth", GoldenToothItem::new);
 
 //    public static final DeferredHolder<Item, RelicItem> MAGMA_WALKER = ITEMS.register("magma_walker", MagmaWalkerItem::new);
 //    public static final DeferredHolder<Item, RelicItem> AQUA_WALKER = ITEMS.register("aqua_walker", AquaWalkerItem::new);
@@ -45,6 +48,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> MIDNIGHT_MANTLE = ITEMS.register("midnight_mantle", MidnightMantleItem::new);
     public static final DeferredHolder<Item, RelicItem> ROLLER_SKATES = ITEMS.register("roller_skate", RollerSkateItem::new);
     public static final DeferredHolder<Item, RelicItem> CHORUS_STAFF = ITEMS.register("chorus_staff", ChorusStaffItem::new);
+    public static final DeferredHolder<Item, RelicItem> PIGLIN_MASK = ITEMS.register("piglin_mask", PiglinMaskItem::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
