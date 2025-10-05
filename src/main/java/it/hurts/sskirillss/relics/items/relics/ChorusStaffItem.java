@@ -19,8 +19,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
@@ -110,13 +108,6 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .step(200)
-                        .build())
-                .style(StyleTemplate.builder()
-                        .tooltip(TooltipData.builder()
-                                .borderTop(0xff3c1230)
-                                .borderBottom(0xff544d20)
-                                .textured(true)
-                                .build())
                         .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.END_LIKE, LootEntries.THE_END)

@@ -18,8 +18,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
@@ -286,13 +284,6 @@ public class MidnightMantleItem extends RelicItem {
                         .initialCost(1000)
                         .maxRank(7)
                         .step(100)
-                        .build())
-                .style(StyleTemplate.builder()
-                        .tooltip(TooltipData.builder()
-                                .borderTop(0xffef9b53)
-                                .borderBottom(0xfff3f38f)
-                                .textured(true)
-                                .build())
                         .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.THE_END, LootEntries.END_LIKE)

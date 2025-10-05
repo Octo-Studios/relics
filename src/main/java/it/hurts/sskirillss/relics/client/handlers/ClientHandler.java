@@ -14,6 +14,7 @@ import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.*;
+import it.hurts.sskirillss.relics.client.style.*;
 import it.hurts.sskirillss.relics.description_categories.AbilityDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategory;
 import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCategory;
@@ -22,6 +23,7 @@ import it.hurts.sskirillss.relics.entities.*;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsRelicRenderers;
+import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -66,7 +68,7 @@ public class ClientHandler {
             }
         });
 
-        RelicsRelicRenderers.register(RelicsItems.ROLLER_SKATES.get(), RollerSkateRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.KINETIC_BELT.get(), KineticBeltRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
@@ -93,6 +95,17 @@ public class ClientHandler {
         DescriptionSubcategories.registerSubcategory(AbilityStatisticDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(RelicDescriptionDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(RelicStatisticDescriptionSubcategory::new);
+
+        RelicsRelicStyles.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceStyle::new);
+        RelicsRelicStyles.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceStyle::new);
+        RelicsRelicStyles.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleStyle::new);
+        RelicsRelicStyles.register(RelicsItems.CHORUS_STAFF.get(), ChorusStaffStyle::new);
+        RelicsRelicStyles.register(RelicsItems.LEAFY_MANTLE.get(), LeafyMantleStyle::new);
+        RelicsRelicStyles.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootStyle::new);
+        RelicsRelicStyles.register(RelicsItems.KINETIC_BELT.get(), KineticBeltStyle::new);
+        RelicsRelicStyles.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateStyle::new);
+
+        RelicsRelicStyles.init();
     }
 
     @SubscribeEvent

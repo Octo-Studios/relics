@@ -14,10 +14,21 @@ public class FlawlessUtils {
 
         var hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
 
-        var goldenHue = 0.125f;
+        var baseHue = 0.125f;
+        var minHue = 0.10f;
+        var maxHue = 0.16f;
 
-        var saturation = Math.min(1f, hsb[1] * 0.8f + 0.2f);
-        var brightness = Math.min(1f, hsb[2] * 0.9f + 0.1f);
+        var blended = baseHue + (hsb[0] - baseHue) * 0.25f;
+        var offset = (hsb[0] - baseHue) * 0.10f;
+        var goldenHue = blended + offset;
+
+        if (hsb[0] > 0.25f && hsb[0] < 0.45f)
+            goldenHue -= 0.01f;
+
+        goldenHue = Math.max(minHue, Math.min(maxHue, goldenHue));
+
+        var saturation = Math.min(1f, Math.max(0f, 0.55f + 0.35f * hsb[1]));
+        var brightness = Math.min(1f, Math.max(0f, 0.72f + 0.28f * hsb[2]));
 
         return Color.getHSBColor(goldenHue, saturation, brightness);
     }

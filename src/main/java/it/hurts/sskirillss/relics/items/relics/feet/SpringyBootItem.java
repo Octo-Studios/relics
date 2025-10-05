@@ -15,8 +15,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -120,13 +118,6 @@ public class SpringyBootItem extends RelicItem {
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .step(100)
-                        .build())
-                .style(StyleTemplate.builder()
-                        .tooltip(TooltipData.builder()
-                                .borderTop(0xff94b920)
-                                .borderBottom(0xff517910)
-                                .textured(true)
-                                .build())
                         .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.MOUNTAIN)

@@ -18,8 +18,6 @@ import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
@@ -134,13 +132,6 @@ public class LeafyMantleItem extends RelicItem {
                                         .star(0, 13, 5).star(1, 2, 14).star(2, 11, 17).star(3, 20, 19).star(4, 8, 28)
                                         .link(2, 0).link(2, 4).link(2, 1).link(2, 3)
                                         .build())
-                                .build())
-                        .build())
-                .style(StyleTemplate.builder()
-                        .tooltip(TooltipData.builder()
-                                .borderTop(0xff4e7a34)
-                                .borderBottom(0xff34502f)
-                                .textured(true)
                                 .build())
                         .build())
                 .leveling(LevelingTemplate.builder()

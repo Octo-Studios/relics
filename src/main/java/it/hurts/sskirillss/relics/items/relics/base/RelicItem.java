@@ -2,21 +2,20 @@ package it.hurts.sskirillss.relics.items.relics.base;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import it.hurts.octostudios.octolib.util.OctoColor;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.init.RelicsCreativeTabs;
+import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.items.ItemBase;
-import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
-import it.hurts.sskirillss.relics.items.misc.ICreativeTabContent;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -34,7 +33,7 @@ public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicIt
 
     public RelicItem() {
         super(new Item.Properties()
-                .rarity(Rarity.RARE)
+                .rarity(Rarity.EPIC)
                 .stacksTo(1));
     }
 
@@ -81,5 +80,56 @@ public abstract class RelicItem extends ItemBase implements ICurioItem, IRelicIt
     @Override
     public String getConfigRoute() {
         return Relics.MODID;
+    }
+
+    @Override
+    public Component getName(ItemStack stack) {
+        var base = super.getName(stack);
+        var text = base.getString();
+
+        if (text.isEmpty())
+            return base;
+
+        var optional = RelicsRelicStyles.getStyle(this);
+
+        if (optional.isEmpty())
+            return base;
+
+        var colors = optional.get().getItemNameColors(null, stack);
+
+        if (colors.isEmpty())
+            return base;
+
+        var result = Component.empty();
+
+        var length = text.length();
+
+        var spread = Math.max(1F, length * 1.25F);
+        var speed = 1F;
+
+        var time = (System.nanoTime() * 1e-9F);
+
+        var colorCount = colors.size();
+
+        for (int i = 0; i < length; i++) {
+            var x = i / spread - time * speed;
+            var tri = 1F - Math.abs((x % 2F) - 1F);
+            var w = 0.5F - 0.5f * (float) Math.cos(tri * Math.PI);
+
+            var scaled = w * (colorCount - 1);
+
+            var idx1 = (int) Math.floor(scaled);
+            var idx2 = (idx1 + 1) % colorCount;
+
+            var localT = scaled - idx1;
+
+            var color = colors.get(idx1).lerp(colors.get(idx2), localT);
+
+            int rgb = color.getARGB() & 0xFFFFFF;
+
+            result.append(Component.literal(String.valueOf(text.charAt(i))).setStyle(base.getStyle().withColor(TextColor.fromRgb(rgb))));
+        }
+
+        return result;
     }
 }

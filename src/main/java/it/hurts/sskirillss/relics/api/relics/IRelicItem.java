@@ -15,7 +15,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
@@ -436,10 +435,6 @@ public interface IRelicItem extends IRelicTemplateHolder, IRelicDataHolder, IRel
 
     default LootTemplate getLootTemplate(LivingEntity entity, ItemStack stack) {
         return getRelicTemplate(entity, stack).getLoot();
-    }
-
-    default StyleTemplate getStyleTemplate(LivingEntity entity, ItemStack stack) {
-        return getRelicTemplate(entity, stack).getStyle();
     }
 
     default void spreadRelicExperience(@Nullable LivingEntity entity, ItemStack stack, int experience) {

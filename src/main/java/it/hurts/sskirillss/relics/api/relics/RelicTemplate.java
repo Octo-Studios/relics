@@ -3,7 +3,6 @@ package it.hurts.sskirillss.relics.api.relics;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -17,7 +16,6 @@ public class RelicTemplate {
     private final AbilitiesTemplate abilities;
     private final RelicStatisticTemplate statistic;
     private final LevelingTemplate leveling;
-    private final StyleTemplate style;
     private final LootTemplate loot;
 
     public static RelicTemplateBuilder builder() {
@@ -39,14 +37,12 @@ public class RelicTemplate {
                         .build())
                 .build();
         private LevelingTemplate leveling = LevelingTemplate.builder().build();
-        private StyleTemplate style = StyleTemplate.builder().build();
         private LootTemplate loot = LootTemplate.builder().build();
 
         private RelicTemplateBuilder(RelicTemplate base) {
             this.abilities = base.getAbilities();
             this.statistic = base.getStatistic();
             this.leveling = base.getLeveling();
-            this.style = base.getStyle();
             this.loot = base.getLoot();
         }
 
@@ -68,12 +64,6 @@ public class RelicTemplate {
             return this;
         }
 
-        public RelicTemplateBuilder style(StyleTemplate style) {
-            this.style = style;
-
-            return this;
-        }
-
         public RelicTemplateBuilder loot(LootTemplate loot) {
             this.loot = loot;
 
@@ -81,7 +71,7 @@ public class RelicTemplate {
         }
 
         public RelicTemplate build() {
-            return new RelicTemplate(abilities, statistic, leveling, style, loot);
+            return new RelicTemplate(abilities, statistic, leveling, loot);
         }
     }
 }

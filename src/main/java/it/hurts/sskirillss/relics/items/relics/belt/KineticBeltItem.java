@@ -18,8 +18,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -123,13 +121,6 @@ public class KineticBeltItem extends RelicItem {
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.THE_END)
                         .entry(LootEntries.END_LIKE)
-                        .build())
-                .style(StyleTemplate.builder()
-                        .tooltip(TooltipData.builder()
-                                .borderTop(0xFFbaa8a8)
-                                .borderBottom(0xFFbaa8a8)
-                                .textured(true)
-                                .build())
                         .build())
                 .build();
     }

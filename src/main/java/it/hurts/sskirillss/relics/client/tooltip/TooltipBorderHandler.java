@@ -5,12 +5,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
+import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -31,11 +30,6 @@ public class TooltipBorderHandler {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var tooltip = relic.getStyleTemplate(player, stack).getTooltip().apply(player, stack);
-
-        if (!tooltip.isTextured())
-            return;
-
         var graphics = event.getGraphics();
         var poseStack = graphics.pose();
 
@@ -45,7 +39,7 @@ public class TooltipBorderHandler {
         var x = event.getX();
         var y = event.getY();
 
-        var id = tooltip.getIcon().isEmpty() ? BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() : tooltip.getIcon();
+        var id = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
 
         var texture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/tooltip/frame/" + id + "/frame.png");
 
@@ -117,21 +111,33 @@ public class TooltipBorderHandler {
 
     @SubscribeEvent
     public static void onTooltipColorEvent(RenderTooltipEvent.Color event) {
-        ItemStack stack = event.getItemStack();
+        var stack = event.getItemStack();
+        var player = Minecraft.getInstance().player;
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        TooltipData tooltip = relic.getStyleTemplate(Minecraft.getInstance().player, stack).getTooltip().apply(Minecraft.getInstance().player, stack);
+        var optional = RelicsRelicStyles.getStyle(relic.getItem());
 
-        if (tooltip.getBorderTop() != -1)
-            event.setBorderStart(tooltip.getBorderTop());
-        if (tooltip.getBorderBottom() != -1)
-            event.setBorderEnd(tooltip.getBorderBottom());
+        if (optional.isEmpty())
+            return;
 
-        if (tooltip.getBackgroundTop() != -1)
-            event.setBackgroundStart(tooltip.getBackgroundTop());
-        if (tooltip.getBackgroundBottom() != -1)
-            event.setBackgroundEnd(tooltip.getBackgroundBottom());
+        var style = optional.get();
+
+        var topBorder = style.getTopTooltipBorderColor(player, stack);
+        var bottomBorder = style.getBottomTooltipBorderColor(player, stack);
+
+        if (topBorder != null)
+            event.setBorderStart(topBorder.getARGB());
+        if (bottomBorder != null)
+            event.setBorderEnd(bottomBorder.getARGB());
+
+        var topBackground = style.getTopTooltipBackgroundColor(player, stack);
+        var bottomBackground = style.getBottomTooltipBackgroundColor(player, stack);
+
+        if (topBackground != null)
+            event.setBackgroundStart(topBackground.getARGB());
+        if (bottomBackground != null)
+            event.setBackgroundEnd(bottomBackground.getARGB());
     }
 }

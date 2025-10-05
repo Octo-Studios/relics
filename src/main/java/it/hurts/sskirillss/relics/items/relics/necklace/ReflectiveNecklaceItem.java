@@ -19,8 +19,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.StyleTemplate;
-import it.hurts.sskirillss.relics.items.relics.base.data.style.TooltipData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
@@ -105,13 +103,6 @@ public class ReflectiveNecklaceItem extends RelicItem {
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .step(200)
-                        .build())
-                .style(StyleTemplate.builder()
-                        .tooltip(TooltipData.builder()
-                                .borderTop(0xff00baff)
-                                .borderBottom(0xff0090a9)
-                                .textured(true)
-                                .build())
                         .build())
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.NETHER_LIKE, LootEntries.THE_NETHER)
