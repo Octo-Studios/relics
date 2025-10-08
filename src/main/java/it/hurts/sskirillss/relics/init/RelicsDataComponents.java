@@ -4,10 +4,8 @@ import com.mojang.serialization.Codec;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
-import it.hurts.sskirillss.relics.utils.data.WorldPosition;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -29,95 +27,8 @@ public class RelicsDataComponents {
                     .build()
     );
 
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CHARGE = DATA_COMPONENTS.register("charge",
-            () -> DataComponentType.<Integer>builder()
-                    .persistent(Codec.INT)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> TOGGLED = DATA_COMPONENTS.register("toggled",
-            () -> DataComponentType.<Boolean>builder()
-                    .persistent(Codec.BOOL)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> TIME = DATA_COMPONENTS.register("time",
-            () -> DataComponentType.<Integer>builder()
-                    .persistent(Codec.INT)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COOLDOWN = DATA_COMPONENTS.register("cooldown",
-            () -> DataComponentType.<Integer>builder()
-                    .persistent(Codec.INT)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> DURATION = DATA_COMPONENTS.register("duration",
-            () -> DataComponentType.<Integer>builder()
-                    .persistent(Codec.INT)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> COUNT = DATA_COMPONENTS.register("count",
-            () -> DataComponentType.<Integer>builder()
-                    .persistent(Codec.INT)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PROGRESS = DATA_COMPONENTS.register("progress",
-            () -> DataComponentType.<Integer>builder()
-                    .persistent(Codec.INT)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> TARGET = DATA_COMPONENTS.register("target",
-            () -> DataComponentType.<String>builder()
-                    .persistent(Codec.STRING)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> SPEED = DATA_COMPONENTS.register("speed",
-            () -> DataComponentType.<Double>builder()
-                    .persistent(Codec.DOUBLE)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> RADIUS = DATA_COMPONENTS.register("radius",
-            () -> DataComponentType.<Double>builder()
-                    .persistent(Codec.DOUBLE)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> HEIGHT = DATA_COMPONENTS.register("height",
-            () -> DataComponentType.<Double>builder()
-                    .persistent(Codec.DOUBLE)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<WorldPosition>> WORLD_POSITION = DATA_COMPONENTS.register("world_position",
-            () -> DataComponentType.<WorldPosition>builder()
-                    .persistent(WorldPosition.CODEC)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<String>> PORTAL = DATA_COMPONENTS.register("portal",
-            () -> DataComponentType.<String>builder()
-                    .persistent(Codec.STRING)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<BlockState>> BLOCK_STATE = DATA_COMPONENTS.register("block_state",
-            () -> DataComponentType.<BlockState>builder()
-                    .persistent(BlockState.CODEC)
-                    .build()
-    );
-
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MODE = DATA_COMPONENTS.register("mode",
-            () -> DataComponentType.<Integer>builder()
-                    .persistent(Codec.INT)
-                    .build()
-    );
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> LEAFY_MANTLE_PROGRESS = RelicsDataComponents.construct("leafy_mantle/progress", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> LEAFY_MANTLE_HIDING = RelicsDataComponents.construct("leafy_mantle/hiding", Codec.BOOL);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PIGLIN_MASK_STACKS = RelicsDataComponents.construct("piglin_mask/stacks", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PIGLIN_MASK_DURATION = RelicsDataComponents.construct("piglin_mask/duration", Codec.INT);

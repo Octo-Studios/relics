@@ -11,10 +11,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.LeavesBlockEntity;
-import it.hurts.sskirillss.relics.init.RelicsEntities;
-import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.init.RelicsScalingModels;
+import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
@@ -41,9 +38,6 @@ import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.Comparator;
 import java.util.stream.IntStream;
-
-import static it.hurts.sskirillss.relics.init.RelicsDataComponents.PROGRESS;
-import static it.hurts.sskirillss.relics.init.RelicsDataComponents.TOGGLED;
 
 public class LeafyMantleItem extends RelicItem {
     @Override
@@ -142,19 +136,19 @@ public class LeafyMantleItem extends RelicItem {
     }
 
     public boolean isHiding(ItemStack stack) {
-        return stack.getOrDefault(TOGGLED, false);
+        return stack.getOrDefault(RelicsDataComponents.LEAFY_MANTLE_HIDING, false);
     }
 
     public void setHiding(ItemStack stack, boolean hiding) {
-        stack.set(TOGGLED, hiding);
+        stack.set(RelicsDataComponents.LEAFY_MANTLE_HIDING, hiding);
     }
 
     public int getCurrentProgress(ItemStack stack) {
-        return stack.getOrDefault(PROGRESS, 0);
+        return stack.getOrDefault(RelicsDataComponents.LEAFY_MANTLE_PROGRESS, 0);
     }
 
     public void setCurrentProgress(ItemStack stack, int progress) {
-        stack.set(PROGRESS, Math.clamp(progress, 0, this.getMaxProgress()));
+        stack.set(RelicsDataComponents.LEAFY_MANTLE_PROGRESS, Math.clamp(progress, 0, this.getMaxProgress()));
     }
 
     public void addCurrentProgress(ItemStack stack, int progress) {
