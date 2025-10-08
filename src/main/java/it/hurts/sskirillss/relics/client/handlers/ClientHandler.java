@@ -5,10 +5,7 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
-import it.hurts.sskirillss.relics.client.gui.layers.ActiveAbilitiesLayer;
-import it.hurts.sskirillss.relics.client.gui.layers.InfoTileLayer;
-import it.hurts.sskirillss.relics.client.gui.layers.LeafyMantleHideLayer;
-import it.hurts.sskirillss.relics.client.gui.layers.StunEffectLayer;
+import it.hurts.sskirillss.relics.client.gui.layers.*;
 import it.hurts.sskirillss.relics.client.layer.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
@@ -168,5 +165,6 @@ public class ClientHandler {
         event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "leafy_ring_hide"), new LeafyMantleHideLayer());
 //        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "phantom_boot_bridge"), new PhantomBootBridgeLayer());
         event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "stun_effect"), new StunEffectLayer());
+        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "piglin_mask/teeth"), new PiglinMaskTeethLayer());
     }
 }

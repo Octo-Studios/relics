@@ -41,7 +41,11 @@ public class GoldenToothEntity extends Entity {
     }
 
     private List<ItemStack> getSuitableRelics(LivingEntity entity) {
-        return EntityUtils.findEquippedCurios(entity, RelicsItems.PIGLIN_MASK.get()).stream().filter(stack -> ((PiglinMaskItem) stack.getItem()).isAbilityRankModifierUnlocked(entity, stack, "looting", "frenzy")).toList();
+        return EntityUtils.findEquippedCurios(entity, RelicsItems.PIGLIN_MASK.get()).stream().filter(stack -> {
+            var relic = ((PiglinMaskItem) stack.getItem());
+
+            return relic.isAbilityRankModifierUnlocked(entity, stack, "looting", "frenzy");
+        }).toList();
     }
 
     @Override
@@ -79,7 +83,14 @@ public class GoldenToothEntity extends Entity {
                     var suitable = this.getSuitableRelics(player);
 
                     for (var stack : suitable) {
-                        ((PiglinMaskItem) stack.getItem()).addStacks(stack, this.getStacks());
+                        var relic = ((PiglinMaskItem) stack.getItem());
+
+                        if (relic.getStacks(stack) < relic.getMaxStacks()) {
+                            relic.addStacks(stack, this.getStacks());
+                            relic.setDuration(player, stack, relic.getMaxDuration(player, stack));
+                        }
+
+                        player.addItem(new ItemStack(RelicsItems.GOLDEN_TOOTH.get(), this.getStacks()));
 
                         this.discard();
 
