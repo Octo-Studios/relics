@@ -85,6 +85,7 @@ public class ClientHandler {
         EntityTrailRegistry.registerProvider(RelicsEntities.LIFE_ESSENCE.get(), LifeEssenceEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.ROLLER_SPARK.get(), RollerSparkEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.GOLDEN_TOOTH.get(), GoldenToothEntity.TrailProvider::new);
 
         DescriptionCategories.registerCategory(RelicDescriptionCategory::new);
         DescriptionCategories.registerCategory(AbilityDescriptionCategory::new);
@@ -152,6 +153,7 @@ public class ClientHandler {
         event.registerEntityRenderer(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockRenderer::new);
         event.registerEntityRenderer(RelicsEntities.RELIC_EXPERIENCE_ORB.get(), RelicExperienceOrbRenderer::new);
         event.registerEntityRenderer(RelicsEntities.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), ThrownItemRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.GOLDEN_TOOTH.get(), GoldenToothRenderer::new);
     }
 
     @SubscribeEvent

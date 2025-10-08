@@ -119,6 +119,9 @@ public class RelicsDataComponents {
                     .build()
     );
 
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PIGLIN_MASK_STACKS = RelicsDataComponents.construct("piglin_mask/stacks", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PIGLIN_MASK_DURATION = RelicsDataComponents.construct("piglin_mask/duration", Codec.INT);
+
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CHORUS_STAFF_CHARGE = RelicsDataComponents.construct("chorus_staff/charge", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> CHORUS_STAFF_SAFE_FALL = RelicsDataComponents.construct("chorus_staff/safe_fall", Codec.BOOL);
 

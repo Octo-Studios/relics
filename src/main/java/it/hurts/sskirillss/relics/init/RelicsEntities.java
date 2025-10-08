@@ -92,6 +92,12 @@ public class RelicsEntities {
                     .build("thrown_relic_experience_bottle")
     );
 
+    public static final DeferredHolder<EntityType<?>, EntityType<GoldenToothEntity>> GOLDEN_TOOTH = ENTITIES.register("golden_tooth", () ->
+            EntityType.Builder.of(GoldenToothEntity::new, MobCategory.MISC)
+                    .sized(0.35F, 0.5F)
+                    .build("golden_tooth")
+    );
+
     public static void register(IEventBus bus) {
         ENTITIES.register(bus);
     }
