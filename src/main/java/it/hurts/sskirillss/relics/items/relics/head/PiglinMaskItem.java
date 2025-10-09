@@ -15,13 +15,11 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -39,12 +37,11 @@ public class PiglinMaskItem extends RelicItem {
                                 .initialMaxLevel(0)
                                 .build())
                         .ability(AbilityTemplate.builder("looting")
-                                .modes("tooth", "buff")
-                                .rankModifier(3, "frenzy")
+                                .rankModifier(5, "frenzy")
                                 .stat(StatTemplate.builder("chance")
                                         .initialValue(0.1D, 0.15D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1212D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("health")
                                         .initialValue(10D, 7.5D)
@@ -58,17 +55,17 @@ public class PiglinMaskItem extends RelicItem {
                                         .build())
                                 .stat(StatTemplate.builder("attack_damage")
                                         .initialValue(0.005D, 0.01D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0607D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0571D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .stat(StatTemplate.builder("attack_speed")
                                         .initialValue(0.005D, 0.01D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1946D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1714D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .stat(StatTemplate.builder("movement_speed")
-                                        .initialValue(0.005D, 0.01D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1946D)
+                                        .initialValue(0.0025D, 0.005D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0857D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .build())
@@ -131,9 +128,6 @@ public class PiglinMaskItem extends RelicItem {
         var duration = this.getDuration(stack);
         var stacks = this.getStacks(stack);
 
-        if (entity instanceof Player player)
-            player.displayClientMessage(Component.literal("S: " + stacks + " D: " + duration), true);
-
         if (entity.tickCount % 20 == 0) {
             if (duration > 0) {
                 this.addDuration(entity, stack, -1);
@@ -144,11 +138,26 @@ public class PiglinMaskItem extends RelicItem {
                     this.addStacks(stack, -1);
             }
 
-            var modifier = this.getStacks(stack) >= PiglinMaskItem.getMaxStacks() ? 5 : 1;
+            var modifier = stacks >= PiglinMaskItem.getMaxStacks() ? 2 : 1;
 
             EntityUtils.resetAttribute(entity, stack, Attributes.ATTACK_SPEED, (float) (stacks * this.getStatValue(entity, stack, "looting", "attack_speed") * modifier), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
             EntityUtils.resetAttribute(entity, stack, Attributes.MOVEMENT_SPEED, (float) (stacks * this.getStatValue(entity, stack, "looting", "attack_speed") * modifier), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+
+            if (stacks >= PiglinMaskItem.getMaxStacks())
+                EntityUtils.resetAttribute(entity, stack, Attributes.STEP_HEIGHT, 1, AttributeModifier.Operation.ADD_VALUE);
         }
+    }
+
+    @Override
+    public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
+        if (stack.getItem() == newStack.getItem())
+            return;
+
+        var entity = slotContext.entity();
+
+        EntityUtils.removeAttribute(entity, stack, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        EntityUtils.removeAttribute(entity, stack, Attributes.ATTACK_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        EntityUtils.removeAttribute(entity, stack, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
     @Override
@@ -220,7 +229,7 @@ public class PiglinMaskItem extends RelicItem {
 
                 var damage = event.getNewDamage();
 
-                var modifier = relic.getStacks(stack) >= PiglinMaskItem.getMaxStacks() ? 5 : 1;
+                var modifier = relic.getStacks(stack) >= PiglinMaskItem.getMaxStacks() ? 2 : 1;
 
                 event.setNewDamage((float) (damage + (damage * relic.getStatValue(source, stack, "looting", "attack_speed") * modifier)));
             }

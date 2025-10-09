@@ -44,7 +44,7 @@ public class PiglinMaskTeethLayer implements LayeredDraw.Layer {
                 maxDuration = relic.getMaxDuration(player, stack);
         }
 
-        if (stacks == 0 || duration == 0)
+        if (stacks <= 0)
             return;
 
         var poseStack = guiGraphics.pose();
@@ -67,7 +67,7 @@ public class PiglinMaskTeethLayer implements LayeredDraw.Layer {
         var yOff = 0;
 
         var progress = ((float) stacks / maxStacks);
-        var alpha = duration > maxDuration * 0.25F ? 1F : duration / (maxDuration * 0.25F);
+        var alpha = stacks >= maxStacks ? (duration > maxDuration * 0.25F ? 1F : duration / (maxDuration * 0.25F)) : 1F;
 
         for (int i = 0; i < Math.ceil((double) maxHeight / height); i++) {
             poseStack.pushPose();

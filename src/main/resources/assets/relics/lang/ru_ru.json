@@ -271,7 +271,6 @@
   "relics.description.chorus_staff.ability.blink.rank_modifier.safe_fall": "Приземление после телепортации не наносит урона от падения.",
   "relics.description.chorus_staff.ability.blink.rank_modifier.ascent": "Использование телепортации глядя на блок в пределах зоны досягаемости вместо телепортации вперед телепортирует игрока на этот блок. Если над целевым блоком есть другие блоки, остаток от расстояния телепортации будет использован на поиск безопасной локации.",
   "relics.description.chorus_staff.ability.blink.rank_modifier.flicker": "При использовании телепортации все цели поблизости на долю секунды теряют игрока из виду.",
-  "relics.description.chorus_staff.ability.blink.experience_source.blink": "+1 единица опыта за каждую секунду катания.",
   "relics.description.chorus_staff.ability.blink.experience_source.blink": "+1 единица опыта за каждую совершённую телепортацию.",
   "relics.description.chorus_staff.ability.blink.experience_source.safe_fall": "+1 единица опыта за каждое безопасное приземление после телепортации.",
   "relics.description.chorus_staff.ability.blink.experience_source.flicker": "+1 единица опыта за каждую цель, потерявшую носителя реликвии из виду при телепортации.",
@@ -279,6 +278,15 @@
   "relics.description.chorus_staff.ability.blink.statistic.distance_traveled": "Преодолено расстояния посредством телепортации",
   "relics.description.chorus_staff.ability.blink.statistic.targets": "Целей, потерявших носителя реликвии из виду во время телепортации",
   "relics.description.chorus_staff.ability.blink.statistic.safe_falls": "Безопасных приземлений после телепортации",
+
+  "item.relics.piglin_mask": "Пиглинская маска",
+  "relics.description.piglin_mask.description": "",
+  "relics.description.piglin_mask.ability.neutrality": "Нейтралитет",
+  "relics.description.piglin_mask.ability.neutrality.description": "Пиглины больше не нападают на носителя реликвии первыми.",
+  "relics.description.piglin_mask.ability.neutrality.rank_modifier.legion": "Ближайшие пиглины нападают на того, кто пытается атаковать носителя реликвии или кто был атакован им.",
+  "relics.description.piglin_mask.ability.looting": "Мародёрство",
+  "relics.description.piglin_mask.ability.looting.description": "Убийство целей дополнительно дропает золотые зубы. Их количество определяется максимальным здоровьем убитой цели, и за каждые %2$s единиц здоровья с шансом в %1$s%% может упасть 1 зуб. Зубы можно использовать для торговли с пиглинами, а также переплавить в золотые самородки.",
+  "relics.description.piglin_mask.ability.looting.rank_modifier.frenzy": "Подбор выбитых зубов на %3$s секунд увеличивает наносимый урон на %4$s%%, скорость атаки на %5$s%% и скорость передвижения на %6$s%% за каждый накопленный зуб. Подбор каждого нового зуба обновляет длительность эффектов. Когда количество накопленных зубов приравнивается 32, подбор последующий зубов перестает обновлять длительность их эффектов, но эффективность всех бонусов удваивается вплоть до истечения времени.",
 
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
 
