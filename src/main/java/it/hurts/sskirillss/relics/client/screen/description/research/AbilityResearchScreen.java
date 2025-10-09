@@ -13,6 +13,7 @@ import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.misc.TextJustificator;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.research.misc.BurnPoint;
 import it.hurts.sskirillss.relics.client.screen.description.research.particles.ResearchParticleData;
@@ -390,7 +391,7 @@ public class AbilityResearchScreen extends DescriptionScreen {
             description.add(Component.translatable("relics.description.ability.research.rule_3.description"));
 
             for (var component : description) {
-                for (var line : RelicDescriptionScreen.justifyStyledText(component, 180)) {
+                for (var line : TextJustificator.justifyStyledText(component, 180)) {
                     guiGraphics.drawString(minecraft.font, line, 0, yOff, DescriptionUtils.TEXT_COLOR, false);
 
                     yOff += 10;

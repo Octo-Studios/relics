@@ -4,28 +4,21 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.misc.TextJustificator;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
-import lombok.AllArgsConstructor;
-import lombok.Data;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 
 public class AbilityDescriptionContainerWidget extends DescriptionContainerWidget {
-    private static final int TEXT_OFFSET = 2;
     private static final int VERTICAL_PADDING = 1;
 
     public AbilityDescriptionContainerWidget(DescriptionScreen screen) {
@@ -50,7 +43,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
         var data = this.constructDescriptionData();
-        var layout = this.layoutJustifiedLines(this.minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
+        var layout = TextJustificator.layoutJustifiedLines(this.minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
 
         var scroll = this.getScrollbar();
 
@@ -66,34 +59,14 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
             poseStack.translate(0, -shiftY, 0);
         }
 
-        this.renderJustifiedDescriptionWithStatBoxes(guiGraphics, (this.getX() + 7) * 2, (this.getY() * 2), 320, this.minecraft.font, layout);
+        TextJustificator.renderJustifiedDescriptionWithStatBoxes(guiGraphics, (this.getX() + 7) * 2, (this.getY() * 2), 320, this.minecraft.font, layout);
 
         poseStack.popPose();
 
         GUIScissors.end();
     }
 
-    private static class Word {
-        final MutableComponent component;
-        final boolean isDynamic;
-
-        Word(MutableComponent component, boolean isDynamic) {
-            this.component = component;
-            this.isDynamic = isDynamic;
-        }
-    }
-
-    @Data
-    @AllArgsConstructor
-    private static class LineEntry {
-        private MutableComponent rawLine;
-        private boolean justify;
-    }
-
-    public record LayoutLine(List<Word> words, boolean justify) {
-    }
-
-    public record DescriptionData(List<LineEntry> rawLines, List<MutableComponent> dynamicComponents) {
+    public record DescriptionData(List<TextJustificator.LineEntry> rawLines, List<MutableComponent> dynamicComponents) {
     }
 
     public DescriptionData constructDescriptionData() {
@@ -134,13 +107,13 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         var tokens = IntStream.rangeClosed(1, dynamicComponents.size()).mapToObj(i -> "%" + i + "$s").toArray(String[]::new);
         var descriptionComponent = Component.translatable(key, (Object[]) tokens);
 
-        var rawLines = new ArrayList<LineEntry>();
+        var rawLines = new ArrayList<TextJustificator.LineEntry>();
 
-        rawLines.add(new LineEntry(descriptionComponent, true));
+        rawLines.add(new TextJustificator.LineEntry(descriptionComponent, true));
 
         for (var entry : template.getRankModifiers().entries()) {
-            rawLines.add(new LineEntry(Component.literal(""), false));
-            rawLines.add(new LineEntry(Component.translatable("relics.description.ability.rank_modifier.condition.rank", entry.getKey())
+            rawLines.add(new TextJustificator.LineEntry(Component.literal(""), false));
+            rawLines.add(new TextJustificator.LineEntry(Component.translatable("relics.description.ability.rank_modifier.condition.rank", entry.getKey())
                     .withStyle(ChatFormatting.BOLD), false));
 
             var description = Component.literal("● ").append(Component.translatable("relics.description." + itemId + ".ability." + ability + ".rank_modifier." + entry.getValue(), (Object[]) tokens));
@@ -148,7 +121,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
             if (relic.getRelicRank(player, stack) < entry.getKey())
                 description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
 
-            rawLines.add(new LineEntry(description, true));
+            rawLines.add(new TextJustificator.LineEntry(description, true));
         }
 
         if (!relic.isAbilityUnlocked(player, stack, ability))
@@ -158,159 +131,10 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         return new DescriptionData(rawLines, dynamicComponents);
     }
 
-    public List<LayoutLine> layoutJustifiedLines(Font font, List<LineEntry> rawLineEntries, List<MutableComponent> dynamicComponents, int maximumLineWidth) {
-        var splitter = font.getSplitter();
-        int spaceWidth = (int) Math.ceil(splitter.stringWidth(FormattedText.of(" ", Style.EMPTY)));
-        var placeholderPattern = Pattern.compile("([()%]*%(\\d+)\\$s[()%]*)");
-        var result = new ArrayList<LayoutLine>();
-
-        for (var entry : rawLineEntries) {
-            var rawText = entry.getRawLine().getString();
-
-            if (rawText.isEmpty()) {
-                result.add(new LayoutLine(List.of(), false));
-
-                continue;
-            }
-
-            var words = new ArrayList<Word>();
-            var matcher = placeholderPattern.matcher(rawText);
-            int lastEnd = 0;
-
-            while (matcher.find()) {
-                if (matcher.start() > lastEnd) {
-                    var before = rawText.substring(lastEnd, matcher.start());
-
-                    Arrays.stream(before.split(" "))
-                            .filter(tok -> !tok.isEmpty())
-                            .forEach(tok -> words.add(new Word(Component.literal(tok).withStyle(entry.getRawLine().getStyle()), false)));
-                }
-
-                var segment = matcher.group(1);
-                var index = Integer.parseInt(matcher.group(2)) - 1;
-                var dynamicComponent = dynamicComponents.get(index).copy();
-
-                var style = dynamicComponent.getStyle();
-
-                var prefix = segment.substring(0, segment.indexOf('%'));
-                var suffix = segment.substring(segment.lastIndexOf('s') + 1);
-
-                if (!prefix.isEmpty())
-                    dynamicComponent = Component.literal(prefix).withStyle(style).append(dynamicComponent);
-
-                if (!suffix.isEmpty())
-                    dynamicComponent.append(Component.literal(suffix).withStyle(style));
-
-                words.add(new Word(dynamicComponent, true));
-
-                lastEnd = matcher.end();
-            }
-
-            if (lastEnd < rawText.length()) {
-                var after = rawText.substring(lastEnd);
-
-                Arrays.stream(after.split(" "))
-                        .filter(tok -> !tok.isEmpty())
-                        .forEach(tok -> words.add(new Word(
-                                Component.literal(tok).withStyle(entry.getRawLine().getStyle()),
-                                false
-                        )));
-            }
-
-            var lines = new ArrayList<List<Word>>();
-            var current = new ArrayList<Word>();
-            int used = 0;
-
-            for (var word : words) {
-                int wordWidth = (int) Math.ceil(splitter.stringWidth(FormattedText.of(word.component.getString(), word.component.getStyle()))) + (word.isDynamic ? 4 : 0);
-
-                if (!current.isEmpty() && used + wordWidth + spaceWidth > maximumLineWidth) {
-                    lines.add(current);
-
-                    current = new ArrayList<>();
-
-                    used = 0;
-                }
-
-                current.add(word);
-
-                used += wordWidth + spaceWidth;
-            }
-
-            if (!current.isEmpty())
-                lines.add(current);
-
-            for (int i = 0; i < lines.size(); i++) {
-                boolean justifyLine = entry.isJustify() && i < lines.size() - 1;
-
-                result.add(new LayoutLine(lines.get(i), justifyLine));
-            }
-        }
-
-        return result;
-    }
-
-    public void renderJustifiedDescriptionWithStatBoxes(GuiGraphics graphics, int startX, int startY, int maximumLineWidth, Font font, List<LayoutLine> layoutLines) {
-        var splitter = font.getSplitter();
-        var spaceWidth = (int) Math.ceil(splitter.stringWidth(FormattedText.of(" ", Style.EMPTY)));
-
-        int y = startY, lineHeight = font.lineHeight;
-
-        for (var line : layoutLines) {
-            var words = line.words();
-
-            if (words.isEmpty()) {
-                y += lineHeight + 1;
-
-                continue;
-            }
-
-            boolean justify = line.justify();
-
-            int totalW = words.stream()
-                    .mapToInt(w -> (int) Math.ceil(splitter.stringWidth(w.component)) + (w.isDynamic ? 4 : 0))
-                    .sum();
-
-            int gaps = Math.max(1, words.size() - 1);
-            int extra = justify ? maximumLineWidth - totalW : spaceWidth * gaps;
-            int base = extra / gaps, rem = extra % gaps;
-
-            int x = startX;
-
-            for (int i = 0; i < words.size(); i++) {
-                var word = words.get(i);
-                var component = word.component;
-                var textWidth = (int) Math.ceil(splitter.stringWidth(component));
-                var style = component.getStyle();
-                var color = style.getColor() != null ? style.getColor().getValue() : DescriptionUtils.TEXT_COLOR;
-
-                if (word.isDynamic) {
-                    graphics.fill(x - 1, y - 1, x + textWidth + 4, y, 0xFF000000 | color);
-                    graphics.fill(x - 1, y + lineHeight, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
-                    graphics.fill(x - 1, y - 1, x, y + lineHeight + 1, 0xFF000000 | color);
-                    graphics.fill(x + textWidth + 3, y - 1, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
-
-                    graphics.drawString(font, Language.getInstance().getVisualOrder(component), x + 2, y + 1, color, false);
-
-                    x += textWidth + 5;
-                } else {
-                    graphics.drawString(font, Language.getInstance().getVisualOrder(component), x, y, color, false);
-
-                    x += textWidth;
-                }
-
-                if (i < words.size() - 1)
-                    x += base + (i < rem ? 1 : 0);
-            }
-
-            y += lineHeight + 1;
-        }
-    }
-
     @Override
     public int getContentHeight() {
         var data = constructDescriptionData();
-        var lines = layoutJustifiedLines(minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
+        var lines = TextJustificator.layoutJustifiedLines(minecraft.font, data.rawLines(), data.dynamicComponents(), 320);
 
         var step = minecraft.font.lineHeight + 1;
 

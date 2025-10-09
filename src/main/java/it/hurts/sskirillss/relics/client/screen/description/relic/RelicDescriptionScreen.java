@@ -23,25 +23,16 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.FormattedText;
-import net.minecraft.network.chat.Style;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.registries.DeferredHolder;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @OnlyIn(Dist.CLIENT)
 public class RelicDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
@@ -104,65 +95,6 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
                 .end();
 
         poseStack.popPose();
-    }
-
-    public static List<FormattedCharSequence> justifyStyledText(Component text, int maxWidth) {
-        var font = Minecraft.getInstance().font;
-        var splitter = font.getSplitter();
-        var words = new ArrayList<FormattedText>();
-        text.visit((style, str) -> {
-            for (var token : str.split(" ", -1)) {
-                if (token.isEmpty())
-                    words.add(FormattedText.of(" ", style));
-                else
-                    words.add(FormattedText.of(token, style));
-            }
-            return Optional.empty();
-        }, Style.EMPTY);
-
-        var result = new ArrayList<FormattedCharSequence>();
-        var line = new ArrayList<FormattedText>();
-        float lineWidth = 0;
-
-        for (var word : words) {
-            float wordWidth = splitter.stringWidth(word) + font.width(" ");
-            if (lineWidth + wordWidth > maxWidth && !line.isEmpty()) {
-                if (line.size() == 1) {
-                    result.add(Language.getInstance().getVisualOrder(line.getFirst()));
-                } else {
-                    float totalWordsWidth = line.stream().map(splitter::stringWidth).reduce(0f, Float::sum);
-                    int gaps = line.size() - 1;
-                    float totalSpacing = maxWidth - totalWordsWidth;
-                    int baseSpaces = (int) (totalSpacing / font.width(" "));
-                    int extra = (int) (totalSpacing % font.width(" "));
-
-                    var parts = new ArrayList<FormattedText>();
-                    for (int i = 0; i < line.size(); i++) {
-                        parts.add(line.get(i));
-                        if (i < gaps) {
-                            int count = baseSpaces / gaps + (i < baseSpaces % gaps ? 1 : 0);
-                            parts.add(FormattedText.of(" ".repeat(Math.max(1, count))));
-                        }
-                    }
-                    result.add(Language.getInstance().getVisualOrder(FormattedText.composite(parts)));
-                }
-                line.clear();
-                lineWidth = 0;
-            }
-            line.add(word);
-            lineWidth += wordWidth;
-        }
-
-        if (!line.isEmpty()) {
-            var parts = new ArrayList<FormattedText>();
-            for (int i = 0; i < line.size(); i++) {
-                parts.add(line.get(i));
-                if (i < line.size() - 1) parts.add(FormattedText.of(" "));
-            }
-            result.add(Language.getInstance().getVisualOrder(FormattedText.composite(parts)));
-        }
-
-        return result;
     }
 
     @Override
