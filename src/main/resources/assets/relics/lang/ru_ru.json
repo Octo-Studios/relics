@@ -284,9 +284,17 @@
   "relics.description.piglin_mask.ability.neutrality": "Нейтралитет",
   "relics.description.piglin_mask.ability.neutrality.description": "Пиглины больше не нападают на носителя реликвии первыми.",
   "relics.description.piglin_mask.ability.neutrality.rank_modifier.legion": "Ближайшие пиглины нападают на того, кто пытается атаковать носителя реликвии или кто был атакован им.",
+  "relics.description.piglin_mask.ability.neutrality.experience_source.target": "+1 единица опыта каждый раз, когда пиглин встаёт на защиту игрока.",
   "relics.description.piglin_mask.ability.looting": "Мародёрство",
   "relics.description.piglin_mask.ability.looting.description": "Убийство целей дополнительно дропает золотые зубы. Их количество определяется максимальным здоровьем убитой цели, и за каждые %2$s единиц здоровья с шансом в %1$s%% может упасть 1 зуб. Зубы можно использовать для торговли с пиглинами, а также переплавить в золотые самородки.",
   "relics.description.piglin_mask.ability.looting.rank_modifier.frenzy": "Подбор выбитых зубов на %3$s секунд увеличивает наносимый урон на %4$s%%, скорость атаки на %5$s%% и скорость передвижения на %6$s%% за каждый накопленный зуб. Подбор каждого нового зуба обновляет длительность эффектов. Когда количество накопленных зубов приравнивается 32, подбор последующий зубов перестает обновлять длительность их эффектов, но эффективность всех бонусов удваивается вплоть до истечения времени.",
+  "relics.description.piglin_mask.ability.looting.experience_source.drop": "+1 единица опыта за каждый выбитый золотой зуб.",
+  "relics.description.piglin_mask.ability.looting.experience_source.stack": "+1 единица опыта за каждый полученный заряд от золотых зубов.",
+  "relics.description.piglin_mask.ability.barter": "Бартер",
+  "relics.description.piglin_mask.ability.barter.description": "При торговле пиглины за одну единицу валюты возвращают носителю реликвии сразу до %1$s результатов обмена.",
+  "relics.description.piglin_mask.ability.barter.rank_modifier.pocket": "Перед началом обмена пиглин может сразу подобрать до %2$s единиц валюты от носителя реликвии.",
+  "relics.description.piglin_mask.ability.barter.experience_source.barter": "+1 единица опыта за каждый торг с пиглинами.",
+  "relics.description.piglin_mask.ability.barter.experience_source.pickup": "+1 единица опыта за каждую дополнительную единицу валюты, подобранную пиглином.",
 
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
 

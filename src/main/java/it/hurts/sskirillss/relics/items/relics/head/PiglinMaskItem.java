@@ -1,8 +1,11 @@
 package it.hurts.sskirillss.relics.items.relics.head;
 
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.entities.GoldenToothEntity;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
@@ -13,6 +16,7 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,6 +39,15 @@ public class PiglinMaskItem extends RelicItem {
                         .ability(AbilityTemplate.builder("neutrality")
                                 .rankModifier(1, "legion")
                                 .initialMaxLevel(0)
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("target")
+                                                .rankModifierVisibilityState("legion", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 6, 9).star(1, 16, 9).star(2, 11, 12).star(3, 3, 15).star(4, 19, 15).star(5, 11, 23)
+                                        .link(2, 1).link(1, 4).link(4, 5).link(5, 3).link(3, 0).link(0, 2)
+                                        .build())
                                 .build())
                         .ability(AbilityTemplate.builder("looting")
                                 .rankModifier(5, "frenzy")
@@ -68,12 +81,40 @@ public class PiglinMaskItem extends RelicItem {
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0857D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("drop")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("stack")
+                                                .rankModifierVisibilityState("frenzy", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 12, 8).star(1, 4, 13).star(2, 13, 17).star(3, 18, 19).star(4, 14, 22)
+                                        .link(2, 3).link(3, 0).link(0, 1).link(1, 4).link(4, 2)
+                                        .build())
                                 .build())
                         .ability(AbilityTemplate.builder("barter")
-                                .stat(StatTemplate.builder("amount")
+                                .rankModifier(3, "pocket")
+                                .stat(StatTemplate.builder("trades")
                                         .initialValue(1D, 3D)
                                         .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.25D)
                                         .formatValue(Double::intValue)
+                                        .build())
+                                .stat(StatTemplate.builder("items_count")
+                                        .initialValue(1D, 4D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.4286D)
+                                        .formatValue(Double::intValue)
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("barter")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("pickup")
+                                                .rankModifierVisibilityState("pocket", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 9, 7).star(1, 17, 13).star(2, 7, 20)
+                                        .link(0, 1).link(1, 2)
                                         .build())
                                 .build())
                         .build())
@@ -186,6 +227,8 @@ public class PiglinMaskItem extends RelicItem {
                     if (piglin.getTarget() != null || !piglin.hasLineOfSight(target))
                         continue;
 
+                    relic.addRelicExperience(source, stack, "neutrality", "target", 1);
+
                     piglin.getBrain().setMemory(MemoryModuleType.ANGRY_AT, target.getUUID());
                 }
             }
@@ -210,6 +253,8 @@ public class PiglinMaskItem extends RelicItem {
                 for (var piglin : level.getEntitiesOfClass(AbstractPiglin.class, target.getBoundingBox().inflate(32))) {
                     if (piglin.getTarget() != null || !piglin.hasLineOfSight(source))
                         continue;
+
+                    relic.addRelicExperience(target, stack, "neutrality", "target", 1);
 
                     piglin.getBrain().setMemory(MemoryModuleType.ANGRY_AT, source.getUUID());
                 }
@@ -261,6 +306,8 @@ public class PiglinMaskItem extends RelicItem {
                     tooth.setDeltaMovement(MathUtils.randomFloat(random) * 0.35F, 0.25F + random.nextFloat() * 0.25F, MathUtils.randomFloat(random) * 0.35F);
 
                     level.addFreshEntity(tooth);
+
+                    relic.addRelicExperience(source, stack, "looting", "drop", 1);
                 }
             }
         }

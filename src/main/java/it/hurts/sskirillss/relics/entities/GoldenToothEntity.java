@@ -85,9 +85,11 @@ public class GoldenToothEntity extends Entity {
                     for (var stack : suitable) {
                         var relic = ((PiglinMaskItem) stack.getItem());
 
-                        if (relic.getStacks(stack) < relic.getMaxStacks()) {
+                        if (relic.getStacks(stack) < PiglinMaskItem.getMaxStacks()) {
                             relic.addStacks(stack, this.getStacks());
                             relic.setDuration(player, stack, relic.getMaxDuration(player, stack));
+
+                            relic.addRelicExperience(player, stack, "looting", "stack", this.getStacks());
                         }
 
                         player.addItem(new ItemStack(RelicsItems.GOLDEN_TOOTH.get(), this.getStacks()));
