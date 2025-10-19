@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+    "textures": {
+        "layer0": "relics:item/piglin_mask_flawless"
+    }
+}
+

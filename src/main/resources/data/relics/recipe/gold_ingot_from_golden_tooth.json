@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "relics:golden_tooth"
+    },
+    {
+      "item": "relics:golden_tooth"
+    },
+    {
+      "item": "relics:golden_tooth"
+    }
+  ],
+  "result": {
+    "id": "minecraft:gold_ingot",
+    "count": 1
+  }
+}

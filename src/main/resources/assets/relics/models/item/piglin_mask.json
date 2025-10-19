@@ -1,0 +1,10 @@
+{
+  "parent": "item/generated",
+    "textures": {
+        "layer0": "relics:item/piglin_mask"
+    },
+    "overrides": [
+        { "predicate": { "relics:flawless": 1 }, "model": "relics:item/piglin_mask_flawless" }
+    ]
+}
+

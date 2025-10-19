@@ -102,6 +102,7 @@ public class ClientHandler {
         RelicsRelicStyles.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootStyle::new);
         RelicsRelicStyles.register(RelicsItems.KINETIC_BELT.get(), KineticBeltStyle::new);
         RelicsRelicStyles.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateStyle::new);
+        RelicsRelicStyles.register(RelicsItems.PIGLIN_MASK.get(), PiglinMaskStyle::new);
 
         RelicsRelicStyles.init();
     }

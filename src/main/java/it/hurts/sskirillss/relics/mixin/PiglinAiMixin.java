@@ -7,7 +7,6 @@ import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.head.PiglinMaskItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.piglin.Piglin;
@@ -27,45 +26,6 @@ public abstract class PiglinAiMixin {
     @Shadow
     private static List<ItemStack> getBarterResponseItems(Piglin piglin) {
         return new ArrayList<>();
-    }
-
-    @WrapOperation(method = "pickUpItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/piglin/Piglin;take(Lnet/minecraft/world/entity/Entity;I)V"))
-    private static void wrapTake(Piglin piglin, Entity entity, int originalCount, Operation<Void> original, @Local(argsOnly = true) ItemEntity itemEntity) {
-        var count = originalCount;
-        var stackCount = itemEntity.getItem().getCount();
-        var optional = piglin.getBrain().getMemory(MemoryModuleType.NEAREST_VISIBLE_PLAYER);
-
-        if (optional.isPresent()) {
-            var player = optional.get();
-
-            var bestStack = ItemStack.EMPTY;
-            var bestValue = 0;
-
-            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.PIGLIN_MASK.get())) {
-                var relic = (PiglinMaskItem) stack.getItem();
-
-                if (!relic.isAbilityRankModifierUnlocked(player, stack, "barter", "pocket"))
-                    continue;
-
-                var value = (int) relic.getStatValue(player, stack, "barter", "items_count");
-
-                if (value > bestValue) {
-                    bestValue = value;
-                    bestStack = stack;
-                }
-            }
-
-            if (bestValue > 0)
-                count = Math.min(stackCount, bestValue);
-
-            if (count > 1 && bestStack.isEmpty()) {
-                var relic = (PiglinMaskItem) bestStack.getItem();
-
-                relic.addRelicExperience(player, bestStack, "barter", "pickup", count - 1);
-            }
-        }
-
-        original.call(piglin, entity, count);
     }
 
     @WrapOperation(method = "pickUpItem", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/entity/monster/piglin/PiglinAi;removeOneItemFromItemEntity(Lnet/minecraft/world/entity/item/ItemEntity;)Lnet/minecraft/world/item/ItemStack;"))
@@ -98,6 +58,10 @@ public abstract class PiglinAiMixin {
             return operation.call(itemEntity);
 
         var stack = itemEntity.getItem();
+
+        if (!stack.is(ItemTags.PIGLIN_LOVED))
+            return operation.call(itemEntity);
+
         var toSplit = Math.min(stack.getCount(), bestValue);
 
         if (toSplit < 1)
@@ -109,10 +73,11 @@ public abstract class PiglinAiMixin {
             itemEntity.discard();
         else itemEntity.setItem(stack);
 
-        if (taken.getCount() > 1 && bestStack.isEmpty()) {
+        if (taken.getCount() > 1 && !bestStack.isEmpty()) {
             var relic = (PiglinMaskItem) bestStack.getItem();
 
             relic.addRelicExperience(player, bestStack, "barter", "pickup", taken.getCount() - 1);
+            relic.addAbilityMetricValue(player, bestStack, "barter", "currency", taken.getCount());
         }
 
         return taken;
@@ -140,12 +105,20 @@ public abstract class PiglinAiMixin {
 
             shouldCancel = true;
 
-            var base = random.nextInt((int) relic.getStatValue(player, stack, "barter", "trades") + 1) + 1;
+            var base = random.nextInt((int) relic.getStatValue(player, stack, "barter", "trades")) + 1;
             var total = Math.max(1, base) * count;
 
             for (int i = 0; i < total; i++) {
-                PiglinAi.throwItems(piglin, PiglinAiMixin.getBarterResponseItems(piglin));
+                var items = PiglinAiMixin.getBarterResponseItems(piglin);
 
+                PiglinAi.throwItems(piglin, items);
+
+                var amount = 0;
+
+                for (var tradeEntry : items)
+                    amount += tradeEntry.getCount();
+
+                relic.addAbilityMetricValue(player, stack, "barter", "items", amount);
                 relic.addRelicExperience(player, stack, "barter", "trade", 1);
             }
         }
