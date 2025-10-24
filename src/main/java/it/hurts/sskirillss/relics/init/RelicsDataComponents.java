@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
+import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.bus.api.IEventBus;
@@ -14,6 +15,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.List;
+import java.util.Map;
 
 @EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class RelicsDataComponents {
@@ -26,6 +28,8 @@ public class RelicsDataComponents {
                     .persistent(RelicComponent.CODEC)
                     .build()
     );
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Map<String, CutGlassBootItem.FluidEntry>>> CUT_GLASS_BOOT_FLUIDS = RelicsDataComponents.construct("cut_glass_boot/fluids", Codec.unboundedMap(Codec.STRING, CutGlassBootItem.FluidEntry.CODEC));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> LEAFY_MANTLE_PROGRESS = RelicsDataComponents.construct("leafy_mantle/progress", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> LEAFY_MANTLE_HIDING = RelicsDataComponents.construct("leafy_mantle/hiding", Codec.BOOL);
