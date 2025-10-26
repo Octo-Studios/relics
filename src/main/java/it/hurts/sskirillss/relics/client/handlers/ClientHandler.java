@@ -9,6 +9,7 @@ import it.hurts.sskirillss.relics.client.gui.layers.*;
 import it.hurts.sskirillss.relics.client.layer.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
+import it.hurts.sskirillss.relics.client.postEffects.LensPostEffect;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.*;
 import it.hurts.sskirillss.relics.client.style.*;
@@ -17,10 +18,7 @@ import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategor
 import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCategory;
 import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
-import it.hurts.sskirillss.relics.init.RelicsEntities;
-import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.init.RelicsRelicRenderers;
-import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
+import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
@@ -104,7 +102,10 @@ public class ClientHandler {
         RelicsRelicStyles.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateStyle::new);
         RelicsRelicStyles.register(RelicsItems.PIGLIN_MASK.get(), PiglinMaskStyle::new);
 
+        RelicsPostEffects.register(LensPostEffect::new);
+
         RelicsRelicStyles.init();
+        RelicsPostEffects.init();
     }
 
     @SubscribeEvent
