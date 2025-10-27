@@ -27,6 +27,9 @@
     "LivingEntityRendererMixin",
     "MouseHandlerMixin",
     "ParticleEngineMixin",
-    "WindowMixin"
+    "WindowMixin",
+    "shakes.AbstractClientPlayerMixin",
+    "shakes.CameraMixin",
+    "shakes.GameRendererMixin"
   ]
 }

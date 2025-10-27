@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.network;
 
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.dev.shake.misc.ShakePacket;
 import it.hurts.sskirillss.relics.network.packets.PacketItemActivation;
 import it.hurts.sskirillss.relics.network.packets.PacketSyncEntityEffects;
 import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
@@ -19,8 +20,10 @@ import it.hurts.sskirillss.relics.network.packets.research.PacketManageLink;
 import it.hurts.sskirillss.relics.network.packets.research.PacketResearchHint;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ChunkPos;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -58,6 +61,8 @@ public class NetworkHandler {
 
         // === ROLLER SKATE ===
         registrar.playToServer(C2SCreateSpark.TYPE, C2SCreateSpark.STREAM_CODEC, C2SCreateSpark::handle);
+
+        registrar.playToClient(ShakePacket.TYPE, ShakePacket.STREAM_CODEC, ShakePacket::handle);
     }
 
     public static <MSG extends CustomPacketPayload> void sendToServer(MSG message) {
@@ -74,5 +79,9 @@ public class NetworkHandler {
 
     public static <MSG extends CustomPacketPayload> void sendToClientsTrackingEntityAndSelf(MSG message, Entity entity) {
         PacketDistributor.sendToPlayersTrackingEntityAndSelf(entity, message);
+    }
+
+    public static <MSG extends CustomPacketPayload> void sendToClientsTrackingChunk(MSG message, ServerLevel level, ChunkPos chunkPos) {
+        PacketDistributor.sendToPlayersTrackingChunk(level, chunkPos, message);
     }
 }

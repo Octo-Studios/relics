@@ -1,5 +1,7 @@
 package it.hurts.sskirillss.relics.entities.relic.midnight_mantle;
 
+import it.hurts.sskirillss.relics.dev.shake.Shake;
+import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
 import it.hurts.sskirillss.relics.entities.MidnightMantleShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
@@ -203,6 +205,12 @@ public class FallingStarEntity extends ThrowableProjectile {
     protected void onHitBlock(BlockHitResult result) {
         var center = result.getBlockPos();
         var level = this.level();
+
+        ShakeManager.add(level, Shake.builder(this)
+                .amplitude(0.075F)
+                .duration(5)
+                .radius(16)
+                .build());
 
         if (level.isClientSide() || this.noPhysics || !level.getBlockState(center).blocksMotion())
             return;

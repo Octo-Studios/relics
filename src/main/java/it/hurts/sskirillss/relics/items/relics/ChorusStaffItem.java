@@ -9,6 +9,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.dev.shake.Shake;
+import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
 import it.hurts.sskirillss.relics.init.RelicsCreativeTabs;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
@@ -71,6 +73,7 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
                                         .build())
                                 .stat(StatTemplate.builder("cooldown")
                                         .initialValue(30D, 15D)
+                                        .thresholdValue(1D, Double.MAX_VALUE)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.019D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
@@ -282,8 +285,22 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
                     }
                 }
             }
+        } else {
+            if (impulse == Vec3.ZERO)
+                ShakeManager.add(level, Shake.builder(player)
+                        .radius(Integer.MAX_VALUE)
+                        .amplitude(0.2F)
+                        .duration(5)
+                        .build());
+            else
+                ShakeManager.add(level, Shake.builder(player)
+                        .radius(Integer.MAX_VALUE)
+                        .amplitude(0)
+                        .fovAmplitude(0.35F)
+                        .duration(10)
+                        .speed(2)
+                        .build());
         }
-
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
 
