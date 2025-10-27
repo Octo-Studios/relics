@@ -2,24 +2,30 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
+import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
+import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import net.minecraft.advancements.CriteriaTriggers;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -35,6 +41,8 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -48,11 +56,15 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import top.theillusivec4.curios.api.SlotContext;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class CutGlassBootItem extends RelicItem {
     @Override
@@ -84,6 +96,11 @@ public class CutGlassBootItem extends RelicItem {
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
+    }
+
+    @Override
+    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
+        return false;
     }
 
     public int getMaxCapacity(LivingEntity entity, ItemStack stack) {
@@ -349,6 +366,161 @@ public class CutGlassBootItem extends RelicItem {
 
     protected boolean canBlockContainFluid(@Nullable Player player, Level worldIn, BlockPos posIn, BlockState blockstate, ItemStack stack) {
         return blockstate.getBlock() instanceof LiquidBlockContainer && ((LiquidBlockContainer) blockstate.getBlock()).canPlaceLiquid(player, worldIn, posIn, blockstate, this.getSelectedFluid(player, stack));
+    }
+
+    @Override
+    public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
+        return Optional.of(new CutGlassBootTooltip(new ArrayList<>(this.getFluidEntries(null, stack).values()), this.getMaxCapacity(null, stack)));
+    }
+
+    public record CutGlassBootTooltip(List<FluidEntry> fluids, int capacity) implements TooltipComponent {
+
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public record ClientCutGlassBootTooltip(CutGlassBootTooltip tooltip) implements ClientTooltipComponent {
+        @Override
+        public int getHeight() {
+            return 22;
+        }
+
+        @Override
+        public int getWidth(Font font) {
+            return 100;
+        }
+
+        @Override
+        public void renderImage(Font font, int mouseX, int mouseY, GuiGraphics guiGraphics) {
+            var MC = net.minecraft.client.Minecraft.getInstance();
+            var pose = guiGraphics.pose();
+
+            int capacity = tooltip.capacity();
+            var list = tooltip.fluids();
+
+            int total = 0;
+
+            for (var e : list)
+                total += Math.max(0, e.getAmount());
+
+            total = Math.max(0, total);
+
+            var overlay = ResourceLocation.fromNamespaceAndPath(it.hurts.sskirillss.relics.Relics.MODID, "textures/gui/tooltip/cut_glass_boot/flask.png");
+            var atlasLoc = InventoryMenu.BLOCK_ATLAS;
+            var atlas = MC.getTextureAtlas(atlasLoc);
+
+            int innerX = 5;
+            int innerY = 2;
+            int innerW = 159;
+            int innerH = 16;
+
+            pose.pushPose();
+
+            int filledW = Math.min(innerW, Math.round(innerW * (total / (float) capacity)));
+            int used = 0;
+
+            for (int i = 0; i < list.size(); i++) {
+                var entry = list.get(i);
+
+                if (entry == null || entry.getAmount() <= 0)
+                    continue;
+
+                var fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(entry.getFluid()));
+
+                if (fluid == Fluids.EMPTY)
+                    continue;
+
+                int segW = (total == 0) ? 0 : Math.round(filledW * (entry.getAmount() / (float) total));
+
+                if (i == list.size() - 1)
+                    segW = Math.max(0, filledW - used);
+
+                if (segW <= 0)
+                    continue;
+
+                if (used >= filledW)
+                    break;
+
+                var ext = IClientFluidTypeExtensions.of(fluid);
+
+                var still = ext.getStillTexture();
+
+                var sprite = atlas.apply(still);
+
+                var contents = sprite.contents();
+
+                int spriteW = contents.width();
+                int spriteH = contents.height();
+                int spriteX0 = sprite.getX();
+                int spriteY0 = sprite.getY();
+
+                int argb = ext.getTintColor();
+
+                int a = (argb >> 24) & 0xFF;
+                int r = (argb >> 16) & 0xFF;
+                int g = (argb >> 8) & 0xFF;
+                int b = argb & 0xFF;
+
+                int drawX = mouseX + innerX + used;
+                int drawYBase = mouseY + innerY;
+                int remainingW = Math.min(segW, filledW - used);
+
+                int localX = 0;
+
+                while (remainingW > 0) {
+                    int takeW = Math.min(spriteW - localX, remainingW);
+
+                    int yRemaining = innerH;
+                    int localY = 0;
+                    int drawY = drawYBase;
+
+                    while (yRemaining > 0) {
+                        int takeH = Math.min(spriteH - localY, yRemaining);
+
+                        GUIRenderer.begin(atlasLoc, pose)
+                                .anchor(SpriteAnchor.TOP_LEFT)
+                                .pos(drawX, drawY)
+                                .patternSize(takeW, takeH)
+                                .texOff(spriteX0 + localX, spriteY0 + localY)
+                                .color(r, g, b, a)
+                                .end();
+
+                        drawY += takeH;
+                        yRemaining -= takeH;
+                        localY = (localY + takeH) % spriteH;
+                    }
+
+                    drawX += takeW;
+                    remainingW -= takeW;
+                    localX = (localX + takeW) % spriteW;
+                }
+
+                used += segW;
+            }
+
+            GUIRenderer.begin(overlay, pose)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(mouseX, mouseY)
+                    .end();
+
+            pose.popPose();
+        }
+    }
+
+    @EventBusSubscriber
+    public static class CommonEvents {
+        @SubscribeEvent
+        public static void onFluidCollision(FluidCollisionEvent event) {
+            var entity = event.getEntity();
+
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CUT_GLASS_BOOT.get())) {
+                var relic = (CutGlassBootItem) stack.getItem();
+
+                var fluids = relic.getFluidEntries(entity, stack);
+
+                if (fluids.containsKey(event.getFluid().getFluidType().toString()))
+                    event.setCanceled(true);
+            }
+        }
     }
 
     @Getter

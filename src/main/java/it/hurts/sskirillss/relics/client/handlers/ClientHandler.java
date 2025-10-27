@@ -20,6 +20,7 @@ import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
+import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -157,7 +158,7 @@ public class ClientHandler {
 
     @SubscribeEvent
     public static void onTooltipRegistry(RegisterClientTooltipComponentFactoriesEvent event) {
-//        event.register(InfiniteHamItem.InfiniteHamTooltip.class, InfiniteHamItem.ClientInfiniteHamTooltip::new);
+        event.register(CutGlassBootItem.CutGlassBootTooltip.class, CutGlassBootItem.ClientCutGlassBootTooltip::new);
     }
 
     @SubscribeEvent
