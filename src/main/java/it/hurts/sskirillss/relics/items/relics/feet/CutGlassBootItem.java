@@ -2,12 +2,12 @@ package it.hurts.sskirillss.relics.items.relics.feet;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
-import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
@@ -15,7 +15,8 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
-import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
+import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.item.cut_glass_boot.C2SCycleFluid;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -23,13 +24,16 @@ import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import net.minecraft.ChatFormatting;
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
@@ -39,8 +43,9 @@ import net.minecraft.stats.Stats;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
@@ -61,6 +66,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
 import top.theillusivec4.curios.api.SlotContext;
 
@@ -72,20 +78,22 @@ public class CutGlassBootItem extends RelicItem {
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
-                        .ability(AbilityTemplate.builder("skating")
-                                .stat(StatTemplate.builder("speed")
-                                        .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.6279D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                        .ability(AbilityTemplate.builder("glass")
+                                .stat(StatTemplate.builder("capacity")
+                                        .initialValue(1000D, 5000D)
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1000D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .research(ResearchTemplate.builder()
-                                        .star(0, 3, 7).star(1, 13, 9).star(2, 6, 16).star(3, 16, 18).star(4, 9, 25).star(5, 15, 29)
-                                        .link(5, 4).link(4, 2).link(2, 0).link(2, 1).link(4, 3)
+                                .stat(StatTemplate.builder("max_fluid")
+                                        .initialValue(1D, 2D)
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .build())
                         .build())
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
+                        .maxRank(0)
                         .step(200)
                         .build())
                 .loot(LootTemplate.builder()
@@ -95,8 +103,44 @@ public class CutGlassBootItem extends RelicItem {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
-        super.inventoryTick(stack, level, entity, slotId, isSelected);
+    public void curioTick(SlotContext slotContext, ItemStack stack) {
+        super.curioTick(slotContext, stack);
+
+        var entity = slotContext.entity();
+        var level = entity.level();
+
+        if (level.isClientSide())
+            return;
+
+        var position = entity.position();
+        var state = level.getFluidState(level.clip(new ClipContext(position, position.add(0, -1, 0), ClipContext.Block.OUTLINE, ClipContext.Fluid.ANY, entity)).getBlockPos());
+
+        var attribute = Attributes.MOVEMENT_SPEED;
+        var operation = AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL;
+
+        if (state.getType() == Fluids.EMPTY)
+            EntityUtils.removeAttribute(entity, stack, attribute, operation);
+        else {
+            var amount = 0;
+
+            for (var fluid : this.getFluidEntries(entity, stack).values())
+                amount += fluid.getAmount();
+
+            var maxAmount = this.getMaxCapacity(entity, stack);
+            var modifier = (float) amount / maxAmount;
+
+            EntityUtils.resetAttribute(entity, stack, attribute, -0.75F * modifier, operation);
+        }
+    }
+
+    @Override
+    public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
+        super.onUnequip(slotContext, newStack, stack);
+
+        if (stack.getItem() == newStack.getItem())
+            return;
+
+        EntityUtils.removeAttribute(slotContext.entity(), stack, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
     @Override
@@ -105,15 +149,24 @@ public class CutGlassBootItem extends RelicItem {
     }
 
     public int getMaxCapacity(LivingEntity entity, ItemStack stack) {
-        return 10000;
+        var amount = 0;
+
+        for (var fluid : this.getFluidEntries(entity, stack).values())
+            amount += fluid.getAmount();
+
+        return Math.max(amount, (int) Math.ceil(this.getStatValue(entity, stack, "glass", "capacity")));
     }
 
     public int getMaxFluidEntries(LivingEntity entity, ItemStack stack) {
-        return 5;
+        return Math.max(this.getFluidEntries(entity, stack).size(), (int) Math.ceil(this.getStatValue(entity, stack, "glass", "max_fluids")));
     }
 
     public int getSelectedFluidIndex(LivingEntity entity, ItemStack stack) {
-        return 0;
+        return Math.clamp(stack.getOrDefault(RelicsDataComponents.CUT_GLASS_BOOT_SELECTED_FLUID_INDEX, 0), 0, this.getFluidEntries(entity, stack).size());
+    }
+
+    public void setSelectedFluidIndex(LivingEntity entity, ItemStack stack, int index) {
+        stack.set(RelicsDataComponents.CUT_GLASS_BOOT_SELECTED_FLUID_INDEX, Math.clamp(index, 0, this.getFluidEntries(entity, stack).size()));
     }
 
     public Fluid getSelectedFluid(LivingEntity entity, ItemStack stack) {
@@ -371,10 +424,10 @@ public class CutGlassBootItem extends RelicItem {
 
     @Override
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
-        return Optional.of(new CutGlassBootTooltip(new ArrayList<>(this.getFluidEntries(null, stack).values()), this.getMaxCapacity(null, stack)));
+        return Optional.of(new CutGlassBootTooltip(new ArrayList<>(this.getFluidEntries(null, stack).values()), this.getSelectedFluidIndex(null, stack), this.getMaxCapacity(null, stack)));
     }
 
-    public record CutGlassBootTooltip(List<FluidEntry> fluids, int capacity) implements TooltipComponent {
+    public record CutGlassBootTooltip(List<FluidEntry> fluids, int selectedFluid, int capacity) implements TooltipComponent {
 
     }
 
@@ -382,7 +435,18 @@ public class CutGlassBootItem extends RelicItem {
     public record ClientCutGlassBootTooltip(CutGlassBootTooltip tooltip) implements ClientTooltipComponent {
         @Override
         public int getHeight() {
-            return 22;
+            var MC = Minecraft.getInstance();
+
+            int baseH = 22;
+
+            int lines = 0;
+            for (var e : tooltip.fluids()) {
+                if (e != null && e.getAmount() > 0) lines++;
+            }
+
+            int gap = lines > 0 ? 14 : 0;
+
+            return baseH + gap + lines * MC.font.lineHeight;
         }
 
         @Override
@@ -392,7 +456,12 @@ public class CutGlassBootItem extends RelicItem {
 
         @Override
         public void renderImage(Font font, int mouseX, int mouseY, GuiGraphics guiGraphics) {
-            var MC = net.minecraft.client.Minecraft.getInstance();
+            var MC = Minecraft.getInstance();
+            var player = MC.player;
+
+            if (player == null)
+                return;
+
             var pose = guiGraphics.pose();
 
             int capacity = tooltip.capacity();
@@ -400,18 +469,16 @@ public class CutGlassBootItem extends RelicItem {
 
             int total = 0;
 
-            for (var e : list)
-                total += Math.max(0, e.getAmount());
+            for (var entry : list)
+                total += entry.getAmount();
 
-            total = Math.max(0, total);
-
-            var overlay = ResourceLocation.fromNamespaceAndPath(it.hurts.sskirillss.relics.Relics.MODID, "textures/gui/tooltip/cut_glass_boot/flask.png");
+            var overlay = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/tooltip/cut_glass_boot/flask.png");
             var atlasLoc = InventoryMenu.BLOCK_ATLAS;
             var atlas = MC.getTextureAtlas(atlasLoc);
 
-            int innerX = 5;
+            int innerX = 4;
             int innerY = 2;
-            int innerW = 159;
+            int innerW = 160;
             int innerH = 16;
 
             pose.pushPose();
@@ -421,9 +488,6 @@ public class CutGlassBootItem extends RelicItem {
 
             for (int i = 0; i < list.size(); i++) {
                 var entry = list.get(i);
-
-                if (entry == null || entry.getAmount() <= 0)
-                    continue;
 
                 var fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(entry.getFluid()));
 
@@ -444,9 +508,7 @@ public class CutGlassBootItem extends RelicItem {
                 var ext = IClientFluidTypeExtensions.of(fluid);
 
                 var still = ext.getStillTexture();
-
                 var sprite = atlas.apply(still);
-
                 var contents = sprite.contents();
 
                 int spriteW = contents.width();
@@ -504,6 +566,34 @@ public class CutGlassBootItem extends RelicItem {
                     .end();
 
             pose.popPose();
+
+            int textX = mouseX + innerX;
+            int textY = mouseY + innerY + innerH + 4;
+
+            for (int i = 0; i < list.size(); i++) {
+                var entry = list.get(i);
+
+                var fluid = BuiltInRegistries.FLUID.get(ResourceLocation.parse(entry.getFluid()));
+                if (fluid == Fluids.EMPTY) continue;
+
+                var fluidComponent = Component.literal(fluid.getFluidType().getDescription().getString());
+
+                var isSelected = i == tooltip.selectedFluid();
+
+                var line = Component.empty()
+                        .append(Component.literal(i == list.size() - 1 ? "┗━" : "┣━").withStyle(ChatFormatting.BOLD))
+                        .append(fluidComponent)
+                        .append(": ")
+                        .append(String.valueOf(entry.getAmount()))
+                        .append(" mB")
+                        .withStyle(ChatFormatting.GRAY);
+
+                if (isSelected)
+                    line.append(Component.literal(" ◀").withStyle(player.tickCount % 30 <= 15 ? ChatFormatting.WHITE : ChatFormatting.GOLD));
+
+                guiGraphics.drawString(font, line, textX, textY, 0xFFFFFF, false);
+                textY += font.lineHeight;
+            }
         }
     }
 
@@ -520,6 +610,28 @@ public class CutGlassBootItem extends RelicItem {
 
                 if (fluids.containsKey(event.getFluid().getFluidType().toString()))
                     event.setCanceled(true);
+            }
+        }
+    }
+
+    @EventBusSubscriber
+    public static class ClientEvents {
+        @SubscribeEvent
+        public static void onMouseScroll(InputEvent.MouseScrollingEvent event) {
+            var player = Minecraft.getInstance().player;
+
+            if (player == null || !player.isShiftKeyDown())
+                return;
+
+            for (var stack : Arrays.asList(player.getMainHandItem(), player.getOffhandItem())) {
+                if (!(stack.getItem() instanceof CutGlassBootItem))
+                    continue;
+
+                NetworkHandler.sendToServer(new C2SCycleFluid((int) Math.round(event.getScrollDeltaY())));
+
+                event.setCanceled(true);
+
+                break;
             }
         }
     }

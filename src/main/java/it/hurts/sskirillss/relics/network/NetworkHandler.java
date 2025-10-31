@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.network.packets.abilities.SpellCastPacket;
 import it.hurts.sskirillss.relics.network.packets.capability.CapabilitySyncPacket;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeMode;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
+import it.hurts.sskirillss.relics.network.packets.item.cut_glass_boot.C2SCycleFluid;
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
@@ -61,6 +62,9 @@ public class NetworkHandler {
 
         // === ROLLER SKATE ===
         registrar.playToServer(C2SCreateSpark.TYPE, C2SCreateSpark.STREAM_CODEC, C2SCreateSpark::handle);
+
+        // === CUT-GLASS BOOT ===
+        registrar.playToServer(C2SCycleFluid.TYPE, C2SCycleFluid.STREAM_CODEC, C2SCycleFluid::handle);
 
         registrar.playToClient(ShakePacket.TYPE, ShakePacket.STREAM_CODEC, ShakePacket::handle);
     }
