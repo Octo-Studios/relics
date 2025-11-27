@@ -304,6 +304,13 @@
   "relics.description.piglin_mask.ability.looting.statistic.effect_duration": "Проведено времени под воздействием эффекта зубов",
   "relics.description.piglin_mask.ability.looting.statistic.tripled_effect_duration": "Проведено времени под воздействием утроенного эффекта зубов",
 
+  "item.relics.cut_glass_boot": "Хрустальный ботинок",
+  "relics.description.cut_glass_boot.description": "",
+  "relics.description.cut_glass_boot.ability.glass": "Стакан",
+  "relics.description.cut_glass_boot.ability.glass.description": "Когда реликвия в руке, работает подобно обычному ведру, способному хранить в себе до %2$s жидкостей общим объемом в %1$s mB. Для переключения текущей выбранной жидкости необходимо с реликвией в руке и зажатой клавишей Шифт прокрутить колёсико мыши. Когда реликвия экипирована, позволяет перемещаться по любой жидкости, которая находится во внутреннем буфере. При этом скорость передвижения по жидкости снижена вдвое от обычной, однако, за каждую 1000 mB жидкости того же типа скорость передвижения по ней увеличивается на %3$s%%.",
+  "relics.description.cut_glass_boot.ability.glass.experience_source.target": "",
+  "relics.description.cut_glass_boot.ability.glass.statistic.target": "",
+
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
   "item.relics.golden_tooth": "Золотой зуб",
 

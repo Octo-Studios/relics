@@ -1,5 +1,8 @@
 package it.hurts.sskirillss.relics.api.relics.abilities.stats;
 
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.misc.InitialValue;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.misc.ThresholdValue;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.misc.UpgradeModifier;
 import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.config.data.StatConfigData;
 import it.hurts.sskirillss.relics.init.RelicsRegistries;
@@ -16,9 +19,9 @@ import java.util.function.Function;
 public class StatTemplate {
     private final String id;
 
-    private final Pair<ScalingModel, Double> upgradeModifier;
-    private final Pair<Double, Double> initialValue;
-    private final Pair<Double, Double> thresholdValue;
+    private final UpgradeModifier upgradeModifier;
+    private final InitialValue initialValue;
+    private final ThresholdValue thresholdValue;
     private final Function<Double, ? extends Number> formatValue;
 
     public static StatTemplateBuilder builder(String id) {
@@ -30,15 +33,15 @@ public class StatTemplate {
     }
 
     public StatConfigData toConfigData() {
-        return new StatConfigData(initialValue.getKey(), initialValue.getValue(), thresholdValue.getKey(), thresholdValue.getValue(), RelicsRegistries.SCALING_MODEL_REGISTRY.getKey(upgradeModifier.getKey()).toString(), upgradeModifier.getValue());
+        return new StatConfigData(initialValue.getMinValue(), initialValue.getMaxValue(), thresholdValue.getMinValue(), thresholdValue.getMaxValue(), RelicsRegistries.SCALING_MODEL_REGISTRY.getKey(upgradeModifier.getScalingModel()).toString(), upgradeModifier.getModifier());
     }
 
     public static class StatTemplateBuilder {
         private final String id;
 
-        private Pair<ScalingModel, Double> upgradeModifier = Pair.of(RelicsScalingModels.ADDITIVE.get(), 1D);
-        private Pair<Double, Double> initialValue = Pair.of(0D, 0D);
-        private Pair<Double, Double> thresholdValue = Pair.of(Double.MIN_VALUE, Double.MAX_VALUE);
+        private UpgradeModifier upgradeModifier = new UpgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D);
+        private InitialValue initialValue = new InitialValue(0D, 0D, 0D);
+        private ThresholdValue thresholdValue = new ThresholdValue(Double.MIN_VALUE, Double.MAX_VALUE);
         private Function<Double, ? extends Number> formatValue = Double::doubleValue;
 
         public StatTemplateBuilder(String id) {
@@ -55,19 +58,23 @@ public class StatTemplate {
         }
 
         public StatTemplateBuilder upgradeModifier(ScalingModel model, double step) {
-            this.upgradeModifier = Pair.of(model, step);
+            this.upgradeModifier = new UpgradeModifier(model, step);
 
             return this;
         }
 
         public StatTemplateBuilder initialValue(double min, double max) {
-            this.initialValue = Pair.of(min, max);
+            return initialValue(min, max, 0D);
+        }
+
+        public StatTemplateBuilder initialValue(double min, double max, double step) {
+            this.initialValue = new InitialValue(min, max, step);
 
             return this;
         }
 
         public StatTemplateBuilder thresholdValue(double min, double max) {
-            this.thresholdValue = Pair.of(min, max);
+            this.thresholdValue = new ThresholdValue(min, max);
 
             return this;
         }

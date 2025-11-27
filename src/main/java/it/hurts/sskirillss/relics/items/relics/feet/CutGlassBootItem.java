@@ -15,6 +15,7 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.cut_glass_boot.C2SCycleFluid;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -25,22 +26,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import net.minecraft.ChatFormatting;
-import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
-import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
@@ -49,18 +43,15 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.BucketPickup;
-import net.minecraft.world.level.block.LiquidBlockContainer;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.gameevent.GameEvent;
-import net.minecraft.world.level.material.FlowingFluid;
+import net.minecraft.world.level.block.LiquidBlock;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -68,6 +59,9 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.common.SoundActions;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import top.theillusivec4.curios.api.SlotContext;
 
 import javax.annotation.Nullable;
@@ -80,14 +74,23 @@ public class CutGlassBootItem extends RelicItem {
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("glass")
                                 .stat(StatTemplate.builder("capacity")
-                                        .initialValue(1000D, 5000D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1000D)
+                                        .initialValue(1000D, 5000D, 1000D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.9)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .stat(StatTemplate.builder("max_fluid")
+                                .stat(StatTemplate.builder("max_fluids")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.4D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .build())
+                                .stat(StatTemplate.builder("speed")
+                                        .initialValue(0.01D, 0.05D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 8, 3).star(1, 16, 5).star(2, 5, 10).star(3, 11, 10).star(4, 3, 16).star(5, 19, 20).star(6, 10, 21).star(7, 2, 23).star(8, 20, 26).star(9, 11, 27)
+                                        .link(4, 6).link(6, 5).link(5, 8).link(8, 9).link(9, 7).link(7, 4).link(6, 9).link(4, 2).link(2, 0).link(0, 1).link(1, 3).link(3, 5)
                                         .build())
                                 .build())
                         .build())
@@ -97,7 +100,7 @@ public class CutGlassBootItem extends RelicItem {
                         .step(200)
                         .build())
                 .loot(LootTemplate.builder()
-                        .entry(LootEntries.OVERWORLD)
+                        .entry(LootEntries.AQUATIC)
                         .build())
                 .build();
     }
@@ -113,7 +116,7 @@ public class CutGlassBootItem extends RelicItem {
             return;
 
         var position = entity.position();
-        var state = level.getFluidState(level.clip(new ClipContext(position, position.add(0, -1, 0), ClipContext.Block.OUTLINE, ClipContext.Fluid.ANY, entity)).getBlockPos());
+        var state = level.getFluidState(level.clip(new ClipContext(position, position.add(0, -2, 0), ClipContext.Block.OUTLINE, ClipContext.Fluid.ANY, entity)).getBlockPos());
 
         var attribute = Attributes.MOVEMENT_SPEED;
         var operation = AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL;
@@ -121,15 +124,10 @@ public class CutGlassBootItem extends RelicItem {
         if (state.getType() == Fluids.EMPTY)
             EntityUtils.removeAttribute(entity, stack, attribute, operation);
         else {
-            var amount = 0;
+            var entry = this.getFluidEntries(entity, stack).get(state.getType().toString());
 
-            for (var fluid : this.getFluidEntries(entity, stack).values())
-                amount += fluid.getAmount();
-
-            var maxAmount = this.getMaxCapacity(entity, stack);
-            var modifier = (float) amount / maxAmount;
-
-            EntityUtils.resetAttribute(entity, stack, attribute, -0.75F * modifier, operation);
+            if (entry != null)
+                EntityUtils.resetAttribute(entity, stack, attribute, (float) (entry.getAmount() / 1000F * this.getStatValue(entity, stack, "glass", "speed")) - 0.5F, operation);
         }
     }
 
@@ -145,7 +143,10 @@ public class CutGlassBootItem extends RelicItem {
 
     @Override
     public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
-        return false;
+        if (!(slotContext.entity() instanceof Player player))
+            return false;
+
+        return Item.getPlayerPOVHitResult(player.level(), player, ClipContext.Fluid.SOURCE_ONLY).getType() == HitResult.Type.MISS;
     }
 
     public int getMaxCapacity(LivingEntity entity, ItemStack stack) {
@@ -221,10 +222,7 @@ public class CutGlassBootItem extends RelicItem {
         if (total + amount > getMaxCapacity(entity, stack))
             return false;
 
-        if (!entries.containsKey(fluidKey) && entries.size() >= getMaxFluidEntries(entity, stack))
-            return false;
-
-        return true;
+        return entries.containsKey(fluidKey) || entries.size() < getMaxFluidEntries(entity, stack);
     }
 
     public void addAmount(LivingEntity entity, ItemStack stack, String fluidKey, int amount) {
@@ -249,11 +247,10 @@ public class CutGlassBootItem extends RelicItem {
         var key = entry.getFluid();
         var left = entry.getAmount() - amount;
 
-        if (left > 0) {
+        if (left > 0)
             entries.put(key, entry.toBuilder().amount(left).build());
-        } else {
+        else
             entries.remove(key);
-        }
 
         this.setFluidEntries(entity, stack, entries);
     }
@@ -261,165 +258,123 @@ public class CutGlassBootItem extends RelicItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
-        var sneaking = player.isShiftKeyDown();
-        var clip = sneaking ? ClipContext.Fluid.NONE : ClipContext.Fluid.SOURCE_ONLY;
-        var hit = getPlayerPOVHitResult(level, player, clip);
 
-        if (hit.getType() != HitResult.Type.BLOCK)
+        var hitResult = Item.getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
+
+        if (hitResult.getType() != HitResult.Type.BLOCK)
             return InteractionResultHolder.pass(stack);
 
-        var targetPos = hit.getBlockPos();
-        var face = hit.getDirection();
-        var placePos = targetPos.relative(face);
+        var pos = hitResult.getBlockPos();
+        var face = hitResult.getDirection();
 
-        if (!level.mayInteract(player, targetPos) || !player.mayUseItemAt(placePos, face, stack))
-            return InteractionResultHolder.fail(stack);
+        var fluidState = level.getFluidState(pos);
+        var type = fluidState.getType();
+        var perUse = 1000;
 
-        if (sneaking) {
-            var selected = this.getSelectedFluid(player, stack);
+        if (type != Fluids.EMPTY && fluidState.isSource()) {
+            var fluidKey = BuiltInRegistries.FLUID.getKey(type).toString();
 
-            if (selected == Fluids.EMPTY)
+            if (!this.canAdd(player, stack, fluidKey, perUse))
                 return InteractionResultHolder.pass(stack);
 
-            var entries = this.getFluidEntries(player, stack);
-            var list = new ArrayList<>(entries.values());
-            var idx = Math.max(0, Math.min(list.size() - 1, this.getSelectedFluidIndex(player, stack)));
-            var entry = list.get(idx);
+            var state = level.getBlockState(pos);
+            var block = state.getBlock();
 
-            if (entry.getAmount() < 1000) {
-                this.consumeSelected(player, stack, entry.getAmount());
+            if (block instanceof BucketPickup pickup) {
+                if (level.isClientSide())
+                    return InteractionResultHolder.sidedSuccess(stack, true);
 
-                player.awardStat(Stats.ITEM_USED.get(this));
+                var result = pickup.pickupBlock(player, level, pos, state);
 
-                return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+                if (result.isEmpty())
+                    return InteractionResultHolder.fail(stack);
+
+                this.addAmount(player, stack, fluidKey, perUse);
+
+                this.playFluidSound(type, null, level, pos, SoundActions.BUCKET_FILL, SoundSource.PLAYERS, 1F, 1F);
+
+                return InteractionResultHolder.sidedSuccess(stack, false);
+            } else if (block instanceof LiquidBlock) {
+                if (level.isClientSide())
+                    return InteractionResultHolder.sidedSuccess(stack, true);
+
+                level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+
+                this.addAmount(player, stack, fluidKey, perUse);
+
+                this.playFluidSound(type, null, level, pos, SoundActions.BUCKET_FILL, SoundSource.PLAYERS, 1F, 1F);
+
+                return InteractionResultHolder.sidedSuccess(stack, false);
             }
-            var actualPos = canBlockContainFluid(player, level, targetPos, level.getBlockState(targetPos), stack) ? targetPos : placePos;
 
-            if (this.emptyContents(player, level, actualPos, hit, stack)) {
-                if (player instanceof ServerPlayer sp)
-                    CriteriaTriggers.PLACED_BLOCK.trigger(sp, actualPos, stack);
+            return InteractionResultHolder.pass(stack);
+        }
 
-                player.awardStat(Stats.ITEM_USED.get(this));
+        var selectedFluid = this.getSelectedFluid(player, stack);
+        var totalAmount = this.getTotalAmount(player, stack);
 
-                this.consumeSelected(player, stack, 1000);
+        if (selectedFluid == Fluids.EMPTY || totalAmount < perUse)
+            return InteractionResultHolder.pass(stack);
 
-                return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
-            }
+        var placePos = pos.relative(face);
+
+        if (!player.mayUseItemAt(placePos, face, stack))
             return InteractionResultHolder.fail(stack);
-        } else {
-            var state = level.getBlockState(targetPos);
 
-            if (!(state.getBlock() instanceof BucketPickup pickup))
-                return InteractionResultHolder.pass(stack);
+        if (level.isClientSide())
+            return InteractionResultHolder.sidedSuccess(stack, true);
 
-            var fluidState = state.getFluidState();
+        var fluidType = selectedFluid.getFluidType();
+        var stackForCheck = new FluidStack(selectedFluid, perUse);
 
-            if (!fluidState.isSource())
-                return InteractionResultHolder.pass(stack);
+        if (fluidType.isVaporizedOnPlacement(level, placePos, stackForCheck)) {
+            if (!level.isClientSide()) {
+                this.consumeSelected(player, stack, perUse);
 
-            var fluid = fluidState.getType();
-            var key = BuiltInRegistries.FLUID.getKey(fluid).toString();
+                fluidType.onVaporize(player, level, placePos, stackForCheck);
 
-            if (!this.canAdd(player, stack, key, 1000))
-                return InteractionResultHolder.fail(stack);
-
-            var picked = pickup.pickupBlock(player, level, targetPos, state);
-
-            if (!picked.isEmpty()) {
-                pickup.getPickupSound(state).ifPresent(snd -> player.playSound(snd, 1.0F, 1.0F));
-                level.gameEvent(player, GameEvent.FLUID_PICKUP, targetPos);
-
-                if (!level.isClientSide && player instanceof ServerPlayer sp)
-                    CriteriaTriggers.FILLED_BUCKET.trigger(sp, picked);
-
-                this.addAmount(player, stack, key, 1000);
-
-                player.awardStat(Stats.ITEM_USED.get(this));
-
-                return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
+                this.playFluidSound(selectedFluid, null, level, placePos, SoundActions.FLUID_VAPORIZE, SoundSource.BLOCKS, 1F, 1F);
             }
+
+            return InteractionResultHolder.sidedSuccess(stack, false);
+        }
+
+        var stateForPlacement = fluidType.getStateForPlacement(level, placePos, stackForCheck);
+
+        if (stateForPlacement.isEmpty())
             return InteractionResultHolder.fail(stack);
-        }
+
+        var placeState = stateForPlacement.createLegacyBlock();
+        var placeBlockState = level.getBlockState(placePos);
+
+        if (!placeBlockState.isAir() && !placeBlockState.canBeReplaced() && placeBlockState.getFluidState().getType() != selectedFluid)
+            return InteractionResultHolder.fail(stack);
+
+        level.setBlockAndUpdate(placePos, placeState);
+
+        this.consumeSelected(player, stack, perUse);
+
+        this.playFluidSound(selectedFluid, null, level, placePos, SoundActions.BUCKET_EMPTY, SoundSource.PLAYERS, 1F, 1F);
+
+        return InteractionResultHolder.sidedSuccess(stack, false);
     }
 
-    public boolean emptyContents(@Nullable Player player, Level level, BlockPos pos, @Nullable BlockHitResult hit, @Nullable ItemStack container) {
-        var selectedFluid = this.getSelectedFluid(player, container);
+    private void playFluidSound(Fluid fluid, @Nullable Player player, Level level, net.minecraft.core.BlockPos pos, net.neoforged.neoforge.common.SoundAction action, SoundSource source, float volume, float pitch) {
+        if (level.isClientSide())
+            return;
 
-        if (!(selectedFluid instanceof FlowingFluid flowing))
-            return false;
+        var type = fluid.getFluidType();
+        var sound = type.getSound(player, level, pos, action);
 
-        var state = level.getBlockState(pos);
-        var block = state.getBlock();
-        var canReplace = state.canBeReplaced(selectedFluid);
-
-        boolean canPlaceHere;
-
-        if (!state.isAir() && !canReplace) {
-            if (block instanceof LiquidBlockContainer tank && tank.canPlaceLiquid(player, level, pos, state, selectedFluid)) {
-                canPlaceHere = true;
-            } else {
-                canPlaceHere = false;
-            }
-        } else {
-            canPlaceHere = true;
+        if (sound == null) {
+            if (action == SoundActions.BUCKET_FILL)
+                sound = (fluid == Fluids.LAVA) ? SoundEvents.BUCKET_FILL_LAVA : SoundEvents.BUCKET_FILL;
+            else if (action == SoundActions.BUCKET_EMPTY)
+                sound = (fluid == Fluids.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
         }
 
-        var contained = java.util.Optional.ofNullable(container).flatMap(net.neoforged.neoforge.fluids.FluidUtil::getFluidContained);
-
-        if (!canPlaceHere) {
-            return hit != null && this.emptyContents(player, level, hit.getBlockPos().relative(hit.getDirection()), null, container);
-        }
-
-        if (contained.isPresent() && selectedFluid.getFluidType().isVaporizedOnPlacement(level, pos, contained.get())) {
-            selectedFluid.getFluidType().onVaporize(player, level, pos, contained.get());
-            return true;
-        }
-
-        if (level.dimensionType().ultraWarm() && selectedFluid.is(FluidTags.WATER)) {
-            var x = pos.getX();
-            var y = pos.getY();
-            var z = pos.getZ();
-
-            level.playSound(player, pos, SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (level.random.nextFloat() - level.random.nextFloat()) * 0.8F);
-
-            for (var n = 0; n < 8; n++) {
-                level.addParticle(ParticleTypes.LARGE_SMOKE, x + Math.random(), y + Math.random(), z + Math.random(), 0.0, 0.0, 0.0);
-            }
-
-            return true;
-        }
-        if (block instanceof LiquidBlockContainer tank2 && tank2.canPlaceLiquid(player, level, pos, state, selectedFluid)) {
-            tank2.placeLiquid(level, pos, state, flowing.getSource(false));
-
-            this.playEmptySound(player, level, pos, container);
-
-            return true;
-        }
-
-        if (!level.isClientSide && canReplace && !state.liquid())
-            level.destroyBlock(pos, true);
-
-        if (!level.setBlock(pos, selectedFluid.defaultFluidState().createLegacyBlock(), 11) && !state.getFluidState().isSource()) {
-            return false;
-        }
-
-        this.playEmptySound(player, level, pos, container);
-
-        return true;
-    }
-
-    protected void playEmptySound(@Nullable Player player, LevelAccessor level, BlockPos pos, ItemStack stack) {
-        SoundEvent soundevent = this.getSelectedFluid(player, stack).getFluidType().getSound(player, level, pos, net.neoforged.neoforge.common.SoundActions.BUCKET_EMPTY);
-
-        if (soundevent == null)
-            soundevent = this.getSelectedFluid(player, stack).is(FluidTags.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
-
-        level.playSound(player, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
-        level.gameEvent(player, GameEvent.FLUID_PLACE, pos);
-    }
-
-    protected boolean canBlockContainFluid(@Nullable Player player, Level worldIn, BlockPos posIn, BlockState blockstate, ItemStack stack) {
-        return blockstate.getBlock() instanceof LiquidBlockContainer && ((LiquidBlockContainer) blockstate.getBlock()).canPlaceLiquid(player, worldIn, posIn, blockstate, this.getSelectedFluid(player, stack));
+        if (sound != null)
+            level.playSound(player, pos, sound, source, volume, pitch);
     }
 
     @Override
@@ -437,20 +392,30 @@ public class CutGlassBootItem extends RelicItem {
         public int getHeight() {
             var MC = Minecraft.getInstance();
 
-            int baseH = 22;
+            var baseHeight = 22;
 
-            int lines = 0;
-            for (var e : tooltip.fluids()) {
-                if (e != null && e.getAmount() > 0) lines++;
-            }
+            var lines = 0;
 
-            int gap = lines > 0 ? 14 : 0;
+            for (var e : tooltip.fluids())
+                if (e != null && e.getAmount() > 0)
+                    lines++;
 
-            return baseH + gap + lines * MC.font.lineHeight;
+            var gap = lines > 0 ? 14 : 0;
+
+            return baseHeight + gap + lines * MC.font.lineHeight;
         }
 
         @Override
         public int getWidth(Font font) {
+            var maxWidth = 100;
+
+            for (var line : this.constructTooltip()) {
+                var width = Minecraft.getInstance().font.width(line);
+
+                if (width > maxWidth)
+                    maxWidth = width;
+            }
+
             return 100;
         }
 
@@ -570,6 +535,19 @@ public class CutGlassBootItem extends RelicItem {
             int textX = mouseX + innerX;
             int textY = mouseY + innerY + innerH + 4;
 
+            for (var line : this.constructTooltip()) {
+                guiGraphics.drawString(font, line, textX, textY, 0xFFFFFF, false);
+
+                textY += font.lineHeight;
+            }
+        }
+
+        private List<Component> constructTooltip() {
+            var MC = Minecraft.getInstance();
+            var list = tooltip.fluids();
+
+            var result = new ArrayList<Component>();
+
             for (int i = 0; i < list.size(); i++) {
                 var entry = list.get(i);
 
@@ -589,11 +567,12 @@ public class CutGlassBootItem extends RelicItem {
                         .withStyle(ChatFormatting.GRAY);
 
                 if (isSelected)
-                    line.append(Component.literal(" ◀").withStyle(player.tickCount % 30 <= 15 ? ChatFormatting.WHITE : ChatFormatting.GOLD));
+                    line.append(Component.literal(" ◀").withStyle(MC.player.tickCount % 30 <= 15 ? ChatFormatting.WHITE : ChatFormatting.GOLD));
 
-                guiGraphics.drawString(font, line, textX, textY, 0xFFFFFF, false);
-                textY += font.lineHeight;
+                result.add(line);
             }
+
+            return result;
         }
     }
 
@@ -602,6 +581,9 @@ public class CutGlassBootItem extends RelicItem {
         @SubscribeEvent
         public static void onFluidCollision(FluidCollisionEvent event) {
             var entity = event.getEntity();
+
+            if (entity.isShiftKeyDown() || entity.isInFluidType())
+                return;
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CUT_GLASS_BOOT.get())) {
                 var relic = (CutGlassBootItem) stack.getItem();
@@ -651,5 +633,141 @@ public class CutGlassBootItem extends RelicItem {
                         Codec.INT.fieldOf("amount").forGetter(FluidEntry::getAmount)
                 ).apply(instance, FluidEntry::new)
         );
+    }
+
+    public static class CutGlassBootFluidHandler implements IFluidHandlerItem {
+        private final ItemStack container;
+        private final CutGlassBootItem item;
+
+        public CutGlassBootFluidHandler(ItemStack stack) {
+            this.container = stack;
+            this.item = (CutGlassBootItem) stack.getItem();
+        }
+
+        @Override
+        public ItemStack getContainer() {
+            return container;
+        }
+
+        @Override
+        public int getTanks() {
+            return 1;
+        }
+
+        @Override
+        public FluidStack getFluidInTank(int tank) {
+            var fluid = item.getSelectedFluid(null, container);
+
+            if (fluid == Fluids.EMPTY)
+                return FluidStack.EMPTY;
+
+            var entries = item.getFluidEntries(null, container);
+            var selected = item.getSelectedFluidIndex(null, container);
+
+            var list = new ArrayList<>(entries.values());
+
+            if (list.isEmpty())
+                return FluidStack.EMPTY;
+
+            var entry = list.get(Math.clamp(selected, 0, list.size() - 1));
+
+            return new FluidStack(fluid, entry.getAmount());
+        }
+
+        @Override
+        public int getTankCapacity(int tank) {
+            return item.getMaxCapacity(null, container);
+        }
+
+        @Override
+        public boolean isFluidValid(int tank, FluidStack stack) {
+            return !stack.isEmpty();
+        }
+
+        @Override
+        public int fill(FluidStack resource, FluidAction action) {
+            if (resource.isEmpty())
+                return 0;
+
+            if (!isFluidValid(0, resource))
+                return 0;
+
+            var capacity = getTankCapacity(0);
+            var maxFluidEntries = item.getMaxFluidEntries(null, container);
+
+            var entries = item.getFluidEntries(null, container);
+            var fluidKey = resource.getFluid().toString();
+
+            var hasFluid = entries.containsKey(fluidKey);
+
+            if (!hasFluid && entries.size() >= maxFluidEntries)
+                return 0;
+
+            var currentTotal = 0;
+
+            for (var entry : entries.values())
+                currentTotal += entry.getAmount();
+
+            var space = capacity - currentTotal;
+
+            if (space <= 0)
+                return 0;
+
+            var step = 1000;
+            var toFill = Math.clamp(resource.getAmount(), space, step);
+
+            if (toFill <= 0)
+                return 0;
+
+            if (action.execute())
+                item.addAmount(null, container, fluidKey, toFill);
+
+            return toFill;
+        }
+
+        @Override
+        public FluidStack drain(FluidStack resource, FluidAction action) {
+            if (resource.isEmpty())
+                return FluidStack.EMPTY;
+
+            var inTank = this.getFluidInTank(0);
+
+            if (inTank.isEmpty())
+                return FluidStack.EMPTY;
+
+            if (inTank.getFluid() != resource.getFluid())
+                return FluidStack.EMPTY;
+
+            var toDrain = Math.min(inTank.getAmount(), resource.getAmount());
+
+            if (toDrain <= 0)
+                return FluidStack.EMPTY;
+
+            if (action.execute())
+                item.consumeSelected(null, container, toDrain);
+
+            return new FluidStack(inTank.getFluid(), toDrain);
+        }
+
+        @Override
+        public FluidStack drain(int maxDrain, FluidAction action) {
+            if (maxDrain <= 0)
+                return FluidStack.EMPTY;
+
+            var inTank = this.getFluidInTank(0);
+
+            if (inTank.isEmpty())
+                return FluidStack.EMPTY;
+
+            var toDrain = Math.min(inTank.getAmount(), maxDrain);
+
+            if (toDrain <= 0)
+                return FluidStack.EMPTY;
+
+            if (action.execute())
+                item.consumeSelected(null, container, toDrain);
+
+            return new FluidStack(inTank.getFluid(), toDrain);
+        }
     }
 }

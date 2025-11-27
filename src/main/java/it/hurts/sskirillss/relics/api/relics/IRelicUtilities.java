@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import org.checkerframework.checker.units.qual.min;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
@@ -66,23 +67,28 @@ public interface IRelicUtilities {
 
         var statData = relic.getStatTemplate(entity, stack, ability, stat);
 
+        var initialValue = statData.getInitialValue();
         var format = statData.getFormatValue();
 
-        var initial = format.apply(optional.get()).doubleValue();
+        var override = format.apply(optional.get()).doubleValue();
 
-        var min = format.apply(statData.getInitialValue().getKey()).doubleValue();
-        var max = format.apply(statData.getInitialValue().getValue()).doubleValue();
+        var min = format.apply(initialValue.getMinValue()).doubleValue();
+        var max = format.apply(initialValue.getMaxValue()).doubleValue();
+        var step = statData.getInitialValue().getStep();
 
         if (min == max)
             return relic.getStatMaxQuality(entity, stack, ability, stat);
 
-        if (initial == min)
+        if (override == min)
             return 0;
 
-        if (initial == max)
+        if (override == max)
             return relic.getStatMaxQuality(entity, stack, ability, stat);
 
-        return Mth.clamp((int) Math.round((initial - min) / ((max - min) / relic.getStatMaxQuality(entity, stack, ability, stat))), 1, relic.getStatMaxQuality(entity, stack, ability, stat) - 1);
+        if (step > 0)
+            override = min + Math.floor((override - min) / step) * step;
+
+        return Mth.clamp((int) Math.round((override - min) / ((max - min) / relic.getStatMaxQuality(entity, stack, ability, stat))), 1, relic.getStatMaxQuality(entity, stack, ability, stat) - 1);
     }
 
     default double getOrCalculateStatValue(LivingEntity entity, ItemStack stack, String ability, String stat) {
@@ -103,25 +109,33 @@ public interface IRelicUtilities {
 
         var threshold = template.getThresholdValue();
 
-        return MathUtils.round(Mth.clamp(template.getUpgradeModifier().getKey().evaluate(entity, stack, value, template.getUpgradeModifier().getValue(), points), threshold.getKey(), threshold.getValue()), 5);
+        return MathUtils.round(Mth.clamp(template.getUpgradeModifier().getScalingModel().evaluate(entity, stack, value, template.getUpgradeModifier().getModifier(), points), threshold.getMinValue(), threshold.getMaxValue()), 5);
     }
 
     default double getStatValueFromQuality(LivingEntity entity, ItemStack stack, String ability, String stat, int quality) {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0D;
 
-        StatTemplate template = relic.getStatTemplate(entity, stack, ability, stat);
+        var template = relic.getStatTemplate(entity, stack, ability, stat);
 
         if (template == null)
             return 0;
 
-        double min = template.getInitialValue().getKey();
-        double max = template.getInitialValue().getValue();
+        var initialValue = template.getInitialValue();
+
+        var min = initialValue.getMinValue();
+        var max = initialValue.getMaxValue();
+        var step = initialValue.getStep();
 
         if (min == max)
             return max;
 
-        return MathUtils.round(min + (((max - min) / relic.getStatMaxQuality(entity, stack, ability, stat)) * quality), 5);
+        var value = min + (((max - min) / relic.getStatMaxQuality(entity, stack, ability, stat)) * quality);
+
+        if (step > 0)
+            value = min + Math.floor((value - min) / step) * step;
+
+        return MathUtils.round(value, 5);
     }
 
     default double getStatValueForLevel(LivingEntity entity, ItemStack stack, String ability, String stat, int level) {

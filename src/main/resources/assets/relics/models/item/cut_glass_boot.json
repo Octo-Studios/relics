@@ -1,0 +1,9 @@
+{
+  "parent": "item/generated",
+    "textures": {
+        "layer0": "relics:item/cut_glass_boot"
+    },
+    "overrides": [
+        { "predicate": { "relics:flawless": 1 }, "model": "relics:item/cut_glass_boot_flawless" }
+    ]
+}
