@@ -1,11 +1,9 @@
 package it.hurts.sskirillss.relics.api.relics;
 
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import org.checkerframework.checker.units.qual.min;
 import org.jetbrains.annotations.ApiStatus;
 
 @ApiStatus.Internal
@@ -62,15 +60,14 @@ public interface IRelicUtilities {
 
         var optional = statComponent.getOverrideValue();
 
-        if (optional.isEmpty())
-            return statComponent.getInitialQuality();
+        var value = optional.orElseGet(() -> this.getStatValueFromQuality(entity, stack, ability, stat, statComponent.getInitialQuality()));
 
         var statData = relic.getStatTemplate(entity, stack, ability, stat);
 
         var initialValue = statData.getInitialValue();
         var format = statData.getFormatValue();
 
-        var override = format.apply(optional.get()).doubleValue();
+        var override = format.apply(value).doubleValue();
 
         var min = format.apply(initialValue.getMinValue()).doubleValue();
         var max = format.apply(initialValue.getMaxValue()).doubleValue();
