@@ -74,19 +74,15 @@ public interface IRelicUtilities {
 
         var min = format.apply(initialValue.getMinValue()).doubleValue();
         var max = format.apply(initialValue.getMaxValue()).doubleValue();
-        var step = statData.getInitialValue().getStep();
 
         if (min == max)
             return relic.getStatMaxQuality(entity, stack, ability, stat);
 
-        if (override == min)
+        if (override <= min)
             return 0;
 
-        if (override == max)
+        if (override >= max)
             return relic.getStatMaxQuality(entity, stack, ability, stat);
-
-        if (step > 0)
-            override = min + Math.floor((override - min) / step) * step;
 
         return Mth.clamp((int) Math.round((override - min) / ((max - min) / relic.getStatMaxQuality(entity, stack, ability, stat))), 1, relic.getStatMaxQuality(entity, stack, ability, stat) - 1);
     }
@@ -125,15 +121,11 @@ public interface IRelicUtilities {
 
         var min = initialValue.getMinValue();
         var max = initialValue.getMaxValue();
-        var step = initialValue.getStep();
 
         if (min == max)
             return max;
 
         var value = min + (((max - min) / relic.getStatMaxQuality(entity, stack, ability, stat)) * quality);
-
-        if (step > 0)
-            value = min + Math.floor((value - min) / step) * step;
 
         return MathUtils.round(value, 5);
     }

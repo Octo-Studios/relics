@@ -40,7 +40,7 @@ public class StatTemplate {
         private final String id;
 
         private UpgradeModifier upgradeModifier = new UpgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D);
-        private InitialValue initialValue = new InitialValue(0D, 0D, 0D);
+        private InitialValue initialValue = new InitialValue(0D, 0D);
         private ThresholdValue thresholdValue = new ThresholdValue(Double.MIN_VALUE, Double.MAX_VALUE);
         private Function<Double, ? extends Number> formatValue = Double::doubleValue;
 
@@ -64,11 +64,7 @@ public class StatTemplate {
         }
 
         public StatTemplateBuilder initialValue(double min, double max) {
-            return initialValue(min, max, 0D);
-        }
-
-        public StatTemplateBuilder initialValue(double min, double max, double step) {
-            this.initialValue = new InitialValue(min, max, step);
+            this.initialValue = new InitialValue(min, max);
 
             return this;
         }

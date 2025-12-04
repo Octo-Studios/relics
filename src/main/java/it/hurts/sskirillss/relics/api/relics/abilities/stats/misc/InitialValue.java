@@ -8,5 +8,4 @@ import lombok.Data;
 public class InitialValue {
     private double minValue;
     private double maxValue;
-    private double step;
 }

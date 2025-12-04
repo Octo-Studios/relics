@@ -4,9 +4,13 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
+import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
+import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
@@ -74,9 +78,9 @@ public class CutGlassBootItem extends RelicItem {
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("glass")
                                 .stat(StatTemplate.builder("capacity")
-                                        .initialValue(1000D, 5000D, 1000D)
+                                        .initialValue(1D, 5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.9)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .formatValue(value -> (int) MathUtils.round(value, 0) * 1000)
                                         .build())
                                 .stat(StatTemplate.builder("max_fluids")
                                         .initialValue(1D, 2D)
@@ -87,6 +91,15 @@ public class CutGlassBootItem extends RelicItem {
                                         .initialValue(0.01D, 0.05D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("standing")
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("duration")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 8, 3).star(1, 16, 5).star(2, 5, 10).star(3, 11, 10).star(4, 3, 16).star(5, 19, 20).star(6, 10, 21).star(7, 2, 23).star(8, 20, 26).star(9, 11, 27)
@@ -155,7 +168,7 @@ public class CutGlassBootItem extends RelicItem {
         for (var fluid : this.getFluidEntries(entity, stack).values())
             amount += fluid.getAmount();
 
-        return Math.max(amount, (int) Math.ceil(this.getStatValue(entity, stack, "glass", "capacity")));
+        return Math.max(amount, (int) Math.ceil(this.getStatValue(entity, stack, "glass", "capacity") * 1000));
     }
 
     public int getMaxFluidEntries(LivingEntity entity, ItemStack stack) {
@@ -416,7 +429,7 @@ public class CutGlassBootItem extends RelicItem {
                     maxWidth = width;
             }
 
-            return 100;
+            return maxWidth + 4;
         }
 
         @Override
@@ -588,10 +601,22 @@ public class CutGlassBootItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CUT_GLASS_BOOT.get())) {
                 var relic = (CutGlassBootItem) stack.getItem();
 
+                if (!relic.canPlayerUseAbility(entity, stack, "glass"))
+                    continue;
+
                 var fluids = relic.getFluidEntries(entity, stack);
 
-                if (fluids.containsKey(event.getFluid().getFluidType().toString()))
-                    event.setCanceled(true);
+                if (!fluids.containsKey(event.getFluid().getFluidType().toString()))
+                    continue;
+
+                if (entity.tickCount % 20 == 0) {
+                    if (entity.getKnownMovement().multiply(1, 0, 1).length() > 0)
+                        relic.addRelicExperience(entity, stack, "glass", "standing", 1);
+
+                    relic.addAbilityMetricValue(entity, stack, "glass", "duration", 1);
+                }
+
+                event.setCanceled(true);
             }
         }
     }
@@ -714,7 +739,7 @@ public class CutGlassBootItem extends RelicItem {
                 return 0;
 
             var step = 1000;
-            var toFill = Math.clamp(resource.getAmount(), space, step);
+            var toFill = Math.clamp(resource.getAmount(), 0, Math.min(space, step));
 
             if (toFill <= 0)
                 return 0;
