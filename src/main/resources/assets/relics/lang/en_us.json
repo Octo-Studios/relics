@@ -304,6 +304,13 @@
   "relics.description.piglin_mask.ability.looting.statistic.effect_duration": "Time spent under tooth effect",
   "relics.description.piglin_mask.ability.looting.statistic.tripled_effect_duration": "Time spent under tripled tooth effect",
 
+  "item.relics.cut_glass_boot": "Cut Glass Boot",
+  "relics.description.cut_glass_boot.description": "Crafted by a mad glassblower who sought to imprison the seas within faceted vessels, this boot is carved from multilayered crystal that remembers every drop that ever touched its walls. Over time, the glass stopped merely storing liquid and learned to command it: once the boot is filled, the surface of water, lava, poison, or anything else hardens beneath the wearer’s steps like a mirrored bridge.",
+  "relics.description.cut_glass_boot.ability.glass": "Glass",
+  "relics.description.cut_glass_boot.ability.glass.description": "When the relic is held, it functions like a regular bucket capable of storing up to %2$s liquids with a total volume of %1$s mB. To switch the currently selected liquid, hold the relic, press Shift, and scroll the mouse wheel. When the relic is equipped, it allows movement across any liquid stored in its internal buffer. Movement speed on the liquid is halved compared to normal, but for every 1000 mB of liquid of the same type, movement speed on it increases by %3$s%%.",
+  "relics.description.cut_glass_boot.ability.glass.experience_source.standing": "+1 experience point for each second spent moving across the liquid",
+  "relics.description.cut_glass_boot.ability.glass.statistic.duration": "Time spent standing on liquid",
+
   "item.relics.relic_experience_bottle": "Relic Experience Bottle",
   "item.relics.golden_tooth": "Golden Tooth",
 
