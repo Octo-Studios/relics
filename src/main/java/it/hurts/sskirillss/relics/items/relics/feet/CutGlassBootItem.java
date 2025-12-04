@@ -125,6 +125,9 @@ public class CutGlassBootItem extends RelicItem {
         var entity = slotContext.entity();
         var level = entity.level();
 
+        if (!this.canPlayerUseAbility(entity, stack, "glass"))
+            return;
+
         if (level.isClientSide())
             return;
 
@@ -271,6 +274,9 @@ public class CutGlassBootItem extends RelicItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
+
+        if (!this.canPlayerUseAbility(player, stack, "glass"))
+            return InteractionResultHolder.pass(stack);
 
         var hitResult = Item.getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
 
@@ -681,6 +687,9 @@ public class CutGlassBootItem extends RelicItem {
 
         @Override
         public FluidStack getFluidInTank(int tank) {
+            if (!item.canPlayerUseAbility(null, container, "glass"))
+                return FluidStack.EMPTY;
+
             var fluid = item.getSelectedFluid(null, container);
 
             if (fluid == Fluids.EMPTY)
@@ -711,6 +720,9 @@ public class CutGlassBootItem extends RelicItem {
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
+            if (!item.canPlayerUseAbility(null, container, "glass"))
+                return 0;
+
             if (resource.isEmpty())
                 return 0;
 
@@ -752,6 +764,9 @@ public class CutGlassBootItem extends RelicItem {
 
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
+            if (!item.canPlayerUseAbility(null, container, "glass"))
+                return FluidStack.EMPTY;
+
             if (resource.isEmpty())
                 return FluidStack.EMPTY;
 
@@ -776,6 +791,9 @@ public class CutGlassBootItem extends RelicItem {
 
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
+            if (!item.canPlayerUseAbility(null, container, "glass"))
+                return FluidStack.EMPTY;
+
             if (maxDrain <= 0)
                 return FluidStack.EMPTY;
 
