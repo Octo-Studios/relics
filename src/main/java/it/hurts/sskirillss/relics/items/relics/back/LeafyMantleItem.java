@@ -14,6 +14,8 @@ import it.hurts.sskirillss.relics.entities.LeavesBlockEntity;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -131,6 +133,10 @@ public class LeafyMantleItem extends RelicItem {
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
                         .step(200)
+                        .build())
+                .loot(LootTemplate.builder()
+                        .entry(LootEntries.FOREST)
+                        .entry(LootEntries.TROPIC)
                         .build())
                 .build();
     }
