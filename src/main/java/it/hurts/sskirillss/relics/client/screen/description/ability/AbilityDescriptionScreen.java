@@ -44,7 +44,7 @@ import java.util.ArrayList;
 public class AbilityDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
     @Getter
     @Setter
-    private int pageOld;
+    private int page;
 
     @Getter
     @Setter
@@ -72,7 +72,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             if (this.selectedAbility == null)
                 this.setSelectedAbility(abilities.getFirst());
 
-            this.setPageOld(abilities.indexOf(getSelectedAbility()) / 5);
+            this.setPage(abilities.indexOf(getSelectedAbility()) / 5);
         }
     }
 
@@ -96,12 +96,15 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         var maxEntries = 4;
 
-        if (abilities.size() > maxEntries) {
-            this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 151, this, -1));
-            this.addRenderableWidget(new AbilityPageWidget(x + 289, y + 186, this, 1));
-        }
+        var totalPages = (int) Math.ceil(abilities.size() / 5D);
 
-        int startIndex = pageOld * maxEntries;
+        if (totalPages > 0 && page >= totalPages)
+            this.setPage(Math.max(totalPages - 1, 0));
+
+        if (abilities.size() > maxEntries)
+            this.addRenderableWidget(new AbilityPageScrollbarWidget(x + 279, y + 173, this));
+
+        int startIndex = page * maxEntries;
         int endIndex = Math.min(startIndex + maxEntries, abilities.size());
 
         var paginatedAbilities = (startIndex < abilities.size() && startIndex >= 0) ? abilities.subList(startIndex, endIndex) : new ArrayList<String>();
@@ -130,6 +133,8 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             int spacing = objectWidth + 8 + (3 * (maxEntries - count));
 
             xOff = (containerWidth / 2) - (((objectWidth * count) + ((spacing - objectWidth) * Math.max(count - 1, 0))) / 2);
+
+            this.addRenderableWidget(new AbilityCardsContainerWidget(this));
 
             for (String entry : paginatedAbilities) {
                 this.addRenderableWidget(new AbilityCardWidget(x + 77 + xOff, y + 160, this, entry));
@@ -249,6 +254,16 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         }
 
         return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        for (GuiEventListener listener : this.children()) {
+            if (listener instanceof AbilityPageScrollbarWidget scrollbar && scrollbar.mouseScrolled(mouseX, mouseY, scrollX, scrollY))
+                return true;
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
     @Override

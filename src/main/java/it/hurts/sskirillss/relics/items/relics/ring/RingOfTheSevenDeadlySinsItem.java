@@ -370,10 +370,10 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 if (!relic.canPlayerUseAbility(wearer, stack, "envy"))
                     continue;
 
-                var sumWearer = CommonEvents.sumCommonAttributes(wearer);
-                var sumOther = CommonEvents.sumCommonAttributes(other);
+                var wearerHp = wearer.getHealth();
+                var otherHp = other.getHealth();
 
-                var diff = sumOther - sumWearer;
+                var diff = otherHp - wearerHp;
 
                 var perPoint = Math.abs(relic.getStatValue(wearer, stack, "envy", "difference_multiplier"));
                 var modifier = (wearerIsAttacker ? diff : -diff) * perPoint;
@@ -463,17 +463,6 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 return;
 
             animal.getPersistentData().putLong(LUST_DEADLINE, deadline);
-        }
-
-        private static double sumCommonAttributes(LivingEntity entity) {
-            double total = 0D;
-
-            var attrs = entity.getAttributes().attributes;
-
-            for (var entry : attrs.entrySet())
-                total += entry.getValue().getValue();
-
-            return total;
         }
     }
 

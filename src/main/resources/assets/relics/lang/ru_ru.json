@@ -316,7 +316,7 @@
   "relics.description.ring_of_the_seven_deadly_sins.ability.pride": "Гордость",
   "relics.description.ring_of_the_seven_deadly_sins.ability.pride.description": "Увеличивает наносимый носителем реликвии урон на %1$s%% за каждый блок разницы в вертикальной позиции над целью, но также увеличивает получаемый носителем реликвии урон за каждый блок разницы вертикальной позиции под целью.",
   "relics.description.ring_of_the_seven_deadly_sins.ability.envy": "Зависть",
-  "relics.description.ring_of_the_seven_deadly_sins.ability.envy.description": "Увеличивает наносимый урон на %1$s%% за каждую единицу, на которую общая сумма характеристик цели превышает характеристики носителя. Если же характеристики носителя превышают характеристики цели, то на ту же величину увеличивается получаемый урон.",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.envy.description": "Увеличивает наносимый урон на %1$s%% за каждую единицу, на которую текущее здоровье цели выше здоровья носителя реликвии. Если же здоровье носителя реликвии выше, чем у цели, то на ту же величину увеличивается получаемый урон.",
   "relics.description.ring_of_the_seven_deadly_sins.ability.wrath": "Гнев",
   "relics.description.ring_of_the_seven_deadly_sins.ability.wrath.description": "При нанесении удара на %1$s секунд открывается временное окно урона: в его начале наносимый урон увеличен на %2$s%% и линейно уменьшается до 100%% к середине, после чего плавно снижается до %3$s%% к концу. Совершение атаки перезапускает окно.",
   "relics.description.ring_of_the_seven_deadly_sins.ability.sloth": "Лень",
