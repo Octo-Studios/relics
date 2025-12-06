@@ -14,14 +14,21 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class AbstractContainerMenuMixin {
     @Inject(at = @At(value = "HEAD"), method = "doClick", cancellable = true)
     protected void onClick(int index, int action, ClickType clickType, Player player, CallbackInfo ci) {
-        if (clickType != ClickType.PICKUP || index < 0)
+        if (index < 0)
             return;
 
-        AbstractContainerMenu menu = (AbstractContainerMenu) (Object) this;
-        Slot slot = menu.slots.get(index);
+        if (clickType != ClickType.PICKUP && clickType != ClickType.QUICK_MOVE && clickType != ClickType.SWAP)
+            return;
+
+        var menu = (AbstractContainerMenu) (Object) this;
+
+        if (index >= menu.slots.size())
+            return;
+
+        var slot = menu.slots.get(index);
 
         if (canInteract(slot, player, menu)) {
-            ContainerSlotClickEvent event = new ContainerSlotClickEvent(player, menu, slot, action == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY, menu.getCarried(), slot.getItem());
+            var event = new ContainerSlotClickEvent(player, menu, slot, clickType, action == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY, menu.getCarried(), slot.getItem());
 
             NeoForge.EVENT_BUS.post(event);
 

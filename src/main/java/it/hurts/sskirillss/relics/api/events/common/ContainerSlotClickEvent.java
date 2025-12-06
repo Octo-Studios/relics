@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.ICancellableEvent;
@@ -17,14 +18,16 @@ public class ContainerSlotClickEvent extends PlayerContainerEvent implements ICa
     @Getter
     private final ItemStack slotStack;
 
-
+    @Getter
+    private final ClickType type;
     @Getter
     private final ClickAction action;
 
-    public ContainerSlotClickEvent(Player player, AbstractContainerMenu container, Slot slot, ClickAction action, ItemStack heldStack, ItemStack slotStack) {
+    public ContainerSlotClickEvent(Player player, AbstractContainerMenu container, Slot slot, ClickType type, ClickAction action, ItemStack heldStack, ItemStack slotStack) {
         super(player, container);
 
         this.slot = slot;
+        this.type = type;
         this.action = action;
         this.heldStack = heldStack;
         this.slotStack = slotStack;

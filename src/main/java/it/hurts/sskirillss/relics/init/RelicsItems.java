@@ -14,6 +14,7 @@ import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
 import it.hurts.sskirillss.relics.items.relics.head.PiglinMaskItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
+import it.hurts.sskirillss.relics.items.relics.ring.RingOfTheSevenDeadlySinsItem;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.neoforged.bus.api.IEventBus;
@@ -51,6 +52,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> CHORUS_STAFF = ITEMS.register("chorus_staff", ChorusStaffItem::new);
     public static final DeferredHolder<Item, RelicItem> PIGLIN_MASK = ITEMS.register("piglin_mask", PiglinMaskItem::new);
     public static final DeferredHolder<Item, RelicItem> CUT_GLASS_BOOT = ITEMS.register("cut_glass_boot", CutGlassBootItem::new);
+    public static final DeferredHolder<Item, RelicItem> RING_OF_THE_SEVEN_DEADLY_SINS = ITEMS.register("ring_of_the_seven_deadly_sins", RingOfTheSevenDeadlySinsItem::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);

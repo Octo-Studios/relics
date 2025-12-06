@@ -1,6 +1,7 @@
 {
   "replace": false,
   "entries": [
-    "relics:relic_loot"
+    "relics:relic_loot",
+    "relics:greed_loot"
   ]
 }

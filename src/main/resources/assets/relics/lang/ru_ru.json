@@ -311,6 +311,23 @@
   "relics.description.cut_glass_boot.ability.glass.experience_source.standing": "+1 единица опыта за каждую секунду, проведенную в движении по жидкости",
   "relics.description.cut_glass_boot.ability.glass.statistic.duration": "Проведено времени стоя на жидкости",
 
+  "item.relics.ring_of_the_seven_deadly_sins": "Кольцо семи смертных грехов",
+  "relics.description.ring_of_the_seven_deadly_sins.description": "",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.pride": "Гордость",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.pride.description": "Увеличивает наносимый носителем реликвии урон на %1$s%% за каждый блок разницы в вертикальной позиции над целью, но также увеличивает получаемый носителем реликвии урон за каждый блок разницы вертикальной позиции под целью.",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.envy": "Зависть",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.envy.description": "Увеличивает наносимый урон на %1$s%% за каждую единицу, на которую общая сумма характеристик цели превышает характеристики носителя. Если же характеристики носителя превышают характеристики цели, то на ту же величину увеличивается получаемый урон.",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.wrath": "Гнев",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.wrath.description": "При нанесении удара на %1$s секунд открывается временное окно урона: в его начале наносимый урон увеличен на %2$s%% и линейно уменьшается до 100%% к середине, после чего плавно снижается до %3$s%% к концу. Совершение атаки перезапускает окно.",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.sloth": "Лень",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.sloth.description": "При неподвижном простаивании на протяжении %1$s секунд наделяет носителя реликвии бессмертием. Однако, при движении получаемый урон увеличивается на %2$s%% за единицу скорости.",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.greed": "Жадность",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.greed.description": "Увеличивает удачу на %1$s, а добычу - на %2$s, но с шансом в %3$s%% уничтожает получаемый носителем реликвии лут.",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.gluttony": "Чревоугодие",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.gluttony.description": "При показателе сытости выше половины увеличивает все характеристики носителя реликвии на %1$s%% за каждую единицу сытости, а при показателе сытости ниже половины - снижает на %1$s%%.",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.lust": "Похоть",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.lust.description": "Разведение животных может дать до %1$s дополнительных детёнышей, но сами разводимые животные при этом погибнут через %2$s секунд, если не будут разведены повторно.",
+
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
   "item.relics.golden_tooth": "Золотой зуб",
 

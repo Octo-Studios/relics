@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
+import it.hurts.sskirillss.relics.items.relics.ring.RingOfTheSevenDeadlySinsItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.bus.api.IEventBus;
@@ -58,6 +59,9 @@ public class RelicsDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_COOLDOWN = RelicsDataComponents.construct("jellyfish_necklace/cooldown", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_DURATION = RelicsDataComponents.construct("jellyfish_necklace/duration", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> JELLYFISH_NECKLACE_RINGS = RelicsDataComponents.construct("jellyfish_necklace/rings", Codec.INT);
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<RingOfTheSevenDeadlySinsItem.SlothData>> RING_OF_THE_SEVEN_DEADLY_SINS_SLOTH = RelicsDataComponents.construct("ring_of_the_seven_deadly_sins/sloth", RingOfTheSevenDeadlySinsItem.SlothData.CODEC);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<RingOfTheSevenDeadlySinsItem.WrathData>> RING_OF_THE_SEVEN_DEADLY_SINS_WRATH = RelicsDataComponents.construct("ring_of_the_seven_deadly_sins/wrath", RingOfTheSevenDeadlySinsItem.WrathData.CODEC);
 
     public static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> construct(String name, Codec<T> codec) {
         return DATA_COMPONENTS.register(name, () -> DataComponentType.<T>builder()

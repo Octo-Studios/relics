@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.client.layer.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
 import it.hurts.sskirillss.relics.client.postEffects.LensPostEffect;
+import it.hurts.sskirillss.relics.client.postEffects.SevenDeadlySinsPostEffect;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.*;
 import it.hurts.sskirillss.relics.client.style.*;
@@ -105,6 +106,7 @@ public class ClientHandler {
         RelicsRelicStyles.register(RelicsItems.PIGLIN_MASK.get(), PiglinMaskStyle::new);
 
         RelicsPostEffects.register(LensPostEffect::new);
+        RelicsPostEffects.register(SevenDeadlySinsPostEffect::new);
 
         RelicsRelicStyles.init();
         RelicsPostEffects.init();
