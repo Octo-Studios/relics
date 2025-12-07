@@ -26,6 +26,7 @@
     "KeyboardHandlerMixin",
     "LivingEntityRendererMixin",
     "MouseHandlerMixin",
+    "MultiPlayerGameModeMixin",
     "ParticleEngineMixin",
     "WindowMixin",
     "shakes.AbstractClientPlayerMixin",

@@ -72,16 +72,14 @@ public interface IRelicUtilities {
         var min = format.apply(initialValue.getMinValue()).doubleValue();
         var max = format.apply(initialValue.getMaxValue()).doubleValue();
 
+        var maxQuality = relic.getStatMaxQuality(entity, stack, ability, stat);
+
         if (min == max)
-            return relic.getStatMaxQuality(entity, stack, ability, stat);
+            return maxQuality;
 
-        if (override <= min)
-            return 0;
+        var quality = (int) Math.round((override - min) * maxQuality / (max - min));
 
-        if (override >= max)
-            return relic.getStatMaxQuality(entity, stack, ability, stat);
-
-        return Mth.clamp((int) Math.round((override - min) / ((max - min) / relic.getStatMaxQuality(entity, stack, ability, stat))), 1, relic.getStatMaxQuality(entity, stack, ability, stat) - 1);
+        return Mth.clamp(quality, 0, maxQuality);
     }
 
     default double getOrCalculateStatValue(LivingEntity entity, ItemStack stack, String ability, String stat) {

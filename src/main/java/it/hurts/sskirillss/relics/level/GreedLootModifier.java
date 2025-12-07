@@ -72,8 +72,12 @@ public class GreedLootModifier extends LootModifier {
                 if (!relic.canPlayerUseAbility(player, stack, "greed"))
                     continue;
 
-                if (random.nextDouble() < relic.getStatValue(player, stack, "greed", "chance"))
+                if (random.nextDouble() < relic.getStatValue(player, stack, "greed", "chance")) {
+                    relic.addRelicExperience(player, stack, "greed", "nullification", 1);
+                    relic.addAbilityMetricValue(player, stack, "greed", "nullified_tables", 1);
+
                     return new ObjectArrayList<>();
+                }
             }
         }
 

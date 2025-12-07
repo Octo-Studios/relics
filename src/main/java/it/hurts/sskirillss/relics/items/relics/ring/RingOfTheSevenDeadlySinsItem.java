@@ -5,11 +5,12 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.ContainerSlotClickEvent;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.api.relics.*;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
-import it.hurts.sskirillss.relics.client.postEffects.SevenDeadlySinsPostEffect;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
@@ -19,10 +20,15 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.item.ring_of_the_seven_deadly_sins.C2SHurtPlayer;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.ServerScheduler;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AgeableMob;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -30,12 +36,22 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.BabyEntitySpawnEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
+import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
@@ -48,97 +64,195 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                         .ability(AbilityTemplate.builder("pride")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("multiplier")
-                                        .initialValue(0.1D, 0.15D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
+                                        .initialValue(0.1D, 0.25D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("height_advantage")
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("additional_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("damage_received")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("envy")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("difference_multiplier")
-                                        .initialValue(0.02D, 0.03D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
+                                        .initialValue(0.05D, 0.1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("health_gap")
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("offensive_shift")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("defensive_shift")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("wrath")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("window")
-                                        .initialValue(3D, 4D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
+                                        .initialValue(2D, 4D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("early_multiplier")
-                                        .initialValue(1.5D, 2.0D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
+                                        .initialValue(0.5D, 1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.4D)
                                         .formatValue(value -> MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("late_multiplier")
-                                        .initialValue(0.6D, 0.8D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
+                                        .initialValue(1D, 0.5D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.08D)
                                         .formatValue(value -> MathUtils.round(value * 100, 0))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("timing")
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("windows")
+                                                .formatValue((value) -> String.valueOf(value.intValue()))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("bonus_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("reduced_damage")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("sloth")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("time")
-                                        .initialValue(2D, 4D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .initialValue(10D, 7.5D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.0867D)
+                                        .formatValue(value -> MathUtils.round(value, 2))
                                         .build())
                                 .stat(StatTemplate.builder("speed")
-                                        .initialValue(0.5D, 0.75D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
+                                        .initialValue(1D, 0.75D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.0667D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("immortality")
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("immortality_duration")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("damage_from_moving")
+                                                .formatValue((value) -> String.valueOf(MathUtils.round(value, 1)))
+                                                .build())
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("greed")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("luck")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.15D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.7D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("looting")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.15D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.7D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("chance")
-                                        .initialValue(0.05D, 0.12D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .initialValue(0.1D, 0.075D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.0867D)
+                                        .formatValue(value -> MathUtils.round(value * 100, 1))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("ore")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("mob")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("nullification")
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("nullified_tables")
+                                                .formatValue((value) -> String.valueOf(value.intValue()))
+                                                .build())
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("gluttony")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("early_multiplier")
-                                        .initialValue(0.02D, 0.04D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .initialValue(0.0025, 0.005D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.9D)
+                                        .formatValue(value -> MathUtils.round(value * 100, 2))
                                         .build())
                                 .stat(StatTemplate.builder("late_multiplier")
-                                        .initialValue(0.02D, 0.04D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .initialValue(0.1D, 0.05)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.08D)
+                                        .formatValue(value -> MathUtils.round(value * 100, 2))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("food")
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("positive_duration")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("negative_duration")
+                                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                                .build())
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("lust")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("amount")
-                                        .initialValue(2D, 3D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0857D)
+                                        .initialValue(1D, 3D)
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("time")
-                                        .initialValue(60D, 120D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 8.2142D)
+                                        .initialValue(360D, 420D)
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 30D)
                                         .formatValue(value -> MathUtils.round(value, 0))
                                         .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("offspring")
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("extra_offspring")
+                                                .formatValue((value) -> String.valueOf(value.intValue()))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("breeding_attempts")
+                                                .formatValue((value) -> String.valueOf(value.intValue()))
+                                                .build())
+                                        .build())
+                                .build())
+                        .build())
+                .statistic(RelicStatisticTemplate.builder()
+                        .metric(RelicMetricTemplate.builder("retention_time") // FIXME @RelicTemplate
+                                .formatValue((value) -> MathUtils.formatTime(value.intValue()))
+                                .component((entity, stack) -> Component.translatable("relics.description.statistic.relic.retention_time"))
+                                .build())
+                        .metric(RelicMetricTemplate.builder("unequip_attempts")
+                                .formatValue((value) -> String.valueOf(value.intValue()))
                                 .build())
                         .build())
                 .leveling(LevelingTemplate.builder()
                         .initialCost(100)
+                        .maxRank(0)
                         .step(200)
                         .build())
                 .loot(LootTemplate.builder()
@@ -147,11 +261,32 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 .build();
     }
 
+    public int getHurtTimer(ItemStack stack) {
+        return stack.getOrDefault(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_HURT_TIMER.get(), 0);
+    }
+
+    public void setHurtTimer(ItemStack stack, int value) {
+        stack.set(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_HURT_TIMER.get(), Math.max(0, value));
+    }
+
+    public void addHurtTimer(ItemStack stack, int value) {
+        this.setHurtTimer(stack, Math.max(this.getHurtTimer(stack), value));
+    }
+
+    public static int getHurtTimer(Player player) {
+        var max = 0;
+
+        for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get()))
+            max = Math.max(max, stack.getOrDefault(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_HURT_TIMER.get(), 0));
+
+        return max;
+    }
+
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         var entity = slotContext.entity();
 
-        if (entity instanceof Player player) {
+        if (entity instanceof Player player && !player.level().isClientSide()) {
             if (this.canPlayerUseAbility(player, stack, "gluttony")) {
                 var foodLevel = player.getFoodData().getFoodLevel();
                 var center = 10;
@@ -164,9 +299,14 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
 
                 var modifier = Math.clamp(positive - negative, -0.9D, 1.0D);
 
-                var blacklist = Lists.newArrayList(Attributes.GRAVITY);
+                if (modifier > 0.0001D)
+                    this.addAbilityMetricValue(player, stack, "gluttony", "positive_duration", 1D / 20D);
+                else if (modifier < -0.0001D)
+                    this.addAbilityMetricValue(player, stack, "gluttony", "negative_duration", 1D / 20D);
 
-                for (var instance : player.getAttributes().attributes.values()) {
+                var blacklist = Lists.newArrayList(Attributes.GRAVITY, Attributes.SCALE);
+
+                for (var instance : entity.getAttributes().attributes.values()) {
                     var attribute = instance.getAttribute();
 
                     if (blacklist.contains(attribute))
@@ -184,6 +324,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             var rotationDelta = Math.abs(entity.getYRot() - slothData.yaw()) + Math.abs(entity.getXRot() - slothData.pitch());
 
             var stillTicks = slothData.stillTicks();
+            var gainedImmortality = false;
 
             if (positionDelta > 0.0001D || rotationDelta > 0.001F) {
                 stillTicks = 0;
@@ -191,13 +332,34 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 stillTicks++;
 
                 var requiredTicks = Math.max(1, (int) Math.round(this.getStatValue(entity, stack, "sloth", "time") * 20D));
+                var hasImmortality = entity.hasEffect(RelicsMobEffects.IMMORTALITY);
 
-                if (stillTicks >= requiredTicks)
+                if (stillTicks >= requiredTicks) {
                     entity.addEffect(new MobEffectInstance(RelicsMobEffects.IMMORTALITY, 5, 0, false, false, true));
+
+                    if (!hasImmortality)
+                        gainedImmortality = true;
+                }
             }
 
             stack.set(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_SLOTH.get(), slothData.with(entity.position(), entity.getYRot(), entity.getXRot(), stillTicks));
+
+            if (gainedImmortality)
+                this.addRelicExperience(entity, stack, "sloth", "immortality", 1);
+
+            if (entity.hasEffect(RelicsMobEffects.IMMORTALITY))
+                this.addAbilityMetricValue(entity, stack, "sloth", "immortality_duration", 1D / 20D);
         }
+    }
+
+    @Override
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
+        super.inventoryTick(stack, level, entity, slotId, isSelected);
+
+        var timer = this.getHurtTimer(stack);
+
+        if (timer > 0)
+            this.setHurtTimer(stack, timer - 1);
     }
 
     @Override
@@ -260,7 +422,12 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                     var perBlock = relic.getStatValue(attacker, stack, "pride", "multiplier");
                     var bonus = verticalDelta * perBlock;
 
+                    var extraDamage = original * bonus;
+
                     event.setNewDamage((float) (original * (1 + bonus)));
+
+                    relic.addRelicExperience(attacker, stack, "pride", "height_advantage", extraDamage);
+                    relic.addAbilityMetricValue(attacker, stack, "pride", "additional_damage", extraDamage);
 
                     return;
                 }
@@ -276,7 +443,12 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                     var perBlock = relic.getStatValue(victim, stack, "pride", "multiplier");
                     var penalty = verticalDelta * perBlock;
 
+                    var extraDamage = original * penalty;
+
                     event.setNewDamage((float) (original * (1 + penalty)));
+
+                    relic.addRelicExperience(victim, stack, "pride", "height_advantage", Math.abs(extraDamage));
+                    relic.addAbilityMetricValue(victim, stack, "pride", "damage_received", extraDamage);
 
                     break;
                 }
@@ -300,7 +472,11 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 if (speed > 0) {
                     var penalty = speed * speedMultiplier;
 
+                    var extraDamage = damage * penalty;
+
                     event.setNewDamage((float) (damage * (1 + penalty)));
+
+                    relic.addAbilityMetricValue(target, stack, "sloth", "damage_from_moving", extraDamage);
                 }
             }
         }
@@ -323,26 +499,40 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
 
                 var delta = now - state.lastHitTick();
 
-                double modifier = 1.0D;
+                double modifier = 1D;
 
                 if (delta < windowTicks) {
-                    double mid = windowTicks / 2.0D;
+                    double mid = windowTicks / 2D;
 
                     var earlyMultiplier = relic.getStatValue(attacker, stack, "wrath", "early_multiplier");
                     var lateMultiplier = relic.getStatValue(attacker, stack, "wrath", "late_multiplier");
 
                     if (delta <= mid) {
                         var t = delta / mid;
+                        var start = 1D + earlyMultiplier;
 
-                        modifier = earlyMultiplier + (1.0D - earlyMultiplier) * t;
+                        modifier = start + (1D - start) * t;
                     } else {
-                        var t = (delta - mid) / Math.max(1.0D, windowTicks - mid);
+                        var t = (delta - mid) / Math.max(1D, windowTicks - mid);
+                        var end = 1D - lateMultiplier;
 
-                        modifier = 1.0D + (lateMultiplier - 1.0D) * t;
+                        modifier = 1D + (end - 1D) * t;
                     }
                 }
 
-                event.setNewDamage((float) (event.getNewDamage() * modifier));
+                var baseDamage = event.getNewDamage();
+                var extraDamage = baseDamage * (modifier - 1);
+
+                relic.addAbilityMetricValue(attacker, stack, "wrath", "windows", 1);
+
+                event.setNewDamage((float) (baseDamage * modifier));
+
+                relic.addRelicExperience(attacker, stack, "wrath", "timing", Math.abs(extraDamage));
+
+                if (extraDamage > 0)
+                    relic.addAbilityMetricValue(attacker, stack, "wrath", "bonus_damage", extraDamage);
+                else if (extraDamage < 0)
+                    relic.addAbilityMetricValue(attacker, stack, "wrath", "reduced_damage", Math.abs(extraDamage));
 
                 stack.set(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_WRATH.get(), new WrathData(now));
 
@@ -373,12 +563,25 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 var wearerHp = wearer.getHealth();
                 var otherHp = other.getHealth();
 
-                var diff = otherHp - wearerHp;
+                var diff = (otherHp - wearerHp) / 5F;
 
                 var perPoint = Math.abs(relic.getStatValue(wearer, stack, "envy", "difference_multiplier"));
                 var modifier = (wearerIsAttacker ? diff : -diff) * perPoint;
 
-                event.setNewDamage((float) (event.getNewDamage() * (1 + modifier)));
+                if (modifier <= 0)
+                    return false;
+
+                var baseDamage = event.getNewDamage();
+                var extraDamage = baseDamage * modifier;
+
+                event.setNewDamage((float) (baseDamage * (1 + modifier)));
+
+                relic.addRelicExperience(wearer, stack, "envy", "health_gap", Math.abs(extraDamage));
+
+                if (wearerIsAttacker && extraDamage > 0)
+                    relic.addAbilityMetricValue(wearer, stack, "envy", "offensive_shift", extraDamage);
+                else if (!wearerIsAttacker && extraDamage > 0)
+                    relic.addAbilityMetricValue(wearer, stack, "envy", "defensive_shift", extraDamage);
 
                 return true;
             }
@@ -420,7 +623,12 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                         extra.moveTo(parentA.getX(), parentA.getY(), parentA.getZ(), random.nextFloat() * 360F, 0F);
                         level.addFreshEntity(extra);
                     }
+
+                    relic.addRelicExperience(player, stack, "lust", "offspring", count);
+                    relic.addAbilityMetricValue(player, stack, "lust", "extra_offspring", count);
                 }
+
+                relic.addAbilityMetricValue(player, stack, "lust", "breeding_attempts", 1);
 
                 var deadline = level.getGameTime() + (long) (relic.getStatValue(player, stack, "lust", "time") * 20);
 
@@ -446,16 +654,126 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
         }
 
         @SubscribeEvent
+        public static void onBlockBreak(BlockEvent.BreakEvent event) {
+            var player = event.getPlayer();
+            var state = event.getState();
+
+            if (!state.is(Tags.Blocks.ORES))
+                return;
+
+            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(player, stack, "greed"))
+                    continue;
+
+                relic.addRelicExperience(player, stack, "greed", "ore", 1);
+            }
+        }
+
+        @SubscribeEvent
+        public static void onLivingDeath(LivingDeathEvent event) {
+            if (!(event.getSource().getEntity() instanceof Player player))
+                return;
+
+            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(player, stack, "greed"))
+                    continue;
+
+                relic.addRelicExperience(player, stack, "greed", "mob", 1);
+            }
+        }
+
+        @SubscribeEvent
+        public static void onFoodEaten(LivingEntityUseItemEvent.Finish event) {
+            var entity = event.getEntity();
+
+            if (!(entity instanceof Player player))
+                return;
+
+            var consumed = event.getItem();
+            var foodProperties = consumed.getFoodProperties(entity);
+
+            if (foodProperties == null)
+                return;
+
+            var nutrition = foodProperties.nutrition();
+
+            if (nutrition <= 0)
+                return;
+
+            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(player, stack, "gluttony"))
+                    continue;
+
+                relic.addRelicExperience(player, stack, "gluttony", "food", nutrition);
+            }
+        }
+
+        @SubscribeEvent
         public static void onSlitClick(ContainerSlotClickEvent event) {
             var entity = event.getEntity();
 
-            if (entity.isCreative() || !(event.getSlotStack().getItem() instanceof RingOfTheSevenDeadlySinsItem) || !(event.getSlot() instanceof CurioSlot))
+            if (!entity.level().isClientSide() || entity.isCreative() || !(event.getSlot() instanceof CurioSlot slot)
+                    || !(event.getSlotStack().getItem() instanceof RingOfTheSevenDeadlySinsItem))
                 return;
 
-            if (entity.hurt(entity.level().damageSources().magic(), 1F))
-                SevenDeadlySinsPostEffect.TIMER = 40;
+            NetworkHandler.sendToServer(new C2SHurtPlayer(slot.getIdentifier(), slot.getSlotIndex()));
 
             event.setCanceled(true);
+        }
+
+        @SubscribeEvent
+        public static void onLivingHurt4(LivingDamageEvent.Post event) {
+            RingOfTheSevenDeadlySinsItem.CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+            RingOfTheSevenDeadlySinsItem.CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+            RingOfTheSevenDeadlySinsItem.CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onBlockBreakAttempt(PlayerEvent.BreakSpeed event) {
+            RingOfTheSevenDeadlySinsItem.CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onAttackEntity(AttackEntityEvent event) {
+            RingOfTheSevenDeadlySinsItem.CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onItemToss(ItemTossEvent event) {
+            RingOfTheSevenDeadlySinsItem.CommonEvents.onInteract(event.getPlayer());
+        }
+
+        @SubscribeEvent
+        public static void onItemPickup(ItemEntityPickupEvent.Post event) {
+            RingOfTheSevenDeadlySinsItem.CommonEvents.onInteract(event.getPlayer());
+        }
+
+        private static void onInteract(LivingEntity entity) {
+            if (entity.getCommandSenderWorld().isClientSide())
+                return;
+
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(entity, stack, "sloth"))
+                    continue;
+
+                ServerScheduler.schedule(1, () -> stack.set(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_SLOTH.get(), SlothData.create(entity.position(), entity.getYRot(), entity.getXRot(), 0)));
+            }
         }
 
         private static void applyLustDeadline(Mob entity, long deadline) {

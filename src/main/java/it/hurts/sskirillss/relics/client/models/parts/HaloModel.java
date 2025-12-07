@@ -8,10 +8,7 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.CubeDeformation;
-import net.minecraft.client.model.geom.builders.CubeListBuilder;
-import net.minecraft.client.model.geom.builders.LayerDefinition;
-import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -27,10 +24,10 @@ public class HaloModel extends HumanoidModel<LivingEntity> {
     public static LayerDefinition createBodyLayer() {
         MeshDefinition mesh = HumanoidModel.createMesh(new CubeDeformation(0.4F), 0.0F);
 
-        mesh.getRoot().getChild("head").addOrReplaceChild("halo", CubeListBuilder.create().texOffs(0, 10).addBox(4.0F, -1.0F, -4.0F, 1.0F, 2.0F, 8.0F, new CubeDeformation(0.0F))
-                .texOffs(10, 3).addBox(-5.0F, -1.0F, 4.0F, 10.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
-                .texOffs(10, 0).addBox(-5.0F, -1.0F, -5.0F, 10.0F, 2.0F, 1.0F, new CubeDeformation(0.0F))
-                .texOffs(0, 0).addBox(-5.0F, -1.0F, -4.0F, 1.0F, 2.0F, 8.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -15.0F, 0.0F));
+        mesh.getRoot().getChild("head").addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 0).addBox(-4.0F, -10.5F, -3.0F, 1.0F, 1.0F, 6.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 14).addBox(-4.0F, -10.5F, 3.0F, 8.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(14, 0).addBox(-4.0F, -10.5F, -4.0F, 8.0F, 1.0F, 1.0F, new CubeDeformation(0.0F))
+                .texOffs(0, 7).addBox(3.0F, -10.5F, -3.0F, 1.0F, 1.0F, 6.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -2.5F, 0.0F));
 
         return LayerDefinition.create(mesh, 32, 32);
     }

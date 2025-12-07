@@ -28,19 +28,16 @@ public class WingsLayer<T extends LivingEntity, M extends EntityModel<T>> extend
 
     @Override
     public void render(PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, T pLivingEntity, float pLimbSwing, float pLimbSwingAmount, float pPartialTicks, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
-        var player = Minecraft.getInstance().player;
-
-        if (player == null || !player.hasEffect(RelicsMobEffects.IMMORTALITY))
+        if (!pLivingEntity.hasEffect(RelicsMobEffects.IMMORTALITY))
             return;
 
         pPoseStack.pushPose();
 
-        pPoseStack.scale(0.75F, 0.75F, 0.75F);
-        pPoseStack.translate(0F, Math.sin(pLivingEntity.tickCount * 0.1F) * 0.05F, 0F);
+        pPoseStack.translate(0F, Math.sin((pLivingEntity.tickCount + pPartialTicks) * 0.1F) * 0.05F + 0.1F, 0F);
 
         ICurioRenderer.followBodyRotations(pLivingEntity, haloModel);
 
-        haloModel.renderToBuffer(pPoseStack, pBuffer.getBuffer(RenderType.entityTranslucentCull(HaloModel.LAYER_LOCATION.getModel())), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        haloModel.renderToBuffer(pPoseStack, pBuffer.getBuffer(RenderType.entityCutoutNoCull(HaloModel.LAYER_LOCATION.getModel())), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
         pPoseStack.popPose();
 
@@ -48,7 +45,7 @@ public class WingsLayer<T extends LivingEntity, M extends EntityModel<T>> extend
 
         ICurioRenderer.followBodyRotations(pLivingEntity, wingsModel);
 
-        wingsModel.renderToBuffer(pPoseStack, pBuffer.getBuffer(RenderType.entityTranslucentCull(WingsModel.LAYER_LOCATION.getModel())), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        wingsModel.renderToBuffer(pPoseStack, pBuffer.getBuffer(RenderType.entityCutoutNoCull(WingsModel.LAYER_LOCATION.getModel())), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
         pPoseStack.popPose();
     }
