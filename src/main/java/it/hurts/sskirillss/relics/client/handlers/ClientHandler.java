@@ -73,6 +73,7 @@ public class ClientHandler {
         RelicsRelicRenderers.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.LEAFY_MANTLE.get(), LeafyMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.PIGLIN_MASK.get(), PiglinMaskRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootRenderer::new);
 
         EntityTrailRegistry.registerProvider(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.ELECTRIC_SPARK.get(), ElectricSparkEntity.TrailProvider::new);
@@ -122,6 +123,7 @@ public class ClientHandler {
         event.registerLayerDefinition(LeafyMantleModel.LAYER, LeafyMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(RollerSkateModel.LAYER, RollerSkateModel::constructLayerDefinition);
         event.registerLayerDefinition(PiglinMaskModel.LAYER, PiglinMaskModel::constructLayerDefinition);
+        event.registerLayerDefinition(CutGlassBootModel.LAYER, CutGlassBootModel::constructLayerDefinition);
     }
 
     @SubscribeEvent
