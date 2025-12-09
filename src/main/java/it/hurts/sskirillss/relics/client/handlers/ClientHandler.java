@@ -95,6 +95,7 @@ public class ClientHandler {
         DescriptionSubcategories.registerSubcategory(RelicDescriptionDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(RelicStatisticDescriptionSubcategory::new);
 
+        RelicsRelicStyles.register(RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), RingOfTheSevenDeadlySinsStyle::new);
         RelicsRelicStyles.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleStyle::new);

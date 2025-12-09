@@ -1,0 +1,10 @@
+{
+  "parent": "item/generated",
+    "textures": {
+        "layer0": "relics:item/ring_of_the_seven_deadly_sins"
+    },
+    "overrides": [
+        { "predicate": { "relics:flawless": 1 }, "model": "relics:item/ring_of_the_seven_deadly_sins_flawless" }
+    ]
+}
+
