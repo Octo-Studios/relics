@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.dev.chromatic_aberration;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.dev.chromatic_aberration.dev.Anchor;
-import it.hurts.sskirillss.relics.dev.chromatic_aberration.dev.EntityAnchor;
-import it.hurts.sskirillss.relics.dev.chromatic_aberration.dev.PositionAnchor;
+import it.hurts.sskirillss.relics.dev.anchor.Anchor;
+import it.hurts.sskirillss.relics.dev.anchor.EntityAnchor;
+import it.hurts.sskirillss.relics.dev.anchor.PositionAnchor;
 import lombok.Data;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;

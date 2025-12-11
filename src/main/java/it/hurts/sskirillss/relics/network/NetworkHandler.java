@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.network;
 
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.dev.chromatic_aberration.misc.ChromaticAberrationPacket;
 import it.hurts.sskirillss.relics.dev.shake.misc.ShakePacket;
 import it.hurts.sskirillss.relics.network.packets.PacketItemActivation;
 import it.hurts.sskirillss.relics.network.packets.PacketSyncEntityEffects;
@@ -70,6 +71,7 @@ public class NetworkHandler {
         // === RING OF THE SEVEN DEADLY SINS ===
         registrar.playToServer(C2SHurtPlayer.TYPE, C2SHurtPlayer.STREAM_CODEC, C2SHurtPlayer::handle);
 
+        registrar.playToClient(ChromaticAberrationPacket.TYPE, ChromaticAberrationPacket.STREAM_CODEC, ChromaticAberrationPacket::handle);
         registrar.playToClient(ShakePacket.TYPE, ShakePacket.STREAM_CODEC, ShakePacket::handle);
     }
 

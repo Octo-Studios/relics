@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.dev.chromatic_aberration;
 
-import it.hurts.sskirillss.relics.dev.shake.Shake;
-import it.hurts.sskirillss.relics.dev.shake.misc.ShakePacket;
+import it.hurts.sskirillss.relics.dev.chromatic_aberration.misc.ChromaticAberrationPacket;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -26,7 +25,7 @@ public class ChromaticAberrationManager {
 
         var vec = chromaticAberration.getAnchor().getPosition(level);
 
-        //NetworkHandler.sendToClientsTrackingChunk(new ShakePacket(shake), (ServerLevel) level, new ChunkPos(new BlockPos((int) vec.x(), (int) vec.y(), (int) vec.z())));
+        NetworkHandler.sendToClientsTrackingChunk(new ChromaticAberrationPacket(chromaticAberration), (ServerLevel) level, new ChunkPos(new BlockPos((int) vec.x(), (int) vec.y(), (int) vec.z())));
     }
 
     public static void addForPlayer(Player player, ChromaticAberration chromaticAberration) {
@@ -36,6 +35,6 @@ public class ChromaticAberrationManager {
             return;
         }
 
-        //NetworkHandler.sendToClient(new ShakePacket(shake), (ServerPlayer) player);
+        NetworkHandler.sendToClient(new ChromaticAberrationPacket(chromaticAberration), (ServerPlayer) player);
     }
 }

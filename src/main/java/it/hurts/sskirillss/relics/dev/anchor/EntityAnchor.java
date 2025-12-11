@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.dev.chromatic_aberration.dev;
+package it.hurts.sskirillss.relics.dev.anchor;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

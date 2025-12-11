@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.dev.shake;
 
 import io.netty.buffer.ByteBuf;
-import it.hurts.sskirillss.relics.dev.shake.dev.EntityShakeAnchor;
-import it.hurts.sskirillss.relics.dev.shake.dev.PositionShakeAnchor;
-import it.hurts.sskirillss.relics.dev.shake.dev.ShakeAnchor;
+import it.hurts.sskirillss.relics.dev.anchor.Anchor;
+import it.hurts.sskirillss.relics.dev.anchor.EntityAnchor;
+import it.hurts.sskirillss.relics.dev.anchor.PositionAnchor;
 import lombok.Data;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -23,7 +23,7 @@ public class Shake {
     private static final float TAU = (float) (Math.PI * 2.0);
     private static final float EPSILON = 1.0e-5f;
 
-    private ShakeAnchor anchor;
+    private Anchor anchor;
     private float radius;
     private float rotationAmplitude;
     private float offsetAmplitude;
@@ -46,7 +46,7 @@ public class Shake {
     private float timeSec;
 
     private Shake(
-            ShakeAnchor anchor,
+            Anchor anchor,
             float radius,
             float rotationAmplitude, float offsetAmplitude, float fovAmplitude,
             float rotationSpeed, float offsetSpeed, float fovSpeed,
@@ -68,16 +68,16 @@ public class Shake {
         this.frequency = generateFrequency(uuid);
     }
 
-    public static ShakeBuilder builder(ShakeAnchor anchor) {
+    public static ShakeBuilder builder(Anchor anchor) {
         return new ShakeBuilder(anchor);
     }
 
     public static ShakeBuilder builder(Entity entity) {
-        return Shake.builder(new EntityShakeAnchor(entity.getId()));
+        return Shake.builder(new EntityAnchor(entity.getId()));
     }
 
     public static ShakeBuilder builder(Vec3 position) {
-        return Shake.builder(new PositionShakeAnchor(position));
+        return Shake.builder(new PositionAnchor(position));
     }
 
     public boolean isFinished() {
@@ -299,11 +299,11 @@ public class Shake {
     public static final StreamCodec<ByteBuf, Shake> STREAM_CODEC = new StreamCodec<>() {
         @Override
         public Shake decode(ByteBuf buffer) {
-            var type = ShakeAnchor.AnchorType.values()[buffer.readByte()];
+            var type = Anchor.AnchorType.values()[buffer.readByte()];
 
             var anchor = switch (type) {
-                case POSITION -> new PositionShakeAnchor(new Vec3(FriendlyByteBuf.readVector3f(buffer)));
-                case ENTITY -> new EntityShakeAnchor(buffer.readInt());
+                case POSITION -> new PositionAnchor(new Vec3(FriendlyByteBuf.readVector3f(buffer)));
+                case ENTITY -> new EntityAnchor(buffer.readInt());
             };
 
             var shake = Shake.builder(anchor).build();
@@ -329,8 +329,8 @@ public class Shake {
             buffer.writeByte(anchor.getType().ordinal());
 
             switch (anchor.getType()) {
-                case POSITION -> FriendlyByteBuf.writeVector3f(buffer, ((PositionShakeAnchor) anchor).getPosition().toVector3f());
-                case ENTITY -> buffer.writeInt(((EntityShakeAnchor) anchor).getId());
+                case POSITION -> FriendlyByteBuf.writeVector3f(buffer, ((PositionAnchor) anchor).getPosition().toVector3f());
+                case ENTITY -> buffer.writeInt(((EntityAnchor) anchor).getId());
             }
 
             buffer.writeFloat(shake.getRadius());
@@ -347,7 +347,7 @@ public class Shake {
     };
 
     public static class ShakeBuilder {
-        private final ShakeAnchor anchor;
+        private final Anchor anchor;
         private float radius = 1F;
         private float rotationAmplitude = 1F;
         private float offsetAmplitude = 1F;
@@ -360,7 +360,7 @@ public class Shake {
         private int fadeOutTime = -1;
         private UUID uuid = UUID.randomUUID();
 
-        public ShakeBuilder(ShakeAnchor anchor) {
+        public ShakeBuilder(Anchor anchor) {
             this.anchor = anchor;
         }
 

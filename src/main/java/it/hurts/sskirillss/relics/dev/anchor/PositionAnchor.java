@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.dev.shake.dev;
+package it.hurts.sskirillss.relics.dev.anchor;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,7 +7,7 @@ import net.minecraft.world.phys.Vec3;
 
 @Data
 @AllArgsConstructor
-public class PositionShakeAnchor extends ShakeAnchor {
+public class PositionAnchor extends Anchor {
     private Vec3 position;
 
     @Override
