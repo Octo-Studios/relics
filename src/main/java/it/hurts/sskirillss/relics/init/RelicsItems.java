@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.items.GoldenToothItem;
 import it.hurts.sskirillss.relics.items.RelicExperienceBottleItem;
 import it.hurts.sskirillss.relics.items.relics.ChorusStaffItem;
+import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -53,6 +54,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> PIGLIN_MASK = ITEMS.register("piglin_mask", PiglinMaskItem::new);
     public static final DeferredHolder<Item, RelicItem> CUT_GLASS_BOOT = ITEMS.register("cut_glass_boot", CutGlassBootItem::new);
     public static final DeferredHolder<Item, RelicItem> RING_OF_THE_SEVEN_DEADLY_SINS = ITEMS.register("ring_of_the_seven_deadly_sins", RingOfTheSevenDeadlySinsItem::new);
+    public static final DeferredHolder<Item, RelicItem> SPHERE_OF_SELF_SACRIFICE = ITEMS.register("sphere_of_self_sacrifice", SphereOfSelfSacrifice::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
