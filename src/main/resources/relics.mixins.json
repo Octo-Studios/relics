@@ -29,6 +29,7 @@
     "MultiPlayerGameModeMixin",
     "ParticleEngineMixin",
     "WindowMixin",
+    "chromatic_aberration.GameRendererMixin",
     "shakes.AbstractClientPlayerMixin",
     "shakes.CameraMixin",
     "shakes.GameRendererMixin"

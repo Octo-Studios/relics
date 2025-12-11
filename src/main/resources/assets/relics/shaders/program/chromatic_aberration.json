@@ -1,0 +1,28 @@
+{
+  "blend": {
+    "func": "add",
+    "srcrgb": "srcalpha",
+    "dstrgb": "1-srcalpha"
+  },
+  "vertex": "blit",
+  "fragment": "relics:chromatic_aberration",
+  "attributes": [
+    "Position"
+  ],
+  "samplers": [
+    { "name": "DiffuseSampler" }
+  ],
+  "uniforms": [
+    { "name": "ProjMat",    "type": "matrix4x4", "count": 16, "values": [1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1] },
+    { "name": "OutSize",    "type": "float", "count": 2, "values": [1,1] },
+    { "name": "ScreenSize", "type": "float", "count": 2, "values": [1,1] },
+
+    { "name": "Strength",   "type": "float", "count": 1, "values": [0] },
+    { "name": "ColorCount", "type": "int",   "count": 1, "values": [0] },
+
+    { "name": "Colors",     "type": "float", "count": 24, "values": [
+      0,0,0, 0,0,0, 0,0,0, 0,0,0,
+      0,0,0, 0,0,0, 0,0,0, 0,0,0
+    ]}
+  ]
+}

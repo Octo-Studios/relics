@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.client.postEffects;
+package it.hurts.sskirillss.relics.client.post_effects;
 
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.postEffects.PostEffect;
