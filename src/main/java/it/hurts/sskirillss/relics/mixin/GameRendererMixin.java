@@ -1,8 +1,10 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.hurts.sskirillss.relics.api.postEffects.PostEffect;
+import it.hurts.sskirillss.relics.api.post_effects.PostEffect;
+import it.hurts.sskirillss.relics.api.post_effects.RenderStage;
 import it.hurts.sskirillss.relics.init.RelicsPostEffects;
+import lombok.SneakyThrows;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.GameRenderer;
@@ -31,13 +33,37 @@ public class GameRendererMixin {
     @Unique
     private final Map<PostEffect, PostChain> relics$postEffects = new HashMap<>();
 
+    @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/pipeline/RenderTarget;bindWrite(Z)V", shift = At.Shift.BEFORE))
+    private void relics$onRenderPre(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
+        this.relics$renderPostEffects(RenderStage.LEVEL);
+    }
+
     @Inject(method = "render", at = @At(value = "TAIL"))
-    private void relics$onRender(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) throws Exception {
+    private void relics$onRenderPost(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {
+        this.relics$renderPostEffects(RenderStage.SCREEN);
+    }
+
+    @Inject(method = "resize(II)V", at = @At("TAIL"))
+    private void relics$onResize(int width, int height, CallbackInfo ci) {
+        for (var postEffect : RelicsPostEffects.getPostEffects().values()) {
+            var postChain = relics$postEffects.get(postEffect);
+
+            if (postChain != null) {
+                postChain.resize(width, height);
+
+                relics$postEffects.put(postEffect, postChain);
+            }
+        }
+    }
+
+    @Unique
+    @SneakyThrows
+    private void relics$renderPostEffects(RenderStage stage) {
         if (minecraft == null)
             return;
 
         for (var postEffect : RelicsPostEffects.getPostEffects().values()) {
-            if (!postEffect.shouldRender())
+            if (postEffect.getStage() != stage || !postEffect.shouldRender())
                 continue;
 
             var postChain = relics$postEffects.get(postEffect);
@@ -58,20 +84,7 @@ public class GameRendererMixin {
 
             postEffect.construct(postChain);
 
-            postChain.process(deltaTracker.getGameTimeDeltaTicks());
-        }
-    }
-
-    @Inject(method = "resize(II)V", at = @At("TAIL"))
-    private void relics$onResize(int width, int height, CallbackInfo ci) {
-        for (var postEffect : RelicsPostEffects.getPostEffects().values()) {
-            var postChain = relics$postEffects.get(postEffect);
-
-            if (postChain != null) {
-                postChain.resize(width, height);
-
-                relics$postEffects.put(postEffect, postChain);
-            }
+            postChain.process(minecraft.getTimer().getGameTimeDeltaTicks());
         }
     }
 }

@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.client.post_effects;
 
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.postEffects.PostEffect;
+import it.hurts.sskirillss.relics.api.post_effects.PostEffect;
 import it.hurts.sskirillss.relics.items.relics.ring.RingOfTheSevenDeadlySinsItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.PostChain;

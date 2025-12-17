@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+    "textures": {
+        "layer0": "relics:item/sphere_of_self_sacrifice_1"
+    }
+}
+

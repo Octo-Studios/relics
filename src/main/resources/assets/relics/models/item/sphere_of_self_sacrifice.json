@@ -1,0 +1,47 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "relics:item/sphere_of_self_sacrifice_0"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "relics:fullness": 0
+      },
+      "model": "relics:item/sphere_of_self_sacrifice_0"
+    },
+    {
+      "predicate": {
+        "relics:fullness": 1
+      },
+      "model": "relics:item/sphere_of_self_sacrifice_1"
+    },
+    {
+      "predicate": {
+        "relics:fullness": 2
+      },
+      "model": "relics:item/sphere_of_self_sacrifice_2"
+    },
+    {
+      "predicate": {
+        "relics:flawless": 1,
+        "relics:fullness": 0
+      },
+      "model": "relics:item/sphere_of_self_sacrifice_0_flawless"
+    },
+    {
+      "predicate": {
+        "relics:flawless": 1,
+        "relics:fullness": 1
+      },
+      "model": "relics:item/sphere_of_self_sacrifice_1_flawless"
+    },
+    {
+      "predicate": {
+        "relics:flawless": 1,
+        "relics:fullness": 2
+      },
+      "model": "relics:item/sphere_of_self_sacrifice_2_flawless"
+    }
+  ]
+}

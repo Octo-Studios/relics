@@ -1,11 +1,10 @@
 package it.hurts.sskirillss.relics.init;
 
-import it.hurts.sskirillss.relics.api.postEffects.PostEffect;
+import it.hurts.sskirillss.relics.api.post_effects.PostEffect;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 

@@ -22,6 +22,7 @@
     "CameraMixin",
     "GameRendererMixin",
     "GuiGraphicsMixin",
+    "ItemInHandRendererMixin",
     "ItemRendererMixin",
     "KeyboardHandlerMixin",
     "LivingEntityRendererMixin",

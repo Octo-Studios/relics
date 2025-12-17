@@ -21,6 +21,7 @@ import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCateg
 import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
 import it.hurts.sskirillss.relics.init.*;
+import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
@@ -56,6 +57,14 @@ public class ClientHandler {
 
                         return mode.equals("full_moon") ? 1 : 0;
                     });
+            ItemProperties.register(RelicsItems.SPHERE_OF_SELF_SACRIFICE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "fullness"),
+                    (stack, world, entity, id) -> {
+                        var relic = (SphereOfSelfSacrifice) stack.getItem();
+                        var stacks = relic.getHealingStacks(stack).size();
+                        var maxStacks = relic.getStatValue(entity, stack, "sacrifice", "stacks");
+
+                        return stacks == 0 ? 0 : stacks < maxStacks ? 1 : 2;
+                    });
 
             for (var item : BuiltInRegistries.ITEM.stream().toList()) {
                 if (!(item instanceof IRelicItem relic))
@@ -85,6 +94,7 @@ public class ClientHandler {
         EntityTrailRegistry.registerProvider(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.ROLLER_SPARK.get(), RollerSparkEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.GOLDEN_TOOTH.get(), GoldenToothEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.SELF_SACRIFICE_PROJECTILE.get(), SelfSacrificeProjectileEntity.TrailProvider::new);
 
         DescriptionCategories.registerCategory(RelicDescriptionCategory::new);
         DescriptionCategories.registerCategory(AbilityDescriptionCategory::new);
@@ -97,6 +107,7 @@ public class ClientHandler {
         DescriptionSubcategories.registerSubcategory(RelicStatisticDescriptionSubcategory::new);
 
         RelicsRelicStyles.register(RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), RingOfTheSevenDeadlySinsStyle::new);
+        RelicsRelicStyles.register(RelicsItems.SPHERE_OF_SELF_SACRIFICE.get(), SphereOfSelfSacrificeStyle::new);
         RelicsRelicStyles.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleStyle::new);
@@ -162,6 +173,7 @@ public class ClientHandler {
         event.registerEntityRenderer(RelicsEntities.RELIC_EXPERIENCE_ORB.get(), RelicExperienceOrbRenderer::new);
         event.registerEntityRenderer(RelicsEntities.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(RelicsEntities.GOLDEN_TOOTH.get(), GoldenToothRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.SELF_SACRIFICE_PROJECTILE.get(), NullRenderer::new);
     }
 
     @SubscribeEvent

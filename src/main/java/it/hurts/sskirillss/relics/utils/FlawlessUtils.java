@@ -8,8 +8,20 @@ import net.minecraft.world.item.ItemStack;
 import java.awt.*;
 
 public class FlawlessUtils {
-    public static Color getColor(LivingEntity entity, ItemStack stack, Color color) {
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isRelicFlawless(entity, stack))
+    public static int getColor(boolean flawless, int color) {
+        var c = new Color(color, (color >>> 24) != 0);
+
+        var res = getColor(flawless, c);
+
+        return (c.getAlpha() << 24) | (res.getRed() << 16) | (res.getGreen() << 8) | res.getBlue();
+    }
+
+    public static int getColor(LivingEntity entity, ItemStack stack, int color) {
+        return getColor(stack.getItem() instanceof IRelicItem relic && relic.isRelicFlawless(entity, stack), color);
+    }
+
+    public static Color getColor(boolean flawless, Color color) {
+        if (!flawless)
             return color;
 
         var hsb = Color.RGBtoHSB(color.getRed(), color.getGreen(), color.getBlue(), null);
@@ -33,9 +45,15 @@ public class FlawlessUtils {
         return Color.getHSBColor(goldenHue, saturation, brightness);
     }
 
-    public static ResourceLocation getTexture(LivingEntity entity, ItemStack stack, ResourceLocation location) {
-        var isFlawless = ((IRelicItem) stack.getItem()).isRelicFlawless(entity, stack);
+    public static Color getColor(LivingEntity entity, ItemStack stack, Color color) {
+        return getColor(stack.getItem() instanceof IRelicItem relic && relic.isRelicFlawless(entity, stack), color);
+    }
 
-        return isFlawless ? ResourceLocation.parse(location.toString().replaceFirst("\\.png$", "_flawless.png")) : location;
+    public static ResourceLocation getTexture(boolean flawless, ResourceLocation location) {
+        return flawless ? ResourceLocation.parse(location.toString().replaceFirst("\\.png$", "_flawless.png")) : location;
+    }
+
+    public static ResourceLocation getTexture(LivingEntity entity, ItemStack stack, ResourceLocation location) {
+        return getTexture(stack.getItem() instanceof IRelicItem relic && relic.isRelicFlawless(entity, stack), location);
     }
 }

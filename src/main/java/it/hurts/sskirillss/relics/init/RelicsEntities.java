@@ -98,6 +98,12 @@ public class RelicsEntities {
                     .build("golden_tooth")
     );
 
+    public static final DeferredHolder<EntityType<?>, EntityType<SelfSacrificeProjectileEntity>> SELF_SACRIFICE_PROJECTILE = ENTITIES.register("self_sacrifice_projectile", () ->
+            EntityType.Builder.<SelfSacrificeProjectileEntity>of(SelfSacrificeProjectileEntity::new, MobCategory.MISC)
+                    .sized(0.35F, 0.35F)
+                    .build("self_sacrifice_projectile")
+    );
+
     public static void register(IEventBus bus) {
         ENTITIES.register(bus);
     }

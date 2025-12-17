@@ -29,7 +29,6 @@ public class ChromaticAberration {
     private int fadeOutTime;
     private float strength;
     private UUID uuid;
-    private List<Integer> colors;
     private int elapsedTime;
 
     private ChromaticAberration(
@@ -39,7 +38,6 @@ public class ChromaticAberration {
             int fadeInTime,
             int fadeOutTime,
             float strength,
-            List<Integer> colors,
             UUID uuid
     ) {
         this.anchor = anchor;
@@ -48,7 +46,6 @@ public class ChromaticAberration {
         this.fadeInTime = Math.max(0, fadeInTime);
         this.fadeOutTime = fadeOutTime;
         this.strength = Math.max(0F, strength);
-        this.colors = Objects.requireNonNull(colors, "colors");
         this.uuid = uuid;
     }
 
@@ -172,7 +169,6 @@ public class ChromaticAberration {
                     .fadeInTime(fadeIn)
                     .fadeOutTime(fadeOut)
                     .strength(strength)
-                    .colors(colors)
                     .build();
         }
 
@@ -193,12 +189,6 @@ public class ChromaticAberration {
             fbb.writeInt(effect.getFadeInTime());
             fbb.writeInt(effect.getFadeOutTime());
             fbb.writeFloat(effect.getStrength());
-
-            var colors = effect.getColors();
-            fbb.writeVarInt(colors.size());
-            for (var color : colors) {
-                fbb.writeInt(color);
-            }
         }
     };
 
@@ -209,7 +199,6 @@ public class ChromaticAberration {
         private int fadeInTime = 0;
         private int fadeOutTime = -1;
         private float strength = 1F;
-        private List<Integer> colors = new ArrayList<>();
         private UUID uuid = UUID.randomUUID();
 
         public Builder(Anchor anchor) {
@@ -246,16 +235,6 @@ public class ChromaticAberration {
             return this;
         }
 
-        public Builder colors(List<Integer> v) {
-            this.colors = Objects.requireNonNull(v, "colors");
-            return this;
-        }
-
-        public Builder color(int v) {
-            this.colors.add(v);
-            return this;
-        }
-
         public Builder uuid(UUID id) {
             this.uuid = Objects.requireNonNull(id, "uuid");
             return this;
@@ -264,7 +243,6 @@ public class ChromaticAberration {
         public ChromaticAberration build() {
             if (radius < 0F) throw new IllegalArgumentException("radius must be >= 0");
             if (duration < 0) throw new IllegalArgumentException("duration must be >= 0");
-            if (colors.isEmpty()) throw new IllegalArgumentException("colors must not be empty");
             if (strength < 0F) throw new IllegalArgumentException("strength must be >= 0");
 
             return new ChromaticAberration(
@@ -274,7 +252,6 @@ public class ChromaticAberration {
                     fadeInTime,
                     fadeOutTime,
                     strength,
-                    colors,
                     uuid
             );
         }

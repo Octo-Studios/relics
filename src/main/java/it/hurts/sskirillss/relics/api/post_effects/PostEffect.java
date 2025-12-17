@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.api.postEffects;
+package it.hurts.sskirillss.relics.api.post_effects;
 
 import net.minecraft.client.renderer.PostChain;
 import net.minecraft.resources.ResourceLocation;
@@ -13,4 +13,8 @@ public abstract class PostEffect {
     }
 
     public abstract ResourceLocation getPath();
+
+    public RenderStage getStage() {
+        return RenderStage.SCREEN;
+    }
 }

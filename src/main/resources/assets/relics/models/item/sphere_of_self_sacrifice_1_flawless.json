@@ -1,0 +1,21 @@
+{
+  "parent": "neoforge:item/default",
+  "base": {
+    "parent": "relics:item/sphere_of_self_sacrifice_3d_flawless"
+  },
+  "textures": {
+    "particle": "relics:item/sphere_of_self_sacrifice_1_flawless"
+  },
+  "loader": "neoforge:separate_transforms",
+  "perspectives": {
+    "ground": {
+      "parent": "relics:item/sphere_of_self_sacrifice_1_2d_flawless"
+    },
+    "gui": {
+      "parent": "relics:item/sphere_of_self_sacrifice_1_2d_flawless"
+    },
+    "fixed": {
+      "parent": "relics:item/sphere_of_self_sacrifice_1_2d_flawless"
+    }
+  }
+}
