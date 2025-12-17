@@ -24,6 +24,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -33,6 +34,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
@@ -53,12 +55,12 @@ public class SphereOfSelfSacrifice extends RelicItem {
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("stacks")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.33D)
+                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 2.2324D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(StatTemplate.builder("resistance")
-                                        .initialValue(0.02D, 0.05D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
+                                        .initialValue(0.01D, 0.025D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -107,7 +109,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
                         .step(200)
                         .build())
                 .loot(LootTemplate.builder()
-                        .entry(LootEntries.END_LIKE, LootEntries.THE_END)
+                        .entry(LootEntries.THE_NETHER, LootEntries.NETHER_LIKE)
                         .build())
                 .build();
     }
@@ -125,9 +127,11 @@ public class SphereOfSelfSacrifice extends RelicItem {
         var maxStacks = Math.max(1, (int) Math.ceil(this.getStatValue(entity, stack, "sacrifice", "stacks")));
 
         while (stacks.size() >= maxStacks)
-            stacks.remove(0);
+            stacks.removeFirst();
 
         stacks.add(healingStack);
+
+        stacks.replaceAll(entry -> entry.withTicks(entry.totalTicks()));
 
         this.setHealingStacks(stack, stacks);
     }
@@ -136,7 +140,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
         return entity.getMaxHealth() * 0.33F;
     }
 
-    public HealingStack buildHealingStack(LivingEntity entity, ItemStack stack) {
+    public HealingStack buildHealingStack(LivingEntity entity) {
         var ticks = 10 * 20;
         var totalHeal = this.getHealthCost(entity) * 2F;
 
@@ -208,7 +212,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
         }
 
         if (!level.isClientSide()) {
-            if (player.getHealth() / player.getMaxHealth() < 0.33F)
+            if (player.getHealth() / player.getMaxHealth() < 0.33F || this.getHealingStacks(stack).size() >= this.getStatValue(player, stack, "sacrifice", "stacks"))
                 return InteractionResultHolder.pass(stack);
 
             var damage = this.getHealthCost(player);
@@ -217,23 +221,12 @@ public class SphereOfSelfSacrifice extends RelicItem {
 
             damage = Math.min(damage, remaining);
 
-            var stacks = this.getHealingStacks(stack);
-
-            if (!stacks.isEmpty()) {
-                var refreshed = new ArrayList<HealingStack>();
-
-                for (var healingStack : stacks)
-                    refreshed.add(healingStack.withTicks(healingStack.totalTicks()));
-
-                this.setHealingStacks(stack, refreshed);
-            }
-
             player.invulnerableTime = 0;
             player.hurt(level.damageSources().magic(), damage);
 
             this.addRelicExperience(player, stack, "sacrifice", "self_inflicted", 1);
 
-            this.addHealingStack(player, stack, this.buildHealingStack(player, stack));
+            this.addHealingStack(player, stack, this.buildHealingStack(player));
         }
 
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
@@ -254,21 +247,51 @@ public class SphereOfSelfSacrifice extends RelicItem {
         var updated = new ArrayList<HealingStack>();
 
         for (var healingStack : stacks) {
-            var healAmount = healingStack.healForCurrentTick();
+            var effectiveHeal = Math.max(0, Math.min(healingStack.healForCurrentTick(), livingEntity.getMaxHealth() - livingEntity.getHealth()));
 
-            livingEntity.heal(healAmount);
+            if (effectiveHeal > 0) {
+                livingEntity.heal(effectiveHeal);
+
+                this.addAbilityMetricValue(livingEntity, stack, "sacrifice", "healing_done", effectiveHeal);
+            }
 
             var remainingTicks = healingStack.remainingTicks() - 1;
 
             if (remainingTicks > 0)
                 updated.add(healingStack.withTicks(remainingTicks));
-
-            this.addAbilityMetricValue(livingEntity, stack, "sacrifice", "healing_done", healAmount);
-
-            this.addRelicExperience(livingEntity, stack, "sacrifice", "healing", healAmount);
         }
 
         this.setHealingStacks(stack, updated);
+    }
+
+    @Override
+    public int getBarWidth(ItemStack stack) {
+        var max = (float) this.getStatValue(null, stack, "sacrifice", "stacks");
+        var cur = (float) this.getHealingStacks(stack).size();
+
+        var ratio = max <= 0F ? 0F : Mth.clamp(cur / max, 0F, 1F);
+
+        return Mth.clamp(Mth.ceil(13F * ratio), 0, 13);
+    }
+
+    @Override
+    public int getBarColor(ItemStack stack) {
+        var max = (float) this.getStatValue(null, stack, "sacrifice", "stacks");
+        var cur = (float) this.getHealingStacks(stack).size();
+
+        var ratio = max <= 0F ? 0F : Mth.clamp(cur / max, 0F, 1F);
+
+        return Mth.hsvToRgb(ratio / 3F, 1F, 1F);
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack stack) {
+        return !this.getHealingStacks(stack).isEmpty();
+    }
+
+    @Override
+    public int getMaxDamage(ItemStack stack) {
+        return (int) this.getStatValue(null, stack, "sacrifice", "stacks");
     }
 
     public record HealingStack(float totalHeal, int remainingTicks, int totalTicks) {
@@ -312,48 +335,64 @@ public class SphereOfSelfSacrifice extends RelicItem {
 
     @EventBusSubscriber
     public static class CommonEvents {
-        @SubscribeEvent
-        public static void onLivingDamage(LivingDamageEvent.Pre event) {
+        @SubscribeEvent(priority = EventPriority.HIGH)
+        public static void onLivingDamage1(LivingDamageEvent.Pre event) {
             var entity = event.getEntity();
 
             if (!(entity instanceof Player player))
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get())) {
+            for (var stack : EntityUtils.findItemsInInventory(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get())) {
                 var relic = (SphereOfSelfSacrifice) stack.getItem();
 
                 if (!relic.canPlayerUseAbility(player, stack, "sacrifice"))
+                    continue;
+
+                if (!relic.isAbilityRankModifierUnlocked(player, stack, "sacrifice", "salvation"))
                     continue;
 
                 var stacks = relic.getHealingStacks(stack);
                 var maxStacks = Math.max(1, (int) Math.ceil(relic.getStatValue(player, stack, "sacrifice", "stacks")));
                 var abilityDamage = relic.getHealthCost(player);
 
-                if (relic.isAbilityRankModifierUnlocked(player, stack, "sacrifice", "salvation") && stacks.size() < maxStacks && event.getNewDamage() > abilityDamage) {
-                    var hasItem = player.getInventory().contains(new ItemStack(stack.getItem()))
-                            || !EntityUtils.findEquippedCurio(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get()).isEmpty();
+                if (stacks.size() >= maxStacks)
+                    continue;
 
-                    if (!hasItem)
-                        continue;
+                if (event.getNewDamage() <= abilityDamage)
+                    continue;
 
-                    var incomingDamage = event.getNewDamage();
+                var incomingDamage = event.getNewDamage();
 
-                    event.setNewDamage(abilityDamage);
+                event.setNewDamage(abilityDamage);
 
-                    relic.addHealingStack(player, stack, relic.buildHealingStack(player, stack));
+                relic.addHealingStack(player, stack, relic.buildHealingStack(player));
 
-                    var prevented = Math.max(0F, incomingDamage - abilityDamage);
+                var prevented = Math.max(0F, incomingDamage - abilityDamage);
 
-                    relic.addAbilityMetricValue(player, stack, "sacrifice", "salvation_triggers", 1);
-                    relic.addAbilityMetricValue(player, stack, "sacrifice", "salvation_damage_blocked", prevented);
+                relic.addAbilityMetricValue(player, stack, "sacrifice", "salvation_triggers", 1);
+                relic.addAbilityMetricValue(player, stack, "sacrifice", "salvation_damage_blocked", prevented);
 
-                    relic.addRelicExperience(player, stack, "sacrifice", "salvation", prevented > 0 ? prevented : 1);
+                relic.addRelicExperience(player, stack, "sacrifice", "salvation", prevented > 0 ? prevented : 1);
+            }
+        }
 
-                    stacks = relic.getHealingStacks(stack);
-                }
+        @SubscribeEvent
+        public static void onLivingDamage2(LivingDamageEvent.Pre event) {
+            var entity = event.getEntity();
+
+            if (!(entity instanceof Player player))
+                return;
+
+            for (var stack : EntityUtils.findItemsInInventory(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get())) {
+                var relic = (SphereOfSelfSacrifice) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(player, stack, "sacrifice"))
+                    continue;
 
                 if (!relic.isAbilityRankModifierUnlocked(player, stack, "sacrifice", "resistance"))
                     continue;
+
+                var stacks = relic.getHealingStacks(stack);
 
                 if (stacks.isEmpty())
                     continue;
@@ -365,7 +404,6 @@ public class SphereOfSelfSacrifice extends RelicItem {
                 relic.addAbilityMetricValue(player, stack, "sacrifice", "damage_resisted", modifier);
 
                 relic.addRelicExperience(player, stack, "sacrifice", "resisting_damage", modifier);
-                relic.addRelicExperience(player, stack, "sacrifice", "self_inflicted", 1);
             }
         }
     }

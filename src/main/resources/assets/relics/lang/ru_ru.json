@@ -394,7 +394,7 @@
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.description": "При использовании расходует 33% от максимального здоровья игрока, восполняя их обратно в удвоенном размере в течение следующих 10 секунд. Одновременно может существовать до %1$s эффектов восполнения здоровья. Повторное применение сбросит время существования всех эффектов восполнения здоровья.",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.rank_modifier.resistance": "Снижает получаемый урон на %2$s%% за каждый активный эффект восполнения здоровья.",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.rank_modifier.salvo": "При нажатии ПКМ в приседе аннулирует все имеющиеся эффекты восполнения здоровья, выпуская их в виде самонаводящихся кровавых снарядов в цель перед собой. Каждый снаряд наносит столько урона, сколько осталось исцелить здоровья соответствующему ему эффекту.",
-  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.rank_modifier.salvation": "Если входящий урон превышает наносимый способностью урон, полностью аннулирует его и однократно применяет способность, если это возможно.",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.rank_modifier.salvation": "Если количество эффектов восполнения здоровья не достигло максимального, а входящий урон превышает наносимый способностью, его значение будет понижено до значения урона способности, а текущее количество эффектов восполнения здоровья - увеличено на 1.",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.experience_source.self_inflicted": "+1 единица опыта за каждое срабатывание способности",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.experience_source.resisting_damage": "+1 единица опыта за каждую единицу урона, сниженую при помощи эффектов восполнения здоровья.",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.experience_source.salvation": "+1 единица опыта за каждую единицу урона, аннулированую взамен срабатывания способности.",
@@ -403,5 +403,5 @@
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.projectiles_created": "Выпущено кровавых снарядов",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.blood_projectile_damage": "Нанесено урона кровавыми снарядами",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_triggers": "Срабатываний нивелирования урона взамен на срабатывание способности",
-  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_damage_blocked": "Навиелировано урона взамен на срабатывание способности"
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_damage_blocked": "Нивелировано урона взамен на срабатывание способности"
 }

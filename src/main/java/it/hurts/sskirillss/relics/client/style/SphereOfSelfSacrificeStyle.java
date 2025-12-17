@@ -31,6 +31,6 @@ public class SphereOfSelfSacrificeStyle extends RelicStyle {
 
     @Override
     public List<OctoColor> getItemNameColors(LivingEntity entity, ItemStack stack) {
-        return Arrays.asList(new OctoColor(0xFFae1f3e), new OctoColor(0xFF5221ac));
+        return Arrays.asList(new OctoColor(0xFFae1f3e), new OctoColor(0xFFa129cd));
     }
 }

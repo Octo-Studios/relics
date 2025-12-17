@@ -352,6 +352,23 @@
   "relics.description.ring_of_the_seven_deadly_sins.ability.lust.statistic.extra_offspring": "Additional offspring produced",
   "relics.description.ring_of_the_seven_deadly_sins.ability.lust.statistic.breeding_attempts": "Breeding attempts made",
 
+  "item.relics.sphere_of_self_sacrifice": "Sphere of Self-Sacrifice",
+  "relics.description.sphere_of_self_sacrifice.description": "This sphere was forged neither from metal nor from glass - it was woven from oaths spoken softer than prayers and heavier than verdicts. Inside, beneath its clouded shell, a crimson glow rolls lazily, as if a чужое heart is searching for its owner's rhythm. They say the true bearers of this relic cease to fear death not because they are immortal, but because they have learned to bargain with inevitability itself - wagering their own blood and winning seconds that should not exist.",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice": "Sacrifice",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.description": "On use, consumes 33% of the player's maximum health, restoring twice that amount over the next 10 seconds. Up to %1$s health restoration effects can exist simultaneously. Reusing the ability resets the duration of all active health restoration effects.",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.rank_modifier.resistance": "Reduces incoming damage by %2$s%% for each active health restoration effect.",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.rank_modifier.salvo": "While crouching, right-clicking nullifies all active health restoration effects, releasing them as homing blood projectiles at the target in front of you. Each projectile deals damage equal to the remaining amount of health its corresponding effect had yet to restore.",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.rank_modifier.salvation": "If the number of health restoration effects has not reached the maximum and incoming damage exceeds the damage dealt by the ability, the damage is reduced to the ability's damage value, and the current number of health restoration effects is increased by 1.",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.experience_source.self_inflicted": "+1 experience for each activation of the ability",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.experience_source.resisting_damage": "+1 experience for each point of damage reduced by health restoration effects.",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.experience_source.salvation": "+1 experience for each point of damage nullified in exchange for triggering the ability.",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.healing_done": "Health restored by health restoration effects",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.damage_resisted": "Damage mitigated by health restoration effects",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.projectiles_created": "Blood projectiles fired",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.blood_projectile_damage": "Damage dealt by blood projectiles",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_triggers": "Damage mitigation triggers in exchange for ability activation",
+  "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_damage_blocked": "Damage mitigated in exchange for ability activation",
+
   "item.relics.relic_experience_bottle": "Relic Experience Bottle",
   "item.relics.golden_tooth": "Golden Tooth",
 

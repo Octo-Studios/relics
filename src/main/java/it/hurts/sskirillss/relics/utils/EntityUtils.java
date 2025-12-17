@@ -63,6 +63,19 @@ public class EntityUtils {
         return list;
     }
 
+    public static List<ItemStack> findItemsInInventory(Player player, Item item) {
+        List<ItemStack> list = Lists.newArrayList();
+
+        for (int i = 0; i < player.getInventory().getContainerSize(); ++i) {
+            var stack = player.getInventory().getItem(i);
+
+            if (stack.getItem() == item)
+                list.add(stack);
+        }
+
+        return list;
+    }
+
     public static void addItem(Player player, ItemStack stack) {
         if (player.addItem(stack))
             return;
@@ -156,7 +169,7 @@ public class EntityUtils {
         applyAttribute(entity, attributeHolder, value, operation, getAttributeId(stack, attributeHolder.value()));
     }
 
-    public static void removeAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, AttributeModifier.Operation operation, ResourceLocation id) {
+    public static void removeAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation operation, ResourceLocation id) {
         var instance = entity.getAttribute(attributeHolder);
 
         if (!hasAttribute(entity, attributeHolder, id))
