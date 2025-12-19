@@ -65,7 +65,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                         .ability(AbilityTemplate.builder("pride")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("multiplier")
-                                        .initialValue(0.1D, 0.25D)
+                                        .initialValue(0.05D, 0.125D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
@@ -88,9 +88,14 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                                 .build())
                         .ability(AbilityTemplate.builder("envy")
                                 .initialMaxLevel(10)
-                                .stat(StatTemplate.builder("difference_multiplier")
-                                        .initialValue(0.05D, 0.1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.15D)
+                                .stat(StatTemplate.builder("outgoing_damage_multiplier")
+                                        .initialValue(0.025D, 0.05D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .formatValue(value -> MathUtils.round(value * 100, 1))
+                                        .build())
+                                .stat(StatTemplate.builder("incoming_damage_multiplier")
+                                        .initialValue(0.75D, 0.5D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.05D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -113,8 +118,8 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                         .ability(AbilityTemplate.builder("wrath")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("window")
-                                        .initialValue(2D, 4D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.15D)
+                                        .initialValue(2D, 3D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0667D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("early_multiplier")
@@ -594,7 +599,8 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
 
                 var diff = (otherHp - wearerHp) / 5F;
 
-                var perPoint = Math.abs(relic.getStatValue(wearer, stack, "envy", "difference_multiplier"));
+                var stat = wearerIsAttacker ? "outgoing_damage_multiplier" : "incoming_damage_multiplier";
+                var perPoint = Math.abs(relic.getStatValue(wearer, stack, "envy", stat));
                 var modifier = (wearerIsAttacker ? diff : -diff) * perPoint;
 
                 if (modifier <= 0)

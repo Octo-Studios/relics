@@ -320,7 +320,7 @@
   "relics.description.ring_of_the_seven_deadly_sins.ability.pride.statistic.additional_damage": "Additional damage dealt from height difference",
   "relics.description.ring_of_the_seven_deadly_sins.ability.pride.statistic.damage_received": "Additional damage received from height difference",
   "relics.description.ring_of_the_seven_deadly_sins.ability.envy": "Envy",
-  "relics.description.ring_of_the_seven_deadly_sins.ability.envy.description": "Increases damage dealt by %1$s%% for every 5 health points by which the target’s current health exceeds the relic bearer’s. If the target’s health is lower than the bearer’s, damage received increases by the same amount.",
+  "relics.description.ring_of_the_seven_deadly_sins.ability.envy.description": "Increases damage dealt by %1$s%% for every 5 health points by which the target’s current health exceeds the relic bearer’s. If the target’s health is lower than the bearer’s, damage received increases by %2$s%%.",
   "relics.description.ring_of_the_seven_deadly_sins.ability.envy.experience_source.health_gap": "+1 experience for each point of damage altered due to the health difference between the target and the relic bearer.",
   "relics.description.ring_of_the_seven_deadly_sins.ability.envy.statistic.offensive_shift": "Additional damage dealt due to health difference",
   "relics.description.ring_of_the_seven_deadly_sins.ability.envy.statistic.defensive_shift": "Additional damage received due to health difference",
