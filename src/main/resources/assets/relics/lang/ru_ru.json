@@ -190,7 +190,7 @@
   "relics.description.leafy_mantle.ability.camouflage": "Камуфляж",
   "relics.description.leafy_mantle.ability.camouflage.description": "Позволяет свободно перемещаться в листве деревьев и не получать урона при падении на неё. Носитель реликвии также будет исцеляться на %1$s единиц здоровья каждую секунду пока находится в листве.",
   "relics.description.leafy_mantle.ability.camouflage.rank_modifier.absorption": "При срабатывании способности носитель реликвии получает %2$s дополнительных единиц поглощения.",
-  "relics.description.leafy_mantle.ability.camouflage.rank_modifier.disappearance": "Носитель реликвии получает эффект исчезновения во время действия способности.",
+  "relics.description.leafy_mantle.ability.camouflage.rank_modifier.disappearance": "Носитель реликвии получает эффект исчезновения во время действия способности, но любое взаимодействие с миром выведет из него на %3$s секунд.",
   "relics.description.leafy_mantle.ability.camouflage.experience_source.hiding": "+1 единица опыта за каждую секунду, проведённую в листве.",
   "relics.description.leafy_mantle.ability.camouflage.experience_source.healing": "+1 единица опыта за каждую единицу здоровья, исцелённую во время маскировки в листве.",
   "relics.description.leafy_mantle.ability.camouflage.statistic.hide_duration": "Время маскировки в листве",

@@ -190,7 +190,7 @@
   "relics.description.leafy_mantle.ability.camouflage": "Camouflage",
   "relics.description.leafy_mantle.ability.camouflage.description": "Allows free movement within tree leaves and prevents fall damage when landing on them. The relic wearer also heals for %1$s health every second while in foliage.",
   "relics.description.leafy_mantle.ability.camouflage.rank_modifier.absorption": "When the ability triggers, the relic wearer gains %2$s additional absorption health.",
-  "relics.description.leafy_mantle.ability.camouflage.rank_modifier.disappearance": "The relic wearer becomes invisible while the ability is active.",
+  "relics.description.leafy_mantle.ability.camouflage.rank_modifier.disappearance": "The relic bearer gains the invisibility effect for the duration of the ability, but any interaction with the world will remove it for %3$s seconds.",
   "relics.description.leafy_mantle.ability.camouflage.experience_source.hiding": "+1 experience point for each second spent in foliage.",
   "relics.description.leafy_mantle.ability.camouflage.experience_source.healing": "+1 experience point for each unit of health restored while camouflaged in foliage.",
   "relics.description.leafy_mantle.ability.camouflage.statistic.hide_duration": "Time Spent Camouflaged in Foliage",

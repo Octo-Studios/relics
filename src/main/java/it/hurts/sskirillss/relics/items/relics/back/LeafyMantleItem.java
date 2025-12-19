@@ -33,8 +33,13 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
+import net.neoforged.neoforge.event.entity.player.ItemEntityPickupEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import top.theillusivec4.curios.api.SlotContext;
 
@@ -58,6 +63,12 @@ public class LeafyMantleItem extends RelicItem {
                                         .initialValue(1D, 3D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1619D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .build())
+                                .stat(StatTemplate.builder("cooldown")
+                                        .thresholdValue(0D, Double.MAX_VALUE)
+                                        .initialValue(15D, 10D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.01636D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
                                         .metric(AbilityMetricTemplate.builder("hide_duration")
@@ -165,6 +176,18 @@ public class LeafyMantleItem extends RelicItem {
         return 10;
     }
 
+    public int getInvisibilityCooldown(ItemStack stack) {
+        return stack.getOrDefault(RelicsDataComponents.LEAFY_MANTLE_INVISIBILITY_COOLDOWN.get(), 0);
+    }
+
+    public void setInvisibilityCooldown(ItemStack stack, int cooldown) {
+        stack.set(RelicsDataComponents.LEAFY_MANTLE_INVISIBILITY_COOLDOWN.get(), cooldown);
+    }
+
+    public void addInvisibilityCooldown(ItemStack stack, int cooldown) {
+        this.setInvisibilityCooldown(stack, this.getInvisibilityCooldown(stack) + cooldown);
+    }
+
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         if (!(slotContext.entity() instanceof LivingEntity entity))
@@ -179,7 +202,12 @@ public class LeafyMantleItem extends RelicItem {
                 .betweenClosedStream(entity.getBoundingBox())
                 .anyMatch(pos -> level.getBlockState(pos).is(BlockTags.LEAVES));
 
-        if (inLeaves) {
+        var cooldown = this.getInvisibilityCooldown(stack);
+
+        if (cooldown > 0)
+            this.addInvisibilityCooldown(stack, -1);
+
+        if (inLeaves && cooldown <= 0) {
             if (!hiding)
                 this.setHiding(stack, true);
             if (progress < this.getMaxProgress())
@@ -390,6 +418,55 @@ public class LeafyMantleItem extends RelicItem {
                     }
                 }
             }
+        }
+
+        private static void onInteract(LivingEntity entity) {
+            if (entity.getCommandSenderWorld().isClientSide())
+                return;
+
+            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
+                var relic = (LeafyMantleItem) stack.getItem();
+
+                if (!relic.canPlayerUseAbility(entity, stack, "camouflage") || !relic.isAbilityRankModifierUnlocked(entity, stack, "camouflage", "disappearance"))
+                    continue;
+
+                ServerScheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getStatValue(entity, stack, "camouflage", "cooldown") * 20)));
+            }
+        }
+
+        @SubscribeEvent
+        public static void onLivingHurt(LivingIncomingDamageEvent event) {
+            CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+            CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+            CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onBlockBreakAttempt(PlayerEvent.BreakSpeed event) {
+            CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onAttackEntity(AttackEntityEvent event) {
+            CommonEvents.onInteract(event.getEntity());
+        }
+
+        @SubscribeEvent
+        public static void onItemToss(ItemTossEvent event) {
+            CommonEvents.onInteract(event.getPlayer());
+        }
+
+        @SubscribeEvent
+        public static void onItemPickup(ItemEntityPickupEvent.Post event) {
+            CommonEvents.onInteract(event.getPlayer());
         }
     }
 }

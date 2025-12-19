@@ -36,6 +36,7 @@ public class RelicsDataComponents {
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> LEAFY_MANTLE_PROGRESS = RelicsDataComponents.construct("leafy_mantle/progress", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> LEAFY_MANTLE_HIDING = RelicsDataComponents.construct("leafy_mantle/hiding", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> LEAFY_MANTLE_INVISIBILITY_COOLDOWN = RelicsDataComponents.construct("leafy_mantle/invisibility_cooldown", Codec.INT);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PIGLIN_MASK_STACKS = RelicsDataComponents.construct("piglin_mask/stacks", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> PIGLIN_MASK_DURATION = RelicsDataComponents.construct("piglin_mask/duration", Codec.INT);
