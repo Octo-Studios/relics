@@ -9,6 +9,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberration;
+import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberrationManager;
 import it.hurts.sskirillss.relics.dev.shake.Shake;
 import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
 import it.hurts.sskirillss.relics.init.RelicsCreativeTabs;
@@ -300,6 +302,12 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
                         .duration(10)
                         .speed(2)
                         .build());
+
+            ChromaticAberrationManager.add(level, ChromaticAberration.builder(player)
+                    .radius(Integer.MAX_VALUE)
+                    .strength(0.075F)
+                    .duration(10)
+                    .build());
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }
