@@ -54,7 +54,9 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.level.BlockEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
+import top.theillusivec4.curios.common.CuriosHelper;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 
 public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreativeTabContent {
@@ -65,9 +67,9 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                         .ability(AbilityTemplate.builder("pride")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("multiplier")
-                                        .initialValue(0.05D, 0.125D)
+                                        .initialValue(0.025D, 0.05D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("height_advantage")
@@ -89,8 +91,8 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                         .ability(AbilityTemplate.builder("envy")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("outgoing_damage_multiplier")
-                                        .initialValue(0.025D, 0.05D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .initialValue(0.005D, 0.015D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0667D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .stat(StatTemplate.builder("incoming_damage_multiplier")
@@ -118,18 +120,18 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                         .ability(AbilityTemplate.builder("wrath")
                                 .initialMaxLevel(10)
                                 .stat(StatTemplate.builder("window")
-                                        .initialValue(2D, 3D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0667D)
+                                        .initialValue(1D, 2D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("early_multiplier")
-                                        .initialValue(0.5D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.4D)
+                                        .initialValue(0.1D, 0.25D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.3D)
                                         .formatValue(value -> MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("late_multiplier")
-                                        .initialValue(1D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.08D)
+                                        .initialValue(1D, 0.75D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.0667D)
                                         .formatValue(value -> MathUtils.round(value * 100, 0))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -427,6 +429,35 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
 
         for (var instance : entity.getAttributes().attributes.values())
             EntityUtils.removeAttribute(entity, stack, instance.getAttribute(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+    }
+
+    @Override
+    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
+        var entity = slotContext.entity();
+
+        var hasFreeSlot = false;
+
+        var curios = CuriosApi.getCuriosInventory(entity);
+
+        if (curios.isPresent()) {
+            var handler = curios.get();
+
+            var rings = handler.getStacksHandler("ring");
+
+            if (rings.isPresent()) {
+                var stacks = rings.get().getStacks();
+
+                for (var i = 0; i < stacks.getSlots(); i++) {
+                    if (stacks.getStackInSlot(i).isEmpty()) {
+                        hasFreeSlot = true;
+
+                        break;
+                    }
+                }
+            }
+        }
+
+        return hasFreeSlot;
     }
 
     @EventBusSubscriber
