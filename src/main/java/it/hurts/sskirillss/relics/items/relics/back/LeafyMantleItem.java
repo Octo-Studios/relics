@@ -207,6 +207,14 @@ public class LeafyMantleItem extends RelicItem {
         if (cooldown > 0)
             this.addInvisibilityCooldown(stack, -1);
 
+        if (level.isClientSide() && inLeaves) {
+            if (entity instanceof LocalPlayer player && player.input.jumping) {
+                var motion = player.getDeltaMovement();
+
+                player.setDeltaMovement(motion.x(), 0.25F, motion.z());
+            }
+        }
+
         if (inLeaves && cooldown <= 0) {
             if (!hiding)
                 this.setHiding(stack, true);
@@ -233,14 +241,6 @@ public class LeafyMantleItem extends RelicItem {
                     this.addRelicExperience(entity, stack, "camouflage", "hiding", 1);
 
                     this.addAbilityMetricValue(entity, stack, "camouflage", "hide_duration", 1);
-                }
-            }
-
-            if (level.isClientSide()) {
-                if (entity instanceof LocalPlayer player && player.input.jumping) {
-                    var motion = player.getDeltaMovement();
-
-                    player.setDeltaMovement(motion.x(), 0.25F, motion.z());
                 }
             }
         } else {
