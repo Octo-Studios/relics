@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.client.layer.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
 import it.hurts.sskirillss.relics.client.post_effects.ChromaticAberrationPostEffect;
+import it.hurts.sskirillss.relics.client.post_effects.DistortionPostEffect;
 import it.hurts.sskirillss.relics.client.post_effects.LensPostEffect;
 import it.hurts.sskirillss.relics.client.post_effects.SevenDeadlySinsPostEffect;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
@@ -120,6 +121,7 @@ public class ClientHandler {
         RelicsRelicStyles.register(RelicsItems.PIGLIN_MASK.get(), PiglinMaskStyle::new);
 
         RelicsPostEffects.register(LensPostEffect::new);
+        RelicsPostEffects.register(DistortionPostEffect::new);
         RelicsPostEffects.register(SevenDeadlySinsPostEffect::new);
         RelicsPostEffects.register(ChromaticAberrationPostEffect::new);
 
