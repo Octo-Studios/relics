@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "relics:kinetic_belt"
+    "relics:kinetic_belt",
+    "relics:hunting_belt"
   ]
 }

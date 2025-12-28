@@ -8,6 +8,7 @@ import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
+import it.hurts.sskirillss.relics.items.relics.belt.HuntingBeltItem;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
 import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
 import it.hurts.sskirillss.relics.items.relics.feet.RollerSkateItem;
@@ -31,7 +32,6 @@ public class RelicsItems {
 //    public static final DeferredHolder<Item, RelicItem> MAGMA_WALKER = ITEMS.register("magma_walker", MagmaWalkerItem::new);
 //    public static final DeferredHolder<Item, RelicItem> AQUA_WALKER = ITEMS.register("aqua_walker", AquaWalkerItem::new);
 //    public static final DeferredHolder<Item, RelicItem> DROWNED_BELT = ITEMS.register("drowned_belt", DrownedBeltItem::new);
-//    public static final DeferredHolder<Item, RelicItem> HUNTER_BELT = ITEMS.register("hunter_belt", HunterBeltItem::new);
 //    public static final DeferredHolder<Item, RelicItem> RAGE_GLOVE = ITEMS.register("rage_glove", RageGloveItem::new);
 //    public static final DeferredHolder<Item, RelicItem> BASTION_RING = ITEMS.register("bastion_ring", BastionRingItem::new);
 //    public static final DeferredHolder<Item, RelicItem> CHORUS_INHIBITOR = ITEMS.register("chorus_inhibitor", ChorusInhibitorItem::new);
@@ -55,6 +55,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> CUT_GLASS_BOOT = ITEMS.register("cut_glass_boot", CutGlassBootItem::new);
     public static final DeferredHolder<Item, RelicItem> RING_OF_THE_SEVEN_DEADLY_SINS = ITEMS.register("ring_of_the_seven_deadly_sins", RingOfTheSevenDeadlySinsItem::new);
     public static final DeferredHolder<Item, RelicItem> SPHERE_OF_SELF_SACRIFICE = ITEMS.register("sphere_of_self_sacrifice", SphereOfSelfSacrifice::new);
+    public static final DeferredHolder<Item, RelicItem> HUNTING_BELT = ITEMS.register("hunting_belt", HuntingBeltItem::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);
