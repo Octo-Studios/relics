@@ -311,7 +311,7 @@
   "relics.description.cut_glass_boot.ability.glass.experience_source.standing": "+1 очко досвіду за кожну секунду, витрачену на рух по рідині",
   "relics.description.cut_glass_boot.ability.glass.statistic.duration": "Час, проведений стоячи на рідині",
 
-  "item.relics.ring_of_the_seven_deadly_sins": "Кільцк семи смертних гріхі",
+  "item.relics.ring_of_the_seven_deadly_sins": "Перстень семи смертних гріхі",
   "relics.description.ring_of_the_seven_deadly_sins.description": "Колись цей перстень служив печаткою на вироку, винесеному королю, який впав на власні пороки. Сім кристалів викувано в його оправу, кожен з яких містить відбиток одного зі смертельних гріхів короля, що охоче реагують навіть на найменші ознаки цього гріха всередині. Чим яскравіше горять кристали, тим сильніше стає тіло власника, але ціна його також зростає: удача обертається тяжкими ранами, а порятунок — боргом, який потрібно заплатити до могили..",
   "relics.description.ring_of_the_seven_deadly_sins.statistic.unequip_attempts": "Спроб зняти кільце",
   "relics.description.ring_of_the_seven_deadly_sins.ability.pride": "Гордість",
