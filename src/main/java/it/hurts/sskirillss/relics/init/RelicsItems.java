@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.init;
 
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.items.GoldenToothItem;
+import it.hurts.sskirillss.relics.items.PetBoneItem;
 import it.hurts.sskirillss.relics.items.RelicExperienceBottleItem;
 import it.hurts.sskirillss.relics.items.relics.ChorusStaffItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
@@ -28,6 +29,7 @@ public class RelicsItems {
 
     public static final DeferredHolder<Item, Item> RELIC_EXPERIENCE_BOTTLE = ITEMS.register("relic_experience_bottle", RelicExperienceBottleItem::new);
     public static final DeferredHolder<Item, Item> GOLDEN_TOOTH = ITEMS.register("golden_tooth", GoldenToothItem::new);
+    public static final DeferredHolder<Item, Item> PET_BONE = ITEMS.register("pet_bone", PetBoneItem::new);
 
 //    public static final DeferredHolder<Item, RelicItem> MAGMA_WALKER = ITEMS.register("magma_walker", MagmaWalkerItem::new);
 //    public static final DeferredHolder<Item, RelicItem> AQUA_WALKER = ITEMS.register("aqua_walker", AquaWalkerItem::new);

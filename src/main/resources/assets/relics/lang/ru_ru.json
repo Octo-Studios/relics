@@ -369,8 +369,24 @@
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_triggers": "Срабатываний нивелирования урона взамен на срабатывание способности",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_damage_blocked": "Нивелировано урона взамен на срабатывание способности",
 
+  "item.relics.hunting_belt": "Охотничий пояс",
+  "relics.description.hunting_belt.description": "Этот пояс носили охотники, что привыкли полагаться не только на собственную руку, но и на клыки своих спутников. Потёртая кожа и костяные подвески хранят память о десятках совместных схваток. Пояс усиливает связь хозяина с его питомцами, превращая их в единую смертоносную стаю.",
+  "relics.description.hunting_belt.ability.pack": "Стая",
+  "relics.description.hunting_belt.ability.pack.description": "Увеличивает наносимый питомцами носителя реликвии урон на %1$s%%.",
+  "relics.description.hunting_belt.ability.pack.rank_modifier.leader": "Питомцы в радиусе %2$s блоков снижают получаемый носителем реликвии урон на %3$s%% за каждого.",
+  "relics.description.hunting_belt.ability.pack.rank_modifier.relentless": "Питомцы носителя реликвии игнорируют время неуязвимости целей.",
+  "relics.description.hunting_belt.ability.pack.rank_modifier.revival": "При гибели питомца выпадает особая кость, которую можно зарядить убивая существ. Каждое убитое существо заряжает кость на значение своего максимальнго здоровья. Стоимость воскрешения питомца составляет %4$s%% от его максимального здоровья.",
+  "relics.description.hunting_belt.ability.pack.experience_source.pet_damage": "+1 опыт за каждую атаку, совершённую питомцем носителя реликвии.",
+  "relics.description.hunting_belt.ability.pack.experience_source.pet_resistance": "+1 опыт за каждую единицу урона, поглощённого за счет защиты от питомцев носителя реликвии.",
+  "relics.description.hunting_belt.ability.pack.experience_source.bone_drop": "+1 опыт за каждую созданную кость погибшего питомца.",
+  "relics.description.hunting_belt.ability.pack.statistic.pet_attacks": "Атак питомцев",
+  "relics.description.hunting_belt.ability.pack.statistic.pet_damage": "Урон, нанесённый питомцами",
+  "relics.description.hunting_belt.ability.pack.statistic.damage_resisted": "Урон, поглощенный защитой от питомцев",
+  "relics.description.hunting_belt.ability.pack.statistic.pet_bones": "Создано костей погибших питомцев",
+
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
   "item.relics.golden_tooth": "Золотой зуб",
+  "item.relics.pet_bone": "Кость питомца",
 
   "block.relics.phantom_block": "Блок фантомного моста",
 
