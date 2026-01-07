@@ -38,6 +38,7 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -292,6 +293,11 @@ public class SphereOfSelfSacrifice extends RelicItem {
     @Override
     public int getMaxDamage(ItemStack stack) {
         return (int) this.getStatValue(null, stack, "sacrifice", "stacks");
+    }
+
+    @Override
+    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
+        return false;
     }
 
     public record HealingStack(float totalHeal, int remainingTicks, int totalTicks) {

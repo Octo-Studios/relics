@@ -50,6 +50,7 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
+import top.theillusivec4.curios.api.SlotContext;
 
 import java.awt.*;
 
@@ -350,6 +351,11 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
     @Override
     public int getMaxDamage(ItemStack stack) {
         return this.getMaxCharge(null, stack);
+    }
+
+    @Override
+    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
+        return false;
     }
 
     @EventBusSubscriber
