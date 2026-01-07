@@ -99,8 +99,7 @@ public class HuntingBeltItem extends RelicItem {
                         .step(100)
                         .build())
                 .loot(LootTemplate.builder()
-                        .entry(LootEntries.THE_END)
-                        .entry(LootEntries.END_LIKE)
+                        .entry(LootEntries.VILLAGE)
                         .build())
                 .build();
     }
