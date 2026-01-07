@@ -18,6 +18,7 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,23 +43,23 @@ public class HuntingBeltItem extends RelicItem {
                                 .rankModifier(3, "relentless")
                                 .rankModifier(5, "revival")
                                 .stat(StatTemplate.builder("damage_modifier")
-                                        .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0667D)
+                                        .initialValue(0.25D, 0.5D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(StatTemplate.builder("pet_radius")
-                                        .initialValue(6D, 10D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 3.0276D)
+                                        .initialValue(3D, 5D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0571D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(StatTemplate.builder("resistance_per_pet")
-                                        .initialValue(0.02D, 0.05D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.005D)
+                                        .initialValue(0.01D, 0.05D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .stat(StatTemplate.builder("revival_cost")
-                                        .initialValue(1D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0D)
+                                        .initialValue(10D, 7.5D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.02475D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -86,6 +87,10 @@ public class HuntingBeltItem extends RelicItem {
                                                 .formatValue((value) -> String.valueOf(value.intValue()))
                                                 .rankModifierVisibilityState("revival", VisibilityState.OBFUSCATED)
                                                 .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 7, 11).star(1, 13, 17).star(2, 16, 9).star(3, 5, 19).star(4, 15, 3).star(5, 6, 4).star(6, 18, 16).star(7, 16, 24).star(8, 5, 28)
+                                        .link(0, 2).link(2, 1).link(1, 3).link(3, 0).link(1, 0).link(5, 4).link(4, 2).link(3, 8).link(8, 7).link(7, 6)
                                         .build())
                                 .build())
                         .build())
@@ -162,7 +167,7 @@ public class HuntingBeltItem extends RelicItem {
                 if (pets.isEmpty())
                     continue;
 
-                var reduction = pets.size() * relic.getStatValue(player, stack, "pack", "resistance_per_pet");
+                var reduction = Math.min(pets.size(), 5) * relic.getStatValue(player, stack, "pack", "resistance_per_pet");
                 var clamped = Math.clamp(reduction, 0D, 0.9D);
                 var resisted = original * clamped;
 

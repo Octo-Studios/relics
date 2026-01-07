@@ -373,7 +373,7 @@
   "relics.description.hunting_belt.description": "Этот пояс носили охотники, что привыкли полагаться не только на собственную руку, но и на клыки своих спутников. Потёртая кожа и костяные подвески хранят память о десятках совместных схваток. Пояс усиливает связь хозяина с его питомцами, превращая их в единую смертоносную стаю.",
   "relics.description.hunting_belt.ability.pack": "Стая",
   "relics.description.hunting_belt.ability.pack.description": "Увеличивает наносимый питомцами носителя реликвии урон на %1$s%%.",
-  "relics.description.hunting_belt.ability.pack.rank_modifier.leader": "Питомцы в радиусе %2$s блоков снижают получаемый носителем реликвии урон на %3$s%% за каждого.",
+  "relics.description.hunting_belt.ability.pack.rank_modifier.leader": "Питомцы в радиусе %2$s блоков снижают получаемый носителем реликвии урон на %3$s%% за каждого, но не более чем за 5 питомцев.",
   "relics.description.hunting_belt.ability.pack.rank_modifier.relentless": "Питомцы носителя реликвии игнорируют время неуязвимости целей.",
   "relics.description.hunting_belt.ability.pack.rank_modifier.revival": "При гибели питомца выпадает особая кость, которую можно зарядить убивая существ. Каждое убитое существо заряжает кость на значение своего максимальнго здоровья. Стоимость воскрешения питомца составляет %4$s%% от его максимального здоровья.",
   "relics.description.hunting_belt.ability.pack.experience_source.pet_damage": "+1 опыт за каждую атаку, совершённую питомцем носителя реликвии.",
