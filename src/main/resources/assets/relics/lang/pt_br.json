@@ -369,8 +369,24 @@
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_triggers": "Acionamentos de mitigação de dano em troca da ativação da habilidade",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_damage_blocked": "Dano mitigado em troca da ativação da habilidade",
 
+  "item.relics.hunting_belt": "Cinto de Caça",
+  "relics.description.hunting_belt.description": "Este cinto era usado por caçadores que aprenderam a confiar não apenas em suas próprias mãos, mas também nas presas de seus companheiros. O couro desgastado e os amuletos de osso preservam a memória de dezenas de batalhas compartilhadas. O cinto fortalece o vínculo entre seu dono e seus animais de estimação, transformando-os em uma única matilha mortal.",
+  "relics.description.hunting_belt.ability.pack": "Matilha",
+  "relics.description.hunting_belt.ability.pack.description": "Aumenta o dano causado pelos animais de estimação do portador da relíquia em %1$s%%.",
+  "relics.description.hunting_belt.ability.pack.rank_modifier.leader": "Animais de estimação dentro de um raio de %2$s blocos reduzem o dano recebido pelo portador da relíquia em %3$s%% para cada animal, até um máximo de 5 animais.",
+  "relics.description.hunting_belt.ability.pack.rank_modifier.relentless": "Os animais de estimação do portador da relíquia ignoram os quadros de invulnerabilidade do alvo.",
+  "relics.description.hunting_belt.ability.pack.rank_modifier.revival": "Quando um animal de estimação morre, cai um osso especial que pode ser carregado ao matar criaturas. Cada criatura morta carrega o osso em uma quantidade igual à sua vida máxima. O custo para reviver um animal de estimação é %4$s%% de sua vida máxima.",
+  "relics.description.hunting_belt.ability.pack.experience_source.pet_damage": "+1 de experiência para cada ataque realizado pelo animal de estimação do portador da relíquia.",
+  "relics.description.hunting_belt.ability.pack.experience_source.pet_resistance": "+1 de experiência para cada ponto de dano absorvido pela proteção baseada em animais de estimação do portador da relíquia.",
+  "relics.description.hunting_belt.ability.pack.experience_source.bone_drop": "+1 de experiência para cada osso criado a partir de um animal de estimação caído.",
+  "relics.description.hunting_belt.ability.pack.statistic.pet_attacks": "Ataques de animais de estimação",
+  "relics.description.hunting_belt.ability.pack.statistic.pet_damage": "Dano causado por animais de estimação",
+  "relics.description.hunting_belt.ability.pack.statistic.damage_resisted": "Dano absorvido pela proteção baseada em animais de estimação",
+  "relics.description.hunting_belt.ability.pack.statistic.pet_bones": "Ossos criados a partir de animais de estimação caídos",
+
   "item.relics.relic_experience_bottle": "Frasco de Experiência de Relíquia",
   "item.relics.golden_tooth": "Dente de Ouro",
+  "item.relics.pet_bone": "Osso de Pet",
 
   "block.relics.phantom_block": "Bloco de Ponte Fantasma",
 
