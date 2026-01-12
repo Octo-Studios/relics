@@ -6,8 +6,6 @@ import com.google.common.collect.Multimaps;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.LockComponent;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.PredicateType;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
@@ -144,34 +142,6 @@ public class AbilityData {
         return relicData.getLevelingData().getRank() >= Collections.max(modifiers.get(rankModifier));
     }
 
-    public CastData getCastData() {
-        var template = getTemplate();
-
-        return template == null ? CastData.builder().build() : template.getCastData();
-    }
-
-    public Map<String, Pair<PredicateType, BiFunction<Player, ItemStack, Boolean>>> getPredicates() {
-        return getCastData().getPredicates();
-    }
-
-    public Map<String, BiFunction<Player, ItemStack, Boolean>> getPredicates(PredicateType type) {
-        return getPredicates().entrySet().stream()
-                .filter(entry -> entry.getValue().getKey() == type)
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().getValue()));
-    }
-
-    public boolean testPredicate(Player player, String predicate) {
-        return getPredicates().get(predicate).getValue().apply(player, relicData.getStack());
-    }
-
-    public boolean testPredicates(Player player, PredicateType type) {
-        for (Map.Entry<String, BiFunction<Player, ItemStack, Boolean>> entry : getPredicates(type).entrySet())
-            if (!testPredicate(player, entry.getKey()))
-                return false;
-
-        return true;
-    }
-
     public void randomizeStats() {
         var template = getTemplate();
 
@@ -262,12 +232,7 @@ public class AbilityData {
 
     public boolean canPlayerUse(LivingEntity entity) {
         return isUnlocked()
-                && (!(entity instanceof Player player) || testPredicates(player, PredicateType.CAST))
                 && getExtenderData().getCooldown() <= 0;
-    }
-
-    public boolean canPlayerSee(Player player) {
-        return testPredicates(player, PredicateType.VISIBILITY);
     }
 
     public boolean mayUnlock() {

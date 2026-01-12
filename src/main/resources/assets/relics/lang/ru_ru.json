@@ -18,17 +18,12 @@
 
   "relics.description.relic.tooltip.abilities": "Способности:",
 
-  "relics.description.researching.badge.relic.flawless_relic.title": "Совершенная реликвия",
-  "relics.description.researching.badge.relic.flawless_relic.description": "Реликвия достигла максимальных идеальных параметров. Гордись собой!",
-
   "relics.description.researching.research.tip": "Чтобы разблокировать способность, необходимо соединить звезды, скрытые под туманом, так, чтобы образованное созвездие совпало с изображением на фоне. Когда созвездие будет подобрано правильно, способность будет исследована автоматически.",
 
   "relics.description.researching.research.hint.description": "Подсказка",
   "relics.description.researching.research.hint.cost": "Стоимость: %1$s очков опыта игрока (%2$s относительных уровней) %3$s.",
   "relics.description.researching.research.hint.quick": "Удерживай [Шифт] для полного автоматического исследования способности.",
   "relics.description.researching.research.hint.locked": "Способность уже исследована!",
-
-  "relics.description.researching.badge.ability.cast_type.hint": "Используй клавишу [%1$s] вне любого интерфейса для вызова меню активных способностей!",
 
   "relics.description.researching.general.leveling_point.title": "Очки улучшения:",
   "relics.description.researching.general.leveling_point.extra_info": "Получаются при повышении уровня реликвии и используются для повышения уровня способностей.",

@@ -7,7 +7,6 @@ import it.hurts.sskirillss.relics.network.packets.PacketItemActivation;
 import it.hurts.sskirillss.relics.network.packets.PacketSyncEntityEffects;
 import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
-import it.hurts.sskirillss.relics.network.packets.abilities.SpellCastPacket;
 import it.hurts.sskirillss.relics.network.packets.capability.CapabilitySyncPacket;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeMode;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
@@ -33,7 +32,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class NetworkHandler {
     @SubscribeEvent
     public static void onRegisterPayloadHandler(final RegisterPayloadHandlersEvent event) {
@@ -47,7 +46,6 @@ public class NetworkHandler {
         registrar.playToServer(PacketAbilityTweak.TYPE, PacketAbilityTweak.STREAM_CODEC, PacketAbilityTweak::handle);
         registrar.playToClient(PacketSyncEntityEffects.TYPE, PacketSyncEntityEffects.STREAM_CODEC, PacketSyncEntityEffects::handle);
         registrar.playToClient(CapabilitySyncPacket.TYPE, CapabilitySyncPacket.STREAM_CODEC, CapabilitySyncPacket::handle);
-        registrar.playToServer(SpellCastPacket.TYPE, SpellCastPacket.STREAM_CODEC, SpellCastPacket::handle);
         registrar.playToClient(S2CSyncEntityTargetPacket.TYPE, S2CSyncEntityTargetPacket.STREAM_CODEC, S2CSyncEntityTargetPacket::handle);
         registrar.playToServer(C2SPacketAbilityUnlock.TYPE, C2SPacketAbilityUnlock.STREAM_CODEC, C2SPacketAbilityUnlock::handle);
         registrar.playToServer(PacketManageLink.TYPE, PacketManageLink.STREAM_CODEC, PacketManageLink::handle);

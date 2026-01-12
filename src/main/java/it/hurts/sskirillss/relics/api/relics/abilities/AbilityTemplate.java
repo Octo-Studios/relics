@@ -8,7 +8,6 @@ import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.CastData;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -33,7 +32,6 @@ public class AbilityTemplate {
     private final double maxLevelRankModifier;
     private final int requiredLevel;
     private final int requiredPoints;
-    private final CastData castData;
     private final ResearchTemplate researchTemplate;
     private final AbilityStatisticTemplate statistic;
     private final List<String> modes;
@@ -71,7 +69,6 @@ public class AbilityTemplate {
         private double maxLevelRankModifier = 0.25D;
         private int requiredLevel = 0;
         private int requiredPoints = 1;
-        private CastData castData = CastData.builder().build();
         private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
         private AbilityStatisticTemplate statistic = AbilityStatisticTemplate.builder().build();
         private List<String> modes = new ArrayList<>();
@@ -91,7 +88,6 @@ public class AbilityTemplate {
             this.maxLevelRankModifier = base.getMaxLevelRankModifier();
             this.requiredLevel = base.getRequiredLevel();
             this.requiredPoints = base.getRequiredPoints();
-            this.castData = base.getCastData();
             this.researchTemplate = base.getResearchTemplate();
             this.statistic = base.getStatistic();
             this.experienceSources = base.getExperienceSources();
@@ -141,12 +137,6 @@ public class AbilityTemplate {
             return this;
         }
 
-        public AbilityTemplateBuilder castData(CastData castData) {
-            this.castData = castData;
-
-            return this;
-        }
-
         public AbilityTemplateBuilder research(ResearchTemplate researchTemplate) {
             this.researchTemplate = researchTemplate;
 
@@ -178,7 +168,7 @@ public class AbilityTemplate {
         }
 
         public AbilityTemplate build() {
-            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredPoints, this.castData, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers);
+            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredPoints, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers);
         }
     }
 }

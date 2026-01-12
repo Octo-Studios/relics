@@ -19,16 +19,15 @@ public class Relics {
         bus.addListener(this::setupCommon);
 
         RelicsItems.register(bus);
-        RelicsBlockEntities.register(bus);
         RelicsBlocks.register(bus);
         RelicsSounds.register(bus);
-        RelicsBadges.register(bus);
         RelicsEntities.register(bus);
-        RelicsMobEffects.register(bus);
         RelicsCommands.register(bus);
         RelicsParticles.register(bus);
+        RelicsMobEffects.register(bus);
         RelicsLootCodecs.register(bus);
         RelicsCreativeTabs.register(bus);
+        RelicsBlockEntities.register(bus);
         RelicsScalingModels.register(bus);
         RelicsDataComponents.register(bus);
         RelicsRelicContainer.register(bus);

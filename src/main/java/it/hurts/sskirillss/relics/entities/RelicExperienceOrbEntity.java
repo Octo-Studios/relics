@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.init.RelicsRegistries;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;

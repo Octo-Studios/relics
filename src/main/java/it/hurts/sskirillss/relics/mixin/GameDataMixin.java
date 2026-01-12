@@ -19,7 +19,6 @@ public class GameDataMixin {
 
         order.add(RelicsRegistries.SCALING_MODEL_REGISTRY_KEY.location());
         order.add(RelicsRegistries.RELIC_CONTAINER_REGISTRY_KEY.location());
-        order.add(RelicsRegistries.BADGE_REGISTRY_KEY.location());
 
         order.addAll(cir.getReturnValue());
 

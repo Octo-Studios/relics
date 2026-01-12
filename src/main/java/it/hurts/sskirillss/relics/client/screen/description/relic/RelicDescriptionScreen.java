@@ -6,17 +6,14 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
-import it.hurts.sskirillss.relics.badges.base.RelicBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RelicBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RankupRelicActionWidget;
-import it.hurts.sskirillss.relics.init.RelicsBadges;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -51,18 +48,7 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
         if (this.stack == null || !(this.stack.getItem() instanceof IRelicItem relic))
             return;
 
-        int xOff = 0;
-
         this.addRenderableWidget(new BigRelicCardWidget(x + 59, y + 43, this));
-
-        for (RelicBadge badge : RelicsBadges.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof RelicBadge).map(entry -> (RelicBadge) entry).toList()) {
-            if (!badge.isVisible(this.minecraft.player, stack))
-                continue;
-
-            this.addRenderableWidget(new RelicBadgeWidget(x + 260 - xOff, y + 54, this, badge));
-
-            xOff += 15;
-        }
 
         var container = subcategory.getContainerWidget(this);
 

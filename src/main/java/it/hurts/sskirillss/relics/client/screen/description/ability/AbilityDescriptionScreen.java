@@ -7,17 +7,14 @@ import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
-import it.hurts.sskirillss.relics.badges.base.AbilityBadge;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.general.widgets.AbilityBadgeWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
-import it.hurts.sskirillss.relics.init.RelicsBadges;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -36,7 +33,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.ArrayList;
 
@@ -116,17 +112,6 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         int xOff = 0;
 
         this.addRenderableWidget(new BigAbilityCardWidget(x + 59, y + 43, this));
-
-        if (abilityData.isUnlocked()) {
-            for (AbilityBadge badge : RelicsBadges.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof AbilityBadge).map(entry -> (AbilityBadge) entry).toList()) {
-                if (!badge.isVisible(player, stack, ability))
-                    continue;
-
-                this.addRenderableWidget(new AbilityBadgeWidget(x + 260 - xOff, y + 54, this, badge, ability));
-
-                xOff += 15;
-            }
-        }
 
         if (!paginatedAbilities.isEmpty()) {
             int objectWidth = 38;

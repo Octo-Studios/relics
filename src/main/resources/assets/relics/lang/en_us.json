@@ -18,17 +18,12 @@
 
   "relics.description.relic.tooltip.abilities": "Abilities:",
 
-  "relics.description.researching.badge.relic.flawless_relic.title": "Flawless Relic",
-  "relics.description.researching.badge.relic.flawless_relic.description": "The relic has reached maximum perfect parameters. Be proud of yourself!",
-
   "relics.description.researching.research.tip": "To unlock an ability, you need to connect the stars hidden under the fog so that the resulting constellation matches the background image. Once the constellation is matched correctly, the ability will be researched automatically.",
 
   "relics.description.researching.research.hint.description": "Hint",
   "relics.description.researching.research.hint.cost": "Cost: %1$s player experience points (%2$s relative levels) %3$s.",
   "relics.description.researching.research.hint.quick": "Hold [Shift] for fully automatic ability research.",
   "relics.description.researching.research.hint.locked": "The ability has already been researched!",
-
-  "relics.description.researching.badge.ability.cast_type.hint": "Use the [%1$s] key outside of any interface to open the active abilities menu!",
 
   "relics.description.researching.general.leveling_point.title": "Upgrade Points:",
   "relics.description.researching.general.leveling_point.extra_info": "Obtained when leveling up the relic and used to upgrade abilities.",

@@ -4,8 +4,6 @@ import it.hurts.sskirillss.relics.api.relics.data.RelicData;
 import it.hurts.sskirillss.relics.config.data.RelicConfigData;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastStage;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.misc.CastType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -76,14 +74,6 @@ public interface IRelicItem extends IRelicTemplateHolder {
     @Nullable
     default RelicConfigData constructDefaultConfigData(@NotNull RelicConfigData config) {
         return config;
-    }
-
-    default void castActiveAbility(Player player, ItemStack stack, String ability, CastType type, CastStage stage) {
-
-    }
-
-    default void tickActiveAbilitySelection(ItemStack stack, Player player, String ability) {
-
     }
 
     // TODO: Probably remove?

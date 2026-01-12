@@ -1,9 +1,9 @@
 package it.hurts.sskirillss.relics.init;
 
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.CuriosRelicContainer;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.InventoryRelicContainer;
-import it.hurts.sskirillss.relics.items.relics.base.data.cast.containers.base.RelicContainer;
+import it.hurts.sskirillss.relics.relic_containers.CuriosRelicContainer;
+import it.hurts.sskirillss.relics.relic_containers.InventoryRelicContainer;
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
