@@ -111,12 +111,12 @@ public class RollerSparkEntity extends ThrowableProjectile {
             this.discard();
 
             if (stack.getItem() instanceof RollerSkateItem relic) {
-                relic.addAbilityMetricValue(owner, stack, "skating", "damage_dealt", damage);
+                relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("skating").getStatisticData().getMetricData("damage_dealt").addValue(damage);
 
-                relic.addRelicExperience(owner, stack, "skating", "spark_hit", 1);
+                relic.getRelicData(owner, stack).getLevelingData().addExperience("skating", "spark_hit", 1);
 
                 if (diff > 0)
-                    relic.addAbilityMetricValue(owner, stack, "skating", "ignite_duration", diff / 20F);
+                    relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("skating").getStatisticData().getMetricData("ignite_duration").addValue(diff / 20F);
             }
         }
     }

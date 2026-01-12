@@ -28,6 +28,6 @@ public class SynergyDescriptionCategory extends DescriptionCategory {
     public boolean shouldAppear(LivingEntity entity, ItemStack stack) {
         var relic = (IRelicItem) stack.getItem();
 
-        return !relic.getAbilitiesTemplate(entity, stack).getSynergies().isEmpty();
+        return !relic.getRelicData(entity, stack).getTemplate().getAbilities().getSynergies().isEmpty();
     }
 }

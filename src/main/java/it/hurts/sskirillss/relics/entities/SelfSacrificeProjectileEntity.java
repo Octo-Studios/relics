@@ -76,7 +76,7 @@ public class SelfSacrificeProjectileEntity extends ThrowableProjectile implement
             target.hurt(source, damage);
 
             if (this.getStack().getItem() instanceof SphereOfSelfSacrifice relic && this.getOwner() instanceof LivingEntity owner)
-                relic.addAbilityMetricValue(owner, this.getStack(), "sacrifice", "blood_projectile_damage", damage);
+                relic.getRelicData(owner, this.getStack()).getAbilitiesData().getAbilityData("sacrifice").getStatisticData().getMetricData("blood_projectile_damage").addValue(damage);
 
             if (!level.isClientSide())
                 this.discard();

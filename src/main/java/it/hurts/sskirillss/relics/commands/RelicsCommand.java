@@ -35,17 +35,22 @@ public class RelicsCommand {
                                         return 0;
                                     }
 
-                                    var levelingTemplate = relic.getLevelingTemplate(player, stack);
+                                    var relicData = relic.getRelicData(player, stack);
+                                    var levelingTemplate = relicData.getTemplate().getLeveling();
 
-                                    relic.setRelicRank(player, stack, levelingTemplate.getMaxRank());
-                                    relic.setRelicLevel(player, stack, relic.calculateRelicMaxLevel(player, stack));
+                                    relicData.getLevelingData().setRank(levelingTemplate.getMaxRank());
+                                    relicData.getLevelingData().setLevel(relicData.calculateMaxLevel());
 
-                                    relic.getAbilitiesTemplate(player, stack).getAbilities().forEach((abilityId, abilityTemplate) -> {
-                                        relic.setAbilityLevel(player, stack, abilityId, abilityTemplate.getInitialMaxLevel());
-                                        relic.setLockUnlocks(player, stack, abilityId, relic.getMaxLockUnlocks());
-                                        relic.setAbilityResearched(player, stack, abilityId, true);
+                                    var abilitiesData = relicData.getAbilitiesData();
 
-                                        abilityTemplate.getStats().keySet().forEach(statId -> relic.setStatInitialQuality(player, stack, abilityId, statId, relic.getStatMaxQuality(player, stack, abilityId, statId)));
+                                    relicData.getTemplate().getAbilities().getAbilities().forEach((abilityId, abilityTemplate) -> {
+                                        var abilityData = abilitiesData.getAbilityData(abilityId);
+
+                                        abilityData.setLevel(abilityTemplate.getInitialMaxLevel());
+                                        abilityData.getLockData().setUnlocks(abilityData.getLockData().getMaxUnlocks());
+                                        abilityData.getResearchData().setResearched(true);
+
+                                        abilityTemplate.getStats().keySet().forEach(statId -> abilityData.getStatData(statId).setInitialQuality(abilityData.getStatData(statId).getMaxQuality()));
                                     });
 
                                     return Command.SINGLE_SUCCESS;
@@ -63,21 +68,25 @@ public class RelicsCommand {
                                         return 0;
                                     }
 
-                                    relic.setRelicRank(player, stack, 0);
-                                    relic.setRelicLevel(player, stack, 0);
-                                    relic.setRelicExperience(player, stack, 0);
+                                    var relicData = relic.getRelicData(player, stack);
 
-                                    relic.getAbilitiesTemplate(player, stack).getAbilities().forEach((abilityId, abilityTemplate) -> {
-                                        relic.setAbilityResearched(player, stack, abilityId, false);
-                                        relic.setAbilityLevel(player, stack, abilityId, 0);
-                                        relic.setResearchLinks(player, stack, abilityId, new HashMap<>());
+                                    relicData.getLevelingData().setRank(0);
+                                    relicData.getLevelingData().setLevel(0);
+                                    relicData.getLevelingData().setExperience(0);
 
-                                        if (!relic.isEnoughLevel(player, stack, abilityId))
-                                            relic.setLockUnlocks(player, stack, abilityId, 0);
+                                    var abilitiesData = relicData.getAbilitiesData();
 
-                                        abilityTemplate.getStats().keySet().forEach(statId ->
-                                                relic.setStatInitialQuality(player, stack, abilityId, statId, 0)
-                                        );
+                                    relicData.getTemplate().getAbilities().getAbilities().forEach((abilityId, abilityTemplate) -> {
+                                        var abilityData = abilitiesData.getAbilityData(abilityId);
+
+                                        abilityData.getResearchData().setResearched(false);
+                                        abilityData.setLevel(0);
+                                        abilityData.getResearchData().setLinks(new HashMap<>());
+
+                                        if (!abilityData.isEnoughLevel())
+                                            abilityData.getLockData().setUnlocks(0);
+
+                                        abilityTemplate.getStats().keySet().forEach(statId -> abilityData.getStatData(statId).setInitialQuality(0));
                                     });
 
                                     return Command.SINGLE_SUCCESS;
@@ -99,10 +108,12 @@ public class RelicsCommand {
                                                     var level = IntegerArgumentType.getInteger(ctx, "level");
                                                     var action = ctx.getArgument("action", CommandAction.class);
 
-                                                    relic.setRelicLevel(player, stack, switch (action) {
+                                                    var levelingData = relic.getRelicData(player, stack).getLevelingData();
+
+                                                    levelingData.setLevel(switch (action) {
                                                         case SET -> level;
-                                                        case ADD -> relic.getRelicLevel(player, stack) + level;
-                                                        case TAKE -> relic.getRelicLevel(player, stack) - level;
+                                                        case ADD -> levelingData.getLevel() + level;
+                                                        case TAKE -> levelingData.getLevel() - level;
                                                     });
 
                                                     return Command.SINGLE_SUCCESS;
@@ -126,10 +137,12 @@ public class RelicsCommand {
                                                     var experience = IntegerArgumentType.getInteger(ctx, "experience");
                                                     var action = ctx.getArgument("action", CommandAction.class);
 
-                                                    relic.setRelicExperience(null, stack, switch (action) {
+                                                    var levelingData = relic.getRelicData(player, stack).getLevelingData();
+
+                                                    levelingData.setExperience(switch (action) {
                                                         case SET -> experience;
-                                                        case ADD -> relic.getRelicExperience(player, stack) + experience;
-                                                        case TAKE -> relic.getRelicExperience(player, stack) - experience;
+                                                        case ADD -> levelingData.getExperience() + experience;
+                                                        case TAKE -> levelingData.getExperience() - experience;
                                                     });
 
                                                     return Command.SINGLE_SUCCESS;
@@ -153,10 +166,12 @@ public class RelicsCommand {
                                                     var points = IntegerArgumentType.getInteger(ctx, "points");
                                                     var action = ctx.getArgument("action", CommandAction.class);
 
-                                                    relic.setRelicLevelingPoints(player, stack, switch (action) {
+                                                    var levelingData = relic.getRelicData(player, stack).getLevelingData();
+
+                                                    levelingData.setPoints(switch (action) {
                                                         case SET -> points;
-                                                        case ADD -> relic.getRelicLevelingPoints(player, stack) + points;
-                                                        case TAKE -> relic.getRelicLevelingPoints(player, stack) - points;
+                                                        case ADD -> levelingData.getPoints() + points;
+                                                        case TAKE -> levelingData.getPoints() - points;
                                                     });
 
                                                     return Command.SINGLE_SUCCESS;
@@ -180,10 +195,12 @@ public class RelicsCommand {
                                                     var rank = IntegerArgumentType.getInteger(ctx, "rank");
                                                     var action = ctx.getArgument("action", CommandAction.class);
 
-                                                    relic.setRelicRank(player, stack, switch (action) {
+                                                    var levelingData = relic.getRelicData(player, stack).getLevelingData();
+
+                                                    levelingData.setRank(switch (action) {
                                                         case SET -> rank;
-                                                        case ADD -> relic.getRelicRank(player, stack) + rank;
-                                                        case TAKE -> relic.getRelicRank(player, stack) - rank;
+                                                        case ADD -> levelingData.getRank() + rank;
+                                                        case TAKE -> levelingData.getRank() - rank;
                                                     });
 
                                                     return Command.SINGLE_SUCCESS;
@@ -209,13 +226,14 @@ public class RelicsCommand {
                                                             var metric = RelicStatisticMetricArgument.getRelicStatisticMetric(ctx, "metric");
                                                             var value = DoubleArgumentType.getDouble(ctx, "value");
 
-                                                            Stream.of(metric.equals("all") ? relic.getRelicStatisticTemplate(player, stack).getMetrics().keySet().toArray(new String[0]) : new String[]{metric})
-                                                                    .forEach(metricEntry -> relic.setRelicMetricValue(player, stack, metricEntry, switch (action) {
-                                                                                case SET -> value;
-                                                                                case ADD -> relic.getRelicMetricValue(player, stack, metricEntry) + value;
-                                                                                case TAKE -> relic.getRelicMetricValue(player, stack, metricEntry) - value;
-                                                                            })
-                                                                    );
+                                                            var statisticData = relic.getRelicData(player, stack).getStatisticData();
+
+                                                            Stream.of(metric.equals("all") ? statisticData.getTemplate().getMetrics().keySet().toArray(new String[0]) : new String[]{metric})
+                                                                    .forEach(metricEntry -> statisticData.getMetricData(metricEntry).setValue(switch (action) {
+                                                                        case SET -> value;
+                                                                        case ADD -> statisticData.getMetricData(metricEntry).getValue() + value;
+                                                                        case TAKE -> statisticData.getMetricData(metricEntry).getValue() - value;
+                                                                    }));
 
                                                             return Command.SINGLE_SUCCESS;
                                                         })
@@ -243,13 +261,17 @@ public class RelicsCommand {
                                                             var ability = AbilityArgument.getAbility(ctx, "ability");
                                                             var level = IntegerArgumentType.getInteger(ctx, "level");
 
-                                                            (ability.equals("all") ? relic.getAbilitiesTemplate(player, stack).getAbilities().keySet() : Set.of(ability)).forEach(entry ->
-                                                                    relic.setAbilityLevel(player, stack, entry, switch (action) {
-                                                                        case SET -> level;
-                                                                        case ADD -> relic.getAbilityLevel(player, stack, entry) + level;
-                                                                        case TAKE -> relic.getAbilityLevel(player, stack, entry) - level;
-                                                                    })
-                                                            );
+                                                            var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
+
+                                                            (ability.equals("all") ? abilitiesData.getAbilityIds() : Set.of(ability)).forEach(entry -> {
+                                                                var abilityData = abilitiesData.getAbilityData(entry);
+
+                                                                abilityData.setLevel(switch (action) {
+                                                                    case SET -> level;
+                                                                    case ADD -> abilityData.getLevel() + level;
+                                                                    case TAKE -> abilityData.getLevel() - level;
+                                                                });
+                                                            });
 
                                                             return Command.SINGLE_SUCCESS;
                                                         })
@@ -277,15 +299,19 @@ public class RelicsCommand {
                                                                     var metric = RelicAbilityStatisticMetricArgument.getAbilityStatisticMetric(ctx, "metric");
                                                                     var value = DoubleArgumentType.getDouble(ctx, "value");
 
-                                                                    Stream.of(ability.equals("all") ? relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().toArray(new String[0]) : new String[]{ability})
-                                                                            .forEach(abilityEntry -> (metric.equals("all") ? relic.getAbilityTemplate(player, stack, abilityEntry).getStats().keySet().stream() : Stream.of(metric))
-                                                                                    .forEach(metricEntry -> relic.setAbilityMetricValue(player, stack, abilityEntry, metricEntry, switch (action) {
-                                                                                                case SET -> value;
-                                                                                                case ADD -> relic.getAbilityMetricValue(player, stack, abilityEntry, metricEntry) + value;
-                                                                                                case TAKE -> relic.getAbilityMetricValue(player, stack, abilityEntry, metricEntry) - value;
-                                                                                            })
-                                                                                    )
-                                                                            );
+                                                                    var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
+
+                                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIds().toArray(new String[0]) : new String[]{ability})
+                                                                            .forEach(abilityEntry -> {
+                                                                                var abilityData = abilitiesData.getAbilityData(abilityEntry);
+
+                                                                                (metric.equals("all") ? abilityData.getStatisticData().getTemplate().getMetrics().keySet().stream() : Stream.of(metric))
+                                                                                        .forEach(metricEntry -> abilityData.getStatisticData().getMetricData(metricEntry).setValue(switch (action) {
+                                                                                            case SET -> value;
+                                                                                            case ADD -> abilityData.getStatisticData().getMetricData(metricEntry).getValue() + value;
+                                                                                            case TAKE -> abilityData.getStatisticData().getMetricData(metricEntry).getValue() - value;
+                                                                                        }));
+                                                                            });
 
                                                                     return Command.SINGLE_SUCCESS;
                                                                 })
@@ -314,15 +340,19 @@ public class RelicsCommand {
                                                                     var stat = AbilityStatArgument.getAbilityStat(ctx, "stat");
                                                                     var override = DoubleArgumentType.getDouble(ctx, "override");
 
-                                                                    Stream.of(ability.equals("all") ? relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().toArray(new String[0]) : new String[]{ability})
-                                                                            .forEach(abilityEntry -> (stat.equals("all") ? relic.getAbilityTemplate(player, stack, abilityEntry).getStats().keySet().stream() : Stream.of(stat))
-                                                                                    .forEach(statEntry -> relic.setStatOverrideValue(player, stack, abilityEntry, statEntry, switch (action) {
-                                                                                                case SET -> override;
-                                                                                                case ADD -> relic.getOrCalculateStatValue(player, stack, abilityEntry, statEntry) + override;
-                                                                                                case TAKE -> relic.getOrCalculateStatValue(player, stack, abilityEntry, statEntry) - override;
-                                                                                            })
-                                                                                    )
-                                                                            );
+                                                                    var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
+
+                                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIds().toArray(new String[0]) : new String[]{ability})
+                                                                            .forEach(abilityEntry -> {
+                                                                                var abilityData = abilitiesData.getAbilityData(abilityEntry);
+
+                                                                                (stat.equals("all") ? abilityData.getTemplate().getStats().keySet().stream() : Stream.of(stat))
+                                                                                        .forEach(statEntry -> abilityData.getStatData(statEntry).setOverrideValue(switch (action) {
+                                                                                            case SET -> override;
+                                                                                            case ADD -> abilityData.getStatData(statEntry).getUnscaledValue() + override;
+                                                                                            case TAKE -> abilityData.getStatData(statEntry).getUnscaledValue() - override;
+                                                                                        }));
+                                                                            });
 
                                                                     return Command.SINGLE_SUCCESS;
                                                                 })
@@ -351,14 +381,19 @@ public class RelicsCommand {
                                                                     var stat = AbilityStatArgument.getAbilityStat(ctx, "stat");
                                                                     var quality = IntegerArgumentType.getInteger(ctx, "quality");
 
-                                                                    Stream.of(ability.equals("all") ? relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().toArray(new String[0]) : new String[]{ability})
-                                                                            .forEach(abilityEntry -> (stat.equals("all") ? relic.getAbilityTemplate(player, stack, abilityEntry).getStats().keySet().stream() : Stream.of(stat))
-                                                                                    .forEach(statEntry -> relic.setStatInitialQuality(player, stack, abilityEntry, statEntry, switch (action) {
-                                                                                        case SET -> quality;
-                                                                                        case ADD -> relic.getStatInitialQuality(player, stack, abilityEntry, statEntry) + quality;
-                                                                                        case TAKE -> relic.getStatInitialQuality(player, stack, abilityEntry, statEntry) - quality;
-                                                                                    }))
-                                                                            );
+                                                                    var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
+
+                                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIds().toArray(new String[0]) : new String[]{ability})
+                                                                            .forEach(abilityEntry -> {
+                                                                                var abilityData = abilitiesData.getAbilityData(abilityEntry);
+
+                                                                                (stat.equals("all") ? abilityData.getTemplate().getStats().keySet().stream() : Stream.of(stat))
+                                                                                        .forEach(statEntry -> abilityData.getStatData(statEntry).setInitialQuality(switch (action) {
+                                                                                            case SET -> quality;
+                                                                                            case ADD -> abilityData.getStatData(statEntry).getInitialQuality() + quality;
+                                                                                            case TAKE -> abilityData.getStatData(statEntry).getInitialQuality() - quality;
+                                                                                        }));
+                                                                            });
 
                                                                     return Command.SINGLE_SUCCESS;
                                                                 })
@@ -383,10 +418,15 @@ public class RelicsCommand {
                                                     var ability = AbilityArgument.getAbility(ctx, "ability");
                                                     var stat = AbilityStatArgument.getAbilityStat(ctx, "stat");
 
-                                                    Stream.of(ability.equals("all") ? relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().toArray(new String[0]) : new String[]{ability})
-                                                            .forEach(abilityEntry -> (stat.equals("all") ? relic.getAbilityTemplate(player, stack, abilityEntry).getStats().keySet().stream() : Stream.of(stat))
-                                                                    .forEach(statEntry -> relic.randomizeStat(player, stack, abilityEntry, statEntry))
-                                                            );
+                                                    var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
+
+                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIds().toArray(new String[0]) : new String[]{ability})
+                                                            .forEach(abilityEntry -> {
+                                                                var abilityData = abilitiesData.getAbilityData(abilityEntry);
+
+                                                                (stat.equals("all") ? abilityData.getTemplate().getStats().keySet().stream() : Stream.of(stat))
+                                                                        .forEach(statEntry -> abilityData.randomizeStat(statEntry));
+                                                            });
 
                                                     return Command.SINGLE_SUCCESS;
                                                 })

@@ -65,8 +65,9 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         super(player, container, slot, screen);
 
         if (stack.getItem() instanceof IRelicItem relic) {
-            var abilities = relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream()
-                    .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
+            var relicData = relic.getRelicData(player, stack);
+            var abilities = relicData.getTemplate().getAbilities().getAbilities().keySet().stream()
+                    .filter(entry -> relicData.getAbilitiesData().getAbilityData(entry).isEnabled())
                     .toList();
 
             if (this.selectedAbility == null)
@@ -87,11 +88,14 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         var ability = this.getSelectedAbility();
 
-        if (relic.getAbilityTemplate(player, stack, ability) == null)
+        var relicData = relic.getRelicData(player, stack);
+        var abilityData = relicData.getAbilitiesData().getAbilityData(ability);
+
+        if (abilityData.getTemplate() == null)
             return;
 
-        var abilities = relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream()
-                .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
+        var abilities = relicData.getTemplate().getAbilities().getAbilities().keySet().stream()
+                .filter(entry -> relicData.getAbilitiesData().getAbilityData(entry).isEnabled())
                 .toList();
 
         var maxEntries = 4;
@@ -113,7 +117,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         this.addRenderableWidget(new BigAbilityCardWidget(x + 59, y + 43, this));
 
-        if (relic.isAbilityUnlocked(player, stack, ability)) {
+        if (abilityData.isUnlocked()) {
             for (AbilityBadge badge : RelicsBadges.BADGES.getEntries().stream().map(DeferredHolder::get).filter(entry -> entry instanceof AbilityBadge).map(entry -> (AbilityBadge) entry).toList()) {
                 if (!badge.isVisible(player, stack, ability))
                     continue;
@@ -160,11 +164,11 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         var ability = this.getSelectedAbility();
         var player = minecraft.player;
 
-        if (relic.isAbilityUpgradeEnabled(player, this.stack, ability))
+        if (relic.getRelicData(player, this.stack).getAbilitiesData().getAbilityData(ability).isUpgradeEnabled())
             this.upgradeButton = this.addRenderableWidget(new UpgradeAbilityActionWidget(x + 289, y + 63, this));
-        if (relic.isAbilityRerollEnabled(player, this.stack, ability))
+        if (relic.getRelicData(player, this.stack).getAbilitiesData().getAbilityData(ability).isRerollEnabled())
             this.rerollButton = this.addRenderableWidget(new RerollAbilityActionWidget(x + 289, y + 84, this));
-        if (relic.isAbilityResetEnabled(player, this.stack, ability))
+        if (relic.getRelicData(player, this.stack).getAbilitiesData().getAbilityData(ability).isResetEnabled())
             this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 289, y + 105, this));
     }
 
@@ -174,8 +178,10 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         var ability = this.getSelectedAbility();
         var player = minecraft.player;
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+        var template = abilityData.getTemplate();
 
-        if (relic.isAbilityUnlocked(player, stack, ability) && !relic.getAbilityTemplate(player, stack, this.getSelectedAbility()).getModes().isEmpty()) {
+        if (abilityData.isUnlocked() && template != null && !template.getModes().isEmpty()) {
             this.addRenderableWidget(new AbilityModeWidget(x + 100, y + 53, this, 1));
             this.addRenderableWidget(new AbilityModeWidget(x + 56, y + 53, this, -1));
         }
@@ -192,6 +198,12 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         var ability = this.getSelectedAbility();
 
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+        var template = abilityData.getTemplate();
+
+        if (template == null)
+            return;
+
         var poseStack = guiGraphics.pose();
 
         poseStack.pushPose();
@@ -200,12 +212,12 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         var title = Component.translatableWithFallback("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability);
 
-        var modes = relic.getAbilityTemplate(player, stack, ability).getModes();
+        var modes = template.getModes();
 
         if (!modes.isEmpty())
-            title.append(Component.literal(" [").append(Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".mode." + relic.getAbilityMode(player, stack, ability))).append(Component.literal("]")));
+            title.append(Component.literal(" [").append(Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability + ".mode." + abilityData.getMode())).append(Component.literal("]")));
 
-        if (!relic.isAbilityUnlocked(player, stack, ability)) {
+        if (!abilityData.isUnlocked()) {
             title = ScreenUtils.stylizeWithReplacement(title, 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(0x9E00B0), ability.length());
 
             var random = player.getRandom();

@@ -94,7 +94,7 @@ public class DescriptionTextures {
 
         var minecraft = Minecraft.getInstance();
 
-        var texture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/abilities/" + BuiltInRegistries.ITEM.getKey(item).getPath() + "/" + relic.getAbilityTemplate(minecraft.player, stack, ability).getIcon().apply(minecraft.player, stack, ability) + ".png");
+        var texture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/abilities/" + BuiltInRegistries.ITEM.getKey(item).getPath() + "/" + relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability).getTemplate().getIcon().apply(minecraft.player, stack, ability) + ".png");
 
         return minecraft.getResourceManager().getResource(texture).orElse(null) == null ? SMALL_CARD_MISSING : texture;
     }

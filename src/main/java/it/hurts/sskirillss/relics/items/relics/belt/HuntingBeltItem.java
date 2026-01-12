@@ -122,11 +122,11 @@ public class HuntingBeltItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get())) {
                 var relic = (HuntingBeltItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(owner, stack, "pack"))
+                if (!relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner))
                     continue;
 
-                totalModifier += relic.getStatValue(owner, stack, "pack", "damage_modifier");
-                ignoreInvulnerability |= relic.isAbilityRankModifierUnlocked(owner, stack, "pack", "relentless");
+                totalModifier += relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatData("damage_modifier").getValue();
+                ignoreInvulnerability |= relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").isRankModifierUnlocked("relentless");
             }
 
             if (ignoreInvulnerability)
@@ -153,11 +153,11 @@ public class HuntingBeltItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HUNTING_BELT.get())) {
                 var relic = (HuntingBeltItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(player, stack, "pack")
-                        || !relic.isAbilityRankModifierUnlocked(player, stack, "pack", "leader"))
+                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(player)
+                        || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").isRankModifierUnlocked("leader"))
                     continue;
 
-                var radius = relic.getStatValue(player, stack, "pack", "pet_radius");
+                var radius = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getStatData("pet_radius").getValue();
 
                 var pets = player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius),
                         target -> target instanceof OwnableEntity ownable && ownable.getOwner() != null
@@ -166,7 +166,7 @@ public class HuntingBeltItem extends RelicItem {
                 if (pets.isEmpty())
                     continue;
 
-                var reduction = Math.min(pets.size(), 5) * relic.getStatValue(player, stack, "pack", "resistance_per_pet");
+                var reduction = Math.min(pets.size(), 5) * relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getStatData("resistance_per_pet").getValue();
                 var clamped = Math.clamp(reduction, 0D, 0.9D);
                 var resisted = original * clamped;
 
@@ -175,8 +175,8 @@ public class HuntingBeltItem extends RelicItem {
 
                 event.setNewDamage((float) (original - resisted));
 
-                relic.addRelicExperience(player, stack, "pack", "pet_resistance", resisted);
-                relic.addAbilityMetricValue(player, stack, "pack", "damage_resisted", resisted);
+                relic.getRelicData(player, stack).getLevelingData().addExperience("pack", "pet_resistance", resisted);
+                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getStatisticData().getMetricData("damage_resisted").addValue(resisted);
 
                 break;
             }
@@ -198,12 +198,12 @@ public class HuntingBeltItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get())) {
                 var relic = (HuntingBeltItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(owner, stack, "pack"))
+                if (!relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner))
                     continue;
 
-                relic.addRelicExperience(owner, stack, "pack", "pet_damage", 1);
-                relic.addAbilityMetricValue(owner, stack, "pack", "pet_attacks", 1);
-                relic.addAbilityMetricValue(owner, stack, "pack", "pet_damage", damage);
+                relic.getRelicData(owner, stack).getLevelingData().addExperience("pack", "pet_damage", 1);
+                relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatisticData().getMetricData("pet_attacks").addValue(1);
+                relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatisticData().getMetricData("pet_damage").addValue(damage);
             }
         }
 
@@ -218,8 +218,8 @@ public class HuntingBeltItem extends RelicItem {
                 for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get())) {
                     var relic = (HuntingBeltItem) stack.getItem();
 
-                    if (!relic.canPlayerUseAbility(owner, stack, "pack")
-                            || !relic.isAbilityRankModifierUnlocked(owner, stack, "pack", "revival"))
+                    if (!relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner)
+                            || !relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").isRankModifierUnlocked("revival"))
                         continue;
 
                     var requiredHealth = CommonEvents.getReviveHealthRequirement(relic, owner, stack, entity);
@@ -231,8 +231,8 @@ public class HuntingBeltItem extends RelicItem {
                     entity.spawnAtLocation(boneStack);
                     entity.getPersistentData().putBoolean(BONE_DROP_TAG, true);
 
-                    relic.addRelicExperience(owner, stack, "pack", "bone_drop", 1);
-                    relic.addAbilityMetricValue(owner, stack, "pack", "pet_bones", 1);
+                    relic.getRelicData(owner, stack).getLevelingData().addExperience("pack", "bone_drop", 1);
+                    relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatisticData().getMetricData("pet_bones").addValue(1);
 
                     break;
                 }
@@ -271,7 +271,7 @@ public class HuntingBeltItem extends RelicItem {
         private static double getReviveHealthRequirement(HuntingBeltItem relic, LivingEntity owner, ItemStack stack, LivingEntity pet) {
             var attribute = pet.getAttribute(Attributes.MAX_HEALTH);
             var baseHealth = attribute != null ? attribute.getBaseValue() : pet.getMaxHealth();
-            var modifier = relic.getStatValue(owner, stack, "pack", "revival_cost");
+            var modifier = relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatData("revival_cost").getValue();
 
             return Math.max(1D, baseHealth * modifier);
         }

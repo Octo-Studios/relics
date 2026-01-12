@@ -34,6 +34,6 @@ public class CastTypeBadge extends AbilityBadge {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return false;
 
-        return relic.getAbilityCastData(entity, stack, ability).getType() == type;
+        return relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(ability).getCastData().getType() == type;
     }
 }

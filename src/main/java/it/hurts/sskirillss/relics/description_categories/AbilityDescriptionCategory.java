@@ -27,6 +27,6 @@ public class AbilityDescriptionCategory extends DescriptionCategory {
     public boolean shouldAppear(LivingEntity entity, ItemStack stack) {
         var relic = (IRelicItem) stack.getItem();
 
-        return !relic.getAbilitiesTemplate(entity, stack).getAbilities().isEmpty();
+        return !relic.getRelicData(entity, stack).getTemplate().getAbilities().getAbilities().isEmpty();
     }
 }

@@ -54,13 +54,15 @@ public class FixLevelingPoints implements CustomPacketPayload {
                 return;
             }
 
-            if (!relic.isSomethingWrongWithLevelingPoints(player, stack))
+            var relicData = relic.getRelicData(player, stack);
+
+            if (!relicData.getLevelingData().isPointsMismatch())
                 return;
 
-            relic.setRelicLevelingPoints(player, stack, relic.getRelicLevel(player, stack));
+            relicData.getLevelingData().setPoints(relicData.getLevelingData().getLevel());
 
-            for (var data : relic.getAbilitiesTemplate(player, stack).getAbilities().values())
-                relic.setAbilityLevel(player, stack, data.getId(), 0);
+            for (var data : relicData.getTemplate().getAbilities().getAbilities().values())
+                relicData.getAbilitiesData().getAbilityData(data.getId()).setLevel(0);
 
             try {
                 player.containerMenu.getSlot(slot).set(stack);

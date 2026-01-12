@@ -125,18 +125,18 @@ public class ReflectiveNecklaceItem extends RelicItem {
                 for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.REFLECTIVE_NECKLACE.get())) {
                     var relic = (ReflectiveNecklaceItem) stack.getItem();
 
-                    if (level.getRandom().nextDouble() > relic.getStatValue(entity, stack, "reflection", "chance"))
+                    if (level.getRandom().nextDouble() > relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("chance").getValue())
                         continue;
 
-                    var orbDamage = Math.clamp((float) (damage * relic.getStatValue(entity, stack, "reflection", "damage")), Float.MIN_VALUE, Float.MAX_VALUE);
+                    var orbDamage = Math.clamp((float) (damage * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("damage").getValue()), Float.MIN_VALUE, Float.MAX_VALUE);
 
                     var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
 
-                    orb.setPiercings(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "piercing") ? (int) relic.getStatValue(entity, stack, "reflection", "piercings") : 0);
-                    orb.setBounces(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "bounce") ? (int) relic.getStatValue(entity, stack, "reflection", "bounces") : 0);
-                    orb.setStun(relic.isAbilityRankModifierUnlocked(entity, stack, "reflection", "stun") ? (int) relic.getStatValue(entity, stack, "reflection", "stun") : 0);
-                    orb.setLifetime((int) (relic.getStatValue(entity, stack, "reflection", "lifetime") * 20));
-                    orb.setFlawless(relic.isRelicFlawless(entity, stack));
+                    orb.setPiercings(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").isRankModifierUnlocked("piercing") ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("piercings").getValue() : 0);
+                    orb.setBounces(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").isRankModifierUnlocked("bounce") ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("bounces").getValue() : 0);
+                    orb.setStun(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").isRankModifierUnlocked("stun") ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("stun").getValue() : 0);
+                    orb.setLifetime((int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("lifetime").getValue() * 20));
+                    orb.setFlawless(relic.getRelicData(entity, stack).isFlawless());
                     orb.setPos(entity.getEyePosition());
                     orb.setDamage(orbDamage);
                     orb.setOwner(entity);
@@ -149,9 +149,9 @@ public class ReflectiveNecklaceItem extends RelicItem {
 
                     level.addFreshEntity(orb);
 
-                    relic.addRelicExperience(entity, stack, "reflection", "construct", orbDamage * 0.1D);
+                    relic.getRelicData(entity, stack).getLevelingData().addExperience("reflection", "construct", orbDamage * 0.1D);
 
-                    relic.addAbilityMetricValue(entity, stack, "reflection", "total_orbs", 1);
+                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatisticData().getMetricData("total_orbs").addValue(1);
                 }
             }
 

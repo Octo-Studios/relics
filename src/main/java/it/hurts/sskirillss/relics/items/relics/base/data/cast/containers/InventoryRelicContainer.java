@@ -50,10 +50,12 @@ public class InventoryRelicContainer extends RelicContainer {
                 if (!(stack.getItem() instanceof IRelicItem relic))
                     continue;
 
-                for (AbilityTemplate abilityData : relic.getAbilitiesTemplate(player, stack).getAbilities().values()) {
-                    String id = abilityData.getId();
+                for (AbilityTemplate abilityTemplate : relic.getRelicData(player, stack).getTemplate().getAbilities().getAbilities().values()) {
+                    String id = abilityTemplate.getId();
 
-                    if (!relic.isAbilityUnlocked(player, stack, id) || !relic.canPlayerSeeAbility(player, stack, id))
+                    var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(id);
+
+                    if (!abilityData.isUnlocked() || !abilityData.canPlayerSee(player))
                         continue;
 
                     CastData castData = abilityData.getCastData();

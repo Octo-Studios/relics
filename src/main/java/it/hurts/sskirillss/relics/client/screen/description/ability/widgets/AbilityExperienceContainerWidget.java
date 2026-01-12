@@ -37,11 +37,16 @@ public class AbilityExperienceContainerWidget extends SimpleDescriptionContainer
         var maxWidth = 320;
 
         var ability = screen.getSelectedAbility();
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+        var template = abilityData.getTemplate();
+
+        if (template == null)
+            return new ArrayList<>();
 
         var group = new LinkedHashMap<String, List<MutableComponent>>();
         var conditions = new HashMap<String, MutableComponent>();
 
-        for (var source : relic.getExperienceSourcesTemplate(player, stack, ability).getSources().values()) {
+        for (var source : template.getExperienceSources().getSources().values()) {
             var state = source.getVisibilityState().apply(player, stack, ability, source.getId());
 
             if (state == VisibilityState.HIDDEN)

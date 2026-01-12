@@ -158,7 +158,7 @@
 //        ItemStack stack = EntityUtils.findEquippedCurio(event.getEntity(), RelicsItems.MAGMA_WALKER.get());
 //
 //        if (stack.getItem() instanceof IRelicItem relic && event.getSource() == event.getEntity().level().damageSources().hotFloor()
-//                && stack.getOrDefault(CHARGE, 0) <= relic.getStatValue(event.getEntity(), stack, "pace", "time")) {
+//                && stack.getOrDefault(CHARGE, 0) <= relic.getRelicData(event.getEntity(), stack).getAbilitiesData().getAbilityData("pace").getStatData("time").getValue()) {
 //            event.setCanceled(true);
 //        }
 //    }

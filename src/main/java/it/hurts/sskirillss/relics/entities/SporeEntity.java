@@ -133,7 +133,7 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
 
             if (entity.hurt(getCommandSenderWorld().damageSources().thrown(this, player), getDamage())) {
                 if (stack.getItem() instanceof IRelicItem relic)
-                    relic.spreadRelicExperience(player, stack, 1);
+                    relic.getRelicData(player, stack).spreadExperience(1);
 
                 if (this.isOnFire())
                     entity.igniteForTicks(this.getRemainingFireTicks());

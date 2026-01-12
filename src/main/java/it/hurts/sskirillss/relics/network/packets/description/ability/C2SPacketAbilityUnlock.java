@@ -58,7 +58,7 @@ public class C2SPacketAbilityUnlock implements CustomPacketPayload, IRelicValida
                 return;
             }
 
-            relic.setLockUnlocks(player, stack, ability, unlocks);
+            relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getLockData().setUnlocks(unlocks);
 
             try {
                 player.containerMenu.getSlot(slot).set(stack);

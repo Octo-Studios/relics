@@ -90,17 +90,36 @@ public class AbilityMetricTemplate extends MetricTemplate {
         }
 
         public MetricTemplateBuilder rankModifierVisibilityState(String rankModifier, VisibilityState state) {
-            this.conditionComponent = (entity, stack, ability) -> ((IRelicItem) stack.getItem()).getAbilityTemplate(entity, stack, ability).getRankModifiers().entries().stream()
-                    .filter(entry -> entry.getValue().equals(rankModifier))
-                    .map(Map.Entry::getKey)
-                    .findFirst()
-                    .map(integer -> Component.translatable("relics.description.ability.statistic.condition.rank", integer)).orElseGet(Component::empty);
+            this.conditionComponent = (entity, stack, ability) -> {
+                var relic = (IRelicItem) stack.getItem();
+                var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(ability);
 
-            return this.visibilityState((entity, stack, ability) -> ((IRelicItem) stack.getItem()).isAbilityRankModifierUnlocked(entity, stack, ability, rankModifier) ? VisibilityState.VISIBLE : state);
+                if (abilityData == null)
+                    return Component.empty();
+
+                return abilityData.getTemplate().getRankModifiers().entries().stream()
+                        .filter(entry -> entry.getValue().equals(rankModifier))
+                        .map(Map.Entry::getKey)
+                        .findFirst()
+                        .map(integer -> Component.translatable("relics.description.ability.statistic.condition.rank", integer))
+                        .orElseGet(Component::empty);
+            };
+
+            return this.visibilityState((entity, stack, ability) -> {
+                var relic = (IRelicItem) stack.getItem();
+                var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(ability);
+
+                return abilityData != null && abilityData.isRankModifierUnlocked(rankModifier) ? VisibilityState.VISIBLE : state;
+            });
         }
 
         public MetricTemplateBuilder modeVisibilityState(String mode, VisibilityState state) {
-            return this.visibilityState((entity, stack, ability) -> ((IRelicItem) stack.getItem()).getAbilityMode(entity, stack, ability).equals(mode) ? state : VisibilityState.VISIBLE);
+            return this.visibilityState((entity, stack, ability) -> {
+                var relic = (IRelicItem) stack.getItem();
+                var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(ability);
+
+                return abilityData != null && abilityData.getMode().equals(mode) ? state : VisibilityState.VISIBLE;
+            });
         }
 
         public AbilityMetricTemplate build() {

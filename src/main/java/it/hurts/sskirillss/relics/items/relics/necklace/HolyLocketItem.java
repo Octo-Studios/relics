@@ -190,17 +190,17 @@
 //                return;
 //
 //            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HOLY_LOCKET.get())) {
-//                if (!(stack.getItem() instanceof IRelicItem relic) || !relic.canPlayerUseAbility(player, stack, "ascension"))
+//                if (!(stack.getItem() instanceof IRelicItem relic) || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("ascension").canPlayerUse(player))
 //                    continue;
 //
 //                var effect = player.getEffect(RelicsMobEffects.IMMORTALITY);
 //                var duration = effect == null ? 0 : effect.getDuration();
-//                var maxDuration = (int) (relic.getStatValue(player, stack, "ascension", "max_duration") * 20);
+//                var maxDuration = (int) (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("ascension").getStatData("max_duration").getValue() * 20);
 //
 //                if (duration >= maxDuration)
 //                    continue;
 //
-//                player.addEffect(new MobEffectInstance(RelicsMobEffects.IMMORTALITY, (int) Math.min((relic.getStatValue(player, stack, "ascension", "duration") * 20) + duration, maxDuration)));
+//                player.addEffect(new MobEffectInstance(RelicsMobEffects.IMMORTALITY, (int) Math.min((relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("ascension").getStatData("duration").getValue() * 20) + duration, maxDuration)));
 //
 //                relic.spreadRelicExperience(player, stack, 1);
 //            }
@@ -228,11 +228,11 @@
 //                targets++;
 //
 //                for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HOLY_LOCKET.get())) {
-//                    if (!(stack.getItem() instanceof HolyLocketItem relic) || relic.getMode(stack) != Mode.HOLINESS || !relic.canPlayerUseAbility(player, stack, "faith")
-//                            || entity.position().distanceTo(player.position()) > relic.getStatValue(entity, stack, "faith", "radius"))
+//                    if (!(stack.getItem() instanceof HolyLocketItem relic) || relic.getMode(stack) != Mode.HOLINESS || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("faith").canPlayerUse(player)
+//                            || entity.position().distanceTo(player.position()) > relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("faith").getStatData("radius").getValue())
 //                        continue;
 //
-//                    var heal = (float) (amount * relic.getStatValue(entity, stack, "faith", "health"));
+//                    var heal = (float) (amount * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("faith").getStatData("health").getValue());
 //
 //                    var essence = new LifeEssenceEntity(RelicsEntities.LIFE_ESSENCE.get(), level);
 //
@@ -255,12 +255,12 @@
 //
 //            if (entity instanceof Player player && player.getHealth() < player.getMaxHealth()) {
 //                for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HOLY_LOCKET.get())) {
-//                    if (!(stack.getItem() instanceof HolyLocketItem relic) || relic.getMode(stack) != Mode.WICKEDNESS || !relic.canPlayerUseAbility(player, stack, "faith"))
+//                    if (!(stack.getItem() instanceof HolyLocketItem relic) || relic.getMode(stack) != Mode.WICKEDNESS || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("faith").canPlayerUse(player))
 //                        continue;
 //
 //                    targets = 0;
 //
-//                    for (var target : EntityUtils.gatherPotentialTargets(player, LivingEntity.class, relic.getStatValue(entity, stack, "faith", "radius")).toList()) {
+//                    for (var target : EntityUtils.gatherPotentialTargets(player, LivingEntity.class, relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("faith").getStatData("radius").getValue()).toList()) {
 //                        if (player.getStringUUID().equals(target.getStringUUID()))
 //                            continue;
 //
@@ -271,7 +271,7 @@
 //                        essence.setOwner(player);
 //                        essence.setTarget(target);
 //                        essence.setPos(player.getEyePosition());
-//                        essence.setDamage((float) (event.getAmount() * relic.getStatValue(entity, stack, "faith", "damage")));
+//                        essence.setDamage((float) (event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("faith").getStatData("damage").getValue()));
 //                        essence.setDeltaMovement(MathUtils.randomFloat(random), random.nextFloat(), MathUtils.randomFloat(random));
 //
 //                        level.addFreshEntity(essence);
@@ -293,7 +293,7 @@
 //                return;
 //
 //            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HOLY_LOCKET.get())) {
-//                if (!(stack.getItem() instanceof HolyLocketItem relic) || !relic.canPlayerUseAbility(player, stack, "penitence"))
+//                if (!(stack.getItem() instanceof HolyLocketItem relic) || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("penitence").canPlayerUse(player))
 //                    continue;
 //
 //                var amount = event.getAmount();
@@ -301,7 +301,7 @@
 //                if (amount >= 1F && !entity.isOnFire())
 //                    relic.spreadRelicExperience(player, stack, 1);
 //
-//                event.setAmount((float) (amount + (amount * relic.getStatValue(entity, stack, "penitence", "amount"))));
+//                event.setAmount((float) (amount + (amount * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("penitence").getStatData("amount").getValue())));
 //
 //                entity.igniteForSeconds(10F);
 //            }

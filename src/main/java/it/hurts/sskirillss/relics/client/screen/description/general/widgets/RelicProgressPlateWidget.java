@@ -35,7 +35,7 @@ public class RelicProgressPlateWidget extends AbstractPlateWidget {
 
         var time = player.tickCount + pPartialTick;
 
-        if (!relic.isRelicFlawless(player, stack))
+        if (!relic.getRelicData(player, stack).isFlawless())
             return;
 
         poseStack.pushPose();
@@ -72,7 +72,7 @@ public class RelicProgressPlateWidget extends AbstractPlateWidget {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return entries;
 
-        entries.add(Component.literal("").append(Component.translatable("relics.description.researching.general.relic_progress.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.calculateRelicProgress(minecraft.player, stack) * 100D, 1) + "%"));
+        entries.add(Component.literal("").append(Component.translatable("relics.description.researching.general.relic_progress.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getRelicData(minecraft.player, stack).calculateProgress() * 100D, 1) + "%"));
 
         entries.add(Component.literal(" "));
 
@@ -86,6 +86,6 @@ public class RelicProgressPlateWidget extends AbstractPlateWidget {
 
     @Override
     public String getValue(ItemStack stack) {
-        return stack.getItem() instanceof IRelicItem relic ? (MathUtils.round(relic.calculateRelicProgress(minecraft.player, stack) * 100, 1) + "%").replace(".0", "") : "";
+        return stack.getItem() instanceof IRelicItem relic ? (MathUtils.round(relic.getRelicData(minecraft.player, stack).calculateProgress() * 100, 1) + "%").replace(".0", "") : "";
     }
 }

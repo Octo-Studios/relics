@@ -317,7 +317,7 @@
 //
 //            var stack = player.getMainHandItem();
 //
-//            if (!(stack.getItem() instanceof InfiniteHamItem relic) || !relic.canPlayerUseAbility(player, stack, "meat_bat"))
+//            if (!(stack.getItem() instanceof InfiniteHamItem relic) || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("meat_bat").canPlayerUse(player))
 //                return;
 //
 //            var charge = relic.getPieces(stack);
@@ -327,8 +327,8 @@
 //
 //            relic.spreadRelicExperience(player, stack, charge);
 //
-//            event.setAmount((float) (event.getAmount() + (relic.getStatValue(player, stack, "meat_bat", "damage") * charge)));
-//            event.getEntity().addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) Math.round(relic.getStatValue(player, stack, "meat_bat", "stun") * charge * 20), 0));
+//            event.setAmount((float) (event.getAmount() + (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("meat_bat").getStatData("damage").getValue() * charge)));
+//            event.getEntity().addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) Math.round(relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("meat_bat").getStatData("stun").getValue() * charge * 20), 0));
 //
 //            relic.setPieces(stack, 0);
 //        }
@@ -344,7 +344,7 @@
 //            var slotStack = event.getSlotStack();
 //
 //            if (!(heldStack.getItem() instanceof PotionItem) || !(slotStack.getItem() instanceof InfiniteHamItem relic)
-//                    || !relic.canPlayerUseAbility(player, slotStack, "marinade"))
+//                    || !relic.getRelicData(player, slotStack).getAbilitiesData().getAbilityData("marinade").canPlayerUse(player))
 //                return;
 //
 //            var contents = heldStack.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY);

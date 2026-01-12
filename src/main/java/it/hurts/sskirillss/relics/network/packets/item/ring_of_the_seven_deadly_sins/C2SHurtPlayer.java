@@ -45,7 +45,7 @@ public class C2SHurtPlayer implements CustomPacketPayload {
                 if (player.hurt(player.level().damageSources().magic(), 1F)) {
                     relic.addHurtTimer(stack, 40);
 
-                    relic.addRelicMetricValue(player, stack, "unequip_attempts", 1);
+                    relic.getRelicData(player, stack).getStatisticData().getMetricData("unequip_attempts").addValue(1);
                 }
             });
         });

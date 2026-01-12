@@ -100,22 +100,22 @@
 //                return;
 //
 //            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.SHADOW_GLAIVE.get())) {
-//                if (!(stack.getItem() instanceof IRelicItem relic) || !relic.canPlayerUseAbility(player, stack, "mayhem")
-//                        || source.getRandom().nextDouble() > relic.getStatValue(player, stack, "mayhem", "chance"))
+//                if (!(stack.getItem() instanceof IRelicItem relic) || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("mayhem").canPlayerUse(player)
+//                        || source.getRandom().nextDouble() > relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("mayhem").getStatData("chance").getValue())
 //                    continue;
 //
 //                var level = target.getCommandSenderWorld();
 //
 //                var entity = new ShadowGlaiveEntity(RelicsEntities.SHADOW_GLAIVE.get(), level);
 //
-//                entity.setDamage((float) (damage * relic.getStatValue(player, stack, "mayhem", "damage")));
-//                entity.setMaxBounces((int) relic.getStatValue(player, stack, "mayhem", "bounces"));
+//                entity.setDamage((float) (damage * relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("mayhem").getStatData("damage").getValue()));
+//                entity.setMaxBounces((int) relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("mayhem").getStatData("bounces").getValue());
 //                entity.getBouncedTargets().add(target.getStringUUID());
 //                entity.setPos(target.getEyePosition());
 //                entity.setOwner(source);
 //
-//                if (relic.canPlayerUseAbility(player, stack, "cloning"))
-//                    entity.setChance((float) relic.getStatValue(player, stack, "cloning", "chance"));
+//                if (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("cloning").canPlayerUse(player))
+//                    entity.setChance((float) relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("cloning").getStatData("chance").getValue());
 //
 //                if (entity.locateNearestTargets().size() > 1) {
 //                    level.addFreshEntity(entity);

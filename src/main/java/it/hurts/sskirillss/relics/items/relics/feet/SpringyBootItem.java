@@ -172,7 +172,7 @@ public class SpringyBootItem extends RelicItem {
         var leaps = this.getLeaps(stack);
 
         if (entity.tickCount % 20 == 0 && (leaped || leaps > 0))
-            this.addAbilityMetricValue(entity, stack, "bounce", "bounce_duration", 1);
+            this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatisticData().getMetricData("bounce_duration").addValue(1);
 
         if (cooldown > 0)
             this.addBounceCooldown(stack, -1);
@@ -183,7 +183,7 @@ public class SpringyBootItem extends RelicItem {
                 this.setLeaps(stack, 0);
             }
 
-            if (this.isAbilityRankModifierUnlocked(entity, stack, "bounce", "disappearance") && leaps <= 0)
+            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").isRankModifierUnlocked("disappearance") && leaps <= 0)
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
         }
     }
@@ -203,12 +203,12 @@ public class SpringyBootItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
                 var relic = (SpringyBootItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "bounce") || relic.isLeaped(stack) || relic.getBounceCooldown(stack) > 0 || !entity.isShiftKeyDown())
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").canPlayerUse(entity) || relic.isLeaped(stack) || relic.getBounceCooldown(stack) > 0 || !entity.isShiftKeyDown())
                     continue;
 
-                power += relic.getStatValue(entity, stack, "bounce", "power");
+                power += relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("power").getValue();
 
-                relic.addAbilityMetricValue(entity, stack, "bounce", "primary_bounces", 1);
+                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatisticData().getMetricData("primary_bounces").addValue(1);
 
                 relic.setLeaped(stack, true);
                 relic.addBounceCooldown(stack, 5);
@@ -239,7 +239,7 @@ public class SpringyBootItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
                 var relic = (SpringyBootItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "bounce") || !relic.isLeaped(stack) || !relic.isAbilityRankModifierUnlocked(entity, stack, "bounce", "strike"))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").canPlayerUse(entity) || !relic.isLeaped(stack) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").isRankModifierUnlocked("strike"))
                     continue;
 
                 var leaps = relic.getLeaps(stack);
@@ -247,15 +247,15 @@ public class SpringyBootItem extends RelicItem {
                 if (totalLeaps < leaps)
                     totalLeaps = leaps;
 
-                var modifier = relic.getStatValue(entity, stack, "bounce", "damage_modifier");
+                var modifier = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("damage_modifier").getValue();
 
                 totalModifier += modifier;
 
                 var damage = event.getNewDamage() * leaps * modifier;
 
-                relic.addAbilityMetricValue(entity, stack, "bounce", "additional_damage", damage);
+                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatisticData().getMetricData("additional_damage").addValue(damage);
 
-                relic.addRelicExperience(entity, stack, "bounce", "strike", damage);
+                relic.getRelicData(entity, stack).getLevelingData().addExperience("bounce", "strike", damage);
             }
 
             var damage = event.getNewDamage() * totalLeaps * totalModifier;

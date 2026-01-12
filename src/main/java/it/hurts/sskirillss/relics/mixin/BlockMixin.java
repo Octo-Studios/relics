@@ -94,28 +94,28 @@ public class BlockMixin {
 
                             if (!livingEntity.isShiftKeyDown()) {
                                 if (!level.isClientSide()) {
-                                    relic.addRelicExperience(livingEntity, stack, "bounce", "bounce", 1);
+                                    relic.getRelicData(livingEntity, stack).getLevelingData().addExperience("bounce", "bounce", 1);
 
-                                    relic.addAbilityMetricValue(livingEntity, stack, "bounce", "secondary_bounces", 1);
+                                    relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getStatisticData().getMetricData("secondary_bounces").addValue(1);
                                 }
 
                                 level.playSound(null, livingEntity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.clamp(0.5F + speed * 0.5F, 0.5F, 2F), (float) Math.max(0.1F, 2F - speed * 0.75F));
 
                                 NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(livingEntity.getId(), motion.multiply(1F, -1F, 1F).toVector3f()), livingEntity);
                             } else {
-                                if (relic.isAbilityRankModifierUnlocked(livingEntity, stack, "bounce", "shockwave")) {
+                                if (relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").isRankModifierUnlocked("shockwave")) {
                                     var delayTicks = waveIndex * 20;
 
                                     var center = livingEntity.blockPosition();
                                     var verticalSpeed = Math.abs(livingEntity.getKnownMovement().y());
-                                    var radius = (int) Math.min(25, Math.round((1 + relic.getStatValue(livingEntity, stack, "bounce", "radius")) * verticalSpeed));
-                                    var damage = (float) relic.getStatValue(livingEntity, stack, "bounce", "damage");
-                                    var stun = (int) relic.getStatValue(livingEntity, stack, "bounce", "stun") * 20;
+                                    var radius = (int) Math.min(25, Math.round((1 + relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("radius").getValue()) * verticalSpeed));
+                                    var damage = (float) relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("damage").getValue();
+                                    var stun = (int) relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("stun").getValue() * 20;
 
-                                    relic.addRelicExperience(livingEntity, stack, "bounce", "create_shockwave", radius);
+                                    relic.getRelicData(livingEntity, stack).getLevelingData().addExperience("bounce", "create_shockwave", radius);
 
                                     ServerScheduler.schedule(delayTicks, () -> {
-                                        relic.addAbilityMetricValue(livingEntity, stack, "bounce", "shockwaves_amount", 1);
+                                        relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getStatisticData().getMetricData("shockwaves_amount").addValue(1);
 
                                         var poses = new ArrayList<BlockPos>();
 

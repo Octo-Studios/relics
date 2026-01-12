@@ -355,11 +355,11 @@
 //                    int stacks = stack.getOrDefault(CHARGE, 0);
 //
 //                    stack.set(CHARGE, ++stacks);
-//                    stack.set(TIME, (int) Math.round(relic.getStatValue(player, stack, "rage", "duration") * 20));
+//                    stack.set(TIME, (int) Math.round(relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("rage").getStatData("duration").getValue() * 20));
 //
 //                    relic.spreadRelicExperience(player, stack, 1);
 //
-//                    event.setAmount((float) (event.getAmount() + (event.getAmount() * (stacks * relic.getStatValue(player, stack, "rage", "dealt_damage")))));
+//                    event.setAmount((float) (event.getAmount() + (event.getAmount() * (stacks * relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("rage").getStatData("dealt_damage").getValue()))));
 //                }
 //            } else if (event.getEntity() instanceof Player player) {
 //                ItemStack stack = EntityUtils.findEquippedCurio(player, RelicsItems.RAGE_GLOVE.get());
@@ -373,7 +373,7 @@
 //                    if (stacks <= 0)
 //                        return;
 //
-//                    event.setAmount((float) (event.getAmount() + (event.getAmount() * (stacks * relic.getStatValue(player, stack, "rage", "incoming_damage")))));
+//                    event.setAmount((float) (event.getAmount() + (event.getAmount() * (stacks * relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("rage").getStatData("incoming_damage").getValue()))));
 //                }
 //            }
 //        }

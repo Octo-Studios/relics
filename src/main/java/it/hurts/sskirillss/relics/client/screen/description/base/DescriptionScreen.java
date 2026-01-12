@@ -59,7 +59,7 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
         if (LogoWidget.getRemainingClicks() != 0)
             this.addRenderableWidget(new LogoWidget(this.x + 313, this.y + 53, this));
 
-        if (((IRelicItem) stack.getItem()).isSomethingWrongWithLevelingPoints(minecraft.player, stack))
+        if (((IRelicItem) stack.getItem()).getRelicData(minecraft.player, stack).getLevelingData().isPointsMismatch())
             this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
         this.addRenderableWidget(new RelicProgressPlateWidget(this.x + 313, this.y + 77, this));

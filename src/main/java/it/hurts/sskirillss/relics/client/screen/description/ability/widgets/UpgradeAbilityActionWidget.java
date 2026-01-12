@@ -35,16 +35,25 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public boolean isLocked() {
-        return !(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility());
+        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
+            return true;
+
+        return !relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerUpgrade(minecraft.player);
     }
 
     @Override
     public void playDownSound(SoundManager handler) {
         if (getScreen().getStack().getItem() instanceof IRelicItem relic && !isLocked()) {
-            int level = relic.getAbilityLevel(minecraft.player, getScreen().getStack(), getAbility());
-            int maxLevel = relic.getAbilityTemplate(minecraft.player, getScreen().getStack(), getAbility()).getInitialMaxLevel();
+            var abilityData = relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility());
+            var template = abilityData.getTemplate();
 
-            handler.play(SimpleSoundInstance.forUI(RelicsSounds.TABLE_UPGRADE.get(), Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility()) ? 2F : 1F + ((float) level / maxLevel)));
+            if (template == null)
+                return;
+
+            int level = abilityData.getLevel();
+            int maxLevel = template.getInitialMaxLevel();
+
+            handler.play(SimpleSoundInstance.forUI(RelicsSounds.TABLE_UPGRADE.get(), Screen.hasShiftDown() && abilityData.mayPlayerUpgrade(minecraft.player) ? 2F : 1F + ((float) level / maxLevel)));
         }
     }
 
@@ -55,7 +64,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
 
         var poseStack = guiGraphics.pose();
 
-        var isQuick = Screen.hasShiftDown() && relic.mayPlayerUpgrade(minecraft.player, getScreen().getStack(), getAbility());
+        var isQuick = Screen.hasShiftDown() && relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerUpgrade(minecraft.player);
 
         var color = isQuick ? (float) (1.05F + (Math.sin((minecraft.player.tickCount + (getAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;
 
@@ -93,14 +102,14 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
         var newLine = Component.literal(" ");
 
         var currentExperience = EntityUtils.getPlayerTotalExperience(player);
-        var requiredExperience = relic.getUpgradePlayerExperienceCost(player, stack, getAbility());
+        var requiredExperience = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility()).getUpgradePlayerExperienceCost();
         var hasExperience = requiredExperience <= currentExperience;
 
-        var currentLevelingPoints = relic.getRelicLevelingPoints(player, stack);
+        var currentLevelingPoints = relic.getRelicData(player, stack).getLevelingData().getPoints();
         var requiredLevelingPoints = relic.getRelicTemplate(player, stack).getAbilities().getAbilities().get(ability).getRequiredPoints();
         var hasLevelingPoints = requiredLevelingPoints <= currentLevelingPoints;
 
-        var level = relic.getAbilityLevel(player, stack, ability);
+        var level = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getLevel();
         var maxLevel = relic.getRelicTemplate(player, stack).getAbilities().getAbilities().get(ability).getInitialMaxLevel();
         var isMaxLevel = level >= maxLevel;
 

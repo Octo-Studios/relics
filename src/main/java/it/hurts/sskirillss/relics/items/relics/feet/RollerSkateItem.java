@@ -152,21 +152,21 @@ public class RollerSkateItem extends RelicItem {
             var movement = entity.getKnownMovement().multiply(1, 0, 1).length();
 
             if (movement > 0F) {
-                this.addRelicExperience(entity, stack, "skating", "skating", 1D / 20D);
+                this.getRelicData(entity, stack).getLevelingData().addExperience("skating", "skating", 1D / 20D);
 
-                this.addAbilityMetricValue(entity, stack, "skating", "distance_traveled", movement);
+                this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatisticData().getMetricData("distance_traveled").addValue(movement);
             }
         } else if (duration > 0)
             this.addDuration(stack, -1);
 
         if (duration > 0) {
-            EntityUtils.resetAttribute(entity, stack, Attributes.MOVEMENT_SPEED, (float) (this.getStatValue(entity, stack, "skating", "speed") / this.getMaxDuration() * this.getDuration(stack)), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.resetAttribute(entity, stack, Attributes.MOVEMENT_SPEED, (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("speed").getValue() / this.getMaxDuration() * this.getDuration(stack)), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
-            if (this.isAbilityRankModifierUnlocked(entity, stack, "skating", "step_height"))
-                EntityUtils.resetAttribute(entity, stack, Attributes.STEP_HEIGHT, (float) this.getStatValue(entity, stack, "skating", "step_height"), AttributeModifier.Operation.ADD_VALUE);
+            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").isRankModifierUnlocked("step_height"))
+                EntityUtils.resetAttribute(entity, stack, Attributes.STEP_HEIGHT, (float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("step_height").getValue(), AttributeModifier.Operation.ADD_VALUE);
         }
 
-        if (this.isAbilityRankModifierUnlocked(entity, stack, "skating", "sparkling")) {
+        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").isRankModifierUnlocked("sparkling")) {
             var motion = entity.getDeltaMovement();
 
             var xMotion = motion.x;
@@ -204,7 +204,7 @@ public class RollerSkateItem extends RelicItem {
                             var deltaZ = -directionZ * force + directionX * offset;
 
                             NetworkHandler.sendToServer(new C2SCreateSpark(slotContext.identifier(), slotContext.index(), entity.position().toVector3f(), new Vector3f(deltaX, deltaY, deltaZ), entity.getStringUUID(),
-                                    (float) (this.getStatValue(entity, stack, "skating", "damage") * speed), (float) (this.getStatValue(entity, stack, "skating", "ignite") * speed), this.isRelicFlawless(entity, stack)));
+                                    (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("damage").getValue() * speed), (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("ignite").getValue() * speed), this.getRelicData(entity, stack).isFlawless()));
                         }
                     }
                 }
@@ -270,16 +270,16 @@ public class RollerSkateItem extends RelicItem {
 
                 var duration = relic.getDuration(stack);
 
-                if (!relic.canPlayerUseAbility(entity, stack, "skating") || !relic.isAbilityRankModifierUnlocked(entity, stack, "skating", "resistance") || duration <= 0)
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").isRankModifierUnlocked("resistance") || duration <= 0)
                     continue;
 
-                var modifier = (float) (original * (relic.getStatValue(entity, stack, "skating", "resistance") * ((float) duration / relic.getMaxDuration())));
+                var modifier = (float) (original * (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("resistance").getValue() * ((float) duration / relic.getMaxDuration())));
 
                 event.setNewDamage(original - modifier);
 
-                relic.addAbilityMetricValue(entity, stack, "skating", "damage_resisted", modifier);
+                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatisticData().getMetricData("damage_resisted").addValue(modifier);
 
-                relic.addRelicExperience(entity, stack, "skating", "resisting_damage", modifier);
+                relic.getRelicData(entity, stack).getLevelingData().addExperience("skating", "resisting_damage", modifier);
             }
         }
     }

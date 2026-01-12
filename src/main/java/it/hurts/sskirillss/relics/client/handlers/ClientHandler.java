@@ -54,7 +54,7 @@ public class ClientHandler {
             ItemProperties.register(RelicsItems.MIDNIGHT_MANTLE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "phase"),
                     (stack, world, entity, id) -> {
                         var relic = (MidnightMantleItem) stack.getItem();
-                        var mode = relic.getAbilityMode(entity, stack, "phase");
+                        var mode = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode();
 
                         return mode.equals("full_moon") ? 1 : 0;
                     });
@@ -62,7 +62,7 @@ public class ClientHandler {
                     (stack, world, entity, id) -> {
                         var relic = (SphereOfSelfSacrifice) stack.getItem();
                         var stacks = relic.getHealingStacks(stack).size();
-                        var maxStacks = relic.getStatValue(entity, stack, "sacrifice", "stacks");
+                        var maxStacks = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sacrifice").getStatData("stacks").getValue();
 
                         return stacks == 0 ? 0 : stacks < maxStacks ? 1 : 2;
                     });
@@ -72,7 +72,7 @@ public class ClientHandler {
                     continue;
 
                 ItemProperties.register(item, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "flawless"),
-                        (stack, level, entity, id) -> relic.isRelicFlawless(entity, stack) ? 1 : 0);
+                        (stack, level, entity, id) -> relic.getRelicData(entity, stack).isFlawless() ? 1 : 0);
             }
         });
 

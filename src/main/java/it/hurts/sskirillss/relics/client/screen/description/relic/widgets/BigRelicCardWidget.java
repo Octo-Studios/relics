@@ -83,7 +83,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         int xOff = 0;
 
-        if (relic.hasUnlockedUpgradeableAbility(player, stack)) {
+        if (relic.getRelicData(player, stack).getAbilitiesData().hasUnlockedUpgradeableAbility()) {
             for (int i = 0; i < 5; i++) {
                 GUIRenderer.begin(DescriptionTextures.BIG_STAR_HOLE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
@@ -95,7 +95,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
             xOff = 0;
 
-            var quality = relic.calculateRelicQuality(player, stack);
+            var quality = relic.getRelicData(player, stack).calculateQuality();
             var isAliquot = quality % 2 == 1;
 
             for (int i = 0; i < Math.floor(quality / 2D); i++) {
@@ -137,13 +137,13 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.scale(0.75F, 0.75F, 1F);
 
-        MutableComponent levelComponent = Component.literal(String.valueOf(relic.getRelicLevel(player, stack))).withStyle(ChatFormatting.BOLD);
+        MutableComponent levelComponent = Component.literal(String.valueOf(relic.getRelicData(player, stack).getLevelingData().getLevel())).withStyle(ChatFormatting.BOLD);
 
         guiGraphics.drawString(minecraft.font, levelComponent, (int) (((getX() + 26.5F) * 1.33F) - (minecraft.font.width(levelComponent) / 2F)), (int) ((getY() + 4.5F) * 1.33F), 0xFFE278, false);
 
         poseStack.popPose();
 
-        if (isHovered() && relic.hasUnlockedUpgradeableAbility(player, stack))
+        if (isHovered() && relic.getRelicData(player, stack).getAbilitiesData().hasUnlockedUpgradeableAbility())
             GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() - 1, getY() - 1)
@@ -237,7 +237,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         ItemStack stack = screen.getStack();
 
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.hasUnlockedUpgradeableAbility(minecraft.player, stack))
+        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.getRelicData(minecraft.player, stack).getAbilitiesData().hasUnlockedUpgradeableAbility())
             return;
 
         var poseStack = guiGraphics.pose();
@@ -248,8 +248,8 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("relics.description.researching.relic.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevel(minecraft.player, stack) + "/" + relic.calculateRelicMaxLevel(minecraft.player, stack)),
-                Component.literal("").append(Component.translatable("relics.description.researching.relic.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.calculateRelicQuality(minecraft.player, stack) / 2F, 1) + "/" + relic.getRelicMaxQuality(minecraft.player, stack) / 2),
+                Component.literal("").append(Component.translatable("relics.description.researching.relic.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicData(minecraft.player, stack).getLevelingData().getLevel() + "/" + relic.getRelicData(minecraft.player, stack).calculateMaxLevel()),
+                Component.literal("").append(Component.translatable("relics.description.researching.relic.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.getRelicData(minecraft.player, stack).calculateQuality() / 2F, 1) + "/" + relic.getRelicData(minecraft.player, stack).getMaxQuality() / 2),
                 Component.literal(" ")
         );
 

@@ -221,26 +221,26 @@ public class LeafyMantleItem extends RelicItem {
             if (progress < this.getMaxProgress())
                 this.addCurrentProgress(stack, 1);
 
-            if (this.isAbilityRankModifierUnlocked(entity, stack, "camouflage", "disappearance"))
+            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").isRankModifierUnlocked("disappearance"))
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
 
             if (entity.tickCount % 20 == 0) {
                 if (entity.getHealth() < entity.getMaxHealth()) {
-                    var heal = (float) Math.min(this.getStatValue(entity, stack, "camouflage", "heal"), entity.getMaxHealth() - entity.getHealth());
+                    var heal = (float) Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatData("heal").getValue(), entity.getMaxHealth() - entity.getHealth());
 
                     entity.heal(heal);
 
                     if (!level.isClientSide()) {
-                        this.addAbilityMetricValue(entity, stack, "camouflage", "heal_amount", heal);
+                        this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatisticData().getMetricData("heal_amount").addValue(heal);
 
-                        this.addRelicExperience(entity, stack, "camouflage", "healing", heal);
+                        this.getRelicData(entity, stack).getLevelingData().addExperience("camouflage", "healing", heal);
                     }
                 }
 
                 if (!level.isClientSide()) {
-                    this.addRelicExperience(entity, stack, "camouflage", "hiding", 1);
+                    this.getRelicData(entity, stack).getLevelingData().addExperience("camouflage", "hiding", 1);
 
-                    this.addAbilityMetricValue(entity, stack, "camouflage", "hide_duration", 1);
+                    this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatisticData().getMetricData("hide_duration").addValue(1);
                 }
             }
         } else {
@@ -281,8 +281,8 @@ public class LeafyMantleItem extends RelicItem {
                 if (!relic.isHiding(stack))
                     continue;
 
-                if (relic.canPlayerUseAbility(entity, stack, "camouflage") && relic.isAbilityRankModifierUnlocked(entity, stack, "camouflage", "absorption"))
-                    total += (float) relic.getStatValue(entity, stack, "camouflage", "absorption");
+                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) && relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").isRankModifierUnlocked("absorption"))
+                    total += (float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatData("absorption").getValue();
             }
 
             var current = entity.getAbsorptionAmount();
@@ -307,7 +307,7 @@ public class LeafyMantleItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
                 var relic = (LeafyMantleItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "camouflage") || !level.getBlockState(entity.getBlockPosBelowThatAffectsMyMovement()).is(BlockTags.LEAVES))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) || !level.getBlockState(entity.getBlockPosBelowThatAffectsMyMovement()).is(BlockTags.LEAVES))
                     continue;
 
                 event.setCanceled(true);
@@ -339,17 +339,17 @@ public class LeafyMantleItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
                 var relic = (LeafyMantleItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "revival"))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").canPlayerUse(entity))
                     continue;
 
                 if (diff > 0)
                     break;
 
                 if (!level.isClientSide())
-                    relic.addAbilityMetricValue(entity, stack, "revival", "damage_negated", Math.abs(diff));
+                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatisticData().getMetricData("damage_negated").addValue(Math.abs(diff));
 
-                var radius = (int) Math.ceil(relic.getStatValue(entity, stack, "revival", "radius"));
-                var heal = (float) relic.getStatValue(entity, stack, "revival", "heal");
+                var radius = (int) Math.ceil(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatData("radius").getValue());
+                var heal = (float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatData("heal").getValue();
 
                 var center = entity.blockPosition();
 
@@ -379,9 +379,9 @@ public class LeafyMantleItem extends RelicItem {
                         var randomVec = new Vec3(MathUtils.randomFloat(random), MathUtils.randomFloat(random), MathUtils.randomFloat(random));
                         var perpendicular = randomVec.subtract(toPlayer.scale(randomVec.dot(toPlayer))).normalize().scale(0.5D + random.nextDouble() * 0.5D);
 
-                        leaves.setParalysis((float) relic.getStatValue(entity, stack, "revival", "paralysis"));
+                        leaves.setParalysis((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatData("paralysis").getValue());
                         leaves.setDeltaMovement(perpendicular.scale(0.5F + random.nextFloat()));
-                        leaves.setFlawless(relic.isRelicFlawless(entity, stack));
+                        leaves.setFlawless(relic.getRelicData(entity, stack).isFlawless());
                         leaves.setPos(posVec.x(), posVec.y(), posVec.z());
                         leaves.setBlockState(level.getBlockState(pos));
                         leaves.setTarget(entity);
@@ -394,9 +394,9 @@ public class LeafyMantleItem extends RelicItem {
                         level.destroyBlock(pos, false);
 
                         if (!level.isClientSide()) {
-                            relic.addAbilityMetricValue(entity, stack, "revival", "leaves_consumed", 1);
+                            relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatisticData().getMetricData("leaves_consumed").addValue(1);
 
-                            relic.addRelicExperience(entity, stack, "revival", "consuming_leaves", 1);
+                            relic.getRelicData(entity, stack).getLevelingData().addExperience("revival", "consuming_leaves", 1);
                         }
                     });
 
@@ -427,10 +427,10 @@ public class LeafyMantleItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
                 var relic = (LeafyMantleItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "camouflage") || !relic.isAbilityRankModifierUnlocked(entity, stack, "camouflage", "disappearance"))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").isRankModifierUnlocked("disappearance"))
                     continue;
 
-                ServerScheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getStatValue(entity, stack, "camouflage", "cooldown") * 20)));
+                ServerScheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatData("cooldown").getValue() * 20)));
             }
         }
 

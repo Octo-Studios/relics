@@ -43,7 +43,10 @@ public class AbilityArgument implements ArgumentType<String> {
         if (player == null || !(player.getMainHandItem().getItem() instanceof IRelicItem relic))
             return Suggestions.empty();
 
-        List<String> result = new ArrayList<>(relic.getRelicTemplate(player, player.getMainHandItem()).getAbilities().getAbilities().keySet());
+        var stack = player.getMainHandItem();
+        var relicData = relic.getRelicData(player, stack);
+
+        List<String> result = new ArrayList<>(relicData.getAbilitiesData().getAbilityIds());
 
         result.add("all");
 

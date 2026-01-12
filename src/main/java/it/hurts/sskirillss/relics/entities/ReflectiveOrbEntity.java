@@ -178,7 +178,7 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
             this.takeBounces = false;
 
             if (stack.getItem() instanceof ReflectiveNecklaceItem relic && this.getOwner() instanceof LivingEntity owner)
-                relic.addAbilityMetricValue(owner, stack, "reflection", "total_bounces", 1);
+                relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("reflection").getStatisticData().getMetricData("total_bounces").addValue(1);
 
             if (this.spawnBounceParticles) {
                 var up = Math.abs(normal.y) < 0.99 ? new Vec3(0, 1, 0) : new Vec3(1, 0, 0);
@@ -284,12 +284,12 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (stun * 20), 0, false, false));
 
             if (stack.getItem() instanceof ReflectiveNecklaceItem relic) {
-                relic.addAbilityMetricValue(entity, stack, "reflection", "total_damage", this.getDamage());
+                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatisticData().getMetricData("total_damage").addValue(this.getDamage());
 
                 if (stun > 0)
-                    relic.addAbilityMetricValue(entity, stack, "reflection", "total_stun", stun);
+                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatisticData().getMetricData("total_stun").addValue(stun);
 
-                relic.addRelicExperience(entity, stack, "reflection", "impact", 1);
+                relic.getRelicData(entity, stack).getLevelingData().addExperience("reflection", "impact", 1);
             }
         }
 

@@ -144,7 +144,7 @@ public class KineticBeltItem extends RelicItem {
     @Override
     public RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
         return RelicSlotModifier.builder()
-                .modifier("charm", (int) Math.round(getStatValue(entity, stack, "slots", "amount")))
+                .modifier("charm", (int) Math.round(getRelicData(entity, stack).getAbilitiesData().getAbilityData("slots").getStatData("amount").getValue()))
                 .build();
     }
 
@@ -154,7 +154,7 @@ public class KineticBeltItem extends RelicItem {
 
         var entity = slotContext.entity();
 
-        if (!this.canPlayerUseAbility(entity, stack, "gliding") || this.getAbilityMode(entity, stack, "gliding").equals("disabled"))
+        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled"))
             return;
 
         var level = entity.level();
@@ -177,7 +177,7 @@ public class KineticBeltItem extends RelicItem {
         }
 
         if (isLanded) {
-            if (this.isAbilityRankModifierUnlocked(entity, stack, "gliding", "momentum") && !onGround && isActive)
+            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").isRankModifierUnlocked("momentum") && !onGround && isActive)
                 this.setLanded(stack, false);
         } else {
             if (onGround && !isActive)
@@ -201,13 +201,13 @@ public class KineticBeltItem extends RelicItem {
 
         if (isActive) {
             if (entity.tickCount % 20 == 0) {
-                this.addAbilityMetricValue(entity, stack, "gliding", "duration", 1);
+                this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatisticData().getMetricData("duration").addValue(1);
 
-                this.addRelicExperience(entity, stack, "gliding", "gliding", 1);
+                this.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "gliding", 1);
             }
 
             if (!hasAttribute)
-                EntityUtils.applyAttribute(entity, stack, Attributes.GRAVITY, (float) -Math.min(this.getStatValue(entity, stack, "gliding", "efficiency"), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                EntityUtils.applyAttribute(entity, stack, Attributes.GRAVITY, (float) -Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue(), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
             var prevPosition = new Vec3(entity.xOld, entity.yOld, entity.zOld);
             var position = entity.getPosition(0.25F);
@@ -240,7 +240,7 @@ public class KineticBeltItem extends RelicItem {
                     var vy = (random.nextFloat() * 2 - 1) * 0.01F;
                     var vz = (random.nextFloat() * 2 - 1) * 0.01F;
 
-                    level.addParticle(ParticleUtils.constructSimpleSpark(this.isRelicFlawless(entity, stack) ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(random.nextInt(50), 75 + random.nextInt(100), 255), 0.1F + random.nextFloat() * 0.15F, 100 + random.nextInt(20), 0.995F), x, y, z, vx, vy, vz);
+                    level.addParticle(ParticleUtils.constructSimpleSpark(this.getRelicData(entity, stack).isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(random.nextInt(50), 75 + random.nextInt(100), 255), 0.1F + random.nextFloat() * 0.15F, 100 + random.nextInt(20), 0.995F), x, y, z, vx, vy, vz);
                 }
             }
         } else if (hasAttribute)
@@ -256,8 +256,8 @@ public class KineticBeltItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
                 var relic = (KineticBeltItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "gliding") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled")
-                        || !relic.isAbilityRankModifierUnlocked(entity, stack, "gliding", "momentum") || !relic.isActive(stack))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
+                        || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").isRankModifierUnlocked("momentum") || !relic.isActive(stack))
                     continue;
 
                 event.setDistance(0);
@@ -276,15 +276,15 @@ public class KineticBeltItem extends RelicItem {
                 for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.KINETIC_BELT.get())) {
                     var relic = (KineticBeltItem) stack.getItem();
 
-                    if (!relic.canPlayerUseAbility(source, stack, "gliding") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled")
-                            || !relic.isAbilityRankModifierUnlocked(source, stack, "gliding", "strike") || !relic.isActive(stack))
+                    if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(source) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
+                            || !relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").isRankModifierUnlocked("strike") || !relic.isActive(stack))
                         continue;
 
-                    var additional = original * relic.getStatValue(entity, stack, "gliding", "damage");
+                    var additional = original * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("damage").getValue();
 
-                    relic.addRelicExperience(entity, stack, "gliding", "strike", additional);
+                    relic.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "strike", additional);
 
-                    relic.addAbilityMetricValue(entity, stack, "gliding", "damage", additional);
+                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatisticData().getMetricData("damage").addValue(additional);
 
                     event.setNewDamage((float) (original + additional));
                 }
@@ -293,15 +293,15 @@ public class KineticBeltItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
                 var relic = (KineticBeltItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "gliding") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled")
-                        || !relic.isAbilityRankModifierUnlocked(entity, stack, "gliding", "resistance") || !relic.isActive(stack))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
+                        || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").isRankModifierUnlocked("resistance") || !relic.isActive(stack))
                     continue;
 
-                var additional = original * relic.getStatValue(entity, stack, "gliding", "resistance");
+                var additional = original * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("resistance").getValue();
 
-                relic.addRelicExperience(entity, stack, "gliding", "resistance", additional);
+                relic.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "resistance", additional);
 
-                relic.addAbilityMetricValue(entity, stack, "gliding", "resistance", additional);
+                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatisticData().getMetricData("resistance").addValue(additional);
 
                 event.setNewDamage((float) (original - additional));
             }

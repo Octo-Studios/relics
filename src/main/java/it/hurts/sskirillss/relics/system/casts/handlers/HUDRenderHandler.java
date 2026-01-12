@@ -182,9 +182,15 @@ public class HUDRenderHandler {
 
         PoseStack poseStack = guiGraphics.pose();
 
-        boolean isLocked = !relic.canPlayerUseAbility(player, stack, ability.getId());
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability.getId());
+        var template = abilityData.getTemplate();
 
-        ResourceLocation card = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/abilities/" + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "/" + relic.getAbilityTemplate(player, stack, ability.getId()).getIcon().apply(player, stack, ability.getId()) + ".png");
+        if (template == null)
+            return;
+
+        boolean isLocked = !abilityData.canPlayerUse(player);
+
+        ResourceLocation card = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/abilities/" + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "/" + template.getIcon().apply(player, stack, ability.getId()) + ".png");
 
         RenderSystem.setShaderTexture(0, card);
 
@@ -199,8 +205,8 @@ public class HUDRenderHandler {
 
         RenderUtils.renderTextureFromCenter(poseStack, x - scale + 1, y - scale + 2, width, height, scale + 0.025F);
 
-        int cooldown = relic.getAbilityCooldown(player, stack, ability.getId());
-        int cap = relic.getAbilityCooldownCap(player, stack, ability.getId());
+        int cooldown = abilityData.getExtenderData().getCooldown();
+        int cap = abilityData.getExtenderData().getCooldownCap();
 
         String iconDescription = "";
 
@@ -220,8 +226,8 @@ public class HUDRenderHandler {
 
         RenderUtils.renderTextureFromCenter(poseStack, x, y + 1, 0, 0, 30, 41, 30, 41, scale);
 
-        if (relic.isAbilityTicking(player, stack, ability.getId())) {
-            CastType type = relic.getAbilityTemplate(player, stack, ability.getId()).getCastData().getType();
+        if (abilityData.isTicking()) {
+            CastType type = abilityData.getCastData().getType();
 
             if (type == CastType.TOGGLEABLE) {
                 RenderSystem.setShaderTexture(0, STATE_TOGGLEABLE);
@@ -418,8 +424,12 @@ public class HUDRenderHandler {
                 if (ability != null) {
                     ItemStack stack = ability.getSlot().gatherStack(player);
 
-                    if (stack.getItem() instanceof IRelicItem relic && relic.getAbilityTemplate(player, stack, ability.getId()) != null && relic.canPlayerUseAbility(player, stack, ability.getId()))
-                        relic.tickActiveAbilitySelection(stack, player, ability.getId());
+                    if (stack.getItem() instanceof IRelicItem relic) {
+                        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability.getId());
+
+                        if (abilityData.getTemplate() != null && abilityData.canPlayerUse(player))
+                            relic.tickActiveAbilitySelection(stack, player, ability.getId());
+                    }
                 }
 
                 if (animationDelta < 5)
@@ -470,12 +480,14 @@ public class HUDRenderHandler {
             if (!(stack.getItem() instanceof IRelicItem relic))
                 return;
 
-            if (!relic.canPlayerUseAbility(player, stack, ability.getId())) {
+            var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability.getId());
+
+            if (!abilityData.canPlayerUse(player)) {
                 int delta = cache.getIconShakeDelta();
 
                 cache.setIconShakeDelta(Math.min(20, delta + (delta > 0 ? 5 : 15)));
 
-                MC.getSoundManager().play(SimpleSoundInstance.forUI(relic.isAbilityOnCooldown(player, stack, ability.getId())
+                MC.getSoundManager().play(SimpleSoundInstance.forUI(abilityData.isOnCooldown()
                         ? RelicsSounds.ABILITY_COOLDOWN.get() : RelicsSounds.ABILITY_LOCKED.get(), 1F));
 
                 event.setCanceled(true);
@@ -483,9 +495,9 @@ public class HUDRenderHandler {
                 return;
             }
 
-            boolean isTicking = relic.isAbilityTicking(player, stack, ability.getId());
+            boolean isTicking = abilityData.isTicking();
 
-            CastType type = relic.getAbilityTemplate(player, stack, ability.getId()).getCastData().getType();
+            CastType type = abilityData.getCastData().getType();
 
             MC.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.ABILITY_CAST.get(), 1F));
 
@@ -535,13 +547,14 @@ public class HUDRenderHandler {
 
             ItemStack stack = ability.getSlot().gatherStack(player);
 
-            if (!(stack.getItem() instanceof IRelicItem relic) || !relic.getAbilitiesTemplate(player, stack).getAbilities().containsKey(ability.getId()))
+            if (!(stack.getItem() instanceof IRelicItem relic) || !relic.getRelicData(player, stack).getTemplate().getAbilities().getAbilities().containsKey(ability.getId()))
                 return;
 
-            boolean isTicking = relic.isAbilityTicking(player, stack, ability.getId());
+            var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability.getId());
+            boolean isTicking = abilityData.isTicking();
             boolean isCasting = Minecraft.getInstance().mouseHandler.isLeftPressed();
 
-            AbilityTemplate entry = relic.getAbilityTemplate(player, stack, ability.getId());
+            AbilityTemplate entry = abilityData.getTemplate();
 
             if (entry == null)
                 return;

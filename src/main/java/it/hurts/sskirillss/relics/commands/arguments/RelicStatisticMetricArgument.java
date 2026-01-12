@@ -47,7 +47,8 @@ public class RelicStatisticMetricArgument implements ArgumentType<String> {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return Suggestions.empty();
 
-        var result = new ArrayList<>(relic.getRelicStatisticTemplate(player, player.getMainHandItem()).getMetrics().keySet());
+        var relicData = relic.getRelicData(player, stack);
+        var result = new ArrayList<>(relicData.getStatisticData().getTemplate().getMetrics().keySet());
 
         result.add("all");
 

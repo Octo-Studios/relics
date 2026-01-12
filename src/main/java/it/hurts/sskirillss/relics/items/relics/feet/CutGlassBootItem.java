@@ -125,7 +125,7 @@ public class CutGlassBootItem extends RelicItem {
         var entity = slotContext.entity();
         var level = entity.level();
 
-        if (!this.canPlayerUseAbility(entity, stack, "glass"))
+        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(entity))
             return;
 
         if (level.isClientSide())
@@ -143,7 +143,7 @@ public class CutGlassBootItem extends RelicItem {
             var entry = this.getFluidEntries(entity, stack).get(state.getType().toString());
 
             if (entry != null)
-                EntityUtils.resetAttribute(entity, stack, attribute, (float) (entry.getAmount() / 1000F * this.getStatValue(entity, stack, "glass", "speed")) - 0.5F, operation);
+                EntityUtils.resetAttribute(entity, stack, attribute, (float) (entry.getAmount() / 1000F * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("speed").getValue()) - 0.5F, operation);
         }
     }
 
@@ -171,11 +171,11 @@ public class CutGlassBootItem extends RelicItem {
         for (var fluid : this.getFluidEntries(entity, stack).values())
             amount += fluid.getAmount();
 
-        return Math.max(amount, (int) Math.ceil(this.getStatValue(entity, stack, "glass", "capacity") * 1000));
+        return Math.max(amount, (int) Math.ceil(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("capacity").getValue() * 1000));
     }
 
     public int getMaxFluidEntries(LivingEntity entity, ItemStack stack) {
-        return Math.max(this.getFluidEntries(entity, stack).size(), (int) Math.ceil(this.getStatValue(entity, stack, "glass", "max_fluids")));
+        return Math.max(this.getFluidEntries(entity, stack).size(), (int) Math.ceil(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("max_fluids").getValue()));
     }
 
     public int getSelectedFluidIndex(LivingEntity entity, ItemStack stack) {
@@ -275,7 +275,7 @@ public class CutGlassBootItem extends RelicItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
 
-        if (!this.canPlayerUseAbility(player, stack, "glass"))
+        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(player))
             return InteractionResultHolder.pass(stack);
 
         var hitResult = Item.getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
@@ -607,7 +607,7 @@ public class CutGlassBootItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CUT_GLASS_BOOT.get())) {
                 var relic = (CutGlassBootItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "glass"))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(entity))
                     continue;
 
                 var fluids = relic.getFluidEntries(entity, stack);
@@ -617,9 +617,9 @@ public class CutGlassBootItem extends RelicItem {
 
                 if (entity.tickCount % 20 == 0) {
                     if (entity.getKnownMovement().multiply(1, 0, 1).length() > 0)
-                        relic.addRelicExperience(entity, stack, "glass", "standing", 1);
+                        relic.getRelicData(entity, stack).getLevelingData().addExperience("glass", "standing", 1);
 
-                    relic.addAbilityMetricValue(entity, stack, "glass", "duration", 1);
+                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatisticData().getMetricData("duration").addValue(1);
                 }
 
                 event.setCanceled(true);
@@ -687,7 +687,7 @@ public class CutGlassBootItem extends RelicItem {
 
         @Override
         public FluidStack getFluidInTank(int tank) {
-            if (!item.canPlayerUseAbility(null, container, "glass"))
+            if (!item.getRelicData(null, container).getAbilitiesData().getAbilityData("glass").canPlayerUse(null))
                 return FluidStack.EMPTY;
 
             var fluid = item.getSelectedFluid(null, container);
@@ -720,7 +720,7 @@ public class CutGlassBootItem extends RelicItem {
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            if (!item.canPlayerUseAbility(null, container, "glass"))
+            if (!item.getRelicData(null, container).getAbilitiesData().getAbilityData("glass").canPlayerUse(null))
                 return 0;
 
             if (resource.isEmpty())
@@ -764,7 +764,7 @@ public class CutGlassBootItem extends RelicItem {
 
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
-            if (!item.canPlayerUseAbility(null, container, "glass"))
+            if (!item.getRelicData(null, container).getAbilitiesData().getAbilityData("glass").canPlayerUse(null))
                 return FluidStack.EMPTY;
 
             if (resource.isEmpty())
@@ -791,7 +791,7 @@ public class CutGlassBootItem extends RelicItem {
 
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
-            if (!item.canPlayerUseAbility(null, container, "glass"))
+            if (!item.getRelicData(null, container).getAbilitiesData().getAbilityData("glass").canPlayerUse(null))
                 return FluidStack.EMPTY;
 
             if (maxDrain <= 0)

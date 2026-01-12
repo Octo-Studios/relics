@@ -90,7 +90,7 @@ public class TooltipBorderHandler {
 
         var xOff = 0;
 
-        for (int i = 1; i < relic.calculateRelicQuality(player, stack) + 1; i++) {
+        for (int i = 1; i < relic.getRelicData(player, stack).calculateQuality() + 1; i++) {
             var isAliquot = i % 2 == 1;
 
             var color = (float) (1F + Math.sin(player.tickCount * i * 0.05F) * 0.1F);

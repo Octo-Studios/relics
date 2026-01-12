@@ -179,11 +179,11 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
                 if (!level.isClientSide()) {
                     if (stack.getItem() instanceof JellyfishNecklaceItem relic && owner instanceof LivingEntity entity) {
-                        relic.addAbilityMetricValue(entity, stack, "shock", "arcs_bounces", 1);
+                        relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatisticData().getMetricData("arcs_bounces").addValue(1);
 
-                        relic.addAbilityMetricValue(entity, stack, "shock", "arcs_damage", damage);
+                        relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatisticData().getMetricData("arcs_damage").addValue(damage);
 
-                        relic.addRelicExperience(entity, stack, "shock", "arcs_bouncing", 1);
+                        relic.getRelicData(entity, stack).getLevelingData().addExperience("shock", "arcs_bouncing", 1);
                     }
                 }
             } else {

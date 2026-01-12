@@ -2,8 +2,6 @@ package it.hurts.sskirillss.relics.description_subcategories;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.AbilityStatisticContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
@@ -33,6 +31,6 @@ public class RelicStatisticDescriptionSubcategory extends DescriptionSubcategory
 
         var relic = (IRelicItem) stack.getItem();
 
-        return !relic.getRelicStatisticTemplate(entity, stack).getMetrics().isEmpty();
+        return !relic.getRelicData(entity, stack).getStatisticData().getTemplate().getMetrics().isEmpty();
     }
 }

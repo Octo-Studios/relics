@@ -85,8 +85,8 @@ public class GoldenToothEntity extends Entity {
                             relic.addStacks(stack, this.getStacks());
                             relic.setDuration(player, stack, relic.getMaxDuration(player, stack));
 
-                            relic.addAbilityMetricValue(player, stack, "looting", "teeth_picked_up", this.getStacks());
-                            relic.addRelicExperience(player, stack, "looting", "stack", this.getStacks());
+                            relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("looting").getStatisticData().getMetricData("teeth_picked_up").addValue(this.getStacks());
+                            relic.getRelicData(player, stack).getLevelingData().addExperience("looting", "stack", this.getStacks());
                         }
 
                         player.addItem(new ItemStack(RelicsItems.GOLDEN_TOOTH.get(), this.getStacks()));

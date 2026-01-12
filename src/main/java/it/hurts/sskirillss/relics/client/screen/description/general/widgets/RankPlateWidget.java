@@ -34,7 +34,7 @@ public class RankPlateWidget extends AbstractPlateWidget {
 
         var time = player.tickCount + pPartialTick;
 
-        if (!relic.isRelicMaxRank(player, stack))
+        if (!relic.getRelicData(player, stack).isMaxRank())
             return;
 
         poseStack.pushPose();
@@ -71,7 +71,7 @@ public class RankPlateWidget extends AbstractPlateWidget {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return entries;
 
-        entries.add(Component.literal("").append(Component.translatable("relics.description.researching.general.relic_rank.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicRank(minecraft.player, stack)));
+        entries.add(Component.literal("").append(Component.translatable("relics.description.researching.general.relic_rank.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicData(minecraft.player, stack).getLevelingData().getRank()));
 
         entries.add(Component.literal(" "));
 
@@ -85,6 +85,6 @@ public class RankPlateWidget extends AbstractPlateWidget {
 
     @Override
     public String getValue(ItemStack stack) {
-        return String.valueOf(stack.getItem() instanceof IRelicItem relic ? relic.getRelicRank(minecraft.player, stack) : 0);
+        return String.valueOf(stack.getItem() instanceof IRelicItem relic ? relic.getRelicData(minecraft.player, stack).getLevelingData().getRank() : 0);
     }
 }

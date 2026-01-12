@@ -12,7 +12,6 @@ import net.minecraft.util.FormattedCharSequence;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 public class RelicStatisticContainerWidget extends SimpleDescriptionContainerWidget {
     public RelicStatisticContainerWidget(DescriptionScreen screen) {
@@ -30,7 +29,9 @@ public class RelicStatisticContainerWidget extends SimpleDescriptionContainerWid
         var dot = ".";
         var dotWidth = Math.max(1, font.width(dot));
 
-        for (var metric : relic.getRelicStatisticTemplate(player, stack).getMetrics().values()) {
+        var statisticData = relic.getRelicData(player, stack).getStatisticData();
+
+        for (var metric : statisticData.getTemplate().getMetrics().values()) {
             var state = metric.getVisibilityState().apply(player, stack);
 
             if (state == VisibilityState.HIDDEN)
@@ -41,7 +42,7 @@ public class RelicStatisticContainerWidget extends SimpleDescriptionContainerWid
             if (state == VisibilityState.OBFUSCATED)
                 prefix = ScreenUtils.randomizeAllCharacters(prefix, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
 
-            var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(relic.getRelicMetricComponent(player, stack, metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));
+            var suffix = Component.literal(" ").append(Component.literal(metric.getFormatValue().apply(statisticData.getMetricData(metric.getId()).getValue())).withStyle(ChatFormatting.BOLD));
 
             var suffixWidth = font.width(suffix);
             var limit = Math.max(0, maxWidth - suffixWidth);

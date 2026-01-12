@@ -26,7 +26,7 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
 
     @Override
     public boolean isLocked() {
-        return !(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.mayPlayerRankup(minecraft.player, getScreen().getStack());
+        return !(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.getRelicData(minecraft.player, getScreen().getStack()).getLevelingData().mayPlayerRankup(minecraft.player);
     }
 
     @Override
@@ -48,12 +48,12 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
         var stack = this.getScreen().getStack();
         var relic = (IRelicItem) stack.getItem();
 
-        var rank = relic.getRelicRank(player, stack);
+        var rank = relic.getRelicData(player, stack).getLevelingData().getRank();
         var maxRank = relic.getRelicTemplate(player, stack).getLeveling().getMaxRank();
         var isMaxRank = rank >= maxRank;
 
-        var level = relic.getRelicLevel(player, stack);
-        var maxLevel = relic.calculateRelicMaxLevel(player, stack);
+        var level = relic.getRelicData(player, stack).getLevelingData().getLevel();
+        var maxLevel = relic.getRelicData(player, stack).calculateMaxLevel();
         var isMaxLevel = level >= maxLevel;
 
         var key = RelicsHotkeys.RESEARCH_RELIC.getKey().getValue();

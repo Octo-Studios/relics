@@ -26,7 +26,7 @@ public class LevelingPointsPlateWidget extends AbstractPlateWidget {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return entries;
 
-        entries.add(Component.literal("").append(Component.translatable("relics.description.researching.general.leveling_point.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicLevelingPoints(minecraft.player, stack)));
+        entries.add(Component.literal("").append(Component.translatable("relics.description.researching.general.leveling_point.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getRelicData(minecraft.player, stack).getLevelingData().getPoints()));
 
         entries.add(Component.literal(" "));
 
@@ -40,6 +40,6 @@ public class LevelingPointsPlateWidget extends AbstractPlateWidget {
 
     @Override
     public String getValue(ItemStack stack) {
-        return stack.getItem() instanceof IRelicItem relic ? String.valueOf(relic.getRelicLevelingPoints(minecraft.player, stack)) : "";
+        return stack.getItem() instanceof IRelicItem relic ? String.valueOf(relic.getRelicData(minecraft.player, stack).getLevelingData().getPoints()) : "";
     }
 }

@@ -43,10 +43,10 @@ public abstract class PiglinAiMixin {
         for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.PIGLIN_MASK.get())) {
             var relic = (PiglinMaskItem) stack.getItem();
 
-            if (!relic.isAbilityRankModifierUnlocked(player, stack, "barter", "pocket"))
+            if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").isRankModifierUnlocked("pocket"))
                 continue;
 
-            var value = (int) relic.getStatValue(player, stack, "barter", "items_count");
+            var value = (int) relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").getStatData("items_count").getValue();
 
             if (value > bestValue) {
                 bestValue = value;
@@ -76,8 +76,8 @@ public abstract class PiglinAiMixin {
         if (taken.getCount() > 1 && !bestStack.isEmpty()) {
             var relic = (PiglinMaskItem) bestStack.getItem();
 
-            relic.addRelicExperience(player, bestStack, "barter", "pickup", taken.getCount() - 1);
-            relic.addAbilityMetricValue(player, bestStack, "barter", "currency", taken.getCount());
+            relic.getRelicData(player, bestStack).getLevelingData().addExperience("barter", "pickup", taken.getCount() - 1);
+            relic.getRelicData(player, bestStack).getAbilitiesData().getAbilityData("barter").getStatisticData().getMetricData("currency").addValue(taken.getCount());
         }
 
         return taken;
@@ -100,12 +100,12 @@ public abstract class PiglinAiMixin {
         for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.PIGLIN_MASK.get())) {
             var relic = (PiglinMaskItem) stack.getItem();
 
-            if (!relic.canPlayerUseAbility(player, stack, "barter"))
+            if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").canPlayerUse(player))
                 continue;
 
             shouldCancel = true;
 
-            var base = random.nextInt((int) relic.getStatValue(player, stack, "barter", "trades")) + 1;
+            var base = random.nextInt((int) relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").getStatData("trades").getValue()) + 1;
             var total = Math.max(1, base) * count;
 
             for (int i = 0; i < total; i++) {
@@ -118,8 +118,8 @@ public abstract class PiglinAiMixin {
                 for (var tradeEntry : items)
                     amount += tradeEntry.getCount();
 
-                relic.addAbilityMetricValue(player, stack, "barter", "items", amount);
-                relic.addRelicExperience(player, stack, "barter", "trade", 1);
+                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").getStatisticData().getMetricData("items").addValue(amount);
+                relic.getRelicData(player, stack).getLevelingData().addExperience("barter", "trade", 1);
             }
         }
 

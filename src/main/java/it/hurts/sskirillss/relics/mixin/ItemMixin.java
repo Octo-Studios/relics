@@ -41,15 +41,19 @@ public class ItemMixin {
         if (level.isClientSide() || !(entity instanceof LivingEntity livingEntity) || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        for (var entry : relic.getAbilitiesTemplate(livingEntity, stack).getAbilities().entrySet()) {
-            String ability = entry.getKey();
+        var relicData = relic.getRelicData(livingEntity, stack);
+        var abilitiesData = relicData.getAbilitiesData();
 
-            if (relic.getAbilityCooldown(livingEntity, stack, ability) > 0)
-                relic.addAbilityCooldown(livingEntity, stack, ability, -1);
+        for (var entry : relicData.getTemplate().getAbilities().getAbilities().entrySet()) {
+            String ability = entry.getKey();
+            var abilityData = abilitiesData.getAbilityData(ability);
+
+            if (abilityData.getExtenderData().getCooldown() > 0)
+                abilityData.getExtenderData().addCooldown(-1);
         }
 
         if (livingEntity.tickCount % 20 == 0)
-            relic.addRelicMetricValue(livingEntity, stack, "retention_time", 1);
+            relicData.getStatisticData().getMetricData("retention_time").addValue(1);
     }
 
     @Inject(method = "appendHoverText", at = @At("HEAD"))
@@ -79,17 +83,24 @@ public class ItemMixin {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
+        var relicData = relic.getRelicData(null, stack);
+        var abilitiesData = relicData.getAbilitiesData();
+
         for (AbilityTemplate abilityData : relic.getDefaultAbilitiesTemplate().getAbilities().values()) {
             String abilityId = abilityData.getId();
+            var ability = abilitiesData.getAbilityData(abilityId);
 
-            if (relic.getAbilityComponent(null, stack, abilityId) == null)
-                relic.randomizeAbilityStats(null, stack, abilityId);
-            else {
+            if (ability == null || ability.getComponent() == null) {
+                if (ability != null)
+                    ability.randomizeStats();
+
+                continue;
+            } else {
                 for (StatTemplate statData : relic.getDefaultAbilityTemplate(abilityId).getStats().values()) {
                     String statId = statData.getId();
 
-                    if (relic.getStatComponent(null, stack, abilityId, statId) == null)
-                        relic.randomizeStat(null, stack, abilityId, statId);
+                    if (ability.getStatData(statId).getComponent() == null)
+                        ability.randomizeStat(statId);
                 }
             }
         }

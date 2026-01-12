@@ -56,12 +56,14 @@ public class C2SChangeMode implements CustomPacketPayload, IRelicValidator {
                 return;
             }
 
-            var event = new AbilityModeSwitchEvent(player, stack, this.getAbility(), relic.getAbilityMode(player, stack, this.getAbility()), this.getMode());
+            var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(this.getAbility());
+
+            var event = new AbilityModeSwitchEvent(player, stack, this.getAbility(), abilityData.getMode(), this.getMode());
 
             NeoForge.EVENT_BUS.post(event);
 
             if (!event.isCanceled())
-                relic.setAbilityMode(event.getEntity(), event.getStack(), event.getAbility(), event.getToMode());
+                abilityData.setMode(event.getToMode());
 
             try {
                 player.containerMenu.getSlot(this.getSlot()).set(stack);

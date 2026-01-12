@@ -76,7 +76,7 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
 
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
-        var percentage = Component.literal(relic.isRelicMaxLevel(minecraft.player, screen.getStack()) ? "MAX" : MathUtils.round(calculateFillerPercentage(relic), 1) + "%").withStyle(ChatFormatting.BOLD);
+        var percentage = Component.literal(relic.getRelicData(minecraft.player, screen.getStack()).isMaxLevel() ? "MAX" : MathUtils.round(calculateFillerPercentage(relic), 1) + "%").withStyle(ChatFormatting.BOLD);
 
         guiGraphics.drawString(minecraft.font, percentage, (getX() + 67) * 2 - (minecraft.font.width(percentage) / 2), (getY() + 6) * 2, DescriptionUtils.TEXT_COLOR, false);
 
@@ -126,13 +126,13 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
         int maxWidth = 150;
         int renderWidth = 0;
 
-        var level = relic.getRelicLevel(minecraft.player, screen.getStack());
+        var level = relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getLevel();
 
-        var experience = String.valueOf(MathUtils.round(relic.getRelicExperience(minecraft.player, screen.getStack()), 1));
+        var experience = String.valueOf(MathUtils.round(relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getExperience(), 1));
 
         List<MutableComponent> entries = Lists.newArrayList(
                 Component.literal("").append(Component.translatable("relics.description.researching.relic.experience.title").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE))
-                        .append(" " + (relic.isRelicMaxLevel(minecraft.player, screen.getStack()) ? "MAX" : (experience.endsWith(".0") ? experience.replace(".0", "") : experience) + "/" + relic.getTotalRelicExperienceBetweenLevels(minecraft.player, screen.getStack(), level, level + 1))),
+                        .append(" " + (relic.getRelicData(minecraft.player, screen.getStack()).isMaxLevel() ? "MAX" : (experience.endsWith(".0") ? experience.replace(".0", "") : experience) + "/" + relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getTotalExperienceBetweenLevels(level, level + 1))),
                 Component.literal(" ")
         );
 
@@ -175,12 +175,12 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
     }
 
     private float calculateFillerPercentage(IRelicItem relic) {
-        var level = relic.getRelicLevel(minecraft.player, screen.getStack());
+        var level = relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getLevel();
 
-        return (float) (relic.getRelicExperience(minecraft.player, screen.getStack()) / (relic.getTotalRelicExperienceBetweenLevels(minecraft.player, screen.getStack(), level, level + 1) / 100D));
+        return (float) (relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getExperience() / (relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getTotalExperienceBetweenLevels(level, level + 1) / 100D));
     }
 
     private int calculateFillerWidth(IRelicItem relic) {
-        return relic.isRelicMaxLevel(minecraft.player, screen.getStack()) ? FILLER_WIDTH : (int) Math.ceil(calculateFillerPercentage(relic) / 100F * FILLER_WIDTH);
+        return relic.getRelicData(minecraft.player, screen.getStack()).isMaxLevel() ? FILLER_WIDTH : (int) Math.ceil(calculateFillerPercentage(relic) / 100F * FILLER_WIDTH);
     }
 }

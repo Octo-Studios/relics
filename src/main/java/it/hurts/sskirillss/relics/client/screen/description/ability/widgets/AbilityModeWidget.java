@@ -34,8 +34,14 @@ public class AbilityModeWidget extends AbstractDescriptionWidget {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var modes = relic.getAbilityTemplate(player, stack, screen.getSelectedAbility()).getModes();
-        var currentMode = relic.getAbilityMode(player, stack, screen.getSelectedAbility());
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(screen.getSelectedAbility());
+        var template = abilityData.getTemplate();
+
+        if (template == null)
+            return;
+
+        var modes = template.getModes();
+        var currentMode = abilityData.getMode();
 
         int step = this.getStep();
 

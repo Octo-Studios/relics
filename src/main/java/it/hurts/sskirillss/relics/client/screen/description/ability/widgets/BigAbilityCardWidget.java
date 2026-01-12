@@ -51,8 +51,14 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         var poseStack = guiGraphics.pose();
         var ability = screen.getSelectedAbility();
 
-        var isUnlocked = relic.isAbilityUnlocked(player, stack, ability);
-        var canBeUpgraded = relic.canBeUpgraded(player, stack, ability);
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+        var template = abilityData.getTemplate();
+
+        if (template == null)
+            return;
+
+        var isUnlocked = abilityData.isUnlocked();
+        var canBeUpgraded = abilityData.canBeUpgraded();
 
         poseStack.pushPose();
 
@@ -76,7 +82,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
                 .pos(getX(), getY())
                 .end();
 
-        var modes = relic.getAbilityTemplate(player, stack, ability).getModes();
+        var modes = template.getModes();
 
         if (isUnlocked && !modes.isEmpty()) {
             GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_list.png"), poseStack)
@@ -101,7 +107,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
                             .pos(x, this.getY() + 15)
                             .end();
 
-                    if (index == modes.indexOf(relic.getAbilityMode(player, stack, ability)))
+                    if (index == modes.indexOf(abilityData.getMode()))
                         GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_selection.png"), poseStack)
                                 .anchor(SpriteAnchor.TOP_LEFT)
                                 .pos(x - 1, this.getY() + 14)
@@ -124,7 +130,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
             xOff = 0;
 
-            var quality = relic.calculateAbilityQuality(player, stack, ability);
+            var quality = abilityData.calculateQuality();
             var isAliquot = quality % 2 == 1;
 
             for (int i = 0; i < Math.floor(quality / 2D); i++) {
@@ -148,7 +154,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         if (canBeUpgraded) {
             poseStack.pushPose();
 
-            var pointsComponent = Component.literal(isUnlocked ? String.valueOf(relic.getAbilityLevel(player, stack, ability)) : "?").withStyle(ChatFormatting.BOLD);
+            var pointsComponent = Component.literal(isUnlocked ? String.valueOf(abilityData.getLevel()) : "?").withStyle(ChatFormatting.BOLD);
 
             poseStack.scale(0.75F, 0.75F, 1F);
 
@@ -192,7 +198,13 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         var stack = screen.getStack();
         var ability = screen.getSelectedAbility();
 
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isAbilityUnlocked(player, stack, ability) || !relic.canBeUpgraded(player, stack, ability))
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+        var template = abilityData.getTemplate();
+
+        if (!abilityData.isUnlocked() || !abilityData.canBeUpgraded() || template == null)
             return;
 
         PoseStack poseStack = guiGraphics.pose();
@@ -203,8 +215,8 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("relics.description.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + relic.getAbilityLevel(player, stack, ability) + "/" + relic.getAbilityTemplate(player, stack, ability).getInitialMaxLevel()),
-                Component.literal("").append(Component.translatable("relics.description.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(relic.calculateAbilityQuality(player, stack, ability) / 2F, 1) + "/" + relic.getAbilityMaxQuality(player, stack, ability) / 2),
+                Component.literal("").append(Component.translatable("relics.description.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + abilityData.getLevel() + "/" + template.getInitialMaxLevel()),
+                Component.literal("").append(Component.translatable("relics.description.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(abilityData.calculateQuality() / 2F, 1) + "/" + abilityData.getMaxQuality() / 2),
                 Component.literal(" ")
         );
 

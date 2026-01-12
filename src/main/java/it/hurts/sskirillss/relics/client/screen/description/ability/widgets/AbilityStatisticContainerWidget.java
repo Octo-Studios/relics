@@ -40,11 +40,16 @@ public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerW
         var dotWidth = Math.max(1, font.width(dot));
 
         var ability = screen.getSelectedAbility();
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+        var template = abilityData.getTemplate();
+
+        if (template == null)
+            return new ArrayList<>();
 
         var group = new LinkedHashMap<String, List<List<FormattedCharSequence>>>();
         var conditions = new HashMap<String, MutableComponent>();
 
-        for (var metric : relic.getAbilityStatisticTemplate(player, stack, ability).getMetrics().values()) {
+        for (var metric : template.getStatistic().getMetrics().values()) {
             var state = metric.getVisibilityState().apply(player, stack, ability);
 
             if (state == VisibilityState.HIDDEN)
@@ -73,7 +78,7 @@ public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerW
             } else {
                 var suffix = Component.literal(" ")
                         .append(Component.literal(metric.getFormatValue()
-                                        .apply(relic.getAbilityMetricComponent(player, stack, ability, metric.getId()).getValue()))
+                                        .apply(abilityData.getStatisticData().getMetricData(metric.getId()).getValue()))
                                 .withStyle(ChatFormatting.BOLD));
 
                 var suffixWidth = font.width(suffix);

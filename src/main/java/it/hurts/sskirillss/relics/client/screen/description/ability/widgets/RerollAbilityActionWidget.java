@@ -36,7 +36,10 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public boolean isLocked() {
-        return !(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.mayPlayerReroll(minecraft.player, getScreen().getStack(), getAbility());
+        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
+            return true;
+
+        return !relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerReroll(minecraft.player);
     }
 
     @Override
@@ -44,8 +47,12 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         var player = minecraft.player;
         var stack = getScreen().getStack();
 
-        if (isLocked() || !(stack.getItem() instanceof IRelicItem relic)
-                || (relic.calculateAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility()) && !Screen.hasShiftDown()))
+        if (isLocked() || !(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility());
+
+        if (abilityData.calculateQuality() == abilityData.getMaxQuality() && !Screen.hasShiftDown())
             return;
 
         handler.play(SimpleSoundInstance.forUI(RelicsSounds.TABLE_REROLL.get(), 1F));
@@ -66,11 +73,12 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         var newLine = Component.literal(" ");
 
         var currentExperience = EntityUtils.getPlayerTotalExperience(player);
-        var requiredExperience = relic.getRerollPlayerExperienceCost(player, stack, getAbility());
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility());
+        var requiredExperience = abilityData.getRerollPlayerExperienceCost();
         var hasExperience = requiredExperience <= currentExperience;
 
-        var quality = relic.calculateRelicQuality(player, stack);
-        var maxQuality = relic.getRelicMaxQuality(player, stack);
+        var quality = abilityData.calculateQuality();
+        var maxQuality = abilityData.getMaxQuality();
 
         var isMaxQuality = quality >= maxQuality;
 
@@ -119,7 +127,8 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         if (isLocked() || !(getScreen().getStack().getItem() instanceof IRelicItem relic))
             return;
 
-        boolean hasWarning = relic.calculateAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility());
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility());
+        boolean hasWarning = abilityData.calculateQuality() == abilityData.getMaxQuality();
 
         if (hasWarning && !Screen.hasShiftDown())
             return;
@@ -137,8 +146,9 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
         var poseStack = guiGraphics.pose();
 
-        var isWarning = relic.calculateAbilityQuality(player, stack, getAbility()) == relic.getAbilityMaxQuality(player, stack, getAbility());
-        var isQuick = Screen.hasShiftDown() && relic.mayPlayerReroll(player, getScreen().getStack(), getAbility());
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility());
+        var isWarning = abilityData.calculateQuality() == abilityData.getMaxQuality();
+        var isQuick = Screen.hasShiftDown() && abilityData.mayPlayerReroll(player);
 
         var color = (isWarning && Screen.hasShiftDown()) || isQuick ? (float) (1.05F + (Math.sin((player.tickCount + (getAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;
 

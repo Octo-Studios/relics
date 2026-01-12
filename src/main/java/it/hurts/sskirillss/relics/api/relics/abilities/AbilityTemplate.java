@@ -57,10 +57,14 @@ public class AbilityTemplate {
 
         private Function3<Player, ItemStack, String, String> icon = (player, stack, ability) -> {
             var relic = (IRelicItem) stack.getItem();
+            var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
 
-            var modes = relic.getAbilityTemplate(player, stack, ability).getModes();
+            if (abilityData == null)
+                return ability;
 
-            return ability + (modes.isEmpty() ? "" : "_" + relic.getAbilityMode(player, stack, ability));
+            var modes = abilityData.getTemplate().getModes();
+
+            return ability + (modes.isEmpty() ? "" : "_" + abilityData.getMode());
         };
         private Map<String, StatTemplate> stats = new LinkedHashMap<>();
         private int initialMaxLevel = 10;

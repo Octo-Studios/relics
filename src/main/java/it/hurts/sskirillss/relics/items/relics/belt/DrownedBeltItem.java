@@ -151,7 +151,7 @@
 //            if (!(stack.getItem() instanceof IRelicItem relic))
 //                return;
 //
-//            event.setAmount((float) (event.getAmount() * relic.getStatValue(player, stack, "pressure", "damage")));
+//            event.setAmount((float) (event.getAmount() * relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pressure").getStatData("damage").getValue()));
 //        }
 //
 //        @SubscribeEvent
@@ -185,7 +185,7 @@
 //
 //            relic.spreadRelicExperience(player, stack, enchantment);
 //
-//            player.getCooldowns().addCooldown(trident.getItem(), (int) Math.round(relic.getStatValue(player, stack, "riptide", "cooldown") * enchantment * 20));
+//            player.getCooldowns().addCooldown(trident.getItem(), (int) Math.round(relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("riptide").getStatData("cooldown").getValue() * enchantment * 20));
 //        }
 //    }
 //}

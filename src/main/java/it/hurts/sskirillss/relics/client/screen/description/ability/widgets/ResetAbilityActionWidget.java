@@ -28,7 +28,10 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public boolean isLocked() {
-        return !(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.mayPlayerReset(minecraft.player, getScreen().getStack(), getAbility());
+        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
+            return true;
+
+        return !relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerReset(minecraft.player);
     }
 
     @Override
@@ -55,10 +58,10 @@ public class ResetAbilityActionWidget extends AbstractAbilityActionWidget {
         var newLine = Component.literal(" ");
 
         var currentExperience = EntityUtils.getPlayerTotalExperience(player);
-        var requiredExperience = relic.getResetPlayerExperienceCost(player, stack, getAbility());
+        var requiredExperience = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility()).getResetPlayerExperienceCost();
         var hasExperience = requiredExperience <= currentExperience;
 
-        var level = relic.getAbilityLevel(player, stack, ability);
+        var level = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getLevel();
         var isMinLevel = level <= 0;
 
         description.add(Component.translatable("relics.description.ability.reset.title")

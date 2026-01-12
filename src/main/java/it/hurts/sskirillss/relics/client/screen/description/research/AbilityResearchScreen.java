@@ -86,7 +86,12 @@ public class AbilityResearchScreen extends DescriptionScreen {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0;
 
-        return relic.getAbilityTemplate(minecraft.player, stack, ability).getResearchTemplate().getConnectedStars(star).size();
+        var template = relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability).getTemplate();
+
+        if (template == null)
+            return 0;
+
+        return template.getResearchTemplate().getConnectedStars(star).size();
     }
 
     public int getOccupiedConnectionsCount(StarData star) {
@@ -95,7 +100,7 @@ public class AbilityResearchScreen extends DescriptionScreen {
 
         int index = star.getIndex();
 
-        return (int) relic.getResearchLinks(minecraft.player, stack, ability).entries().stream()
+        return (int) relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().getLinks().entries().stream()
                 .filter(entry -> entry.getKey() == index || entry.getValue() == index)
                 .map(entry -> entry.getKey() < entry.getValue()
                         ? entry.getKey() + "-" + entry.getValue()
@@ -119,11 +124,16 @@ public class AbilityResearchScreen extends DescriptionScreen {
         stars.clear();
         points.clear();
 
+        var template = relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability).getTemplate();
+
+        if (template == null)
+            return;
+
         this.addRenderableWidget(new HintWidget(x + 192, y + 198, this));
 
         int starSize = 17;
 
-        for (var entry : relic.getAbilityTemplate(minecraft.player, stack, ability).getResearchTemplate().getStars().values())
+        for (var entry : template.getResearchTemplate().getStars().values())
             stars.add(this.addWidget(new StarWidget((int) (x + 67 + (entry.getX() * 5F) - starSize / 2F), (int) (y + 54 + (entry.getY() * 5F) - starSize / 2F), this, entry)));
     }
 
@@ -141,16 +151,22 @@ public class AbilityResearchScreen extends DescriptionScreen {
 
         super.tick();
 
+        var abilityData = relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability);
+        var template = abilityData.getTemplate();
+
+        if (template == null)
+            return;
+
         RandomSource random = minecraft.player.getRandom();
 
-        if (relic.isAbilityResearched(minecraft.player, stack, ability)) {
+        if (abilityData.getResearchData().isResearched()) {
             if (researchProgress >= 0 && researchProgress < maxResearchProgress) {
                 researchProgress++;
 
                 if (researchProgress % 3 == 0) {
-                    ResearchTemplate researchData = relic.getResearchTemplate(minecraft.player, stack, ability);
+                    ResearchTemplate researchData = template.getResearchTemplate();
 
-                    for (var link : relic.getResearchLinks(minecraft.player, stack, ability).entries()) {
+                    for (var link : abilityData.getResearchData().getLinks().entries()) {
                         var start = researchData.getStars().get(link.getKey()).getPos();
                         var end = researchData.getStars().get(link.getValue()).getPos();
 
@@ -164,7 +180,7 @@ public class AbilityResearchScreen extends DescriptionScreen {
         }
 
         if (minecraft.player.tickCount % 3 == 0) {
-            var links = relic.getResearchLinks(minecraft.player, stack, ability);
+            var links = relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().getLinks();
 
             for (var pair : links.entries()) {
                 var start = pair.getKey();
@@ -280,7 +296,7 @@ public class AbilityResearchScreen extends DescriptionScreen {
         if (stack == null || !(stack.getItem() instanceof IRelicItem relic) || player == null)
             return;
 
-        RelicTemplate relicData = relic.getRelicTemplate(player, stack);
+        var relicData = relic.getRelicData(player, stack);
 
         if (relicData == null)
             return;
@@ -301,9 +317,15 @@ public class AbilityResearchScreen extends DescriptionScreen {
         }
 
         {
-            ResearchTemplate researchData = relic.getAbilityTemplate(player, stack, ability).getResearchTemplate();
+            var abilityData = relicData.getAbilitiesData().getAbilityData(ability);
+            var template = abilityData.getTemplate();
 
-            for (var link : relic.getResearchLinks(player, stack, ability).entries()) {
+            if (template == null)
+                return;
+
+            ResearchTemplate researchData = template.getResearchTemplate();
+
+            for (var link : abilityData.getResearchData().getLinks().entries()) {
                 var start = researchData.getStars().get(link.getKey()).getPos();
                 var end = researchData.getStars().get(link.getValue()).getPos();
 
@@ -417,7 +439,7 @@ public class AbilityResearchScreen extends DescriptionScreen {
         float offset = (float) (Math.sin(((minecraft.player.tickCount + partialTick + start.length()) * 0.2F)) * 0.1F);
         float color = 1.25F + offset;
 
-        if (!relic.isAbilityResearched(minecraft.player, stack, ability) && isHoveringConnection(start, end, mouseX, mouseY))
+        if (!relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().isResearched() && isHoveringConnection(start, end, mouseX, mouseY))
             RenderSystem.setShaderColor(color, 0.25F, 0.25F, 0.75F + offset);
         else
             RenderSystem.setShaderColor(color, color, color, 0.75F + offset);
@@ -522,12 +544,18 @@ public class AbilityResearchScreen extends DescriptionScreen {
 
     @Override
     public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
-        if (stack.getItem() instanceof IRelicItem relic && !relic.isAbilityResearched(minecraft.player, stack, ability) && pButton == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
-            ResearchTemplate researchData = relic.getResearchTemplate(minecraft.player, stack, ability);
+        if (stack.getItem() instanceof IRelicItem relic && !relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().isResearched() && pButton == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
+            var abilityData = relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability);
+            var template = abilityData.getTemplate();
+
+            if (template == null)
+                return super.mouseClicked(pMouseX, pMouseY, pButton);
+
+            ResearchTemplate researchData = template.getResearchTemplate();
 
             Pair<Integer, Integer> toRemove = null;
 
-            for (var link : relic.getResearchLinks(minecraft.player, stack, ability).entries())
+            for (var link : abilityData.getResearchData().getLinks().entries())
                 if (isHoveringConnection(getScaledPos(researchData.getStars().get(link.getKey()).getPos()), getScaledPos(researchData.getStars().get(link.getValue()).getPos()), (int) pMouseX, (int) pMouseY))
                     toRemove = Pair.of(link.getKey(), link.getValue());
 
@@ -582,7 +610,7 @@ public class AbilityResearchScreen extends DescriptionScreen {
                 if (!widget.isHovered())
                     continue;
 
-                Multimap<Integer, Integer> links = relic.getResearchLinks(minecraft.player, stack, ability);
+                Multimap<Integer, Integer> links = relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().getLinks();
 
                 int start = selectedStar.getIndex();
                 int end = widget.getStar().getIndex();

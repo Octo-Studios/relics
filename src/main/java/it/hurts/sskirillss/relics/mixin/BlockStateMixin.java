@@ -34,7 +34,7 @@ public class BlockStateMixin {
 
         var relic = (LeafyMantleItem) stack.getItem();
 
-        if (!relic.canPlayerUseAbility(entity, stack, "camouflage"))
+        if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity))
             return;
 
         if (entity.isShiftKeyDown()) {

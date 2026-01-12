@@ -214,7 +214,7 @@
 //
 //        int time = heldStack.getBurnTime(RecipeType.SMELTING) / 20;
 //        int amount = slotStack.getOrDefault(CHARGE, 0);
-//        int capacity = (int) Math.round(booster.getStatValue(player, slotStack, "boost", "capacity"));
+//        int capacity = (int) Math.round(booster.getRelicData(player, slotStack).getAbilitiesData().getAbilityData("boost").getStatData("capacity").getValue());
 //        int sum = amount + time;
 //
 //        if (time <= 0)

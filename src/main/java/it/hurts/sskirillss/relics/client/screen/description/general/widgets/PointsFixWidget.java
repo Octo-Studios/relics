@@ -38,7 +38,8 @@ public class PointsFixWidget extends AbstractDescriptionWidget implements IHover
 
     @Override
     public void onPress() {
-        if (!(screen.getStack().getItem() instanceof IRelicItem relic) || !relic.isSomethingWrongWithLevelingPoints(minecraft.player, screen.getStack()))
+        if (!(screen.getStack().getItem() instanceof IRelicItem relic)
+                || !relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().isPointsMismatch())
             return;
 
         NetworkHandler.sendToServer(new FixLevelingPoints(screen.getContainer(), screen.getSlot()));
@@ -49,7 +50,7 @@ public class PointsFixWidget extends AbstractDescriptionWidget implements IHover
         LocalPlayer player = Minecraft.getInstance().player;
 
         if (player == null || !(screen.getStack().getItem() instanceof IRelicItem relic)
-                || !relic.isSomethingWrongWithLevelingPoints(player, screen.getStack()))
+                || !relic.getRelicData(player, screen.getStack()).getLevelingData().isPointsMismatch())
             return;
 
         PoseStack poseStack = guiGraphics.pose();
@@ -73,7 +74,8 @@ public class PointsFixWidget extends AbstractDescriptionWidget implements IHover
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
         ItemStack stack = getScreen().getStack();
 
-        if (!(stack.getItem() instanceof IRelicItem relic) || !relic.isSomethingWrongWithLevelingPoints(minecraft.player, screen.getStack()))
+        if (!(stack.getItem() instanceof IRelicItem relic)
+                || !relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().isPointsMismatch())
             return;
 
         PoseStack poseStack = guiGraphics.pose();

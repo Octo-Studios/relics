@@ -192,7 +192,7 @@ public class PiglinMaskItem extends RelicItem {
     }
 
     public int getMaxDuration(LivingEntity entity, ItemStack stack) {
-        return (int) this.getStatValue(entity, stack, "looting", "duration");
+        return (int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("looting").getStatData("duration").getValue();
     }
 
     @Override
@@ -206,10 +206,10 @@ public class PiglinMaskItem extends RelicItem {
 
         if (entity.tickCount % 20 == 0) {
             if (duration > 0 || stacks > 0) {
-                this.addAbilityMetricValue(entity, stack, "looting", "effect_duration", 1);
+                this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("looting").getStatisticData().getMetricData("effect_duration").addValue(1);
 
                 if (stacks >= PiglinMaskItem.getMaxStacks())
-                    this.addAbilityMetricValue(entity, stack, "looting", "tripled_effect_duration", 1);
+                    this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("looting").getStatisticData().getMetricData("tripled_effect_duration").addValue(1);
             }
 
             if (duration > 0) {
@@ -223,7 +223,7 @@ public class PiglinMaskItem extends RelicItem {
 
             var modifier = stacks >= PiglinMaskItem.getMaxStacks() ? 3 : 1;
 
-            EntityUtils.resetAttribute(entity, stack, Attributes.ATTACK_SPEED, (float) (stacks * this.getStatValue(entity, stack, "looting", "attack_speed") * modifier), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.resetAttribute(entity, stack, Attributes.ATTACK_SPEED, (float) (stacks * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("looting").getStatData("attack_speed").getValue() * modifier), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         }
     }
 
@@ -239,7 +239,7 @@ public class PiglinMaskItem extends RelicItem {
 
     @Override
     public boolean makesPiglinsNeutral(SlotContext slotContext, ItemStack stack) {
-        return this.canPlayerUseAbility(slotContext.entity(), stack, "neutrality");
+        return this.getRelicData(slotContext.entity(), stack).getAbilitiesData().getAbilityData("neutrality").canPlayerUse(slotContext.entity());
     }
 
     @EventBusSubscriber
@@ -256,15 +256,15 @@ public class PiglinMaskItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.PIGLIN_MASK.get())) {
                 var relic = (PiglinMaskItem) stack.getItem();
 
-                if (!relic.isAbilityRankModifierUnlocked(source, stack, "neutrality", "legion"))
+                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("neutrality").isRankModifierUnlocked("legion"))
                     continue;
 
                 for (var piglin : level.getEntitiesOfClass(Mob.class, source.getBoundingBox().inflate(32), mob -> mob instanceof Piglin || mob instanceof ZombifiedPiglin)) {
                     if (piglin.getTarget() != null || !piglin.hasLineOfSight(target) || piglin.isBaby())
                         continue;
 
-                    relic.addRelicExperience(source, stack, "neutrality", "target", 1);
-                    relic.addAbilityMetricValue(target, stack, "neutrality", "target", 1);
+                    relic.getRelicData(source, stack).getLevelingData().addExperience("neutrality", "target", 1);
+                    relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("neutrality").getStatisticData().getMetricData("target").addValue(1);
 
                     piglin.getBrain().setMemory(MemoryModuleType.ANGRY_AT, target.getUUID());
 
@@ -286,15 +286,15 @@ public class PiglinMaskItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(target, RelicsItems.PIGLIN_MASK.get())) {
                 var relic = (PiglinMaskItem) stack.getItem();
 
-                if (!relic.isAbilityRankModifierUnlocked(target, stack, "neutrality", "legion"))
+                if (!relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("neutrality").isRankModifierUnlocked("legion"))
                     continue;
 
                 for (var piglin : level.getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate(32), mob -> mob instanceof Piglin || mob instanceof ZombifiedPiglin)) {
                     if (piglin.getTarget() != null || !piglin.hasLineOfSight(source) || piglin.isBaby())
                         continue;
 
-                    relic.addRelicExperience(target, stack, "neutrality", "target", 1);
-                    relic.addAbilityMetricValue(target, stack, "neutrality", "target", 1);
+                    relic.getRelicData(target, stack).getLevelingData().addExperience("neutrality", "target", 1);
+                    relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("neutrality").getStatisticData().getMetricData("target").addValue(1);
 
                     piglin.getBrain().setMemory(MemoryModuleType.ANGRY_AT, source.getUUID());
 
@@ -312,18 +312,18 @@ public class PiglinMaskItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.PIGLIN_MASK.get())) {
                 var relic = (PiglinMaskItem) stack.getItem();
 
-                if (!relic.isAbilityRankModifierUnlocked(source, stack, "looting", "frenzy"))
+                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").isRankModifierUnlocked("frenzy"))
                     continue;
 
                 var damage = event.getNewDamage();
                 var stacks = relic.getStacks(stack);
                 var multiplier = stacks >= PiglinMaskItem.getMaxStacks() ? 3 : 1;
 
-                var modifier = damage * relic.getStatValue(source, stack, "looting", "attack_damage") * stacks * multiplier;
+                var modifier = damage * relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("attack_damage").getValue() * stacks * multiplier;
 
                 event.setNewDamage((float) (damage + modifier));
 
-                relic.addAbilityMetricValue(source, stack, "looting", "additional_damage", modifier);
+                relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatisticData().getMetricData("additional_damage").addValue(modifier);
             }
         }
 
@@ -340,12 +340,12 @@ public class PiglinMaskItem extends RelicItem {
             for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.PIGLIN_MASK.get())) {
                 var relic = (PiglinMaskItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(source, stack, "looting"))
+                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").canPlayerUse(source))
                     continue;
 
-                var amount = MathUtils.multicast(random, relic.getStatValue(source, stack, "looting", "chance"), (int) Math.ceil(entity.getMaxHealth() / relic.getStatValue(source, stack, "looting", "health")));
+                var amount = MathUtils.multicast(random, relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("chance").getValue(), (int) Math.ceil(entity.getMaxHealth() / relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("health").getValue()));
 
-                relic.addAbilityMetricValue(source, stack, "looting", "teeth_dropped", amount);
+                relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatisticData().getMetricData("teeth_dropped").addValue(amount);
 
                 for (int i = 0; i < amount; i++) {
                     var tooth = new GoldenToothEntity(RelicsEntities.GOLDEN_TOOTH.get(), level);
@@ -356,7 +356,7 @@ public class PiglinMaskItem extends RelicItem {
 
                     level.addFreshEntity(tooth);
 
-                    relic.addRelicExperience(source, stack, "looting", "drop", 1);
+                    relic.getRelicData(source, stack).getLevelingData().addExperience("looting", "drop", 1);
                 }
             }
         }

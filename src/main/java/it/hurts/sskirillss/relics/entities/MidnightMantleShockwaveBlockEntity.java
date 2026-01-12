@@ -31,14 +31,14 @@ public class MidnightMantleShockwaveBlockEntity extends ShockwaveBlockEntity {
                     var stack = this.getStack();
 
                     if (stack.getItem() instanceof MidnightMantleItem relic && owner instanceof LivingEntity livingOwner) {
-                        relic.addAbilityMetricValue(livingOwner, stack, "starfall", "shockwave_targets", 1);
+                        relic.getRelicData(livingOwner, stack).getAbilitiesData().getAbilityData("starfall").getStatisticData().getMetricData("shockwave_targets").addValue(1);
 
-                        relic.addRelicExperience(livingOwner, stack, "starfall", "shockwave_hit", 1);
+                        relic.getRelicData(livingOwner, stack).getLevelingData().addExperience("starfall", "shockwave_hit", 1);
 
-                        relic.addAbilityMetricValue(livingOwner, stack, "starfall", "shockwave_damage", damage);
+                        relic.getRelicData(livingOwner, stack).getAbilitiesData().getAbilityData("starfall").getStatisticData().getMetricData("shockwave_damage").addValue(damage);
 
                         if (stun > 0)
-                            relic.addAbilityMetricValue(livingOwner, stack, "starfall", "shockwave_stun", stun / 20F);
+                            relic.getRelicData(livingOwner, stack).getAbilitiesData().getAbilityData("starfall").getStatisticData().getMetricData("shockwave_stun").addValue(stun / 20F);
                     }
                 }
             }

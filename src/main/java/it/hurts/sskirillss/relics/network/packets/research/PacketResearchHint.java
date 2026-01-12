@@ -73,7 +73,7 @@ public class PacketResearchHint implements CustomPacketPayload {
 
             RandomSource random = player.getRandom();
 
-            int cost = relic.getResearchHintPlayerExperienceCost(player, stack, ability) * amount;
+            int cost = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().getHintPlayerExperienceCost() * amount;
 
             if (EntityUtils.getPlayerTotalExperience(player) < cost)
                 return;
@@ -82,8 +82,8 @@ public class PacketResearchHint implements CustomPacketPayload {
 
             research(player, stack, amount);
 
-            if (relic.testAbilityResearch(player, stack, ability)) {
-                relic.setAbilityResearched(player, stack, ability, true);
+            if (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().isComplete()) {
+                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().setResearched(true);
 
                 player.connection.send(new ClientboundSoundPacket(Holder.direct(RelicsSounds.FINISH_RESEARCH.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1F, 1F, random.nextLong()));
             } else
@@ -103,8 +103,14 @@ public class PacketResearchHint implements CustomPacketPayload {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        Multimap<Integer, Integer> pattern = relic.getResearchTemplate(entity, stack, ability).getLinks();
-        Multimap<Integer, Integer> links = relic.getResearchLinks(entity, stack, ability);
+        var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(ability);
+        var template = abilityData.getTemplate();
+
+        if (template == null)
+            return;
+
+        Multimap<Integer, Integer> pattern = template.getResearchTemplate().getLinks();
+        Multimap<Integer, Integer> links = abilityData.getResearchData().getLinks();
 
         int iteration = 0;
 
@@ -113,7 +119,7 @@ public class PacketResearchHint implements CustomPacketPayload {
             Integer end = entry.getValue();
 
             if (!(pattern.containsEntry(start, end) || pattern.containsEntry(end, start))) {
-                relic.removeResearchLink(entity, stack, ability, start, end);
+                abilityData.getResearchData().removeLink(start, end);
 
                 if (++iteration >= amount)
                     break;
@@ -127,7 +133,7 @@ public class PacketResearchHint implements CustomPacketPayload {
             Integer end = entry.getValue();
 
             if (!(links.containsEntry(start, end) || links.containsEntry(end, start))) {
-                relic.addResearchLink(entity, stack, ability, start, end);
+                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(ability).getResearchData().addLink(start, end);
 
                 if (++iteration >= amount)
                     break;

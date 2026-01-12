@@ -323,22 +323,22 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
         var entity = slotContext.entity();
 
         if (entity instanceof Player player && !player.level().isClientSide()) {
-            if (this.canPlayerUseAbility(player, stack, "gluttony")) {
+            if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("gluttony").canPlayerUse(player)) {
                 var foodLevel = player.getFoodData().getFoodLevel();
                 var center = 10;
 
                 var above = Math.max(0, foodLevel - center);
                 var below = Math.max(0, center - foodLevel);
 
-                var positive = above * this.getStatValue(entity, stack, "gluttony", "early_multiplier");
-                var negative = below * this.getStatValue(entity, stack, "gluttony", "late_multiplier");
+                var positive = above * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gluttony").getStatData("early_multiplier").getValue();
+                var negative = below * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gluttony").getStatData("late_multiplier").getValue();
 
                 var modifier = Math.clamp(positive - negative, -0.9D, 1.0D);
 
                 if (modifier > 0.0001D)
-                    this.addAbilityMetricValue(player, stack, "gluttony", "positive_duration", 1D / 20D);
+                    this.getRelicData(player, stack).getAbilitiesData().getAbilityData("gluttony").getStatisticData().getMetricData("positive_duration").addValue(1D / 20D);
                 else if (modifier < -0.0001D)
-                    this.addAbilityMetricValue(player, stack, "gluttony", "negative_duration", 1D / 20D);
+                    this.getRelicData(player, stack).getAbilitiesData().getAbilityData("gluttony").getStatisticData().getMetricData("negative_duration").addValue(1D / 20D);
 
                 var blacklist = Lists.newArrayList(Attributes.GRAVITY, Attributes.SCALE);
 
@@ -353,7 +353,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             }
         }
 
-        if (this.canPlayerUseAbility(entity, stack, "sloth")) {
+        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sloth").canPlayerUse(entity)) {
             var slothData = stack.getOrDefault(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_SLOTH.get(), SlothData.create(entity.position(), entity.getYRot(), entity.getXRot(), 0));
 
             var positionDelta = entity.position().distanceToSqr(new Vec3(slothData.x(), slothData.y(), slothData.z()));
@@ -367,7 +367,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             } else {
                 stillTicks++;
 
-                var requiredTicks = Math.max(1, (int) Math.round(this.getStatValue(entity, stack, "sloth", "time") * 20D));
+                var requiredTicks = Math.max(1, (int) Math.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sloth").getStatData("time").getValue() * 20D));
                 var hasImmortality = entity.hasEffect(RelicsMobEffects.IMMORTALITY);
 
                 if (stillTicks >= requiredTicks) {
@@ -381,10 +381,10 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             stack.set(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_SLOTH.get(), slothData.with(entity.position(), entity.getYRot(), entity.getXRot(), stillTicks));
 
             if (gainedImmortality)
-                this.addRelicExperience(entity, stack, "sloth", "immortality", 1);
+                this.getRelicData(entity, stack).getLevelingData().addExperience("sloth", "immortality", 1);
 
             if (entity.hasEffect(RelicsMobEffects.IMMORTALITY))
-                this.addAbilityMetricValue(entity, stack, "sloth", "immortality_duration", 1D / 20D);
+                this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sloth").getStatisticData().getMetricData("immortality_duration").addValue(1D / 20D);
         }
     }
 
@@ -402,20 +402,20 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
     public int getFortuneLevel(SlotContext slotContext, LootContext lootContext, ItemStack stack) {
         var entity = slotContext.entity();
 
-        if (entity == null || !this.canPlayerUseAbility(entity, stack, "greed"))
+        if (entity == null || !this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").canPlayerUse(entity))
             return super.getFortuneLevel(slotContext, lootContext, stack);
 
-        return (int) Math.round(this.getStatValue(entity, stack, "greed", "luck"));
+        return (int) Math.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").getStatData("luck").getValue());
     }
 
     @Override
     public int getLootingLevel(SlotContext slotContext, LootContext lootContext, ItemStack stack) {
         var entity = slotContext.entity();
 
-        if (entity == null || !this.canPlayerUseAbility(entity, stack, "greed"))
+        if (entity == null || !this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").canPlayerUse(entity))
             return super.getLootingLevel(slotContext, lootContext, stack);
 
-        return (int) Math.round(this.getStatValue(entity, stack, "greed", "looting"));
+        return (int) Math.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").getStatData("looting").getValue());
     }
 
     @Override
@@ -481,18 +481,18 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 for (var stack : EntityUtils.findEquippedCurios(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                     var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                    if (!relic.canPlayerUseAbility(attacker, stack, "pride"))
+                    if (!relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("pride").canPlayerUse(attacker))
                         continue;
 
-                    var perBlock = relic.getStatValue(attacker, stack, "pride", "multiplier");
+                    var perBlock = relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("pride").getStatData("multiplier").getValue();
                     var bonus = verticalDelta * perBlock;
 
                     var extraDamage = original * bonus;
 
                     event.setNewDamage((float) (original * (1 + bonus)));
 
-                    relic.addRelicExperience(attacker, stack, "pride", "height_advantage", extraDamage);
-                    relic.addAbilityMetricValue(attacker, stack, "pride", "additional_damage", extraDamage);
+                    relic.getRelicData(attacker, stack).getLevelingData().addExperience("pride", "height_advantage", extraDamage);
+                    relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("pride").getStatisticData().getMetricData("additional_damage").addValue(extraDamage);
 
                     return;
                 }
@@ -502,18 +502,18 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 for (var stack : EntityUtils.findEquippedCurios(victim, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                     var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                    if (!relic.canPlayerUseAbility(victim, stack, "pride"))
+                    if (!relic.getRelicData(victim, stack).getAbilitiesData().getAbilityData("pride").canPlayerUse(victim))
                         continue;
 
-                    var perBlock = relic.getStatValue(victim, stack, "pride", "multiplier");
+                    var perBlock = relic.getRelicData(victim, stack).getAbilitiesData().getAbilityData("pride").getStatData("multiplier").getValue();
                     var penalty = verticalDelta * perBlock;
 
                     var extraDamage = original * penalty;
 
                     event.setNewDamage((float) (original * (1 + penalty)));
 
-                    relic.addRelicExperience(victim, stack, "pride", "height_advantage", Math.abs(extraDamage));
-                    relic.addAbilityMetricValue(victim, stack, "pride", "damage_received", extraDamage);
+                    relic.getRelicData(victim, stack).getLevelingData().addExperience("pride", "height_advantage", Math.abs(extraDamage));
+                    relic.getRelicData(victim, stack).getAbilitiesData().getAbilityData("pride").getStatisticData().getMetricData("damage_received").addValue(extraDamage);
 
                     break;
                 }
@@ -528,11 +528,11 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             for (var stack : EntityUtils.findEquippedCurios(target, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(target, stack, "sloth"))
+                if (!relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("sloth").canPlayerUse(target))
                     continue;
 
                 var speed = target.getKnownMovement().multiply(1, 0, 1).length();
-                var speedMultiplier = relic.getStatValue(target, stack, "sloth", "speed");
+                var speedMultiplier = relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("sloth").getStatData("speed").getValue();
 
                 if (speed > 0) {
                     var penalty = speed * speedMultiplier;
@@ -541,7 +541,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
 
                     event.setNewDamage((float) (damage * (1 + penalty)));
 
-                    relic.addAbilityMetricValue(target, stack, "sloth", "damage_from_moving", extraDamage);
+                    relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("sloth").getStatisticData().getMetricData("damage_from_moving").addValue(extraDamage);
                 }
             }
         }
@@ -554,12 +554,12 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             for (var stack : EntityUtils.findEquippedCurios(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(attacker, stack, "wrath"))
+                if (!relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").canPlayerUse(attacker))
                     continue;
 
                 var now = attacker.level().getGameTime();
 
-                var windowTicks = Math.max(1, (int) Math.round(relic.getStatValue(attacker, stack, "wrath", "window") * 20D));
+                var windowTicks = Math.max(1, (int) Math.round(relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatData("window").getValue() * 20D));
                 var state = stack.getOrDefault(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_WRATH.get(), WrathData.create(now));
 
                 var delta = now - state.lastHitTick();
@@ -569,8 +569,8 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 if (delta < windowTicks) {
                     double mid = windowTicks / 2D;
 
-                    var earlyMultiplier = relic.getStatValue(attacker, stack, "wrath", "early_multiplier");
-                    var lateMultiplier = relic.getStatValue(attacker, stack, "wrath", "late_multiplier");
+                    var earlyMultiplier = relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatData("early_multiplier").getValue();
+                    var lateMultiplier = relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatData("late_multiplier").getValue();
 
                     if (delta <= mid) {
                         var t = delta / mid;
@@ -588,16 +588,16 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 var baseDamage = event.getNewDamage();
                 var extraDamage = baseDamage * (modifier - 1);
 
-                relic.addAbilityMetricValue(attacker, stack, "wrath", "windows", 1);
+                relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatisticData().getMetricData("windows").addValue(1);
 
                 event.setNewDamage((float) (baseDamage * modifier));
 
-                relic.addRelicExperience(attacker, stack, "wrath", "timing", Math.abs(extraDamage));
+                relic.getRelicData(attacker, stack).getLevelingData().addExperience("wrath", "timing", Math.abs(extraDamage));
 
                 if (extraDamage > 0)
-                    relic.addAbilityMetricValue(attacker, stack, "wrath", "bonus_damage", extraDamage);
+                    relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatisticData().getMetricData("bonus_damage").addValue(extraDamage);
                 else if (extraDamage < 0)
-                    relic.addAbilityMetricValue(attacker, stack, "wrath", "reduced_damage", Math.abs(extraDamage));
+                    relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatisticData().getMetricData("reduced_damage").addValue(Math.abs(extraDamage));
 
                 stack.set(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_WRATH.get(), new WrathData(now));
 
@@ -622,7 +622,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             for (var stack : EntityUtils.findEquippedCurios(wearer, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(wearer, stack, "envy"))
+                if (!relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").canPlayerUse(wearer))
                     continue;
 
                 var wearerHp = wearer.getHealth();
@@ -631,7 +631,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 var diff = (otherHp - wearerHp) / 5F;
 
                 var stat = wearerIsAttacker ? "outgoing_damage_multiplier" : "incoming_damage_multiplier";
-                var perPoint = Math.abs(relic.getStatValue(wearer, stack, "envy", stat));
+                var perPoint = Math.abs(relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").getStatData(stat).getValue());
                 var modifier = (wearerIsAttacker ? diff : -diff) * perPoint;
 
                 if (modifier <= 0)
@@ -642,12 +642,12 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
 
                 event.setNewDamage((float) (baseDamage * (1 + modifier)));
 
-                relic.addRelicExperience(wearer, stack, "envy", "health_gap", Math.abs(extraDamage));
+                relic.getRelicData(wearer, stack).getLevelingData().addExperience("envy", "health_gap", Math.abs(extraDamage));
 
                 if (wearerIsAttacker && extraDamage > 0)
-                    relic.addAbilityMetricValue(wearer, stack, "envy", "offensive_shift", extraDamage);
+                    relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").getStatisticData().getMetricData("offensive_shift").addValue(extraDamage);
                 else if (!wearerIsAttacker && extraDamage > 0)
-                    relic.addAbilityMetricValue(wearer, stack, "envy", "defensive_shift", extraDamage);
+                    relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").getStatisticData().getMetricData("defensive_shift").addValue(extraDamage);
 
                 return true;
             }
@@ -665,7 +665,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(player, stack, "lust"))
+                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").canPlayerUse(player))
                     continue;
 
                 var parentA = event.getParentA();
@@ -676,7 +676,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                 var random = level.getRandom();
 
                 if (child != null) {
-                    var maxOffspring = Math.max(1, (int) Math.round(relic.getStatValue(player, stack, "lust", "amount")));
+                    var maxOffspring = Math.max(1, (int) Math.round(relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatData("amount").getValue()));
                     var count = random.nextInt(maxOffspring + 1);
 
                     for (int i = 0; i < count; i++) {
@@ -690,13 +690,13 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
                         level.addFreshEntity(extra);
                     }
 
-                    relic.addRelicExperience(player, stack, "lust", "offspring", count);
-                    relic.addAbilityMetricValue(player, stack, "lust", "extra_offspring", count);
+                    relic.getRelicData(player, stack).getLevelingData().addExperience("lust", "offspring", count);
+                    relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatisticData().getMetricData("extra_offspring").addValue(count);
                 }
 
-                relic.addAbilityMetricValue(player, stack, "lust", "breeding_attempts", 1);
+                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatisticData().getMetricData("breeding_attempts").addValue(1);
 
-                var deadline = level.getGameTime() + (long) (relic.getStatValue(player, stack, "lust", "time") * 20);
+                var deadline = level.getGameTime() + (long) (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatData("time").getValue() * 20);
 
                 CommonEvents.applyLustDeadline(parentA, deadline);
                 CommonEvents.applyLustDeadline(parentB, deadline);
@@ -730,10 +730,10 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(player, stack, "greed"))
+                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("greed").canPlayerUse(player))
                     continue;
 
-                relic.addRelicExperience(player, stack, "greed", "ore", 1);
+                relic.getRelicData(player, stack).getLevelingData().addExperience("greed", "ore", 1);
             }
         }
 
@@ -745,10 +745,10 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(player, stack, "greed"))
+                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("greed").canPlayerUse(player))
                     continue;
 
-                relic.addRelicExperience(player, stack, "greed", "mob", 1);
+                relic.getRelicData(player, stack).getLevelingData().addExperience("greed", "mob", 1);
             }
         }
 
@@ -773,10 +773,10 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(player, stack, "gluttony"))
+                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("gluttony").canPlayerUse(player))
                     continue;
 
-                relic.addRelicExperience(player, stack, "gluttony", "food", nutrition);
+                relic.getRelicData(player, stack).getLevelingData().addExperience("gluttony", "food", nutrition);
             }
         }
 
@@ -835,7 +835,7 @@ public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreative
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(entity, stack, "sloth"))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sloth").canPlayerUse(entity))
                     continue;
 
                 ServerScheduler.schedule(1, () -> stack.set(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_SLOTH.get(), SlothData.create(entity.position(), entity.getYRot(), entity.getXRot(), 0)));

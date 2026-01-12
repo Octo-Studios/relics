@@ -42,7 +42,7 @@ public class KineticBeltRenderer implements IRelicRenderer {
 
         ICurioRenderer.followBodyRotations(entity, this.model);
 
-        if (relic.isRelicFlawless(entity, stack))
+        if (relic.getRelicData(entity, stack).isFlawless())
             this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt_flawless.png"))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
         else {
             this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/kinetic_belt.png"))), light, OverlayTexture.NO_OVERLAY);

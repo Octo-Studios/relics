@@ -44,19 +44,21 @@ public class AbilityStatArgument implements ArgumentType<String> {
             return Suggestions.empty();
 
         var ability = StringArgumentType.getString(context, "ability");
+        var stack = player.getMainHandItem();
+        var relicData = relic.getRelicData(player, stack);
 
         var result = new ArrayList<String>();
 
         if (ability.equals("all")) {
-            for (var abilityEntry : relic.getRelicTemplate(player, player.getMainHandItem()).getAbilities().getAbilities().values())
+            for (var abilityEntry : relicData.getTemplate().getAbilities().getAbilities().values())
                 result.addAll(abilityEntry.getStats().keySet());
         } else {
-            var data = relic.getAbilityTemplate(player, player.getMainHandItem(), ability);
+            var data = relicData.getAbilitiesData().getAbilityData(ability);
 
-            if (data == null)
+            if (data == null || data.getTemplate() == null)
                 return Suggestions.empty();
 
-            result.addAll(data.getStats().keySet());
+            result.addAll(data.getTemplate().getStats().keySet());
         }
 
         result.add("all");

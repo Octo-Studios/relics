@@ -30,10 +30,10 @@ public class LivingEntityMixin {
         for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
             var relic = (KineticBeltItem) stack.getItem();
 
-            if (!relic.canPlayerUseAbility(entity, stack, "gliding") || relic.getAbilityMode(entity, stack, "gliding").equals("disabled") || !relic.isActive(stack))
+            if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled") || !relic.isActive(stack))
                 continue;
 
-            var scale = relic.getStatValue(entity, stack, "gliding", "efficiency");
+            var scale = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue();
 
             entity.setDeltaMovement(motion.add(motion.scale(scale)));
         }
@@ -53,9 +53,9 @@ public class LivingEntityMixin {
                 .filter(stack -> {
                     var relic = ((KineticBeltItem) stack.getItem());
 
-                    return relic.canPlayerUseAbility(entity, stack, "gliding") && !relic.getAbilityMode(entity, stack, "gliding").equals("disabled") && (!relic.isLanded(stack) || relic.isActive(stack));
+                    return relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) && !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled") && (!relic.isLanded(stack) || relic.isActive(stack));
                 })
-                .mapToDouble(stack -> ((KineticBeltItem) stack.getItem()).getStatValue(entity, stack, "gliding", "efficiency"))
+                .mapToDouble(stack -> ((KineticBeltItem) stack.getItem()).getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue())
                 .max()
                 .orElse(0D);
 

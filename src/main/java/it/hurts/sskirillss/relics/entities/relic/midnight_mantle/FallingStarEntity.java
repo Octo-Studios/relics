@@ -310,9 +310,9 @@ public class FallingStarEntity extends ThrowableProjectile {
                 var stack = this.getStack();
 
                 if (stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner) {
-                    relic.addAbilityMetricValue(owner, stack, "starfall", "star_bounces", 1);
+                    relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("starfall").getStatisticData().getMetricData("star_bounces").addValue(1);
 
-                    relic.addRelicExperience(owner, stack, "starfall", "star_bounce", 1);
+                    relic.getRelicData(owner, stack).getLevelingData().addExperience("starfall", "star_bounce", 1);
                 }
             } else
                 this.discard();

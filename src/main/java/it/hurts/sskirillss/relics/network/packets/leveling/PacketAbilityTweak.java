@@ -68,7 +68,8 @@ public class PacketAbilityTweak implements CustomPacketPayload {
                 return;
             }
 
-            AbilityTemplate entry = relic.getAbilityTemplate(player, stack, ability);
+            var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+            AbilityTemplate entry = abilityData.getTemplate();
 
             if (entry == null)
                 return;
@@ -80,11 +81,11 @@ public class PacketAbilityTweak implements CustomPacketPayload {
 
                     if (withShift)
                         for (; ; )
-                            if (relic.upgrade(player, stack, ability))
+                            if (abilityData.upgrade(player))
                                 result = true;
                             else break;
                     else
-                        result = relic.upgrade(player, stack, ability);
+                        result = abilityData.upgrade(player);
 
                     yield result;
                 }
@@ -92,14 +93,14 @@ public class PacketAbilityTweak implements CustomPacketPayload {
                     boolean result = false;
 
                     if (withShift)
-                        while (relic.calculateAbilityQuality(player, stack, ability) != relic.getAbilityMaxQuality(player, stack, ability) && relic.reroll(player, stack, ability))
+                        while (abilityData.calculateQuality() != abilityData.getMaxQuality() && abilityData.reroll(player))
                             result = true;
                     else
-                        result = relic.reroll(player, stack, ability);
+                        result = abilityData.reroll(player);
 
                     yield result;
                 }
-                case RESET -> relic.reset(player, stack, ability);
+                case RESET -> abilityData.reset(player);
             }) return;
 
             try {

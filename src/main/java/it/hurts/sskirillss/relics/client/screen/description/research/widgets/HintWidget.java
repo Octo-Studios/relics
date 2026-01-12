@@ -42,12 +42,18 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
 
     @Override
     public void onPress() {
-        if (!(screen.stack.getItem() instanceof IRelicItem relic) || relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability))
+        if (!(screen.stack.getItem() instanceof IRelicItem relic))
             return;
 
-        int links = relic.getResearchTemplate(minecraft.player, screen.stack, screen.ability).getLinks().size();
+        var abilityData = relic.getRelicData(minecraft.player, screen.stack).getAbilitiesData().getAbilityData(screen.ability);
+        var template = abilityData.getTemplate();
 
-        int requiredExperience = relic.getResearchHintPlayerExperienceCost(minecraft.player, screen.stack, screen.ability) * (Screen.hasShiftDown() ? links : 1);
+        if (template == null || abilityData.getResearchData().isResearched())
+            return;
+
+        int links = template.getResearchTemplate().getLinks().size();
+
+        int requiredExperience = abilityData.getResearchData().getHintPlayerExperienceCost() * (Screen.hasShiftDown() ? links : 1);
         long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         if (experience >= requiredExperience)
@@ -70,7 +76,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
                 .pos(getX(), getY() - 10)
                 .end();
 
-        if (relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability)) {
+        if (relic.getRelicData(minecraft.player, screen.stack).getAbilitiesData().getAbilityData(screen.ability).getResearchData().isResearched()) {
             GUIRenderer.begin(DescriptionTextures.BULB_BROKEN, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() + 33, getY() - 6)
@@ -111,7 +117,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
 
     @Override
     public void onTick() {
-        if (!isHovered() || !(screen.stack.getItem() instanceof IRelicItem relic) || relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability))
+        if (!isHovered() || !(screen.stack.getItem() instanceof IRelicItem relic) || relic.getRelicData(minecraft.player, screen.stack).getAbilitiesData().getAbilityData(screen.ability).getResearchData().isResearched())
             return;
 
         RandomSource random = minecraft.player.getRandom();
@@ -134,7 +140,13 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
         int maxWidth = 150;
         int renderWidth = 0;
 
-        int requiredExperience = relic.getResearchHintPlayerExperienceCost(minecraft.player, screen.stack, screen.ability) * (Screen.hasShiftDown() ? relic.getResearchTemplate(minecraft.player, screen.stack, screen.ability).getLinks().size() : 1);
+        var abilityData = relic.getRelicData(minecraft.player, screen.stack).getAbilitiesData().getAbilityData(screen.ability);
+        var template = abilityData.getTemplate();
+
+        if (template == null)
+            return;
+
+        int requiredExperience = abilityData.getResearchData().getHintPlayerExperienceCost() * (Screen.hasShiftDown() ? template.getResearchTemplate().getLinks().size() : 1);
         long experience = EntityUtils.getPlayerTotalExperience(minecraft.player);
 
         MutableComponent negativeStatus = Component.translatable("relics.description.relic.status.negative");
@@ -147,7 +159,7 @@ public class HintWidget extends AbstractDescriptionWidget implements IHoverableW
 
         boolean hasExperience = requiredExperience <= experience;
 
-        if (relic.isAbilityResearched(minecraft.player, screen.stack, screen.ability))
+        if (relic.getRelicData(minecraft.player, screen.stack).getAbilitiesData().getAbilityData(screen.ability).getResearchData().isResearched())
             entries.add(Component.translatable("relics.description.researching.research.hint.locked"));
         else {
             entries.add(Component.translatable("relics.description.researching.research.hint.cost", requiredExperience,

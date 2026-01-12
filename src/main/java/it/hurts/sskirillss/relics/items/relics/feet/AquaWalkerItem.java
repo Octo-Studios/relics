@@ -163,7 +163,7 @@
 //
 //        int drench = stack.getOrDefault(CHARGE, 0);
 //
-//        if (!(event.getEntity() instanceof Player player) || drench > relic.getStatValue(player, stack, "walking", "time")
+//        if (!(event.getEntity() instanceof Player player) || drench > relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("walking").getStatData("time").getValue()
 //                || !event.getFluid().is(FluidTags.WATER) || player.isShiftKeyDown())
 //            return;
 //

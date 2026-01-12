@@ -122,7 +122,7 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
     }
 
     public int getMaxCharge(LivingEntity entity, ItemStack stack) {
-        return (int) this.getStatValue(entity, stack, "blink", "max_charge");
+        return (int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("blink").getStatData("max_charge").getValue();
     }
 
     public int getCharge(LivingEntity entity, ItemStack stack) {
@@ -149,10 +149,10 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
 
-        if (!this.canPlayerUseAbility(player, stack, "blink"))
+        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").canPlayerUse(player))
             return InteractionResultHolder.pass(stack);
 
-        var radius = this.getStatValue(player, stack, "blink", "distance");
+        var radius = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatData("distance").getValue();
 
         var eyePos = player.getEyePosition();
         var lookAngle = player.getLookAngle().normalize();
@@ -168,7 +168,7 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
         if (charge <= 0)
             return InteractionResultHolder.pass(stack);
 
-        if (this.isAbilityRankModifierUnlocked(player, stack, "blink", "ascent")
+        if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").isRankModifierUnlocked("ascent")
                 && hit.getType() == HitResult.Type.BLOCK && hit.getLocation().distanceTo(eyePos) <= radius) {
             var current = hit.getBlockPos();
 
@@ -268,22 +268,22 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
 
                 this.addCharge(player, stack, -1);
 
-                this.addRelicExperience(player, stack, "blink", "blink", 1);
+                this.getRelicData(player, stack).getLevelingData().addExperience("blink", "blink", 1);
 
-                this.addAbilityMetricValue(player, stack, "blink", "blinks_amount", 1);
-                this.addAbilityMetricValue(player, stack, "blink", "distance_traveled", from.distanceTo(to));
+                this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatisticData().getMetricData("blinks_amount").addValue(1);
+                this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatisticData().getMetricData("distance_traveled").addValue(from.distanceTo(to));
 
-                if (this.isAbilityRankModifierUnlocked(player, stack, "blink", "safe_fall"))
+                if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").isRankModifierUnlocked("safe_fall"))
                     this.setSafeFall(stack, true);
 
-                if (this.isAbilityRankModifierUnlocked(player, stack, "blink", "flicker")) {
+                if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").isRankModifierUnlocked("flicker")) {
                     for (var mob : level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(32))) {
                         if (mob.getTarget() == player) {
                             mob.setTarget(null);
 
-                            this.addRelicExperience(player, stack, "blink", "flicker", 1);
+                            this.getRelicData(player, stack).getLevelingData().addExperience("blink", "flicker", 1);
 
-                            this.addAbilityMetricValue(player, stack, "blink", "targets", 1);
+                            this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatisticData().getMetricData("targets").addValue(1);
                         }
                     }
                 }
@@ -317,7 +317,7 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
 
-        if (level.isClientSide() || !(entity instanceof LivingEntity livingEntity) || livingEntity.tickCount % ((int) this.getStatValue(livingEntity, stack, "blink", "cooldown") * 20) != 0
+        if (level.isClientSide() || !(entity instanceof LivingEntity livingEntity) || livingEntity.tickCount % ((int) this.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("blink").getStatData("cooldown").getValue() * 20) != 0
                 || this.getCharge(livingEntity, stack) >= this.getMaxCharge(livingEntity, stack))
             return;
 
@@ -371,14 +371,14 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
                 var stack = inventory.getItem(i);
 
                 if (stack.getItem() instanceof ChorusStaffItem relic) {
-                    if (!relic.isAbilityRankModifierUnlocked(player, stack, "blink", "safe_fall") || !relic.shouldSafeFall(stack))
+                    if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").isRankModifierUnlocked("safe_fall") || !relic.shouldSafeFall(stack))
                         continue;
 
                     relic.setSafeFall(stack, false);
 
-                    relic.addRelicExperience(player, stack, "blink", "blink", 1);
+                    relic.getRelicData(player, stack).getLevelingData().addExperience("blink", "blink", 1);
 
-                    relic.addAbilityMetricValue(player, stack, "blink", "safe_falls", 1);
+                    relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatisticData().getMetricData("safe_falls").addValue(1);
 
                     event.setDamageMultiplier(0F);
                 }

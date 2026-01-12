@@ -16,6 +16,6 @@ public class SilenceBadge extends AbilityBadge {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return false;
 
-        return relic.getAbilityCastData(entity, stack, ability).getType() != CastType.NONE;
+        return relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(ability).getCastData().getType() != CastType.NONE;
     }
 }

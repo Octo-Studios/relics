@@ -50,14 +50,19 @@ public class RelicAbilityStatisticMetricArgument implements ArgumentType<String>
             return Suggestions.empty();
 
         var ability = StringArgumentType.getString(context, "ability");
+        var relicData = relic.getRelicData(player, stack);
 
         var result = new ArrayList<String>();
 
         if (ability.equals("all"))
-            for (AbilityTemplate abilityEntry : relic.getAbilitiesTemplate(player, stack).getAbilities().values())
+            for (AbilityTemplate abilityEntry : relicData.getTemplate().getAbilities().getAbilities().values())
                 result.addAll(abilityEntry.getStatistic().getMetrics().keySet());
-        else
-            result.addAll(relic.getAbilityStatisticTemplate(player, stack, ability).getMetrics().keySet());
+        else {
+            var abilityData = relicData.getAbilitiesData().getAbilityData(ability);
+
+            if (abilityData != null)
+                result.addAll(abilityData.getStatisticData().getTemplate().getMetrics().keySet());
+        }
 
         result.add("all");
 

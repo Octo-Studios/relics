@@ -165,8 +165,9 @@ public class AbilityPageScrollbarWidget extends AbstractDescriptionWidget implem
         if (!(stack.getItem() instanceof IRelicItem relic))
             return 0;
 
-        var abilities = relic.getAbilitiesTemplate(player, stack).getAbilities().keySet().stream()
-                .filter(entry -> relic.isAbilityEnabled(player, stack, entry))
+        var relicData = relic.getRelicData(player, stack);
+        var abilities = relicData.getTemplate().getAbilities().getAbilities().keySet().stream()
+                .filter(entry -> relicData.getAbilitiesData().getAbilityData(entry).isEnabled())
                 .toList();
 
         var maxEntries = 5;

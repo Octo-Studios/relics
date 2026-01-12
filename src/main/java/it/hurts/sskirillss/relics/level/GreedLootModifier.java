@@ -69,12 +69,12 @@ public class GreedLootModifier extends LootModifier {
             for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.canPlayerUseAbility(player, stack, "greed"))
+                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("greed").canPlayerUse(player))
                     continue;
 
-                if (random.nextDouble() < relic.getStatValue(player, stack, "greed", "chance")) {
-                    relic.addRelicExperience(player, stack, "greed", "nullification", 1);
-                    relic.addAbilityMetricValue(player, stack, "greed", "nullified_tables", 1);
+                if (random.nextDouble() < relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("greed").getStatData("chance").getValue()) {
+                    relic.getRelicData(player, stack).getLevelingData().addExperience("greed", "nullification", 1);
+                    relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("greed").getStatisticData().getMetricData("nullified_tables").addValue(1);
 
                     return new ObjectArrayList<>();
                 }
