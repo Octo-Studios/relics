@@ -16,55 +16,61 @@ public class AbilitiesData {
         this.relicData = relicData;
     }
 
+    public RelicData getRelicData() {
+        return relicData;
+    }
+
     public AbilitiesComponent getComponent() {
-        return relicData.getComponent().getAbilities();
+        return this.relicData.getComponent().getAbilities();
     }
 
     public void setComponent(AbilitiesComponent component) {
-        relicData.setComponent(relicData.getComponent().toBuilder()
+        this.relicData.setComponent(this.relicData.getComponent().toBuilder()
                 .abilities(component)
                 .build());
     }
 
     public AbilitiesTemplate getTemplate() {
-        return relicData.getTemplate().getAbilities();
+        return this.relicData.getTemplate().getAbilities();
     }
 
     public Set<String> getAbilityIds() {
-        return getTemplate().getAbilities().keySet();
+        return this.getTemplate().getAbilities().keySet();
     }
 
     public AbilityData getAbilityData(String ability) {
-        if (!getTemplate().getAbilities().containsKey(ability))
+        if (!this.getTemplate().getAbilities().containsKey(ability))
             return null;
 
-        return new AbilityData(relicData, ability);
+        return new AbilityData(this, ability);
     }
 
     public Map<String, AbilityData> getAbilityDataMap() {
-        return getTemplate().getAbilities().keySet().stream()
+        return this.getTemplate().getAbilities().keySet().stream()
                 .collect(Collectors.toMap(
                         id -> id,
-                        id -> new AbilityData(relicData, id),
+                        id -> new AbilityData(this, id),
                         (o1, o2) -> o1,
                         LinkedHashMap::new
                 ));
     }
 
     public Collection<AbilityData> getAbilities() {
-        return getAbilityDataMap().values();
+        return this.getAbilityDataMap().values();
     }
 
     public boolean hasUnlockedUpgradeableAbility() {
-        return getAbilityIds().stream().anyMatch(ability -> {
+        return this.getAbilityIds().stream().anyMatch(ability -> {
             var abilityData = getAbilityData(ability);
+
             return abilityData != null && abilityData.canBeUpgraded() && abilityData.isUnlocked();
         });
     }
 
     public boolean hasUnlockedAbility() {
-        return getAbilityIds().stream().anyMatch(ability -> {
+        return this.getAbilityIds().stream().anyMatch(ability -> {
             var abilityData = getAbilityData(ability);
+
             return abilityData != null && abilityData.isUnlocked();
         });
     }

@@ -5,7 +5,6 @@ import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsRegistries;
-import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
@@ -26,28 +25,28 @@ public class RelicData {
     }
 
     public IRelicItem getRelic() {
-        return relic;
+        return this.relic;
     }
 
     @Nullable
     public LivingEntity getEntity() {
-        return entity;
+        return this.entity;
     }
 
     public ItemStack getStack() {
-        return stack;
+        return this.stack;
     }
 
     public RelicTemplate getTemplate() {
-        return relic.getRelicTemplate(entity, stack);
+        return this.relic.getRelicTemplate(entity, stack);
     }
 
     public RelicComponent getComponent() {
-        return stack.getOrDefault(RelicsDataComponents.DATA, RelicComponent.EMPTY);
+        return this.stack.getOrDefault(RelicsDataComponents.RELIC, RelicComponent.EMPTY);
     }
 
     public void setComponent(RelicComponent component) {
-        stack.set(RelicsDataComponents.DATA, component);
+        this.stack.set(RelicsDataComponents.RELIC, component);
     }
 
     public AbilitiesData getAbilitiesData() {
@@ -62,12 +61,8 @@ public class RelicData {
         return new RelicStatisticData(this);
     }
 
-    public LootTemplate getLootTemplate() {
-        return getTemplate().getLoot();
-    }
-
     public int calculateMaxLevel() {
-        return getTemplate().getAbilities().getAbilities().values().stream()
+        return this.getTemplate().getAbilities().getAbilities().values().stream()
                 .mapToInt(template -> template.getInitialMaxLevel() * template.getRequiredPoints())
                 .sum();
     }
@@ -77,12 +72,12 @@ public class RelicData {
     }
 
     public int calculateQuality() {
-        var abilities = getTemplate().getAbilities().getAbilities();
+        var abilities = this.getTemplate().getAbilities().getAbilities();
 
         if (abilities.isEmpty())
             return 0;
 
-        var abilitiesData = getAbilitiesData();
+        var abilitiesData = this.getAbilitiesData();
 
         var filtered = abilities.keySet().stream()
                 .filter(ability -> {
@@ -110,15 +105,15 @@ public class RelicData {
     }
 
     public double calculateProgress() {
-        var levelingData = getLevelingData();
+        var levelingData = this.getLevelingData();
         var unspentPoints = levelingData.getPoints();
-        var template = getTemplate().getLeveling();
+        var template = this.getTemplate().getLeveling();
         var rank = levelingData.getRank();
         var maxRank = template.getMaxRank();
         var level = levelingData.getLevel();
-        var maxLevel = calculateMaxLevel();
-        var quality = calculateQuality();
-        var maxQuality = getMaxQuality();
+        var maxLevel = this.calculateMaxLevel();
+        var quality = this.calculateQuality();
+        var maxQuality = this.getMaxQuality();
 
         var adjustedUnits = Math.max(0.0, Math.min(level - (unspentPoints * 0.5), maxLevel));
 
@@ -132,20 +127,23 @@ public class RelicData {
         var qualityContribution = qualityRatio * maxQualityWeight * (1 - baseProgress);
 
         var progress = baseProgress + qualityContribution;
+
         return Math.min(1.0, Math.max(0.0, progress));
     }
 
+    @Deprecated(forRemoval = true)
     public void spreadExperience(int experience) {
-        spreadExperience(experience, 0.25D);
+        this.spreadExperience(experience, 0.25D);
     }
 
+    @Deprecated(forRemoval = true)
     public void spreadExperience(int experience, double percentage) {
-        var isMaxLevel = isMaxLevel();
+        var isMaxLevel = this.isMaxLevel();
 
         var toSpread = isMaxLevel ? 0 : experience * percentage;
 
         if (!isMaxLevel)
-            getLevelingData().addExperience(experience);
+            this.getLevelingData().addExperience(experience);
 
         if (toSpread <= 0 || entity == null)
             return;
@@ -168,18 +166,18 @@ public class RelicData {
     }
 
     public boolean isMaxRank() {
-        return getLevelingData().getRank() >= getTemplate().getLeveling().getMaxRank();
+        return this.getLevelingData().getRank() >= this.getTemplate().getLeveling().getMaxRank();
     }
 
     public boolean isMaxLevel() {
-        return getLevelingData().getLevel() >= calculateMaxLevel();
+        return this.getLevelingData().getLevel() >= this.calculateMaxLevel();
     }
 
     public boolean isMaxQuality() {
-        return calculateQuality() >= getMaxQuality();
+        return this.calculateQuality() >= this.getMaxQuality();
     }
 
     public boolean isFlawless() {
-        return calculateProgress() >= 1F;
+        return this.calculateProgress() >= 1F;
     }
 }

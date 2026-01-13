@@ -42,15 +42,6 @@ public class ItemMixin {
             return;
 
         var relicData = relic.getRelicData(livingEntity, stack);
-        var abilitiesData = relicData.getAbilitiesData();
-
-        for (var entry : relicData.getTemplate().getAbilities().getAbilities().entrySet()) {
-            String ability = entry.getKey();
-            var abilityData = abilitiesData.getAbilityData(ability);
-
-            if (abilityData.getExtenderData().getCooldown() > 0)
-                abilityData.getExtenderData().addCooldown(-1);
-        }
 
         if (livingEntity.tickCount % 20 == 0)
             relicData.getStatisticData().getMetricData("retention_time").addValue(1);

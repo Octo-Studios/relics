@@ -1,38 +1,32 @@
 package it.hurts.sskirillss.relics.api.relics.data;
 
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
 import com.google.common.collect.Multimaps;
+import it.hurts.sskirillss.relics.api.relics.LockComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.api.relics.LockComponent;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
-import java.util.function.BiFunction;
-import java.util.stream.Collectors;
 
 public class AbilityData {
-    private final RelicData relicData;
+    private final AbilitiesData abilitiesData;
     private final String ability;
 
-    public AbilityData(RelicData relicData, String ability) {
-        this.relicData = relicData;
+    public AbilityData(AbilitiesData abilitiesData, String ability) {
+        this.abilitiesData = abilitiesData;
         this.ability = ability;
     }
 
-    public RelicData getRelicData() {
-        return relicData;
+    public AbilitiesData getAbilitiesData() {
+        return abilitiesData;
     }
 
     public String getId() {
@@ -40,7 +34,7 @@ public class AbilityData {
     }
 
     public AbilityTemplate getTemplate() {
-        return relicData.getTemplate().getAbilities().getAbilities().get(ability);
+        return abilitiesData.getTemplate().getAbilities().get(ability);
     }
 
     public AbilityComponent getComponent() {
@@ -49,7 +43,6 @@ public class AbilityData {
         if (template == null)
             return null;
 
-        var abilitiesData = relicData.getAbilitiesData();
         var abilitiesComponent = abilitiesData.getComponent();
         var abilityComponent = abilitiesComponent.getAbilities().get(ability);
 
@@ -73,8 +66,6 @@ public class AbilityData {
     }
 
     public void setComponent(AbilityComponent component) {
-        var abilitiesData = relicData.getAbilitiesData();
-
         abilitiesData.setComponent(abilitiesData.getComponent().toBuilder()
                 .ability(ability, component)
                 .build());
@@ -94,10 +85,6 @@ public class AbilityData {
 
     public LockData getLockData() {
         return new LockData(this);
-    }
-
-    public AbilityExtenderData getExtenderData() {
-        return new AbilityExtenderData(this);
     }
 
     public int getLevel() {
@@ -139,7 +126,7 @@ public class AbilityData {
 
         var modifiers = Multimaps.invertFrom(template.getRankModifiers(), HashMultimap.create());
 
-        return relicData.getLevelingData().getRank() >= Collections.max(modifiers.get(rankModifier));
+        return abilitiesData.getRelicData().getLevelingData().getRank() >= Collections.max(modifiers.get(rankModifier));
     }
 
     public void randomizeStats() {
@@ -153,7 +140,7 @@ public class AbilityData {
         if (stats.isEmpty())
             return;
 
-        var entity = relicData.getEntity();
+        var entity = abilitiesData.getRelicData().getEntity();
         var random = entity == null ? RandomSource.create() : entity.getRandom();
 
         double targetQuality;
@@ -210,7 +197,7 @@ public class AbilityData {
     }
 
     public void randomizeStat(String stat) {
-        var entity = relicData.getEntity();
+        var entity = abilitiesData.getRelicData().getEntity();
         var random = entity == null ? RandomSource.create() : entity.getRandom();
 
         getStatData(stat).setInitialQuality(random.nextInt(getStatData(stat).getMaxQuality() + 1));
@@ -219,7 +206,7 @@ public class AbilityData {
     public boolean isEnoughLevel() {
         var template = getTemplate();
 
-        return template != null && relicData.getLevelingData().getLevel() >= template.getRequiredLevel();
+        return template != null && abilitiesData.getRelicData().getLevelingData().getLevel() >= template.getRequiredLevel();
     }
 
     public boolean isEnabled() {
@@ -231,8 +218,7 @@ public class AbilityData {
     }
 
     public boolean canPlayerUse(LivingEntity entity) {
-        return isUnlocked()
-                && getExtenderData().getCooldown() <= 0;
+        return isUnlocked();
     }
 
     public boolean mayUnlock() {
@@ -259,7 +245,7 @@ public class AbilityData {
         return template != null
                 && canBeUpgraded()
                 && !isMaxLevel()
-                && relicData.getLevelingData().getPoints() >= template.getRequiredPoints()
+                && abilitiesData.getRelicData().getLevelingData().getPoints() >= template.getRequiredPoints()
                 && isUnlocked();
     }
 
@@ -274,7 +260,7 @@ public class AbilityData {
         player.giveExperiencePoints(-getUpgradePlayerExperienceCost());
 
         setLevel(getLevel() + 1);
-        relicData.getLevelingData().addPoints(-getTemplate().getRequiredPoints());
+        abilitiesData.getRelicData().getLevelingData().addPoints(-getTemplate().getRequiredPoints());
 
         return true;
     }
@@ -326,7 +312,7 @@ public class AbilityData {
 
         player.giveExperiencePoints(-getResetPlayerExperienceCost());
 
-        relicData.getLevelingData().addPoints(getLevel() * getTemplate().getRequiredPoints());
+        abilitiesData.getRelicData().getLevelingData().addPoints(getLevel() * getTemplate().getRequiredPoints());
         setLevel(0);
 
         return true;
@@ -372,14 +358,6 @@ public class AbilityData {
 
     public boolean isMaxQuality() {
         return calculateQuality() >= getMaxQuality();
-    }
-
-    public boolean isTicking() {
-        return isUnlocked() && getExtenderData().isTicking();
-    }
-
-    public boolean isOnCooldown() {
-        return getExtenderData().getCooldown() > 0;
     }
 
     public boolean isUpgradeEnabled() {

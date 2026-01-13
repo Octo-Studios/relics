@@ -4,10 +4,10 @@ import com.mojang.serialization.Codec;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
+import it.hurts.sskirillss.relics.items.PetBoneItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
 import it.hurts.sskirillss.relics.items.relics.ring.RingOfTheSevenDeadlySinsItem;
-import it.hurts.sskirillss.relics.items.PetBoneItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
 import net.neoforged.bus.api.IEventBus;
@@ -20,13 +20,11 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.List;
 import java.util.Map;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class RelicsDataComponents {
     public static final DeferredRegister<DataComponentType<?>> DATA_COMPONENTS = DeferredRegister.create(Registries.DATA_COMPONENT_TYPE, Relics.MODID);
 
-    // TODO: Rename to RELIC_DATA or just RELIC instead of DATA
-    @Deprecated(since = "1.21", forRemoval = true)
-    public static final DeferredHolder<DataComponentType<?>, DataComponentType<RelicComponent>> DATA = DATA_COMPONENTS.register("data",
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<RelicComponent>> RELIC = DATA_COMPONENTS.register("data", // TODO: Rename to "relic" instead of "data"
             () -> DataComponentType.<RelicComponent>builder()
                     .persistent(RelicComponent.CODEC)
                     .build()
@@ -81,6 +79,6 @@ public class RelicsDataComponents {
 
     @SubscribeEvent
     public static void modifyComponents(ModifyDefaultComponentsEvent event) {
-        event.modifyMatching(item -> item instanceof IRelicItem, builder -> builder.set(DATA.get(), RelicComponent.EMPTY));
+        event.modifyMatching(item -> item instanceof IRelicItem, builder -> builder.set(RELIC.get(), RelicComponent.EMPTY));
     }
 }

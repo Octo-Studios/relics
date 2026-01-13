@@ -139,7 +139,7 @@ public class StatData {
         var threshold = template.getThresholdValue();
 
         return MathUtils.round(Mth.clamp(template.getUpgradeModifier().getScalingModel()
-                .evaluate(abilityData.getRelicData().getEntity(), abilityData.getRelicData().getStack(), value, template.getUpgradeModifier().getModifier(), points), threshold.getMinValue(), threshold.getMaxValue()), 5);
+                .evaluate(abilityData.getAbilitiesData().getRelicData().getEntity(), abilityData.getAbilitiesData().getRelicData().getStack(), value, template.getUpgradeModifier().getModifier(), points), threshold.getMinValue(), threshold.getMaxValue()), 5);
     }
 
     public double getValueFromQuality(int quality) {
