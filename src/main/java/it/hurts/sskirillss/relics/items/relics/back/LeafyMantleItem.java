@@ -9,7 +9,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.entities.LeavesBlockEntity;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -29,6 +29,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -54,17 +55,17 @@ public class LeafyMantleItem extends RelicItem {
                         .ability(AbilityTemplate.builder("camouflage")
                                 .rankModifier(3, "absorption")
                                 .rankModifier(5, "disappearance")
-                                .stat(StatTemplate.builder("heal")
+                                .stat(AbilityStatTemplate.builder("heal")
                                         .initialValue(0.1D, 0.25D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.6279D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("absorption")
+                                .stat(AbilityStatTemplate.builder("absorption")
                                         .initialValue(1D, 3D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1619D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .stat(StatTemplate.builder("cooldown")
+                                .stat(AbilityStatTemplate.builder("cooldown")
                                         .thresholdValue(0D, Double.MAX_VALUE)
                                         .initialValue(15D, 10D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.01636D)
@@ -92,22 +93,22 @@ public class LeafyMantleItem extends RelicItem {
                         .ability(AbilityTemplate.builder("revival")
                                 .requiredLevel(5)
                                 .rankModifier(1, "piercing")
-                                .stat(StatTemplate.builder("radius")
+                                .stat(AbilityStatTemplate.builder("radius")
                                         .initialValue(5D, 10D)
                                         .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.0265D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("heal")
+                                .stat(AbilityStatTemplate.builder("heal")
                                         .initialValue(0.5D, 1D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("damage")
+                                .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(0.5D, 1D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("paralysis")
+                                .stat(AbilityStatTemplate.builder("paralysis")
                                         .initialValue(0.5D, 1D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
                                         .formatValue(value -> MathUtils.round(value, 1))

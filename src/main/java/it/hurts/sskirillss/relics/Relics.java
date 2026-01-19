@@ -30,7 +30,7 @@ public class Relics {
         RelicsBlockEntities.register(bus);
         RelicsScalingModels.register(bus);
         RelicsDataComponents.register(bus);
-        RelicsRelicContainer.register(bus);
+        RelicsRelicContainers.register(bus);
     }
 
     private void setupCommon(final FMLCommonSetupEvent event) {

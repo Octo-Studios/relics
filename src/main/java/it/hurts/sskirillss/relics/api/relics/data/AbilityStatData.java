@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.api.relics.data;
 
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
 
@@ -9,11 +9,11 @@ import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.Random;
 
-public class StatData {
+public class AbilityStatData {
     private final AbilityData abilityData;
     private final String stat;
 
-    public StatData(AbilityData abilityData, String stat) {
+    public AbilityStatData(AbilityData abilityData, String stat) {
         this.abilityData = abilityData;
         this.stat = stat;
     }
@@ -23,7 +23,7 @@ public class StatData {
     }
 
     @Nullable
-    public StatTemplate getTemplate() {
+    public AbilityStatTemplate getTemplate() {
         var abilityTemplate = abilityData.getTemplate();
 
         return abilityTemplate == null ? null : abilityTemplate.getStats().get(stat);

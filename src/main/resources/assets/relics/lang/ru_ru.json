@@ -153,6 +153,8 @@
   "relics.description.kinetic_belt.ability.gliding.rank_modifier.momentum": "Использование способности перед падением подавит весь потенциальный урон от падения и сохранит инерцию для следующего прыжка.",
   "relics.description.kinetic_belt.ability.gliding.rank_modifier.strike": "При использовании способности увеличивает наносимый снарядами носителя реликвии урон на %2$s%%.",
   "relics.description.kinetic_belt.ability.gliding.rank_modifier.resistance": "Снижает входящий по носителю реликвии урон на %3$s%% во время использования способности.",
+  "relics.description.kinetic_belt.synergy.test": "Электрическая дуга",
+  "relics.description.kinetic_belt.synergy.test.description": "При планировании оставляет за носителем реликвии след из электрических цепей, наносящий %1$s урона любой цели при касании.",
   "relics.description.kinetic_belt.ability.gliding.experience_source.gliding": "+1 единица опыта за каждую секунду планирования.",
   "relics.description.kinetic_belt.ability.gliding.experience_source.strike": "+1 единица опыта за каждую дополнительную единицу урона от модификатора.",
   "relics.description.kinetic_belt.ability.gliding.experience_source.resistance": "+1 единица опыта за каждую единицу заблокированного урона благодаря модификатору.",

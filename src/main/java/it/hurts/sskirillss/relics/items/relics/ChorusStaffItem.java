@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberration;
 import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberrationManager;
 import it.hurts.sskirillss.relics.dev.shake.Shake;
@@ -64,17 +64,17 @@ public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
                                 .rankModifier(3, "safe_fall")
                                 .rankModifier(5, "ascent")
                                 .initialMaxLevel(10)
-                                .stat(StatTemplate.builder("distance")
+                                .stat(AbilityStatTemplate.builder("distance")
                                         .initialValue(10D, 15D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .stat(StatTemplate.builder("max_charge")
+                                .stat(AbilityStatTemplate.builder("max_charge")
                                         .initialValue(3D, 5D)
                                         .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .stat(StatTemplate.builder("cooldown")
+                                .stat(AbilityStatTemplate.builder("cooldown")
                                         .initialValue(30D, 15D)
                                         .thresholdValue(1D, Double.MAX_VALUE)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.019D)

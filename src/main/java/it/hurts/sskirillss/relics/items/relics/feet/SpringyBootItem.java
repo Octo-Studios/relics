@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -40,27 +40,27 @@ public class SpringyBootItem extends RelicItem {
                                 .rankModifier(1, "disappearance")
                                 .rankModifier(3, "strike")
                                 .rankModifier(5, "shockwave")
-                                .stat(StatTemplate.builder("power")
+                                .stat(AbilityStatTemplate.builder("power")
                                         .initialValue(0.5D, 0.75D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.3488D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .stat(StatTemplate.builder("damage_modifier")
+                                .stat(AbilityStatTemplate.builder("damage_modifier")
                                         .initialValue(0.05D, 0.15D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0667D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .stat(StatTemplate.builder("radius")
+                                .stat(AbilityStatTemplate.builder("radius")
                                         .initialValue(1D, 3D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.9534D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("damage")
+                                .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(2.5D, 5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("stun")
+                                .stat(AbilityStatTemplate.builder("stun")
                                         .initialValue(0.25D, 0.5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2571D)
                                         .formatValue(value -> MathUtils.round(value, 1))

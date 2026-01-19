@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.api.relics;
 
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -160,14 +160,14 @@ public interface IRelicTemplateHolder {
     }
 
     /**
-     * Retrieves the {@link StatTemplate} for a specific stat of a given ability from the default template.
+     * Retrieves the {@link AbilityStatTemplate} for a specific stat of a given ability from the default template.
      *
      * @param ability the ID of the ability
      * @param stat    the ID of the stat
-     * @return the corresponding {@link StatTemplate}, or {@code null} if not found
+     * @return the corresponding {@link AbilityStatTemplate}, or {@code null} if not found
      */
     @ApiStatus.Internal
-    default StatTemplate getDefaultStatTemplate(String ability, String stat) {
+    default AbilityStatTemplate getDefaultStatTemplate(String ability, String stat) {
         return getDefaultAbilityTemplate(ability).getStats().get(stat);
     }
 

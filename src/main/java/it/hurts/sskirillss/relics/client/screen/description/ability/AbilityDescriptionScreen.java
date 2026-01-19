@@ -69,7 +69,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             if (this.selectedAbility == null)
                 this.setSelectedAbility(abilities.getFirst());
 
-            this.setPage(abilities.indexOf(getSelectedAbility()) / 5);
+            this.setPage(abilities.indexOf(getSelectedAbility()) / 4);
         }
     }
 
@@ -96,7 +96,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         var maxEntries = 4;
 
-        var totalPages = (int) Math.ceil(abilities.size() / 5D);
+        var totalPages = (int) Math.ceil(abilities.size() / (double) maxEntries);
 
         if (totalPages > 0 && page >= totalPages)
             this.setPage(Math.max(totalPages - 1, 0));

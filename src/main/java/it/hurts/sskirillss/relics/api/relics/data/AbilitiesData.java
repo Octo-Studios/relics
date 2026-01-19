@@ -59,6 +59,31 @@ public class AbilitiesData {
         return this.getAbilityDataMap().values();
     }
 
+    public Set<String> getSynergyIds() {
+        return this.getTemplate().getSynergies().keySet();
+    }
+
+    public SynergyData getSynergyData(String synergy) {
+        if (!this.getTemplate().getSynergies().containsKey(synergy))
+            return null;
+
+        return new SynergyData(this, synergy);
+    }
+
+    public Map<String, SynergyData> getSynergyDataMap() {
+        return this.getTemplate().getSynergies().keySet().stream()
+                .collect(Collectors.toMap(
+                        id -> id,
+                        id -> new SynergyData(this, id),
+                        (o1, o2) -> o1,
+                        LinkedHashMap::new
+                ));
+    }
+
+    public Collection<SynergyData> getSynergies() {
+        return this.getSynergyDataMap().values();
+    }
+
     public boolean hasUnlockedUpgradeableAbility() {
         return this.getAbilityIds().stream().anyMatch(ability -> {
             var abilityData = getAbilityData(ability);

@@ -1,0 +1,258 @@
+package it.hurts.sskirillss.relics.client.screen.description.synergy;
+
+import com.mojang.blaze3d.platform.InputConstants;
+import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
+import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
+import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.synergy.widgets.*;
+import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
+import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
+import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractButton;
+import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.Style;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
+
+import java.util.ArrayList;
+
+@OnlyIn(Dist.CLIENT)
+public class SynergyDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
+    @Getter
+    @Setter
+    private int page;
+
+    @Getter
+    @Setter
+    private String selectedSynergy;
+
+    @Getter
+    @Setter
+    private DescriptionSubcategory subcategory = DescriptionSubcategories.getSubcategory("synergy_description");
+
+    public SynergyDescriptionScreen(Player player, int container, int slot, Screen screen) {
+        super(player, container, slot, screen);
+
+        if (stack.getItem() instanceof IRelicItem relic) {
+            var relicData = relic.getRelicData(player, stack);
+            var synergies = relicData.getTemplate().getAbilities().getSynergies().keySet().stream()
+                    .toList();
+
+            if (this.selectedSynergy == null)
+                this.setSelectedSynergy(synergies.getFirst());
+
+            this.setPage(synergies.indexOf(getSelectedSynergy()) / 4);
+        }
+    }
+
+    @Override
+    protected void init() {
+        super.init();
+
+        if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var player = minecraft.player;
+
+        var synergy = this.getSelectedSynergy();
+
+        var relicData = relic.getRelicData(player, stack);
+        var synergyData = relicData.getAbilitiesData().getSynergyData(synergy);
+
+        if (synergyData.getTemplate() == null)
+            return;
+
+        var synergies = relicData.getTemplate().getAbilities().getSynergies().keySet().stream()
+                .filter(entry -> relicData.getAbilitiesData().getSynergyData(entry).isEnabled())
+                .toList();
+
+        var maxEntries = 4;
+
+        var totalPages = (int) Math.ceil(synergies.size() / (double) maxEntries);
+
+        if (totalPages > 0 && page >= totalPages)
+            this.setPage(Math.max(totalPages - 1, 0));
+
+        if (synergies.size() > maxEntries)
+            this.addRenderableWidget(new SynergyPageScrollbarWidget(x + 279, y + 173, this));
+
+        int startIndex = page * maxEntries;
+        int endIndex = Math.min(startIndex + maxEntries, synergies.size());
+
+        var paginatedSynergies = (startIndex < synergies.size() && startIndex >= 0) ? synergies.subList(startIndex, endIndex) : new ArrayList<String>();
+
+        int xOff = 0;
+
+        this.addRenderableWidget(new BigSynergyCardWidget(x + 59, y + 43, this));
+
+        if (!paginatedSynergies.isEmpty()) {
+            int objectWidth = 38;
+            int containerWidth = 209;
+
+            int count = paginatedSynergies.size();
+
+            int spacing = objectWidth + 8 + (3 * (maxEntries - count));
+
+            xOff = (containerWidth / 2) - (((objectWidth * count) + ((spacing - objectWidth) * Math.max(count - 1, 0))) / 2);
+
+            this.addRenderableWidget(new SynergyCardsContainerWidget(this));
+
+            for (String entry : paginatedSynergies) {
+                this.addRenderableWidget(new SynergyCardWidget(x + 77 + xOff, y + 160, this, entry));
+
+                xOff += spacing;
+            }
+        }
+
+        var container = subcategory.getContainerWidget(this);
+
+        this.addRenderableWidget(container);
+        this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
+
+        this.initModeButtons();
+    }
+
+    public void initModeButtons() {
+        if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var synergy = this.getSelectedSynergy();
+        var player = minecraft.player;
+        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(synergy);
+        var template = synergyData.getTemplate();
+
+        if (synergyData.isUnlocked() && template != null && !template.getModes().isEmpty()) {
+            this.addRenderableWidget(new SynergyModeWidget(x + 100, y + 53, this, 1));
+            this.addRenderableWidget(new SynergyModeWidget(x + 56, y + 53, this, -1));
+        }
+    }
+
+    @Override
+    public void renderBackground(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.renderBackground(guiGraphics, pMouseX, pMouseY, pPartialTick);
+
+        var player = Minecraft.getInstance().player;
+
+        if (this.stack == null || !(this.stack.getItem() instanceof IRelicItem relic) || player == null)
+            return;
+
+        var synergy = this.getSelectedSynergy();
+
+        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(synergy);
+        var template = synergyData.getTemplate();
+
+        if (template == null)
+            return;
+
+        var poseStack = guiGraphics.pose();
+
+        poseStack.pushPose();
+
+        poseStack.scale(0.75F, 0.75F, 1F);
+
+        var title = Component.translatableWithFallback("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".synergy." + synergy, synergy);
+
+        var modes = template.getModes();
+
+        if (!modes.isEmpty())
+            title.append(Component.literal(" [").append(Component.translatable("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".synergy." + synergy + ".mode." + synergyData.getMode())).append(Component.literal("]")));
+
+        if (!synergyData.isUnlocked()) {
+            title = ScreenUtils.stylizeWithReplacement(title, 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(0x9E00B0), synergy.length());
+
+            var random = player.getRandom();
+
+            var shakeX = MathUtils.randomFloat(random) * 0.5F;
+            var shakeY = MathUtils.randomFloat(random) * 0.5F;
+
+            poseStack.translate(shakeX, shakeY, 0F);
+        } else
+            title.withStyle(ChatFormatting.BOLD);
+
+        guiGraphics.drawString(minecraft.font, title.withStyle(ChatFormatting.BOLD), (int) ((x + 114) * 1.33F), (int) ((y + 62) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
+
+        poseStack.popPose();
+
+        poseStack.pushPose();
+
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/top_background_delimiter.png"), poseStack)
+                .anchor(SpriteAnchor.TOP_LEFT)
+                .pos(x + 107, y + 70)
+                .end();
+
+        poseStack.popPose();
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
+
+        for (GuiEventListener listener : this.children()) {
+            if (listener instanceof AbstractButton button && button.isHovered()
+                    && button instanceof IHoverableWidget widget) {
+                guiGraphics.pose().translate(0, 0, 100);
+
+                widget.onHovered(guiGraphics, pMouseX, pMouseY);
+            }
+        }
+    }
+
+    @Override
+    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+        if (Minecraft.getInstance().options.keyInventory.isActiveAndMatches(InputConstants.getKey(pKeyCode, pScanCode))) {
+            this.onClose();
+
+            return true;
+        }
+
+        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+    }
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+        for (GuiEventListener listener : this.children()) {
+            if (listener instanceof SynergyPageScrollbarWidget scrollbar && scrollbar.mouseScrolled(mouseX, mouseY, scrollX, scrollY))
+                return true;
+        }
+
+        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+    }
+
+    @Override
+    public void onClose() {
+        screen.rebuildWidgets();
+
+        Minecraft.getInstance().setScreen(screen);
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
+    }
+
+    @Override
+    public DescriptionCategory getCategory() {
+        return DescriptionCategories.getCategory("synergy");
+    }
+}

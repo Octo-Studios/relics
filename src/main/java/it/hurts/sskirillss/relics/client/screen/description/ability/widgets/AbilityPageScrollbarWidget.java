@@ -170,7 +170,7 @@ public class AbilityPageScrollbarWidget extends AbstractDescriptionWidget implem
                 .filter(entry -> relicData.getAbilitiesData().getAbilityData(entry).isEnabled())
                 .toList();
 
-        var maxEntries = 5;
+        var maxEntries = 4;
         var size = abilities.size();
 
         return (int) Math.ceil(size / (double) maxEntries);

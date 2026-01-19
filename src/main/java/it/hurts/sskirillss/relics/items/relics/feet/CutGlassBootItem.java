@@ -11,7 +11,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
@@ -77,17 +77,17 @@ public class CutGlassBootItem extends RelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("glass")
-                                .stat(StatTemplate.builder("capacity")
+                                .stat(AbilityStatTemplate.builder("capacity")
                                         .initialValue(1D, 5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.9)
                                         .formatValue(value -> (int) MathUtils.round(value, 0) * 1000)
                                         .build())
-                                .stat(StatTemplate.builder("max_fluids")
+                                .stat(AbilityStatTemplate.builder("max_fluids")
                                         .initialValue(1D, 2D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.4D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .stat(StatTemplate.builder("speed")
+                                .stat(AbilityStatTemplate.builder("speed")
                                         .initialValue(0.01D, 0.05D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))

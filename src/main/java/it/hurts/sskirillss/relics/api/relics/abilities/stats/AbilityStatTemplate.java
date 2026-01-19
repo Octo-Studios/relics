@@ -10,13 +10,12 @@ import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.function.Function;
 
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class StatTemplate {
+public class AbilityStatTemplate {
     private final String id;
 
     private final UpgradeModifier upgradeModifier;
@@ -48,7 +47,7 @@ public class StatTemplate {
             this.id = id;
         }
 
-        private StatTemplateBuilder(StatTemplate base) {
+        private StatTemplateBuilder(AbilityStatTemplate base) {
             this.id = base.getId();
 
             this.upgradeModifier = base.getUpgradeModifier();
@@ -81,8 +80,8 @@ public class StatTemplate {
             return this;
         }
 
-        public StatTemplate build() {
-            return new StatTemplate(id, upgradeModifier, initialValue, thresholdValue, formatValue);
+        public AbilityStatTemplate build() {
+            return new AbilityStatTemplate(id, upgradeModifier, initialValue, thresholdValue, formatValue);
         }
     }
 }

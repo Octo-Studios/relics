@@ -71,8 +71,8 @@ public class AbilityData {
                 .build());
     }
 
-    public StatData getStatData(String stat) {
-        return new StatData(this, stat);
+    public AbilityStatData getStatData(String stat) {
+        return new AbilityStatData(this, stat);
     }
 
     public AbilityStatisticData getStatisticData() {
@@ -236,14 +236,14 @@ public class AbilityData {
     public boolean canBeUpgraded() {
         var template = getTemplate();
 
-        return template != null && template.getInitialMaxLevel() > 0 && !template.getStats().isEmpty();
+        return template.getInitialMaxLevel() > 0 && !template.getStats().isEmpty();
     }
 
     public boolean mayUpgrade() {
         var template = getTemplate();
 
         return template != null
-                && canBeUpgraded()
+                && template.getInitialMaxLevel() > 0 && !template.getStats().isEmpty()
                 && !isMaxLevel()
                 && abilitiesData.getRelicData().getLevelingData().getPoints() >= template.getRequiredPoints()
                 && isUnlocked();

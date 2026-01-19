@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.api.relics.abilities;
 
+import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilitiesConfigData;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -14,8 +15,7 @@ import java.util.stream.Collectors;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class AbilitiesTemplate {
     private final Map<String, AbilityTemplate> abilities;
-    // TODO
-    private final Map<String, AbilityTemplate> synergies;
+    private final Map<String, SynergyTemplate> synergies;
 
     public static AbilitiesTemplateBuilder builder() {
         return new AbilitiesTemplateBuilder();
@@ -32,10 +32,11 @@ public class AbilitiesTemplate {
     @NoArgsConstructor
     public static class AbilitiesTemplateBuilder {
         private Map<String, AbilityTemplate> abilities = new LinkedHashMap<>();
-        private Map<String, AbilityTemplate> synergies = new LinkedHashMap<>();
+        private Map<String, SynergyTemplate> synergies = new LinkedHashMap<>();
 
         private AbilitiesTemplateBuilder(AbilitiesTemplate base) {
             this.abilities = new LinkedHashMap<>(base.getAbilities());
+            this.synergies = new LinkedHashMap<>(base.getSynergies());
         }
 
         public AbilitiesTemplateBuilder abilities(Map<String, AbilityTemplate> abilities) {
@@ -50,13 +51,13 @@ public class AbilitiesTemplate {
             return this;
         }
 
-        public AbilitiesTemplateBuilder synergies(Map<String, AbilityTemplate> synergies) {
+        public AbilitiesTemplateBuilder synergies(Map<String, SynergyTemplate> synergies) {
             this.synergies = synergies;
 
             return this;
         }
 
-        public AbilitiesTemplateBuilder synergy(AbilityTemplate synergy) {
+        public AbilitiesTemplateBuilder synergy(SynergyTemplate synergy) {
             synergies.put(synergy.getId(), synergy);
 
             return this;

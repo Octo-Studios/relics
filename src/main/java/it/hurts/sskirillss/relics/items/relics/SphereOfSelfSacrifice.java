@@ -10,7 +10,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.entities.SelfSacrificeProjectileEntity;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
@@ -54,12 +54,12 @@ public class SphereOfSelfSacrifice extends RelicItem {
                                 .rankModifier(3, "salvo")
                                 .rankModifier(5, "salvation")
                                 .initialMaxLevel(10)
-                                .stat(StatTemplate.builder("stacks")
+                                .stat(AbilityStatTemplate.builder("stacks")
                                         .initialValue(1D, 2D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 2.2324D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
-                                .stat(StatTemplate.builder("resistance")
+                                .stat(AbilityStatTemplate.builder("resistance")
                                         .initialValue(0.01D, 0.025D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))

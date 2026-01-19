@@ -6,7 +6,7 @@ import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import lombok.AccessLevel;
@@ -27,7 +27,7 @@ public class AbilityTemplate {
     private final String id;
 
     private final Function3<Player, ItemStack, String, String> icon;
-    private final Map<String, StatTemplate> stats;
+    private final Map<String, AbilityStatTemplate> stats;
     private final int initialMaxLevel;
     private final double maxLevelRankModifier;
     private final int requiredLevel;
@@ -64,7 +64,7 @@ public class AbilityTemplate {
 
             return ability + (modes.isEmpty() ? "" : "_" + abilityData.getMode());
         };
-        private Map<String, StatTemplate> stats = new LinkedHashMap<>();
+        private Map<String, AbilityStatTemplate> stats = new LinkedHashMap<>();
         private int initialMaxLevel = 10;
         private double maxLevelRankModifier = 0.25D;
         private int requiredLevel = 0;
@@ -101,13 +101,13 @@ public class AbilityTemplate {
             return this;
         }
 
-        public AbilityTemplateBuilder stats(Map<String, StatTemplate> stats) {
+        public AbilityTemplateBuilder stats(Map<String, AbilityStatTemplate> stats) {
             this.stats = stats;
 
             return this;
         }
 
-        public AbilityTemplateBuilder stat(StatTemplate stat) {
+        public AbilityTemplateBuilder stat(AbilityStatTemplate stat) {
             this.stats.put(stat.getId(), stat);
 
             return this;

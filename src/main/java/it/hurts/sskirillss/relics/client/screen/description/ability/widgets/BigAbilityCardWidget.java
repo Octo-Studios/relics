@@ -58,7 +58,9 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             return;
 
         var isUnlocked = abilityData.isUnlocked();
-        var canBeUpgraded = abilityData.canBeUpgraded();
+
+        var canBeLeveledUp = abilityData.getTemplate().getInitialMaxLevel() > 0;
+        var hasStats = !abilityData.getTemplate().getStats().isEmpty();
 
         poseStack.pushPose();
 
@@ -77,10 +79,16 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
                     .pos(this.getX() + 8, this.getY() + 20)
                     .end();
 
-        GUIRenderer.begin(canBeUpgraded ? isUnlocked ? DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_INACTIVE : isUnlocked ? DescriptionTextures.BIG_CARD_FRAME_LOCKED_ACTIVE : DescriptionTextures.BIG_CARD_FRAME_LOCKED_INACTIVE, poseStack)
+        GUIRenderer.begin(isUnlocked ? DescriptionTextures.BIG_CARD_FRAME_ACTIVE : DescriptionTextures.BIG_CARD_FRAME_INACTIVE , poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(getX(), getY())
+                .pos(this.getX(), this.getY())
                 .end();
+
+        if (!canBeLeveledUp)
+            GUIRenderer.begin(isUnlocked ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_level_slug_active.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_level_slug_inactive.png"), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(this.getX(), this.getY())
+                    .end();
 
         var modes = template.getModes();
 
@@ -118,7 +126,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         var xOff = 0;
 
-        if (isUnlocked && canBeUpgraded) {
+        if (isUnlocked && hasStats) {
             for (int i = 0; i < 5; i++) {
                 GUIRenderer.begin(DescriptionTextures.BIG_STAR_HOLE, poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
@@ -151,7 +159,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
                         .end();
         }
 
-        if (canBeUpgraded) {
+        if (canBeLeveledUp) {
             poseStack.pushPose();
 
             var pointsComponent = Component.literal(isUnlocked ? String.valueOf(abilityData.getLevel()) : "?").withStyle(ChatFormatting.BOLD);
@@ -163,14 +171,14 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             poseStack.popPose();
         }
 
-        if (isUnlocked && canBeUpgraded && this.isHovered()) {
+        if (isUnlocked && canBeLeveledUp && this.isHovered()) {
             if (modes.isEmpty())
-                GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
+                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_outline.png"), poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
                         .pos(this.getX() - 1, this.getY() - 1)
                         .end();
             else
-                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_outline_modes.png"), poseStack)
+                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_outline_with_modes.png"), poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
                         .pos(this.getX() - 4, this.getY() - 1)
                         .end();

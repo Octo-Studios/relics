@@ -102,6 +102,7 @@ public class ClientHandler {
         DescriptionCategories.registerCategory(SynergyDescriptionCategory::new);
 
         DescriptionSubcategories.registerSubcategory(AbilityDescriptionDescriptionSubcategory::new);
+        DescriptionSubcategories.registerSubcategory(SynergyDescriptionDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(AbilityExperienceDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(AbilityStatisticDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(RelicDescriptionDescriptionSubcategory::new);

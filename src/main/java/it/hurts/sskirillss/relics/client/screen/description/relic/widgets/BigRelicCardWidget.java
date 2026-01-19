@@ -55,10 +55,13 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
         var player = minecraft.player;
         var poseStack = guiGraphics.pose();
 
+        var relicData = relic.getRelicData(player, stack);
+
+        var canBeLeveledUp = relicData.calculateMaxLevel() > 0;
+
         poseStack.pushPose();
 
         poseStack.translate(0, 0, -100);
-
 
         var color = (float) (1.05F + (Math.sin(player.tickCount * 0.25F) * 0.1F));
 
@@ -76,10 +79,16 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.translate(0, 0, 100);
 
-        GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_UNLOCKED_ACTIVE, poseStack)
+        GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_ACTIVE, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(getX(), getY())
                 .end();
+
+        if (!canBeLeveledUp)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_level_slug_active.png"), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(this.getX(), this.getY())
+                    .end();
 
         int xOff = 0;
 
@@ -144,7 +153,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
         poseStack.popPose();
 
         if (isHovered() && relic.getRelicData(player, stack).getAbilitiesData().hasUnlockedUpgradeableAbility())
-            GUIRenderer.begin(DescriptionTextures.BIG_CARD_FRAME_OUTLINE, poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_outline.png"), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(getX() - 1, getY() - 1)
                     .end();

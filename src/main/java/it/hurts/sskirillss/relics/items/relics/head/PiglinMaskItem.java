@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.entities.GoldenToothEntity;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
@@ -62,12 +62,12 @@ public class PiglinMaskItem extends RelicItem {
                                 .build())
                         .ability(AbilityTemplate.builder("barter")
                                 .rankModifier(3, "pocket")
-                                .stat(StatTemplate.builder("trades")
+                                .stat(AbilityStatTemplate.builder("trades")
                                         .initialValue(1D, 3D)
                                         .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.25D)
                                         .formatValue(Double::intValue)
                                         .build())
-                                .stat(StatTemplate.builder("items_count")
+                                .stat(AbilityStatTemplate.builder("items_count")
                                         .initialValue(1D, 4D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.4286D)
                                         .formatValue(Double::intValue)
@@ -95,27 +95,27 @@ public class PiglinMaskItem extends RelicItem {
                         .ability(AbilityTemplate.builder("looting")
                                 .requiredLevel(5)
                                 .rankModifier(5, "frenzy")
-                                .stat(StatTemplate.builder("chance")
+                                .stat(AbilityStatTemplate.builder("chance")
                                         .initialValue(0.1D, 0.15D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .stat(StatTemplate.builder("health")
+                                .stat(AbilityStatTemplate.builder("health")
                                         .initialValue(10D, 7.5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.019D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("duration")
+                                .stat(AbilityStatTemplate.builder("duration")
                                         .initialValue(5D, 10D)
                                         .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 5.5811D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("attack_damage")
+                                .stat(AbilityStatTemplate.builder("attack_damage")
                                         .initialValue(0.005D, 0.01D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0571D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
-                                .stat(StatTemplate.builder("attack_speed")
+                                .stat(AbilityStatTemplate.builder("attack_speed")
                                         .initialValue(0.005D, 0.01D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1714D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))

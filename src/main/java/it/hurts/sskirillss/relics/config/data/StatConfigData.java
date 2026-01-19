@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.config.data;
 
 import it.hurts.octostudios.octolib.module.config.annotation.Prop;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsRegistries;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -28,7 +28,7 @@ public class StatConfigData {
     @Prop(comment = "Modifier applied to the base value of the stat, depending on the [upgradeOperation] parameter.")
     private double upgradeModifier;
 
-    public StatTemplate toData(IRelicItem relic, String ability, String stat) {
+    public AbilityStatTemplate toData(IRelicItem relic, String ability, String stat) {
         return relic.getDefaultStatTemplate(ability, stat).toBuilder()
                 .initialValue(minInitialValue, maxInitialValue)
                 .thresholdValue(minThresholdValue, maxThresholdValue)

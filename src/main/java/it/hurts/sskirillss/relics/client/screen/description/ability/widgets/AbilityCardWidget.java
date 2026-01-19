@@ -28,14 +28,12 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
 import it.hurts.sskirillss.relics.utils.ClientScheduler;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.client.sounds.SoundManager;
@@ -51,9 +49,7 @@ import net.minecraft.world.phys.Vec2;
 import org.joml.Vector2f;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class AbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     private final AbilityDescriptionScreen screen;
@@ -316,11 +312,9 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var canUse = isEnoughLevel && isLockUnlocked && isAbilityResearched;
 
         var canUpgrade = abilityData.mayPlayerUpgrade(player);
-        var canResearch = abilityData.mayResearch();
 
-        var canBeUpgraded = abilityData.canBeUpgraded();
-
-        var hasAction = canUpgrade || canResearch;
+        var canBeLeveledUp = abilityData.getTemplate().getInitialMaxLevel() > 0;
+        var hasStats = !abilityData.getTemplate().getStats().isEmpty();
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
@@ -344,21 +338,33 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     .pos(0, -2)
                     .end();
 
-        if (!canUse) {
-            GUIRenderer.begin(isLockUnlocked ? DescriptionTextures.SMALL_CARD_RESEARCH_BACKGROUND : DescriptionTextures.SMALL_CARD_LOCK_BACKGROUND, poseStack)
+        if (!canUse)
+            GUIRenderer.begin(isLockUnlocked ? DescriptionTextures.ABILITY_SMALL_CARD_RESEARCH_BACKGROUND : DescriptionTextures.ABILITY_SMALL_CARD_LOCK_BACKGROUND, poseStack)
                     .pos(0, -2)
                     .end();
-        }
 
-        GUIRenderer.begin(canBeUpgraded ? canUse ? DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_UNLOCKED_INACTIVE : canUse ? DescriptionTextures.SMALL_CARD_FRAME_LOCKED_ACTIVE : DescriptionTextures.SMALL_CARD_FRAME_LOCKED_INACTIVE, poseStack).end();
+        GUIRenderer.begin(canUse ? DescriptionTextures.ABILITY_SMALL_CARD_FRAME_ACTIVE : DescriptionTextures.ABILITY_SMALL_CARD_FRAME_INACTIVE, poseStack)
+                .end();
+
+        if (!canBeLeveledUp)
+            GUIRenderer.begin(canUse ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_level_slug_active.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_level_slug_inactive.png"), poseStack)
+                    .end();
+
+        if (!hasStats)
+            GUIRenderer.begin(canUse ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_quality_slug_active.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_quality_slug_inactive.png"), poseStack)
+                    .end();
+
+        if (!canBeLeveledUp && !hasStats)
+            GUIRenderer.begin(canUse ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_progress_slug_active.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_progress_slug_inactive.png"), poseStack)
+                    .end();
 
         var level = abilityData.getLevel();
         var maxLevel = template.getInitialMaxLevel();
 
-        drawProgressBar(guiGraphics, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_filler.png"), (-this.width / 2F) + 2, (-this.height / 2F) + 3F, (float) level / maxLevel);
+        drawProgressBar(guiGraphics, (-this.width / 2F) + 2, (-this.height / 2F) + 3F, (float) level / maxLevel);
 
         if (isHovered())
-            GUIRenderer.begin(DescriptionTextures.SMALL_CARD_FRAME_SELECTION, poseStack)
+            GUIRenderer.begin(DescriptionTextures.ABILITY_SMALL_CARD_FRAME_SELECTION, poseStack)
                     .end();
 
         if (isLockUnlocked) {
@@ -373,13 +379,13 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             }
         } else {
             GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/chains_active_" + unlocks + ".png") : DescriptionTextures.ABILITY_CHAINS_INACTIVE, poseStack)
-                    .pos(0, -1)
+                    .pos(0, 0.5F)
                     .end();
 
 
             poseStack.pushPose();
 
-            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/icons/lock_active_" + unlocks + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
+            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/icons/lock_active_" + unlocks + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
                     .pos(0, -2)
                     .end();
 
@@ -406,7 +412,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         }
 
         {
-            if (canBeUpgraded && canUse) {
+            if (hasStats && canUse) {
                 int xOff = 0;
 
                 int quality = abilityData.calculateQuality();
@@ -429,7 +435,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         }
 
         {
-            if (canBeUpgraded) {
+            if (canBeLeveledUp) {
                 MutableComponent title = Component.literal(canUse ? String.valueOf(level) : "?").withStyle(ChatFormatting.BOLD);
 
                 float textScale = 0.5F;
@@ -445,15 +451,25 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         poseStack.popPose();
     }
 
-    public static void drawProgressBar(GuiGraphics gui, ResourceLocation tex, float x, float y, float progress) {
-        var textureWidth = 34;
-        var textureHeight = 46;
+    public static void drawProgressBar(GuiGraphics gui, float x, float y, float progress) {
+        var textureWidth = 38;
+        var textureHeight = 51;
+
+        var padU = 2;
+        var padV = 3;
+
+        var frameWidth = 34;
+        var frameHeight = 46;
+
         var cornerSize = 3;
         var borderThickness = 3;
-        var topStartU = 7;
-        var topEndU = 27;
-        var verticalEdgeLength = textureHeight - 2 * cornerSize;
-        var horizontalEdgeLength = textureWidth - 2 * cornerSize;
+
+        var topStartU = 5;
+        var topEndU = 28;
+
+        var verticalEdgeLength = frameHeight - 2 * cornerSize;
+        var horizontalEdgeLength = frameWidth - 2 * cornerSize;
+
         var segTop = topStartU - cornerSize + 1;
         var segCornerTopLeft = cornerSize;
         var segLeftEdge = verticalEdgeLength;
@@ -462,16 +478,18 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var segCornerBotRight = cornerSize;
         var segRightEdge = verticalEdgeLength;
         var segCornerTopRight = cornerSize;
-        var segTopRightPart = textureWidth - cornerSize - topEndU;
+        var segTopRightPart = frameWidth - cornerSize - topEndU;
+
         var totalLength = segTop + segCornerTopLeft + segLeftEdge + segCornerBotLeft + segBottom + segCornerBotRight + segRightEdge + segCornerTopRight + segTopRightPart;
 
-        var remaining = (int) (Mth.clamp(progress, 0f, 1f) * totalLength);
+        var total = Mth.clamp(progress, 0f, 1f) * totalLength;
+        var remaining = Math.min(totalLength, (int) Math.ceil(total));
 
         if (remaining <= 0)
             return;
 
         var renderer = GUIRenderer
-                .begin(tex, gui.pose())
+                .begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_filler.png"), gui.pose())
                 .texSize(textureWidth, textureHeight)
                 .anchor(SpriteAnchor.TOP_LEFT);
 
@@ -484,7 +502,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         renderer.pos(x + u0, y)
                 .patternSize(drawLen, borderThickness)
-                .texOff(u0, 0)
+                .texOff(padU + u0, padV + 0)
                 .end();
 
         remaining -= drawLen;
@@ -496,7 +514,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             renderer.pos(x + offsetU1, y)
                     .patternSize(drawLen, borderThickness)
-                    .texOff(offsetU1, 0)
+                    .texOff(padU + offsetU1, padV + 0)
                     .end();
 
             remaining -= drawLen;
@@ -507,7 +525,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             renderer.pos(x, y + cornerSize)
                     .patternSize(borderThickness, moveLen)
-                    .texOff(0, cornerSize)
+                    .texOff(padU + 0, padV + cornerSize)
                     .end();
 
             remaining -= moveLen;
@@ -516,9 +534,9 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (remaining > 0) {
             drawLen = Math.min(remaining, segCornerBotLeft);
 
-            renderer.pos(x, y + textureHeight - borderThickness)
+            renderer.pos(x, y + frameHeight - borderThickness)
                     .patternSize(drawLen, borderThickness)
-                    .texOff(0, textureHeight - borderThickness)
+                    .texOff(padU + 0, padV + frameHeight - borderThickness)
                     .end();
 
             remaining -= drawLen;
@@ -527,9 +545,9 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (remaining > 0) {
             drawLen = Math.min(remaining, segBottom);
 
-            renderer.pos(x + cornerSize, y + textureHeight - borderThickness)
+            renderer.pos(x + cornerSize, y + frameHeight - borderThickness)
                     .patternSize(drawLen, borderThickness)
-                    .texOff(cornerSize, textureHeight - borderThickness)
+                    .texOff(padU + cornerSize, padV + frameHeight - borderThickness)
                     .end();
 
             remaining -= drawLen;
@@ -538,11 +556,11 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (remaining > 0) {
             drawLen = Math.min(remaining, segCornerBotRight);
 
-            var offsetUBot = textureWidth - cornerSize;
+            var offsetUBot = frameWidth - cornerSize;
 
-            renderer.pos(x + offsetUBot, y + textureHeight - borderThickness)
+            renderer.pos(x + offsetUBot, y + frameHeight - borderThickness)
                     .patternSize(drawLen, borderThickness)
-                    .texOff(offsetUBot, textureHeight - borderThickness)
+                    .texOff(padU + offsetUBot, padV + frameHeight - borderThickness)
                     .end();
 
             remaining -= drawLen;
@@ -553,9 +571,9 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             var v6 = cornerSize + (verticalEdgeLength - moveLen);
 
-            renderer.pos(x + textureWidth - borderThickness, y + v6)
+            renderer.pos(x + frameWidth - borderThickness, y + v6)
                     .patternSize(borderThickness, moveLen)
-                    .texOff(textureWidth - borderThickness, v6)
+                    .texOff(padU + frameWidth - borderThickness, padV + v6)
                     .end();
 
             remaining -= moveLen;
@@ -564,11 +582,11 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (remaining > 0) {
             drawLen = Math.min(remaining, segCornerTopRight);
 
-            var u7 = textureWidth - borderThickness;
+            var u7 = frameWidth - borderThickness;
 
             renderer.pos(x + u7, y)
                     .patternSize(borderThickness, drawLen)
-                    .texOff(u7, 0)
+                    .texOff(padU + u7, padV + 0)
                     .end();
 
             remaining -= drawLen;
@@ -577,12 +595,12 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (remaining > 0) {
             drawLen = Math.min(remaining, segTopRightPart);
 
-            var startU8 = textureWidth - cornerSize - 1;
-            var offsetU8 = startU8 - (drawLen - 1);
+            var startU8 = frameWidth - cornerSize;
+            var offsetU8 = startU8 - drawLen;
 
             renderer.pos(x + offsetU8, y)
                     .patternSize(drawLen, borderThickness)
-                    .texOff(offsetU8, 0)
+                    .texOff(padU + offsetU8, padV + 0)
                     .end();
         }
     }

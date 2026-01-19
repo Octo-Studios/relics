@@ -8,7 +8,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
@@ -31,7 +31,6 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
-import top.theillusivec4.curios.api.SlotContext;
 
 public class HuntingBeltItem extends RelicItem {
     @Override
@@ -42,22 +41,22 @@ public class HuntingBeltItem extends RelicItem {
                                 .rankModifier(1, "leader")
                                 .rankModifier(3, "relentless")
                                 .rankModifier(5, "revival")
-                                .stat(StatTemplate.builder("damage_modifier")
+                                .stat(AbilityStatTemplate.builder("damage_modifier")
                                         .initialValue(0.25D, 0.5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .stat(StatTemplate.builder("pet_radius")
+                                .stat(AbilityStatTemplate.builder("pet_radius")
                                         .initialValue(3D, 5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0571D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
-                                .stat(StatTemplate.builder("resistance_per_pet")
+                                .stat(AbilityStatTemplate.builder("resistance_per_pet")
                                         .initialValue(0.01D, 0.05D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
-                                .stat(StatTemplate.builder("revival_cost")
+                                .stat(AbilityStatTemplate.builder("revival_cost")
                                         .initialValue(10D, 7.5D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.02475D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))

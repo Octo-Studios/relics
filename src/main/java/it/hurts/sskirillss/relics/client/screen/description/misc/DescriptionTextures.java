@@ -30,23 +30,25 @@ public class DescriptionTextures {
     public static final ResourceLocation BIG_STAR_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_star_active.png");
     public static final ResourceLocation BIG_STAR_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_star_inactive.png");
 
-    public static final ResourceLocation SMALL_CARD_LOCK_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_lock_background.png");
-    public static final ResourceLocation SMALL_CARD_RESEARCH_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_research_background.png");
-    public static final ResourceLocation SMALL_CARD_FRAME_UNLOCKED_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_unlocked_active.png");
-    public static final ResourceLocation SMALL_CARD_FRAME_UNLOCKED_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_unlocked_inactive.png");
-    public static final ResourceLocation SMALL_CARD_FRAME_LOCKED_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_locked_active.png");
-    public static final ResourceLocation SMALL_CARD_FRAME_LOCKED_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_locked_inactive.png");
-    public static final ResourceLocation SMALL_CARD_FRAME_SELECTION = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/small_card_frame_selection.png");
+    public static final ResourceLocation ABILITY_SMALL_CARD_LOCK_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_lock_background.png");
+    public static final ResourceLocation ABILITY_SMALL_CARD_RESEARCH_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_research_background.png");
+    public static final ResourceLocation ABILITY_SMALL_CARD_FRAME_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_active.png");
+    public static final ResourceLocation ABILITY_SMALL_CARD_FRAME_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_inactive.png");
+    public static final ResourceLocation ABILITY_SMALL_CARD_FRAME_LOCKED_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_locked_active.png");
+    public static final ResourceLocation ABILITY_SMALL_CARD_FRAME_LOCKED_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_locked_inactive.png");
+    public static final ResourceLocation ABILITY_SMALL_CARD_FRAME_SELECTION = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_selection.png");
+
+    public static final ResourceLocation SYNERGY_SMALL_CARD_LOCK_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/synergy/small_card_lock_background.png");
+    public static final ResourceLocation SYNERGY_SMALL_CARD_FRAME_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/synergy/small_card_frame_active.png");
+    public static final ResourceLocation SYNERGY_SMALL_CARD_FRAME_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/synergy/small_card_frame_inactive.png");
+    public static final ResourceLocation SYNERGY_SMALL_CARD_FRAME_SELECTION = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/synergy/small_card_frame_selection.png");
 
     public static final ResourceLocation RESEARCH_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/research/research_background.png");
     public static final ResourceLocation RESEARCH_FOG = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/research/research_fog.png");
 
     public static final ResourceLocation BIG_CARD_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_background.png");
-    public static final ResourceLocation BIG_CARD_FRAME_UNLOCKED_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_unlocked_active.png");
-    public static final ResourceLocation BIG_CARD_FRAME_UNLOCKED_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_unlocked_inactive.png");
-    public static final ResourceLocation BIG_CARD_FRAME_LOCKED_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_locked_active.png");
-    public static final ResourceLocation BIG_CARD_FRAME_LOCKED_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_locked_inactive.png");
-    public static final ResourceLocation BIG_CARD_FRAME_OUTLINE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_outline.png");
+    public static final ResourceLocation BIG_CARD_FRAME_ACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_active.png");
+    public static final ResourceLocation BIG_CARD_FRAME_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_inactive.png");
 
     public static final ResourceLocation ABILITY_CHAINS_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/chains_inactive.png");
 
@@ -58,9 +60,9 @@ public class DescriptionTextures {
     public static final ResourceLocation PAGE_ARROW_DOWN = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/page_arrow_down.png");
     public static final ResourceLocation PAGE_COUNTER = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/page_counter.png");
 
-    public static final ResourceLocation LOCK_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/icons/lock_inactive.png");
-    public static final ResourceLocation UPGRADE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/icons/upgrade.png");
-    public static final ResourceLocation RESEARCH = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/icons/research.png");
+    public static final ResourceLocation LOCK_INACTIVE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/icons/lock_inactive.png");
+    public static final ResourceLocation UPGRADE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/icons/upgrade.png");
+    public static final ResourceLocation RESEARCH = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/icons/research.png");
 
     public static final ResourceLocation RELIC_EXPERIENCE_BACKGROUND = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/relic_experience_background.png");
     public static final ResourceLocation RELIC_EXPERIENCE_FILLER = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/relic_experience_filler.png");
@@ -84,7 +86,6 @@ public class DescriptionTextures {
 
     private static final ResourceLocation SMALL_CARD_MISSING = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/abilities/missing.png");
 
-    // TODO: Since ability may have different icons based on the relic state we need to implement some sort of default icon that will be used in the description UIs
     @OnlyIn(Dist.CLIENT)
     public static ResourceLocation getAbilityCardTexture(ItemStack stack, String ability) {
         var item = stack.getItem();
@@ -95,6 +96,20 @@ public class DescriptionTextures {
         var minecraft = Minecraft.getInstance();
 
         var texture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/abilities/" + BuiltInRegistries.ITEM.getKey(item).getPath() + "/" + relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability).getTemplate().getIcon().apply(minecraft.player, stack, ability) + ".png");
+
+        return minecraft.getResourceManager().getResource(texture).orElse(null) == null ? SMALL_CARD_MISSING : texture;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static ResourceLocation getSynergyCardTexture(ItemStack stack, String ability) {
+        var item = stack.getItem();
+
+        if (!(item instanceof IRelicItem relic))
+            return SMALL_CARD_MISSING;
+
+        var minecraft = Minecraft.getInstance();
+
+        var texture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/synergies/" + BuiltInRegistries.ITEM.getKey(item).getPath() + "/" + relic.getRelicData(minecraft.player, stack).getAbilitiesData().getSynergyData(ability).getTemplate().getIcon().apply(minecraft.player, stack, ability) + ".png");
 
         return minecraft.getResourceManager().getResource(texture).orElse(null) == null ? SMALL_CARD_MISSING : texture;
     }

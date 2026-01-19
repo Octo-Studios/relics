@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.mixin;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
 import net.minecraft.ChatFormatting;
@@ -87,7 +87,7 @@ public class ItemMixin {
 
                 continue;
             } else {
-                for (StatTemplate statData : relic.getDefaultAbilityTemplate(abilityId).getStats().values()) {
+                for (AbilityStatTemplate statData : relic.getDefaultAbilityTemplate(abilityId).getStats().values()) {
                     String statId = statData.getId();
 
                     if (ability.getStatData(statId).getComponent() == null)

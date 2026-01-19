@@ -8,9 +8,14 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
+import it.hurts.sskirillss.relics.api.relics.synergies.conditions.AbilityConditionTemplate;
+import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicConditionTemplate;
+import it.hurts.sskirillss.relics.api.relics.synergies.stats.SynergyStatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
@@ -20,15 +25,20 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
+import it.hurts.sskirillss.relics.relic_containers.CuriosRelicContainer;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.particles.BlockParticleOption;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -47,7 +57,7 @@ public class KineticBeltItem extends RelicItem {
                                 .requiredPoints(2)
                                 .initialMaxLevel(5)
                                 .maxLevelRankModifier(0.1)
-                                .stat(StatTemplate.builder("amount")
+                                .stat(AbilityStatTemplate.builder("amount")
                                         .initialValue(1D, 2D)
                                         .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 0)))
@@ -62,18 +72,18 @@ public class KineticBeltItem extends RelicItem {
                                 .rankModifier(3, "strike")
                                 .rankModifier(5, "resistance")
                                 .modes("enabled", "disabled")
-                                .stat(StatTemplate.builder("efficiency")
+                                .stat(AbilityStatTemplate.builder("efficiency")
                                         .initialValue(0.25D, 0.35D)
                                         .thresholdValue(0D, 1D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0531D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .stat(StatTemplate.builder("damage")
+                                .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(0.1D, 0.25D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2571D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
-                                .stat(StatTemplate.builder("resistance")
+                                .stat(AbilityStatTemplate.builder("resistance")
                                         .initialValue(0.05D, 0.15D)
                                         .thresholdValue(0D, 0.75D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
@@ -111,6 +121,22 @@ public class KineticBeltItem extends RelicItem {
                                 .research(ResearchTemplate.builder()
                                         .star(0, 2, 9).star(1, 20, 9).star(2, 5, 13).star(3, 17, 13).star(4, 11, 14).star(5, 2, 18).star(6, 20, 18).star(7, 5, 19).star(8, 11, 19).star(9, 17, 19).star(10, 7, 26).star(11, 15, 26)
                                         .link(8, 4).link(8, 2).link(8, 3).link(8, 10).link(8, 11).link(2, 7).link(2, 0).link(0, 5).link(3, 9).link(3, 1).link(1, 6)
+                                        .build())
+                                .build())
+                        .synergy(SynergyTemplate.builder("test")
+                                .stat(SynergyStatTemplate.builder("test")
+                                        .thresholdValue(1, 5)
+                                        .formatValue(value -> value)
+                                        .build())
+                                .condition(RelicConditionTemplate.builder(RelicsItems.KINETIC_BELT::get)
+                                        .container(RelicsRelicContainers.CURIOS.get())
+                                        .condition(AbilityConditionTemplate.builder("gliding")
+                                                .build())
+                                        .build())
+                                .condition(RelicConditionTemplate.builder(RelicsItems.JELLYFISH_NECKLACE::get)
+                                        .container(RelicsRelicContainers.CURIOS.get())
+                                        .condition(AbilityConditionTemplate.builder("shock")
+                                                .build())
                                         .build())
                                 .build())
                         .build())
