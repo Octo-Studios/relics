@@ -18,17 +18,12 @@
 
   "relics.description.relic.tooltip.abilities": "Habilidades:",
 
-  "relics.description.researching.badge.relic.flawless_relic.title": "Relíquia Perfeito",
-  "relics.description.researching.badge.relic.flawless_relic.description": "A relíquia atingiu os parâmetros máximos perfeitos. Orgulhe-se!",
-
   "relics.description.researching.research.tip": "Para desbloquear uma habilidade, você precisa conectar as estrelas escondidas sob o nevoeiro para que a constelação resultante corresponda à imagem de fundo. Assim que a constelação for correspondida corretamente, a habilidade será pesquisada automaticamente.",
 
   "relics.description.researching.research.hint.description": "Dica",
   "relics.description.researching.research.hint.cost": "Custo: %1$s pontos de experiência do jogador (%2$s níveis relativos) %3$s.",
   "relics.description.researching.research.hint.quick": "Segure [Shift] para pesquisa de habilidade totalmente automática.",
   "relics.description.researching.research.hint.locked": "A habilidade já foi pesquisada!",
-
-  "relics.description.researching.badge.ability.cast_type.hint": "Use a tecla [%1$s] fora de qualquer interface para abrir o menu de habilidades ativas!",
 
   "relics.description.researching.general.leveling_point.title": "Pontos de Melhoria:",
   "relics.description.researching.general.leveling_point.extra_info": "Obtidos ao subir o nível da relíquia e usados para aprimorar habilidades.",
