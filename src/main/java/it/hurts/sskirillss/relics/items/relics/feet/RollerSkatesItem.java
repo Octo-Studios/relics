@@ -91,7 +91,7 @@ public class RollerSkatesItem extends RelicItem {
     public static class Events {
         @SubscribeEvent
         public static void onLivingSlipping(LivingSlippingEvent event) {
-            if (!(event.getEntity() instanceof Player player) || player.isInWater() || player.isFallFlying() || !player.onGround())
+            if (!(event.getEntity() instanceof Player player) || player.isInLiquid() || player.isFallFlying() || !player.onGround() || player.isSwimming())
                 return;
 
             ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.ROLLER_SKATES.get());
@@ -104,7 +104,7 @@ public class RollerSkatesItem extends RelicItem {
 
         @SubscribeEvent
         public static void onSpeedFactor(EntityBlockSpeedFactorEvent event) {
-            if (!(event.getEntity() instanceof Player player) || player.isInWater() || player.isFallFlying() || !player.onGround())
+            if (!(event.getEntity() instanceof Player player) || player.isInLiquid() || player.isFallFlying() || !player.onGround() || player.isSwimming())
                 return;
 
             ItemStack stack = EntityUtils.findEquippedCurio(player, ItemRegistry.ROLLER_SKATES.get());
