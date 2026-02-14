@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics;
 
 import it.hurts.sskirillss.relics.api.events.common.ContainerSlotClickEvent;
+import it.hurts.sskirillss.relics.init.ConfigRegistry;
 import it.hurts.sskirillss.relics.init.CreativeTabRegistry;
 import it.hurts.sskirillss.relics.init.EffectRegistry;
 import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
@@ -216,10 +217,13 @@ public class InfiniteHamItem extends RelicItem {
             return null;
 
         var nutrition = Math.min((int) Math.ceil(charge * getStatValue(stack, "regeneration", "feed")), 20 - player.getFoodData().getFoodLevel());
-
+        
+        int hamGivesSaturation = ConfigRegistry.RELICS_CONFIG.isEnableInfinityHamSaturation() ? 1 : 0;
+        //had to do it this way in order to get around 'effectively final variable in lamba' when applying effects
         var builder = new FoodProperties.Builder()
                 .nutrition(nutrition)
-                .saturationModifier(nutrition / 3F);
+                .saturationModifier((nutrition / 3F) * hamGivesSaturation);
+        
 
         if (canPlayerUseAbility(player, stack, "marinade")) {
             var contents = stack.get(DataComponents.POTION_CONTENTS);
