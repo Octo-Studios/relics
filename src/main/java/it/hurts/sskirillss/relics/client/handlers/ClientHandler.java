@@ -178,6 +178,7 @@ public class ClientHandler {
         event.registerEntityRenderer(RelicsEntities.THROWN_RELIC_EXPERIENCE_BOTTLE.get(), ThrownItemRenderer::new);
         event.registerEntityRenderer(RelicsEntities.GOLDEN_TOOTH.get(), GoldenToothRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SELF_SACRIFICE_PROJECTILE.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.KINETIC_ELECTRICITY.get(), NullRenderer::new);
     }
 
     @SubscribeEvent

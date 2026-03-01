@@ -13,10 +13,8 @@ import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.AbilityConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.stats.SynergyStatTemplate;
-import it.hurts.sskirillss.relics.init.RelicsDataComponents;
-import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
-import it.hurts.sskirillss.relics.init.RelicsScalingModels;
+import it.hurts.sskirillss.relics.entities.KineticElectricityEntity;
+import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -25,20 +23,15 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
-import it.hurts.sskirillss.relics.relic_containers.CuriosRelicContainer;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.particles.BlockParticleOption;
-import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -49,6 +42,9 @@ import top.theillusivec4.curios.api.SlotContext;
 import java.awt.*;
 
 public class KineticBeltItem extends RelicItem {
+    private static final double ELECTRICITY_MIN_DISTANCE_SQR = 1D;
+    private static final double ELECTRICITY_MAX_LINK_DISTANCE_SQR = 100D;
+
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -123,8 +119,8 @@ public class KineticBeltItem extends RelicItem {
                                         .link(8, 4).link(8, 2).link(8, 3).link(8, 10).link(8, 11).link(2, 7).link(2, 0).link(0, 5).link(3, 9).link(3, 1).link(1, 6)
                                         .build())
                                 .build())
-                        .synergy(SynergyTemplate.builder("test")
-                                .stat(SynergyStatTemplate.builder("test")
+                        .synergy(SynergyTemplate.builder("electricity")
+                                .stat(SynergyStatTemplate.builder("damage")
                                         .thresholdValue(1, 5)
                                         .formatValue(value -> value)
                                         .build())
@@ -167,6 +163,30 @@ public class KineticBeltItem extends RelicItem {
         return stack.getOrDefault(RelicsDataComponents.KINETIC_BELT_LANDED, false);
     }
 
+    private KineticElectricityEntity getLastElectricityEntity(LivingEntity owner, ItemStack stack) {
+        var entityId = stack.getOrDefault(RelicsDataComponents.KINETIC_BELT_LAST_ELECTRICITY_ID, -1);
+
+        if (entityId < 0)
+            return null;
+
+        var raw = owner.level().getEntity(entityId);
+
+        if (raw instanceof KineticElectricityEntity electricity && electricity.isAlive())
+            return electricity;
+
+        this.clearLastElectricityEntityId(stack);
+
+        return null;
+    }
+
+    private void setLastElectricityEntityId(ItemStack stack, int entityId) {
+        stack.set(RelicsDataComponents.KINETIC_BELT_LAST_ELECTRICITY_ID, entityId);
+    }
+
+    private void clearLastElectricityEntityId(ItemStack stack) {
+        stack.set(RelicsDataComponents.KINETIC_BELT_LAST_ELECTRICITY_ID, -1);
+    }
+
     @Override
     public RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
         return RelicSlotModifier.builder()
@@ -179,15 +199,21 @@ public class KineticBeltItem extends RelicItem {
         super.curioTick(slotContext, stack);
 
         var entity = slotContext.entity();
-
-        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled"))
-            return;
-
         var level = entity.level();
+
+        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")) {
+            if (!level.isClientSide())
+                this.clearLastElectricityEntityId(stack);
+
+            return;
+        }
         var random = level.getRandom();
 
         var isActive = this.isActive(stack);
         var isLanded = this.isLanded(stack);
+
+        if (!level.isClientSide() && !isActive)
+            this.clearLastElectricityEntityId(stack);
 
         var onGround = entity.onGround();
 
@@ -230,6 +256,27 @@ public class KineticBeltItem extends RelicItem {
                 this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatisticData().getMetricData("duration").addValue(1);
 
                 this.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "gliding", 1);
+            }
+
+            if (!level.isClientSide() && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").isUnlocked()) {
+                var previous = this.getLastElectricityEntity(entity, stack);
+                var position = entity.position();
+                var distanceToPreviousSqr = previous == null ? 0D : previous.position().distanceToSqr(position);
+
+                if (previous == null || distanceToPreviousSqr >= ELECTRICITY_MIN_DISTANCE_SQR) {
+                    var electricity = new KineticElectricityEntity(RelicsEntities.KINETIC_ELECTRICITY.get(), level);
+
+                    electricity.setDamage((float) this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getStatData("damage").getValue());
+                    electricity.setFlawless(this.getRelicData(entity, stack).isFlawless());
+                    electricity.setPos(position);
+                    electricity.setOwner(entity);
+
+                    if (previous != null && distanceToPreviousSqr <= ELECTRICITY_MAX_LINK_DISTANCE_SQR)
+                        electricity.setPreviousEntityId(previous.getId());
+
+                    level.addFreshEntity(electricity);
+                    this.setLastElectricityEntityId(stack, electricity.getId());
+                }
             }
 
             if (!hasAttribute)
