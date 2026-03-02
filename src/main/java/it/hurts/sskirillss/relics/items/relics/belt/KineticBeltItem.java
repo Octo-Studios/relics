@@ -291,21 +291,28 @@ public class KineticBeltItem extends RelicItem {
             var prevPosition = new Vec3(entity.xOld, entity.yOld, entity.zOld);
             var position = entity.position();
             var movementDelta = position.subtract(prevPosition);
-            var distance = movementDelta.length();
+            var horizontalDelta = new Vec3(movementDelta.x, 0, movementDelta.z);
+            var horizontalDistance = horizontalDelta.length();
+            var trailLagFactor = Math.clamp(0.3D + horizontalDistance * 0.18D, 0.3D, 0.85D);
+            var laggedMovementDelta = movementDelta.scale(1D - trailLagFactor);
+
+            var distance = laggedMovementDelta.length();
             var spawnStep = 0.075D;
             int spawnCount = (int) (distance / spawnStep) + 1;
 
             var yawRadians = Math.toRadians(entity.yBodyRot);
-            var forward = new Vec3(-Math.sin(yawRadians), 0, Math.cos(yawRadians)).normalize();
+            var facingForward = new Vec3(-Math.sin(yawRadians), 0, Math.cos(yawRadians)).normalize();
+            var forward = horizontalDelta.lengthSqr() > 1.0E-6D ? horizontalDelta.normalize() : facingForward;
             var right = forward.cross(new Vec3(0, 1, 0)).normalize();
             var left = right.scale(-1);
 
             var sideOffset = 0.4D;
             var backOffset = 0.2D;
+            var speedBackOffset = backOffset + Math.min(horizontalDistance * 0.5D, 1.4D);
 
             for (var i = 0; i <= spawnCount; i++) {
                 var t = spawnCount == 0 ? 0 : (double) i / spawnCount;
-                var basePosition = prevPosition.add(movementDelta.scale(t)).subtract(forward.scale(backOffset));
+                var basePosition = prevPosition.add(laggedMovementDelta.scale(t)).subtract(forward.scale(speedBackOffset));
                 var centerX = basePosition.x;
                 var centerY = basePosition.y + entity.getBbHeight() / 2F - 0.15F;
                 var centerZ = basePosition.z;
