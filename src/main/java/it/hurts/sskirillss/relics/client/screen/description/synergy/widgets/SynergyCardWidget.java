@@ -41,7 +41,7 @@ import java.util.List;
 public class SynergyCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     private final SynergyDescriptionScreen screen;
     @Getter
-    private final String ability;
+    private final String synergy;
 
     @Getter
     @Setter
@@ -63,11 +63,11 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
     @Setter
     private float hoverYSqueeze = 1F;
 
-    public SynergyCardWidget(int x, int y, SynergyDescriptionScreen screen, String ability) {
+    public SynergyCardWidget(int x, int y, SynergyDescriptionScreen screen, String synergy) {
         super(x, y, 38, 51);
 
         this.screen = screen;
-        this.ability = ability;
+        this.synergy = synergy;
     }
 
     @Override
@@ -79,14 +79,14 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(ability);
+        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(synergy);
         var isUnlocked = synergyData.isUnlocked();
 
         SoundManager soundManager = minecraft.getSoundManager();
 
         if (isUnlocked) {
-            if (!screen.getSelectedSynergy().equals(ability)) {
-                screen.setSelectedSynergy(ability);
+            if (!screen.getSelectedSynergy().equals(synergy)) {
+                screen.setSelectedSynergy(synergy);
 
                 var subcategories = DescriptionSubcategories.getSubcategories().values().stream()
                         .filter(subcategory -> subcategory.shouldAppear(this.screen, player, stack))
@@ -98,7 +98,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
                 screen.rebuildWidgets();
 
                 for (var entry : screen.renderables) {
-                    if (!(entry instanceof SynergyCardWidget card) || !card.ability.equals(ability))
+                    if (!(entry instanceof SynergyCardWidget card) || !card.synergy.equals(synergy))
                         continue;
                 }
             }
@@ -170,7 +170,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
         var stack = this.screen.getStack();
         var poseStack = guiGraphics.pose();
 
-        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(this.ability);
+        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(this.synergy);
 
         var canBeUpgraded = synergyData.canBeUpgraded();
         var canUse = synergyData.isUnlocked();
@@ -188,9 +188,9 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
 
         poseStack.mulPose(Axis.ZP.rotation(this.getClickZRotation()));
 
-        var color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
+        var color = (float) (1.05F + (Math.sin((player.tickCount + (synergy.length() * 10)) * 0.2F) * 0.1F));
 
-        GUIRenderer.begin(DescriptionTextures.getSynergyCardTexture(stack, ability), poseStack)
+        GUIRenderer.begin(DescriptionTextures.getSynergyCardTexture(stack, synergy), poseStack)
                 .color(color, color, color, 1F)
                 .texSize(22, 31)
                 .pos(0, 1)
@@ -209,6 +209,9 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
                     .end();
 
         if (!canUse) {
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/synergy/small_card_frame_progress_slug_inactive.png"), poseStack)
+                    .end();
+
             GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/synergy/chains_inactive.png"), poseStack)
                     .pos(0, 0.5F)
                     .end();
@@ -223,7 +226,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
 
             poseStack.scale(textScale, textScale, textScale);
 
-            var requiredConditionsComponent = Component.literal(String.valueOf(relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(ability).getTemplate().getRelicConditions().size())).withStyle(ChatFormatting.BOLD);
+            var requiredConditionsComponent = Component.literal(String.valueOf(relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(synergy).getTemplate().getRelicConditions().size())).withStyle(ChatFormatting.BOLD);
 
             guiGraphics.drawString(minecraft.font, requiredConditionsComponent, (-(width / 2) + 19) * 2 - minecraft.font.width(requiredConditionsComponent) / 2, (-(height / 2) + 24) * 2, 0xB7AED9, true);
 
@@ -244,12 +247,15 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
 
             guiGraphics.drawString(minecraft.font, title, -((width + 1) / 2) - (minecraft.font.width(title) / 2) + 35, (-(height / 2) - 20), canUse ? 0xFFE278 : 0xB7AED9, true);
         }
+
         RenderSystem.disableBlend();
 
         poseStack.popPose();
     }
 
     public static void drawProgressBar(GuiGraphics gui, float x, float y, float progress) {
+        progress = 1F;
+
         var atlasWidth = 38;
         var atlasHeight = 51;
 
@@ -411,7 +417,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
 
     @Override
     public boolean isLocked() {
-        return screen.getSelectedSynergy().equals(ability);
+        return screen.getSelectedSynergy().equals(synergy);
     }
 
     @Override
@@ -422,7 +428,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(ability);
+        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(synergy);
         var data = synergyData.getTemplate();
 
         if (data == null)
@@ -432,7 +438,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
 
         List<FormattedCharSequence> tooltip = Lists.newArrayList();
 
-        var title = Component.translatableWithFallback("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".ability." + ability, ability);
+        var title = Component.translatableWithFallback("relics.description." + BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + ".synergy." + synergy, synergy);
 
         int maxWidth = 110;
         int renderWidth = Math.min((minecraft.font.width(title.withStyle(ChatFormatting.BOLD)) / 2) + 4, maxWidth);
@@ -493,7 +499,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
         poseStack.scale(0.5F, 0.5F, 0.5F);
 
         if (!synergyData.isUnlocked()) {
-            title = ScreenUtils.stylizeWithReplacement(title, 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(0x9E00B0), ability.length());
+            title = ScreenUtils.stylizeWithReplacement(title, 1F, Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(0x9E00B0), synergy.length());
 
             var random = player.getRandom();
 
@@ -525,7 +531,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
     @Override
     public void playDownSound(SoundManager handler) {
         if (!isLocked() && screen.getStack().getItem() instanceof IRelicItem relic
-                && relic.getRelicData(minecraft.player, screen.stack).getAbilitiesData().getSynergyData(ability).isUnlocked())
+                && relic.getRelicData(minecraft.player, screen.stack).getAbilitiesData().getSynergyData(synergy).isUnlocked())
             super.playDownSound(handler);
     }
 }

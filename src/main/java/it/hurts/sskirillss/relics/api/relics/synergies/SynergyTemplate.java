@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.AbilityConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.stats.SynergyStatTemplate;
@@ -40,7 +41,17 @@ public class SynergyTemplate {
     public static class SynergyTemplateBuilder {
         private final String id;
 
-        private Function3<Player, ItemStack, String, String> icon = (player, stack, synergy) -> synergy;
+        private Function3<Player, ItemStack, String, String> icon = (player, stack, synergy) -> {
+            var relic = (IRelicItem) stack.getItem();
+            var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(synergy);
+
+            if (synergyData == null)
+                return synergy;
+
+            var modes = synergyData.getTemplate().getModes();
+
+            return synergy + (modes.isEmpty() ? "" : "_" + synergyData.getMode());
+        };
         private Map<String, SynergyStatTemplate> stats = new LinkedHashMap<>();
         private List<String> modes = new ArrayList<>();
         private Multimap<Integer, String> rankModifiers = LinkedHashMultimap.create();
