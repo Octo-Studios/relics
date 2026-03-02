@@ -289,10 +289,10 @@ public class KineticBeltItem extends RelicItem {
                 EntityUtils.applyAttribute(entity, stack, Attributes.GRAVITY, (float) -Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue(), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
             var prevPosition = new Vec3(entity.xOld, entity.yOld, entity.zOld);
-            var position = entity.getPosition(0.25F);
+            var position = entity.position();
             var movementDelta = position.subtract(prevPosition);
             var distance = movementDelta.length();
-            var spawnStep = 0.025D;
+            var spawnStep = 0.075D;
             int spawnCount = (int) (distance / spawnStep) + 1;
 
             var yawRadians = Math.toRadians(entity.yBodyRot);
