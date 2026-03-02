@@ -209,6 +209,9 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
                     .end();
 
         if (!canUse) {
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/synergy/small_card_frame_progress_slug_inactive.png"), poseStack)
+                    .end();
+
             GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/synergy/chains_inactive.png"), poseStack)
                     .pos(0, 0.5F)
                     .end();
@@ -244,12 +247,15 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
 
             guiGraphics.drawString(minecraft.font, title, -((width + 1) / 2) - (minecraft.font.width(title) / 2) + 35, (-(height / 2) - 20), canUse ? 0xFFE278 : 0xB7AED9, true);
         }
+
         RenderSystem.disableBlend();
 
         poseStack.popPose();
     }
 
     public static void drawProgressBar(GuiGraphics gui, float x, float y, float progress) {
+        progress = 1F;
+
         var atlasWidth = 38;
         var atlasHeight = 51;
 
