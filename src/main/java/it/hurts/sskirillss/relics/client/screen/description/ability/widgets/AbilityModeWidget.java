@@ -5,7 +5,7 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeMode;
+import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityMode;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -54,7 +54,7 @@ public class AbilityModeWidget extends AbstractDescriptionWidget {
 
         var newMode = modes.get(newIndex);
 
-        NetworkHandler.sendToServer(new C2SChangeMode(screen.getContainer(), screen.getSlot(), screen.getSelectedAbility(), newMode));
+        NetworkHandler.sendToServer(new C2SChangeAbilityMode(screen.getContainer(), screen.getSlot(), screen.getSelectedAbility(), newMode));
 
         screen.rebuildWidgets();
     }

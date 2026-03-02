@@ -17,20 +17,20 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 @Data
 @AllArgsConstructor
-public class C2SChangeMode implements CustomPacketPayload, IRelicValidator {
+public class C2SChangeAbilityMode implements CustomPacketPayload, IRelicValidator {
     private final int container;
     private final int slot;
     private final String ability;
     private final String mode;
 
-    public static final Type<C2SChangeMode> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "description/ability/change_mode"));
+    public static final Type<C2SChangeAbilityMode> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "description/ability/change_mode"));
 
-    public static final StreamCodec<ByteBuf, C2SChangeMode> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT, C2SChangeMode::getContainer,
-            ByteBufCodecs.INT, C2SChangeMode::getSlot,
-            ByteBufCodecs.STRING_UTF8, C2SChangeMode::getAbility,
-            ByteBufCodecs.STRING_UTF8, C2SChangeMode::getMode,
-            C2SChangeMode::new
+    public static final StreamCodec<ByteBuf, C2SChangeAbilityMode> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT, C2SChangeAbilityMode::getContainer,
+            ByteBufCodecs.INT, C2SChangeAbilityMode::getSlot,
+            ByteBufCodecs.STRING_UTF8, C2SChangeAbilityMode::getAbility,
+            ByteBufCodecs.STRING_UTF8, C2SChangeAbilityMode::getMode,
+            C2SChangeAbilityMode::new
     );
 
     @Override

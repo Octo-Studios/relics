@@ -120,8 +120,13 @@ public class KineticBeltItem extends RelicItem {
                                         .build())
                                 .build())
                         .synergy(SynergyTemplate.builder("electricity")
+                                .modes("enabled", "disabled")
                                 .stat(SynergyStatTemplate.builder("damage")
                                         .thresholdValue(1, 5)
+                                        .formatValue(value -> value)
+                                        .build())
+                                .stat(SynergyStatTemplate.builder("lifetime")
+                                        .thresholdValue(2, 10)
                                         .formatValue(value -> value)
                                         .build())
                                 .condition(RelicConditionTemplate.builder(RelicsItems.KINETIC_BELT::get)
@@ -258,7 +263,7 @@ public class KineticBeltItem extends RelicItem {
                 this.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "gliding", 1);
             }
 
-            if (!level.isClientSide() && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").isUnlocked()) {
+            if (!level.isClientSide() && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").isUnlocked() && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getMode().equals("enabled")) {
                 var previous = this.getLastElectricityEntity(entity, stack);
                 var position = entity.position();
                 var distanceToPreviousSqr = previous == null ? 0D : previous.position().distanceToSqr(position);
@@ -266,6 +271,7 @@ public class KineticBeltItem extends RelicItem {
                 if (previous == null || distanceToPreviousSqr >= ELECTRICITY_MIN_DISTANCE_SQR) {
                     var electricity = new KineticElectricityEntity(RelicsEntities.KINETIC_ELECTRICITY.get(), level);
 
+                    electricity.setLifetime((int) this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getStatData("lifetime").getValue());
                     electricity.setDamage((float) this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getStatData("damage").getValue());
                     electricity.setFlawless(this.getRelicData(entity, stack).isFlawless());
                     electricity.setPos(position);

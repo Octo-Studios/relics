@@ -8,8 +8,9 @@ import it.hurts.sskirillss.relics.network.packets.PacketSyncEntityEffects;
 import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.capability.CapabilitySyncPacket;
-import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeMode;
+import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityMode;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
+import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyMode;
 import it.hurts.sskirillss.relics.network.packets.item.cut_glass_boot.C2SCycleFluid;
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
 import it.hurts.sskirillss.relics.network.packets.item.ring_of_the_seven_deadly_sins.C2SHurtPlayer;
@@ -52,7 +53,8 @@ public class NetworkHandler {
         registrar.playToServer(PacketResearchHint.TYPE, PacketResearchHint.STREAM_CODEC, PacketResearchHint::handle);
         registrar.playToServer(FixLevelingPoints.TYPE, FixLevelingPoints.STREAM_CODEC, FixLevelingPoints::handle);
         registrar.playToServer(PacketRelicTweak.TYPE, PacketRelicTweak.STREAM_CODEC, PacketRelicTweak::handle);
-        registrar.playToServer(C2SChangeMode.TYPE, C2SChangeMode.STREAM_CODEC, C2SChangeMode::handle);
+        registrar.playToServer(C2SChangeAbilityMode.TYPE, C2SChangeAbilityMode.STREAM_CODEC, C2SChangeAbilityMode::handle);
+        registrar.playToServer(C2SChangeSynergyMode.TYPE, C2SChangeSynergyMode.STREAM_CODEC, C2SChangeSynergyMode::handle);
 
         // === KINETIC BELT ===
         registrar.playToServer(C2SSetActive.TYPE, C2SSetActive.STREAM_CODEC, C2SSetActive::handle);

@@ -23,6 +23,7 @@ import java.awt.*;
 
 public class KineticElectricityEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(KineticElectricityEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> LIFETIME = SynchedEntityData.defineId(KineticElectricityEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(KineticElectricityEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> PREVIOUS_ENTITY_ID = SynchedEntityData.defineId(KineticElectricityEntity.class, EntityDataSerializers.INT);
 
@@ -40,6 +41,14 @@ public class KineticElectricityEntity extends ThrowableProjectile {
 
     public float getDamage() {
         return this.getEntityData().get(DAMAGE);
+    }
+
+    public void setLifetime(int lifetime) {
+        this.getEntityData().set(LIFETIME, lifetime);
+    }
+
+    public int getLifetime() {
+        return this.getEntityData().get(LIFETIME);
     }
 
     public void setFlawless(boolean flawless) {
@@ -72,7 +81,7 @@ public class KineticElectricityEntity extends ThrowableProjectile {
                 this.hurtEntitiesOnChain(level, segment.start(), segment.end());
         }
 
-        if (this.tickCount > 200)
+        if (this.tickCount > this.getLifetime() * 20)
             this.discard();
     }
 
@@ -154,6 +163,7 @@ public class KineticElectricityEntity extends ThrowableProjectile {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(DAMAGE, 1F);
+        builder.define(LIFETIME, 1);
         builder.define(FLAWLESS, false);
         builder.define(PREVIOUS_ENTITY_ID, -1);
     }
@@ -163,6 +173,7 @@ public class KineticElectricityEntity extends ThrowableProjectile {
         super.addAdditionalSaveData(tag);
 
         tag.putFloat("damage", this.getDamage());
+        tag.putInt("lifetime", this.getLifetime());
         tag.putBoolean("flawless", this.isFlawless());
         tag.putInt("previousEntityId", this.getPreviousEntityId());
     }
@@ -172,6 +183,7 @@ public class KineticElectricityEntity extends ThrowableProjectile {
         super.readAdditionalSaveData(tag);
 
         this.setDamage(tag.getFloat("damage"));
+        this.setLifetime(tag.getInt("lifetime"));
         this.setFlawless(tag.getBoolean("flawless"));
         this.setPreviousEntityId(tag.getInt("previousEntityId"));
     }

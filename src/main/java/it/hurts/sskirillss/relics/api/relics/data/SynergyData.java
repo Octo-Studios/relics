@@ -2,6 +2,9 @@ package it.hurts.sskirillss.relics.api.relics.data;
 
 import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.LockComponent;
+import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
+import it.hurts.sskirillss.relics.api.relics.synergies.SynergyComponent;
 import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.AbilityConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicConditionTemplate;
@@ -107,6 +110,33 @@ public class SynergyData {
         return template != null && !template.getStats().isEmpty();
     }
 
+    public SynergyComponent getComponent() {
+        var template = getTemplate();
+
+        if (template == null)
+            return null;
+
+        var abilitiesComponent = abilitiesData.getComponent();
+        var synergyComponent = abilitiesComponent.getSynergies().get(synergy);
+
+        if (synergyComponent != null)
+            return synergyComponent;
+
+        synergyComponent = SynergyComponent.EMPTY;
+
+        abilitiesData.setComponent(abilitiesComponent.toBuilder()
+                .synergy(synergy, synergyComponent)
+                .build());
+
+        return synergyComponent;
+    }
+
+    public void setComponent(SynergyComponent component) {
+        abilitiesData.setComponent(abilitiesData.getComponent().toBuilder()
+                .synergy(synergy, component)
+                .build());
+    }
+
     public String getMode() {
         var template = getTemplate();
 
@@ -115,7 +145,18 @@ public class SynergyData {
 
         var modes = template.getModes();
 
-        return modes.isEmpty() ? "" : modes.getFirst();
+        if (modes.isEmpty())
+            return "";
+
+        var mode = getComponent().getMode();
+
+        return mode.isEmpty() ? modes.getFirst() : mode;
+    }
+
+    public void setMode(String mode) {
+        setComponent(getComponent().toBuilder()
+                .mode(mode)
+                .build());
     }
 
     public boolean isEnabled() {

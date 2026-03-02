@@ -2,11 +2,11 @@ package it.hurts.sskirillss.relics.client.screen.description.synergy.widgets;
 
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.synergy.SynergyDescriptionScreen;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeMode;
+import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityMode;
+import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyMode;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -35,14 +35,14 @@ public class SynergyModeWidget extends AbstractDescriptionWidget {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(screen.getSelectedSynergy());
-        var template = abilityData.getTemplate();
+        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(screen.getSelectedSynergy());
+        var template = synergyData.getTemplate();
 
         if (template == null)
             return;
 
         var modes = template.getModes();
-        var currentMode = abilityData.getMode();
+        var currentMode = synergyData.getMode();
 
         int step = this.getStep();
 
@@ -55,7 +55,7 @@ public class SynergyModeWidget extends AbstractDescriptionWidget {
 
         var newMode = modes.get(newIndex);
 
-        NetworkHandler.sendToServer(new C2SChangeMode(screen.getContainer(), screen.getSlot(), screen.getSelectedSynergy(), newMode));
+        NetworkHandler.sendToServer(new C2SChangeSynergyMode(screen.getContainer(), screen.getSlot(), screen.getSelectedSynergy(), newMode));
 
         screen.rebuildWidgets();
     }
