@@ -1,10 +1,13 @@
 package it.hurts.sskirillss.relics.client.handlers;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.platform.Window;
 import it.hurts.sskirillss.relics.client.screen.description.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -21,6 +24,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.lwjgl.glfw.GLFW;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT)
 public class DescriptionHandler {
@@ -35,12 +39,17 @@ public class DescriptionHandler {
         if (!player.level().isClientSide())
             return;
 
-        boolean hasShiftDown = Screen.hasShiftDown();
-
-        if (ticksCount > 0 && !hasShiftDown)
-            ticksCount--;
-
         Minecraft MC = Minecraft.getInstance();
+
+        int key = HotkeyRegistry.RESEARCH_RELIC.getKey().getValue();
+
+        if (key == GLFW.GLFW_KEY_UNKNOWN)
+            return;
+
+        boolean isResearching = InputConstants.isKeyDown(MC.getWindow().getWindow(), key);;
+
+        if (ticksCount > 0 && !isResearching)
+            ticksCount--;
 
         if (!(MC.screen instanceof AbstractContainerScreen<? extends AbstractContainerMenu> screen))
             return;
@@ -74,7 +83,7 @@ public class DescriptionHandler {
         if (!(stack.getItem() instanceof IRelicItem))
             return;
 
-        if (hasShiftDown) {
+        if (isResearching) {
             ticksCount++;
 
             if (ticksCount >= REQUIRED_TIME) {

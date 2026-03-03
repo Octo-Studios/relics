@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.mixin;
 
+import it.hurts.sskirillss.relics.init.HotkeyRegistry;
 import it.hurts.sskirillss.relics.items.relics.base.IRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.AbilityData;
@@ -67,7 +68,7 @@ public class ItemMixin {
         tooltip.add(Component.literal(" "));
 
         if (Minecraft.getInstance().screen instanceof AbstractContainerScreen<? extends AbstractContainerMenu>)
-            tooltip.add(Component.translatable("tooltip.relics.researching.info").withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("tooltip.relics.researching.info", HotkeyRegistry.RESEARCH_RELIC.getKey().getDisplayName()).withStyle(ChatFormatting.GRAY));
 
         tooltip.add(Component.literal(" "));
     }

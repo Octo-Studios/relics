@@ -3,7 +3,7 @@
 
   "curios.identifier.feet": "Feet",
 
-  "tooltip.relics.researching.info": "Hold [Shift] to research...",
+  "tooltip.relics.researching.info": "Hold [%1$s] to research...",
 
   "tooltip.relics.relic.tooltip.abilities": "Abilities:",
 
@@ -447,5 +447,6 @@
 
   "info.relics.researching.wrong_container": "Working with the relic in this inventory is not possible. Move item to the player's main inventory and try again.",
 
-  "key.relics.ability_list": "Show the active abilities HUD"
+  "key.relics.ability_list": "Show the active abilities HUD",
+  "key.relics.research_relic": "Research relic under the cursor"
 }

@@ -435,5 +435,5 @@
   "command.relics.base.not_relic": "Предмет в руке должен являться реликвией!",
 
   "key.relics.ability_list": "Открыть интерфейс активных способностей",
-  "tooltip.relics.holy_locket.ability.steal": "Divine Blessing"
+  "key.relics.research_relic": "Исследовать реликвию под курсором"
 }
