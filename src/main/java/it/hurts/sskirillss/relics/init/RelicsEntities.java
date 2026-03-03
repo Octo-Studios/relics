@@ -106,7 +106,7 @@ public class RelicsEntities {
 
     public static final DeferredHolder<EntityType<?>, EntityType<KineticElectricityEntity>> KINETIC_ELECTRICITY = ENTITIES.register("kinetic_electricity", () ->
             EntityType.Builder.<KineticElectricityEntity>of(KineticElectricityEntity::new, MobCategory.MISC)
-                    .sized(1F, 1F)
+                    .sized(0.4F, 0.4F)
                     .build("kinetic_electricity")
     );
 

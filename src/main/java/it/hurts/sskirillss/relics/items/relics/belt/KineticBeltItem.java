@@ -278,7 +278,7 @@ public class KineticBeltItem extends RelicItem {
                     electricity.setOwner(entity);
 
                     if (previous != null && distanceToPreviousSqr <= ELECTRICITY_MAX_LINK_DISTANCE_SQR)
-                        electricity.setPreviousEntityId(previous.getId());
+                        electricity.setPreviousEntity(previous);
 
                     level.addFreshEntity(electricity);
                     this.setLastElectricityEntityId(stack, electricity.getId());

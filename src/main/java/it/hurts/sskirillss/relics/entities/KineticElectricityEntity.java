@@ -8,7 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -20,6 +20,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class KineticElectricityEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(KineticElectricityEntity.class, EntityDataSerializers.FLOAT);
@@ -30,6 +31,8 @@ public class KineticElectricityEntity extends ThrowableProjectile {
     @Getter
     @Setter
     private ItemStack stack = ItemStack.EMPTY;
+    @Nullable
+    private UUID previousEntityUuid;
 
     public KineticElectricityEntity(EntityType<? extends KineticElectricityEntity> type, Level level) {
         super(type, level);
@@ -61,6 +64,21 @@ public class KineticElectricityEntity extends ThrowableProjectile {
 
     public void setPreviousEntityId(int entityId) {
         this.getEntityData().set(PREVIOUS_ENTITY_ID, entityId);
+
+        if (entityId < 0) {
+            this.previousEntityUuid = null;
+            return;
+        }
+
+        var previous = this.level().getEntity(entityId);
+
+        if (previous != null)
+            this.previousEntityUuid = previous.getUUID();
+    }
+
+    public void setPreviousEntity(KineticElectricityEntity previous) {
+        this.getEntityData().set(PREVIOUS_ENTITY_ID, previous.getId());
+        this.previousEntityUuid = previous.getUUID();
     }
 
     public int getPreviousEntityId() {
@@ -87,14 +105,9 @@ public class KineticElectricityEntity extends ThrowableProjectile {
 
     @Nullable
     private ChainSegment resolveChainSegment(Level level) {
-        var previousId = this.getPreviousEntityId();
+        var previous = this.resolvePreviousEntity(level);
 
-        if (previousId < 0)
-            return null;
-
-        Entity previousRaw = level.getEntity(previousId);
-
-        if (!(previousRaw instanceof KineticElectricityEntity previous) || !previous.isAlive())
+        if (previous == null)
             return null;
 
         var start = this.position().add(0, this.getBbHeight() * 0.5F, 0);
@@ -105,6 +118,34 @@ public class KineticElectricityEntity extends ThrowableProjectile {
             return null;
 
         return new ChainSegment(start, end);
+    }
+
+    @Nullable
+    private KineticElectricityEntity resolvePreviousEntity(Level level) {
+        var previousId = this.getPreviousEntityId();
+
+        if (previousId >= 0) {
+            var previousRawById = level.getEntity(previousId);
+
+            if (previousRawById instanceof KineticElectricityEntity previous && previous.isAlive()) {
+                if (!level.isClientSide())
+                    this.previousEntityUuid = previous.getUUID();
+
+                return previous;
+            }
+        }
+
+        if (level.isClientSide() || this.previousEntityUuid == null || !(level instanceof ServerLevel serverLevel))
+            return null;
+
+        var previousRawByUuid = serverLevel.getEntity(this.previousEntityUuid);
+
+        if (!(previousRawByUuid instanceof KineticElectricityEntity previous) || !previous.isAlive())
+            return null;
+
+        this.getEntityData().set(PREVIOUS_ENTITY_ID, previous.getId());
+
+        return previous;
     }
 
     private void hurtEntitiesOnChain(Level level, Vec3 start, Vec3 end) {
@@ -125,7 +166,7 @@ public class KineticElectricityEntity extends ThrowableProjectile {
                 Math.max(start.z, end.z) + radius
         );
 
-        for (var target : level.getEntitiesOfClass(LivingEntity.class, segmentBox, entity -> entity.isAlive() && entity != owner && !(entity instanceof Player))) {
+        for (var target : level.getEntitiesOfClass(LivingEntity.class, segmentBox, entity -> entity != owner)) {
             if (target.getBoundingBox().inflate(0.1D).clip(start, end).isPresent())
                 target.hurt(level.damageSources().thrown(owner instanceof LivingEntity livingOwner ? livingOwner : this, this), damage);
         }
@@ -176,6 +217,9 @@ public class KineticElectricityEntity extends ThrowableProjectile {
         tag.putInt("lifetime", this.getLifetime());
         tag.putBoolean("flawless", this.isFlawless());
         tag.putInt("previousEntityId", this.getPreviousEntityId());
+
+        if (this.previousEntityUuid != null)
+            tag.putUUID("previousEntityUuid", this.previousEntityUuid);
     }
 
     @Override
@@ -185,6 +229,7 @@ public class KineticElectricityEntity extends ThrowableProjectile {
         this.setDamage(tag.getFloat("damage"));
         this.setLifetime(tag.getInt("lifetime"));
         this.setFlawless(tag.getBoolean("flawless"));
+        this.previousEntityUuid = tag.hasUUID("previousEntityUuid") ? tag.getUUID("previousEntityUuid") : null;
         this.setPreviousEntityId(tag.getInt("previousEntityId"));
     }
 

@@ -404,6 +404,7 @@
   "entity.relics.relic_experience_orb": "Relic Experience Orb",
   "entity.relics.thrown_relic_experience_bottle": "Thrown Relic Experience Bottle",
   "entity.relics.golden_tooth": "Golden Tooth",
+  "entity.relics.kinetic_electricity": "Electrical chain",
 
   "effect.relics.stun": "Stun",
   "effect.relics.paralysis": "Paralysis",
