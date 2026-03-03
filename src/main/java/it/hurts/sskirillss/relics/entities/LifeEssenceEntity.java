@@ -59,9 +59,7 @@ public class LifeEssenceEntity extends ThrowableProjectile implements ITargetabl
             this.discard();
 
         if (this.distanceTo(target) <= 1) {
-            Level level = target.getCommandSenderWorld();
-
-            target.hurt(level.damageSources().generic(), heal);
+            target.heal(heal);
 
             this.remove(RemovalReason.KILLED);
         }
