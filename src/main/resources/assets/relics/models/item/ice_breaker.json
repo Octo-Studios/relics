@@ -4,7 +4,6 @@
         "layer0": "relics:item/ice_breaker"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/ice_breaker_broken" }
     ]
 }
 

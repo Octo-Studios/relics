@@ -4,7 +4,6 @@
         "layer0": "relics:item/ghost_skin_talisman"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/ghost_skin_talisman_broken" }
     ]
 }
 

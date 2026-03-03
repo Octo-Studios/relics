@@ -4,7 +4,6 @@
         "layer0": "relics:item/reflection_necklace"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/reflection_necklace_broken" }
     ]
 }
 

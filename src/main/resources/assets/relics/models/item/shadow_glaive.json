@@ -4,7 +4,6 @@
         "layer0": "relics:item/shadow_glaive_8"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/shadow_glaive_broken" },
         { "predicate": { "relics:charges": 0 }, "model": "relics:item/shadow_glaive_0" },
         { "predicate": { "relics:charges": 1 }, "model": "relics:item/shadow_glaive_1" },
         { "predicate": { "relics:charges": 2 }, "model": "relics:item/shadow_glaive_2" },

@@ -4,7 +4,6 @@
         "layer0": "relics:item/bastion_ring"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/bastion_ring_broken" }
     ]
 }
 

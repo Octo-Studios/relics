@@ -4,7 +4,6 @@
         "layer0": "relics:item/midnight_robe"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/midnight_robe_broken" }
     ]
 }
 

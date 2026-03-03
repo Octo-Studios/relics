@@ -4,7 +4,6 @@
         "layer0": "relics:item/drowned_belt"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/drowned_belt_broken" }
     ]
 }
 

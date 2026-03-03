@@ -4,7 +4,6 @@
         "layer0": "relics:item/leather_belt"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/leather_belt_broken" }
     ]
 }
 

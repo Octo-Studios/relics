@@ -4,7 +4,6 @@
         "layer0": "relics:item/fragrant_flower"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/fragrant_flower_broken" }
     ]
 }
 

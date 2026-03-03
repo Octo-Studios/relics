@@ -4,7 +4,6 @@
         "layer0": "relics:item/delay_ring"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/delay_ring_broken" }
     ]
 }
 

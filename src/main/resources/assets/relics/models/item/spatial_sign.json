@@ -5,7 +5,6 @@
         "layer1": "relics:item/spatial_sign_shine"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/spatial_sign_broken" }
     ]
 }
 

@@ -4,6 +4,5 @@
         "layer0": "relics:item/space_dissector"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/space_dissector_broken" }
     ]
 }

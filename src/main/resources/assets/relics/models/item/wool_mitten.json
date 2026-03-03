@@ -4,7 +4,6 @@
         "layer0": "relics:item/wool_mitten"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/wool_mitten_broken" }
     ]
 }
 
