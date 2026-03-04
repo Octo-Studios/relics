@@ -54,7 +54,7 @@ import top.theillusivec4.curios.api.SlotContext;
 
 import java.awt.*;
 
-public class ChorusStaffItem extends RelicItem implements ICreativeTabContent {
+public class ChorusStaffItem extends RelicItem {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()

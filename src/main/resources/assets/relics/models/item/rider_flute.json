@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
     "textures": {
-        "layer0": "relics:item/drowned_belt"
+        "layer0": "relics:item/rider_flute"
     }
 }
 

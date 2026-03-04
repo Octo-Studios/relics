@@ -4,7 +4,6 @@
         "layer0": "relics:item/elytra_booster_0"
     },
     "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/elytra_booster_broken" },
         { "predicate": { "relics:fuel": 0 }, "model": "relics:item/elytra_booster_0" },
         { "predicate": { "relics:fuel": 1 }, "model": "relics:item/elytra_booster_1" }
     ]

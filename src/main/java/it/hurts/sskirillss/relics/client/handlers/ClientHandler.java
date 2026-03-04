@@ -22,6 +22,7 @@ import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCateg
 import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
 import it.hurts.sskirillss.relics.init.*;
+import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
@@ -184,6 +185,7 @@ public class ClientHandler {
     @SubscribeEvent
     public static void onTooltipRegistry(RegisterClientTooltipComponentFactoriesEvent event) {
         event.register(CutGlassBootItem.CutGlassBootTooltip.class, CutGlassBootItem.ClientCutGlassBootTooltip::new);
+        event.register(RiderFluteItem.RiderFluteTooltip.class, RiderFluteItem.ClientRiderFluteTooltip::new);
     }
 
     @SubscribeEvent

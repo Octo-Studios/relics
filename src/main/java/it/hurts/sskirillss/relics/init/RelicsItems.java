@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.items.GoldenToothItem;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
 import it.hurts.sskirillss.relics.items.RelicExperienceBottleItem;
 import it.hurts.sskirillss.relics.items.relics.ChorusStaffItem;
+import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
@@ -55,6 +56,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> CHORUS_STAFF = ITEMS.register("chorus_staff", ChorusStaffItem::new);
     public static final DeferredHolder<Item, RelicItem> PIGLIN_MASK = ITEMS.register("piglin_mask", PiglinMaskItem::new);
     public static final DeferredHolder<Item, RelicItem> CUT_GLASS_BOOT = ITEMS.register("cut_glass_boot", CutGlassBootItem::new);
+    public static final DeferredHolder<Item, RelicItem> RIDER_FLUTE = ITEMS.register("rider_flute", RiderFluteItem::new);
     public static final DeferredHolder<Item, RelicItem> RING_OF_THE_SEVEN_DEADLY_SINS = ITEMS.register("ring_of_the_seven_deadly_sins", RingOfTheSevenDeadlySinsItem::new);
     public static final DeferredHolder<Item, RelicItem> SPHERE_OF_SELF_SACRIFICE = ITEMS.register("sphere_of_self_sacrifice", SphereOfSelfSacrifice::new);
     public static final DeferredHolder<Item, RelicItem> HUNTING_BELT = ITEMS.register("hunting_belt", HuntingBeltItem::new);

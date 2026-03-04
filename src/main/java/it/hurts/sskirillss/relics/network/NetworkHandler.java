@@ -12,6 +12,7 @@ import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeA
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyMode;
 import it.hurts.sskirillss.relics.network.packets.item.cut_glass_boot.C2SCycleFluid;
+import it.hurts.sskirillss.relics.network.packets.item.rider_flute.C2SCycleRiderFluteSlot;
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
 import it.hurts.sskirillss.relics.network.packets.item.ring_of_the_seven_deadly_sins.C2SHurtPlayer;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
@@ -67,6 +68,9 @@ public class NetworkHandler {
 
         // === CUT-GLASS BOOT ===
         registrar.playToServer(C2SCycleFluid.TYPE, C2SCycleFluid.STREAM_CODEC, C2SCycleFluid::handle);
+
+        // === RIDER FLUTE ===
+        registrar.playToServer(C2SCycleRiderFluteSlot.TYPE, C2SCycleRiderFluteSlot.STREAM_CODEC, C2SCycleRiderFluteSlot::handle);
 
         // === RING OF THE SEVEN DEADLY SINS ===
         registrar.playToServer(C2SHurtPlayer.TYPE, C2SHurtPlayer.STREAM_CODEC, C2SHurtPlayer::handle);

@@ -4,7 +4,6 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "relics.refmap.json",
   "mixins": [
-    "AbstractChestedHorseMixin",
     "AbstractContainerMenuMixin",
     "BlockMixin",
     "BlockStateMixin",
@@ -12,6 +11,7 @@
     "GameDataMixin",
     "ItemMixin",
     "LivingEntityMixin",
+    "PlayerMixin",
     "PiglinAiMixin",
     "ScreenMixin",
     "compat.sophisticatedbackpacks.FeedingUpgradeWrapperMixin",

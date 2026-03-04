@@ -2,9 +2,6 @@
   "parent": "item/generated",
     "textures": {
         "layer0": "relics:item/spore_sack"
-    },
-    "overrides": [
-        { "predicate": { "relics:broken": 1 }, "model": "relics:item/spore_sack_broken" }
-    ]
+    }
 }
 
