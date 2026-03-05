@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.items.GoldenToothItem;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
 import it.hurts.sskirillss.relics.items.RelicExperienceBottleItem;
 import it.hurts.sskirillss.relics.items.relics.ChorusStaffItem;
+import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
@@ -54,6 +55,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> MIDNIGHT_MANTLE = ITEMS.register("midnight_mantle", MidnightMantleItem::new);
     public static final DeferredHolder<Item, RelicItem> ROLLER_SKATE = ITEMS.register("roller_skate", RollerSkateItem::new);
     public static final DeferredHolder<Item, RelicItem> CHORUS_STAFF = ITEMS.register("chorus_staff", ChorusStaffItem::new);
+    public static final DeferredHolder<Item, RelicItem> CLOT_OF_TIME = ITEMS.register("clot_of_time", ClotOfTimeItem::new);
     public static final DeferredHolder<Item, RelicItem> PIGLIN_MASK = ITEMS.register("piglin_mask", PiglinMaskItem::new);
     public static final DeferredHolder<Item, RelicItem> CUT_GLASS_BOOT = ITEMS.register("cut_glass_boot", CutGlassBootItem::new);
     public static final DeferredHolder<Item, RelicItem> RIDER_FLUTE = ITEMS.register("rider_flute", RiderFluteItem::new);

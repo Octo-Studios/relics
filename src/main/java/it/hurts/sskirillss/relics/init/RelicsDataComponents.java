@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
+import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
@@ -36,6 +37,9 @@ public class RelicsDataComponents {
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<RiderFluteItem.HorseSlotData>>> RIDER_FLUTE_SLOTS = RelicsDataComponents.construct("rider_flute/slots", Codec.list(RiderFluteItem.HorseSlotData.CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> RIDER_FLUTE_SELECTED_SLOT_INDEX = RelicsDataComponents.construct("rider_flute/selected_slot_index", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> CLOT_OF_TIME_REWIND_CURSOR = RelicsDataComponents.construct("clot_of_time/rewind_cursor", Codec.DOUBLE);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CLOT_OF_TIME_COOLDOWN = RelicsDataComponents.construct("clot_of_time/cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<ClotOfTimeItem.PathPointData>>> CLOT_OF_TIME_PATH = RelicsDataComponents.construct("clot_of_time/path", Codec.list(ClotOfTimeItem.PathPointData.CODEC));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> LEAFY_MANTLE_PROGRESS = RelicsDataComponents.construct("leafy_mantle/progress", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> LEAFY_MANTLE_HIDING = RelicsDataComponents.construct("leafy_mantle/hiding", Codec.BOOL);
