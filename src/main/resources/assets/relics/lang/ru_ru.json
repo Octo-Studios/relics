@@ -410,7 +410,6 @@
   "relics.description.clot_of_time.ability.rewind.rank_modifier.invulnerability": "Во время возвращения во времени носитель реликвии не получает урон.",
   "relics.description.clot_of_time.ability.rewind.rank_modifier.health_rewind": "Во время возвращения во времени возвращает показатель здоровья к значению на соответствующем участке пути, но никогда не понижает текущее здоровье.",
   "relics.description.clot_of_time.ability.rewind.rank_modifier.oblivion": "Во время использования способности все ближайшие существа теряют носителя реликвии из виду.",
-  "relics.description.clot_of_time.ability.rewind.experience_source.activation": "+1 единица опыта за каждую активацию способности.",
   "relics.description.clot_of_time.ability.rewind.experience_source.rewind": "+1 единица опыта за каждую секунду, проведённую в режиме возвращения во времени.",
   "relics.description.clot_of_time.ability.rewind.experience_source.health_rewind": "+1 единица опыта за каждую единицу здоровья, восстановленную модификатором возврата здоровья.",
   "relics.description.clot_of_time.ability.rewind.statistic.activations": "Активаций реликвии",

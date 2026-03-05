@@ -13,9 +13,12 @@ import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
+import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
+import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import net.minecraft.client.Minecraft;
@@ -39,8 +42,10 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderFrameEvent;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
+import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
+import org.joml.Vector3f;
+import top.theillusivec4.curios.api.SlotContext;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -53,18 +58,14 @@ public class ClotOfTimeItem extends RelicItem {
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("rewind")
                                 .rankModifier(1, "invulnerability")
-                                .rankModifier(3, "health_rewind")
-                                .rankModifier(5, "oblivion")
+                                .rankModifier(3, "oblivion")
+                                .rankModifier(5, "health_rewind")
                                 .stat(AbilityStatTemplate.builder("time")
-                                        .initialValue(10D, 10D)
-                                        .formatValue(value -> MathUtils.round(value, 0))
-                                        .build())
-                                .stat(AbilityStatTemplate.builder("cooldown")
-                                        .initialValue(5D, 5D)
-                                        .formatValue(value -> MathUtils.round(value, 0))
+                                        .initialValue(3D, 5D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
-                                        .source("activation")
                                         .source("rewind")
                                         .source(ExperienceSourceTemplate.builder("health_rewind")
                                                 .rankModifierVisibilityState("health_rewind", VisibilityState.OBFUSCATED)
@@ -124,11 +125,8 @@ public class ClotOfTimeItem extends RelicItem {
 
             var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("rewind");
 
-            if (ability.canPlayerUse(player)) {
-                this.getRelicData(player, stack).getLevelingData().addExperience("rewind", "activation", 1D);
-
+            if (ability.canPlayerUse(player))
                 ability.getStatisticData().getMetricData("activations").addValue(1D);
-            }
         }
 
         player.startUsingItem(hand);
@@ -178,21 +176,107 @@ public class ClotOfTimeItem extends RelicItem {
         var p2 = path.get(Math.min(lastIndex, segment + 1));
 
         if (player instanceof ServerPlayer serverPlayer) {
-            var point = p1.dimension().equals(p2.dimension()) ? p1 : t <= 0.5F ? p1 : p2;
+            var p0 = path.get(Math.max(0, segment - 1));
+            var p3 = path.get(Math.min(lastIndex, segment + 2));
             var currentDimension = serverPlayer.level().dimension().location().toString();
+            var p1Dimension = p1.dimension().isBlank() ? currentDimension : p1.dimension();
+            var p2Dimension = p2.dimension().isBlank() ? currentDimension : p2.dimension();
 
-            if (!point.dimension().isBlank() && !currentDimension.equals(point.dimension())) {
-                var dimensionId = ResourceLocation.tryParse(point.dimension());
+            if (!p1Dimension.equals(currentDimension)) {
+                var dimensionId = ResourceLocation.tryParse(p1Dimension);
 
                 if (dimensionId != null) {
                     var key = ResourceKey.create(Registries.DIMENSION, dimensionId);
                     var targetLevel = serverPlayer.server.getLevel(key);
 
                     if (targetLevel != null) {
-                        serverPlayer.teleportTo(targetLevel, point.x(), point.y(), point.z(), point.yRot(), point.xRot());
+                        serverPlayer.teleportTo(targetLevel, p1.x(), p1.y(), p1.z(), p1.yRot(), p1.xRot());
+                        serverPlayer.setPortalCooldown();
                         serverPlayer.setDeltaMovement(Vec3.ZERO);
                         serverPlayer.fallDistance = 0F;
+
+                        stack.set(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
+                        stack.set(RelicsDataComponents.CLOT_OF_TIME_PATH, path);
+
+                        player.stopUsingItem();
+
+                        return;
                     }
+                }
+            }
+
+            double targetX;
+            double targetY;
+            double targetZ;
+
+            float targetYRot;
+            float targetXRot;
+
+            if (!p1Dimension.equals(p2Dimension)) {
+                var point = p1Dimension.equals(currentDimension) ? p1 : p2;
+
+                targetX = point.x();
+                targetY = point.y();
+                targetZ = point.z();
+
+                targetYRot = point.yRot();
+                targetXRot = point.xRot();
+            } else {
+                targetX = Mth.catmullrom(t, (float) p0.x(), (float) p1.x(), (float) p2.x(), (float) p3.x());
+                targetY = Mth.catmullrom(t, (float) p0.y(), (float) p1.y(), (float) p2.y(), (float) p3.y());
+                targetZ = Mth.catmullrom(t, (float) p0.z(), (float) p1.z(), (float) p2.z(), (float) p3.z());
+
+                targetYRot = this.interpolateAngleCatmullrom(t, p0.yRot(), p1.yRot(), p2.yRot(), p3.yRot());
+                targetXRot = Mth.catmullrom(t, p0.xRot(), p1.xRot(), p2.xRot(), p3.xRot());
+            }
+
+            var clampedXRot = Mth.clamp(targetXRot, -90F, 90F);
+
+            if (serverPlayer.distanceToSqr(targetX, targetY, targetZ) > 16D * 16D)
+                serverPlayer.teleportTo((ServerLevel) serverPlayer.level(), targetX, targetY, targetZ, targetYRot, clampedXRot);
+            else
+                serverPlayer.moveTo(targetX, targetY, targetZ, targetYRot, clampedXRot);
+
+            serverPlayer.setYHeadRot(targetYRot);
+            serverPlayer.yHeadRotO = targetYRot;
+            serverPlayer.yBodyRot = targetYRot;
+            serverPlayer.yBodyRotO = targetYRot;
+            serverPlayer.setDeltaMovement(Vec3.ZERO);
+            serverPlayer.fallDistance = 0F;
+        }
+
+        if (level instanceof ServerLevel) {
+            var random = level.random;
+            var previousCenter = new Vec3(player.xOld, player.yOld + player.getBbHeight() * 0.55D, player.zOld);
+            var currentCenter = new Vec3(player.getX(), player.getY() + player.getBbHeight() * 0.55D, player.getZ());
+            var movement = currentCenter.subtract(previousCenter);
+            var distance = movement.length();
+            var spawnCount = Mth.clamp((int) Math.ceil(distance / 0.125D), 2, 5);
+            var phase = player.tickCount * 0.45D;
+
+            for (int step = 0; step <= spawnCount; step++) {
+                var progress = spawnCount == 0 ? 0D : (double) step / spawnCount;
+                var center = previousCenter.add(movement.scale(progress));
+                var subPhase = phase + progress * 0.35D;
+
+                for (int i = 0; i < 6; i++) {
+                    var angle = subPhase + i * (Math.PI * 2D / 6D);
+                    var radius = 0.45D + 0.12D * Math.sin(subPhase * 1.6D + i);
+
+                    var px = center.x + Math.cos(angle) * radius;
+                    var pz = center.z + Math.sin(angle) * radius;
+                    var py = center.y + Math.sin(angle * 1.7D) * 0.2D;
+
+                    var hue = (float) ((0.58D + subPhase * 0.025D + i * 0.06D) % 1D);
+                    var color = Color.getHSBColor(hue, 0.6F + random.nextFloat() * 0.25F, 1F);
+
+                    var inward = new Vec3(center.x - px, center.y - py, center.z - pz).scale(0.1D);
+                    var swirl = new Vec3(-Math.sin(angle), 0D, Math.cos(angle)).scale(0.03D);
+
+                    var velocity = inward.add(swirl).add(0D, 0.01D + random.nextDouble() * 0.01D, 0D);
+
+                    NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CSpawnParticle(ParticleUtils.constructSimpleSpark(color, 0.25F + random.nextFloat() * 0.15F, 20 + random.nextInt(10), 0.975F), new Vector3f((float) px, (float) py, (float) pz),
+                            new Vector3f((float) velocity.x, (float) velocity.y, (float) velocity.z)), player);
                 }
             }
         }
@@ -249,6 +333,36 @@ public class ClotOfTimeItem extends RelicItem {
         return UseAnim.BLOCK;
     }
 
+    @Override
+    public int getBarWidth(ItemStack stack) {
+        var max = (float) Math.max(1, Math.round(this.getRelicData(null, stack).getAbilitiesData().getAbilityData("rewind").getStatData("time").getValue() * 20D) - 2);
+        var cur = (float) Math.max(0, stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<PathPointData>of()).size() - 2);
+
+        var ratio = Mth.clamp(cur / max, 0F, 1F);
+
+        return Mth.clamp(Mth.ceil(13F * ratio), 0, 13);
+    }
+
+    @Override
+    public int getBarColor(ItemStack stack) {
+        var max = (float) Math.max(1, Math.round(this.getRelicData(null, stack).getAbilitiesData().getAbilityData("rewind").getStatData("time").getValue() * 20D) - 2);
+        var cur = (float) Math.max(0, stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<PathPointData>of()).size() - 2);
+
+        var ratio = Mth.clamp(cur / max, 0F, 1F);
+
+        return Mth.hsvToRgb(ratio / 3F, 1F, 1F);
+    }
+
+    @Override
+    public boolean isBarVisible(ItemStack stack) {
+        return this.getRelicData(null, stack).getAbilitiesData().getAbilityData("rewind").canPlayerUse(null);
+    }
+
+    @Override
+    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
+        return false;
+    }
+
     public record PathPointData(double x, double y, double z, float yRot, float xRot, float health, String dimension) {
         public static final Codec<PathPointData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.DOUBLE.fieldOf("x").forGetter(PathPointData::x),
@@ -277,7 +391,7 @@ public class ClotOfTimeItem extends RelicItem {
     @EventBusSubscriber
     public static class CommonEvents {
         @SubscribeEvent
-        public static void onLivingDamage(LivingDamageEvent.Pre event) {
+        public static void onLivingDamage(LivingIncomingDamageEvent event) {
             if (!(event.getEntity() instanceof Player player) || player.level().isClientSide())
                 return;
 
@@ -289,7 +403,7 @@ public class ClotOfTimeItem extends RelicItem {
             if (!ability.canPlayerUse(player) || !ability.isRankModifierUnlocked("invulnerability"))
                 return;
 
-            event.setNewDamage(0F);
+            event.setCanceled(true);
         }
 
         @SubscribeEvent
@@ -319,6 +433,7 @@ public class ClotOfTimeItem extends RelicItem {
                 }
 
                 var cursor = stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
+                var path = new ArrayList<>(stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<PathPointData>of()));
                 var usingThisStack = i == usingSlot;
                 var justStoppedRewind = false;
 
@@ -339,7 +454,16 @@ public class ClotOfTimeItem extends RelicItem {
                 if (!usingThisStack && cursor >= 0D) {
                     stack.set(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
 
-                    if (relic.getCooldown(stack) <= 0)
+                    if (!path.isEmpty()) {
+                        var lastPoint = path.getLast();
+                        var currentDimension = player.level().dimension().location().toString();
+                        var lastDimension = lastPoint.dimension().isBlank() ? currentDimension : lastPoint.dimension();
+
+                        if (!lastDimension.equals(currentDimension))
+                            relic.setCooldown(stack, 0);
+                        else if (relic.getCooldown(stack) <= 0)
+                            relic.setCooldown(stack, 1);
+                    } else if (relic.getCooldown(stack) <= 0)
                         relic.setCooldown(stack, 1);
 
                     justStoppedRewind = true;
@@ -354,8 +478,6 @@ public class ClotOfTimeItem extends RelicItem {
                     if (cooldown > 0)
                         relic.setCooldown(stack, cooldown - 1);
                 }
-
-                var path = new ArrayList<>(stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<PathPointData>of()));
 
                 path.add(PathPointData.fromPlayer(player));
 
@@ -415,7 +537,7 @@ public class ClotOfTimeItem extends RelicItem {
             double x;
             double y;
             double z;
-            
+
             float targetYRot;
             float targetXRot;
 
@@ -439,31 +561,6 @@ public class ClotOfTimeItem extends RelicItem {
 
             var yRot = Mth.rotLerp(0.45F, player.getYRot(), targetYRot);
             var xRot = Mth.lerp(0.45F, player.getXRot(), Mth.clamp(targetXRot, -90F, 90F));
-
-            var level = player.level();
-            var random = level.random;
-            var center = new Vec3(x, y + player.getBbHeight() * 0.55D, z);
-            var phase = (player.tickCount + partial) * 0.45D;
-
-            for (int i = 0; i < 6; i++) {
-                var angle = phase + i * (Math.PI * 2D / 6D);
-                var radius = 0.45D + 0.12D * Math.sin(phase * 1.6D + i);
-
-                var px = center.x + Math.cos(angle) * radius;
-                var pz = center.z + Math.sin(angle) * radius;
-                var py = center.y + Math.sin(angle * 1.7D) * 0.2D;
-
-                var hue = (float) ((0.58D + phase * 0.025D + i * 0.06D) % 1D);
-                var color = Color.getHSBColor(hue, 0.6F + random.nextFloat() * 0.25F, 1F);
-
-                var inward = new Vec3(center.x - px, center.y - py, center.z - pz).scale(0.1D);
-                var swirl = new Vec3(-Math.sin(angle), 0D, Math.cos(angle)).scale(0.03D);
-
-                var velocity = inward.add(swirl).add(0D, 0.01D + random.nextDouble() * 0.01D, 0D);
-
-                level.addParticle(ParticleUtils.constructSimpleSpark(color, 0.25F + random.nextFloat() * 0.15F, 20 + random.nextInt(10), 0.975F),
-                        px, py, pz, velocity.x, velocity.y, velocity.z);
-            }
 
             player.setYRot(yRot);
             player.setXRot(xRot);

@@ -3,11 +3,13 @@ package it.hurts.sskirillss.relics.mixin;
 import it.hurts.sskirillss.relics.api.events.common.EntityBlockSpeedFactorEvent;
 import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.init.RelicsItems;
+import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
@@ -100,5 +102,14 @@ public class EntityMixin {
         NeoForge.EVENT_BUS.post(event);
 
         cir.setReturnValue(event.getSpeedFactor());
+    }
+
+    @Inject(method = "canUsePortal", at = @At("HEAD"), cancellable = true)
+    private void canUsePortal(boolean allowPassengers, CallbackInfoReturnable<Boolean> cir) {
+        if (!((Object) this instanceof Player player))
+            return;
+
+        if (player.isUsingItem() && player.getUseItem().getItem() instanceof ClotOfTimeItem)
+            cir.setReturnValue(false);
     }
 }
