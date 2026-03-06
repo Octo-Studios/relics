@@ -131,40 +131,6 @@ public class RelicData {
         return Math.min(1.0, Math.max(0.0, progress));
     }
 
-    @Deprecated(forRemoval = true)
-    public void spreadExperience(int experience) {
-        this.spreadExperience(experience, 0.25D);
-    }
-
-    @Deprecated(forRemoval = true)
-    public void spreadExperience(int experience, double percentage) {
-        var isMaxLevel = this.isMaxLevel();
-
-        var toSpread = isMaxLevel ? 0 : experience * percentage;
-
-        if (!isMaxLevel)
-            this.getLevelingData().addExperience(experience);
-
-        if (toSpread <= 0 || entity == null)
-            return;
-
-        var relics = RelicsRegistries.RELIC_CONTAINER_REGISTRY.entrySet().stream()
-                .map(entry -> entry.getValue())
-                .flatMap(source -> source.gatherRelics().apply(entity).stream())
-                .filter(entry -> entry.getItem() instanceof IRelicItem relicItem
-                        && !relicItem.getRelicData(entity, entry).isMaxLevel()
-                        && !stack.equals(entry))
-                .toList();
-
-        if (relics.isEmpty())
-            return;
-
-        var relicStack = relics.get(entity.level().getRandom().nextInt(relics.size()));
-
-        if (relicStack.getItem() instanceof IRelicItem relicItem)
-            relicItem.getRelicData(entity, relicStack).getLevelingData().addExperience(toSpread);
-    }
-
     public boolean isMaxRank() {
         return this.getLevelingData().getRank() >= this.getTemplate().getLeveling().getMaxRank();
     }

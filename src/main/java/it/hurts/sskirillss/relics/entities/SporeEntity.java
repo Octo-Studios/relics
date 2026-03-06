@@ -132,9 +132,6 @@ public class SporeEntity extends ThrowableProjectile implements ITargetableEntit
             var stack = getRelicStack();
 
             if (entity.hurt(getCommandSenderWorld().damageSources().thrown(this, player), getDamage())) {
-                if (stack.getItem() instanceof IRelicItem relic)
-                    relic.getRelicData(player, stack).spreadExperience(1);
-
                 if (this.isOnFire())
                     entity.igniteForTicks(this.getRemainingFireTicks());
 

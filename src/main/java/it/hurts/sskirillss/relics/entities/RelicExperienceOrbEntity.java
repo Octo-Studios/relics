@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.entities;
 
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.init.RelicsRegistries;
-import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -101,8 +101,31 @@ public class RelicExperienceOrbEntity extends Entity {
 
                     if (!upgradeable.isEmpty()) {
                         ItemStack stack = upgradeable.get(random.nextInt(upgradeable.size()));
+                        IRelicItem relic = (IRelicItem) stack.getItem();
 
-                        ((IRelicItem) stack.getItem()).getRelicData(player, stack).spreadExperience(this.getExperience());
+                        var isMaxLevel = relic.getRelicData(player, stack).isMaxLevel();
+
+                        var toSpread = isMaxLevel ? 0 : this.getExperience() * 0.25D;
+
+                        if (!isMaxLevel)
+                            relic.getRelicData(player, stack).getLevelingData().addExperience(this.getExperience());
+
+                        if (toSpread > 0) {
+                            var relics = RelicsRegistries.RELIC_CONTAINER_REGISTRY.entrySet().stream()
+                                    .map(Map.Entry::getValue)
+                                    .flatMap(source -> source.gatherRelics().apply(player).stream())
+                                    .filter(entry -> entry.getItem() instanceof IRelicItem relicItem
+                                            && !relicItem.getRelicData(player, entry).isMaxLevel()
+                                            && !stack.equals(entry))
+                                    .toList();
+
+                            if (!relics.isEmpty()) {
+                                var relicStack = relics.get(player.level().getRandom().nextInt(relics.size()));
+
+                                if (relicStack.getItem() instanceof IRelicItem relicItem)
+                                    relicItem.getRelicData(player, relicStack).getLevelingData().addExperience(toSpread);
+                            }
+                        }
 
                         this.discard();
 
