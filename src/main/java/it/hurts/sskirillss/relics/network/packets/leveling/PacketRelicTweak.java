@@ -66,7 +66,7 @@ public class PacketRelicTweak implements CustomPacketPayload {
             }
 
             if (!switch (operation) {
-                case RANKUP -> relic.getRelicData(player, stack).getLevelingData().rankup(player);
+                case RANKUP -> relic.getRelicData(player, stack).getLevelingData().rankup();
             }) return;
 
             try {

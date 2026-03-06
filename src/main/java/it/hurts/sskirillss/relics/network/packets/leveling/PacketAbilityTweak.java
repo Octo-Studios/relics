@@ -81,11 +81,11 @@ public class PacketAbilityTweak implements CustomPacketPayload {
 
                     if (withShift)
                         for (; ; )
-                            if (abilityData.upgrade(player))
+                            if (abilityData.upgrade())
                                 result = true;
                             else break;
                     else
-                        result = abilityData.upgrade(player);
+                        result = abilityData.upgrade();
 
                     yield result;
                 }
@@ -93,14 +93,14 @@ public class PacketAbilityTweak implements CustomPacketPayload {
                     boolean result = false;
 
                     if (withShift)
-                        while (abilityData.calculateQuality() != abilityData.getMaxQuality() && abilityData.reroll(player))
+                        while (abilityData.calculateQuality() != abilityData.getMaxQuality() && abilityData.reroll())
                             result = true;
                     else
-                        result = abilityData.reroll(player);
+                        result = abilityData.reroll();
 
                     yield result;
                 }
-                case RESET -> abilityData.reset(player);
+                case RESET -> abilityData.reset();
             }) return;
 
             try {

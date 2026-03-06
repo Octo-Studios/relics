@@ -10,12 +10,16 @@ public class LockData {
         this.abilityData = abilityData;
     }
 
+    public AbilityData getAbilityData() {
+        return this.abilityData;
+    }
+
     public LockComponent getComponent() {
-        return abilityData.getComponent().getLock();
+        return this.getAbilityData().getComponent().getLock();
     }
 
     public void setComponent(LockComponent component) {
-        abilityData.setComponent(abilityData.getComponent().toBuilder()
+        this.getAbilityData().setComponent(this.getAbilityData().getComponent().toBuilder()
                 .lock(component)
                 .build());
     }

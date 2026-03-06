@@ -46,7 +46,7 @@ public class AbilityArgument implements ArgumentType<String> {
         var stack = player.getMainHandItem();
         var relicData = relic.getRelicData(player, stack);
 
-        List<String> result = new ArrayList<>(relicData.getAbilitiesData().getAbilityIds());
+        List<String> result = new ArrayList<>(relicData.getAbilitiesData().getAbilityIDs());
 
         result.add("all");
 

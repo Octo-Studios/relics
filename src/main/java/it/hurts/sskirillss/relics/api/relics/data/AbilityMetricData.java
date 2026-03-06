@@ -11,30 +11,38 @@ public class AbilityMetricData {
         this.metric = metric;
     }
 
+    public AbilityStatisticData getStatisticData() {
+        return this.statisticData;
+    }
+
+    public String getId() {
+        return this.metric;
+    }
+
     public AbilityMetricComponent getComponent() {
-        var template = statisticData.getTemplate().getMetrics().get(metric);
+        var template = this.getStatisticData().getTemplate().getMetrics().get(this.getId());
 
         if (template == null)
             return null;
 
-        var statisticComponent = statisticData.getComponent();
-        var metricComponent = statisticComponent.getMetrics().get(metric);
+        var statisticComponent = this.getStatisticData().getComponent();
+        var metricComponent = statisticComponent.getMetrics().get(this.getId());
 
         if (metricComponent != null)
             return metricComponent;
 
         metricComponent = AbilityMetricComponent.EMPTY;
 
-        statisticData.setComponent(statisticComponent.toBuilder()
-                .metric(metric, metricComponent)
+        this.getStatisticData().setComponent(statisticComponent.toBuilder()
+                .metric(this.getId(), metricComponent)
                 .build());
 
         return metricComponent;
     }
 
     public void setComponent(AbilityMetricComponent component) {
-        statisticData.setComponent(statisticData.getComponent().toBuilder()
-                .metric(metric, component)
+        this.getStatisticData().setComponent(this.getStatisticData().getComponent().toBuilder()
+                .metric(this.getId(), component)
                 .build());
     }
 

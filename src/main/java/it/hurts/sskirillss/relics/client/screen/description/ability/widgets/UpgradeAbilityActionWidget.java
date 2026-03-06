@@ -38,7 +38,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
         if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
             return true;
 
-        return !relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerUpgrade(minecraft.player);
+        return !relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerUpgrade();
     }
 
     @Override
@@ -53,7 +53,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
             int level = abilityData.getLevel();
             int maxLevel = template.getInitialMaxLevel();
 
-            handler.play(SimpleSoundInstance.forUI(RelicsSounds.TABLE_UPGRADE.get(), Screen.hasShiftDown() && abilityData.mayPlayerUpgrade(minecraft.player) ? 2F : 1F + ((float) level / maxLevel)));
+            handler.play(SimpleSoundInstance.forUI(RelicsSounds.TABLE_UPGRADE.get(), Screen.hasShiftDown() && abilityData.mayPlayerUpgrade() ? 2F : 1F + ((float) level / maxLevel)));
         }
     }
 
@@ -64,7 +64,7 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
 
         var poseStack = guiGraphics.pose();
 
-        var isQuick = Screen.hasShiftDown() && relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerUpgrade(minecraft.player);
+        var isQuick = Screen.hasShiftDown() && relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerUpgrade();
 
         var color = isQuick ? (float) (1.05F + (Math.sin((minecraft.player.tickCount + (getAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;
 

@@ -26,15 +26,15 @@ public class AbilityData {
     }
 
     public AbilitiesData getAbilitiesData() {
-        return abilitiesData;
+        return this.abilitiesData;
     }
 
     public String getId() {
-        return ability;
+        return this.ability;
     }
 
     public AbilityTemplate getTemplate() {
-        return abilitiesData.getTemplate().getAbilities().get(ability);
+        return this.getAbilitiesData().getTemplate().getAbilities().get(this.getId());
     }
 
     public AbilityComponent getComponent() {
@@ -43,8 +43,8 @@ public class AbilityData {
         if (template == null)
             return null;
 
-        var abilitiesComponent = abilitiesData.getComponent();
-        var abilityComponent = abilitiesComponent.getAbilities().get(ability);
+        var abilitiesComponent = this.getAbilitiesData().getComponent();
+        var abilityComponent = abilitiesComponent.getAbilities().get(this.getId());
 
         if (abilityComponent != null)
             return abilityComponent;
@@ -58,16 +58,16 @@ public class AbilityData {
                             .build())
                     .build();
 
-        abilitiesData.setComponent(abilitiesComponent.toBuilder()
-                .ability(ability, abilityComponent)
+        this.getAbilitiesData().setComponent(abilitiesComponent.toBuilder()
+                .ability(this.getId(), abilityComponent)
                 .build());
 
         return abilityComponent;
     }
 
     public void setComponent(AbilityComponent component) {
-        abilitiesData.setComponent(abilitiesData.getComponent().toBuilder()
-                .ability(ability, component)
+        this.getAbilitiesData().setComponent(this.getAbilitiesData().getComponent().toBuilder()
+                .ability(this.getId(), component)
                 .build());
     }
 
@@ -126,7 +126,7 @@ public class AbilityData {
 
         var modifiers = Multimaps.invertFrom(template.getRankModifiers(), HashMultimap.create());
 
-        return abilitiesData.getRelicData().getLevelingData().getRank() >= Collections.max(modifiers.get(rankModifier));
+        return this.getAbilitiesData().getRelicData().getLevelingData().getRank() >= Collections.max(modifiers.get(rankModifier));
     }
 
     public void randomizeStats() {
@@ -140,7 +140,7 @@ public class AbilityData {
         if (stats.isEmpty())
             return;
 
-        var entity = abilitiesData.getRelicData().getEntity();
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
         var random = entity == null ? RandomSource.create() : entity.getRandom();
 
         double targetQuality;
@@ -197,7 +197,7 @@ public class AbilityData {
     }
 
     public void randomizeStat(String stat) {
-        var entity = abilitiesData.getRelicData().getEntity();
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
         var random = entity == null ? RandomSource.create() : entity.getRandom();
 
         getStatData(stat).setInitialQuality(random.nextInt(getStatData(stat).getMaxQuality() + 1));
@@ -206,7 +206,7 @@ public class AbilityData {
     public boolean isEnoughLevel() {
         var template = getTemplate();
 
-        return template != null && abilitiesData.getRelicData().getLevelingData().getLevel() >= template.getRequiredLevel();
+        return template != null && this.getAbilitiesData().getRelicData().getLevelingData().getLevel() >= template.getRequiredLevel();
     }
 
     public boolean isEnabled() {
@@ -245,22 +245,30 @@ public class AbilityData {
         return template != null
                 && template.getInitialMaxLevel() > 0 && !template.getStats().isEmpty()
                 && !isMaxLevel()
-                && abilitiesData.getRelicData().getLevelingData().getPoints() >= template.getRequiredPoints()
+                && this.getAbilitiesData().getRelicData().getLevelingData().getPoints() >= template.getRequiredPoints()
                 && isUnlocked();
     }
 
-    public boolean mayPlayerUpgrade(Player player) {
+    public boolean mayPlayerUpgrade() {
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
+
+        if (!(entity instanceof Player player))
+            return false;
+
         return mayUpgrade() && EntityUtils.getPlayerTotalExperience(player) >= getUpgradePlayerExperienceCost();
     }
 
-    public boolean upgrade(Player player) {
-        if (!mayPlayerUpgrade(player))
+    public boolean upgrade() {
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
+
+        if (!(entity instanceof Player player) || !this.mayPlayerUpgrade())
             return false;
 
-        player.giveExperiencePoints(-getUpgradePlayerExperienceCost());
+        player.giveExperiencePoints(-this.getUpgradePlayerExperienceCost());
 
-        setLevel(getLevel() + 1);
-        abilitiesData.getRelicData().getLevelingData().addPoints(-getTemplate().getRequiredPoints());
+        this.setLevel(getLevel() + 1);
+
+        this.getAbilitiesData().getRelicData().getLevelingData().addPoints(-getTemplate().getRequiredPoints());
 
         return true;
     }
@@ -275,45 +283,60 @@ public class AbilityData {
         return template != null && !template.getStats().isEmpty() && isUnlocked();
     }
 
-    public boolean mayPlayerReroll(Player player) {
-        return mayReroll() && EntityUtils.getPlayerTotalExperience(player) >= getRerollPlayerExperienceCost();
-    }
+    public boolean mayPlayerReroll() {
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
 
-    public boolean reroll(Player player) {
-        if (!mayPlayerReroll(player))
+        if (!(entity instanceof Player player))
             return false;
 
-        player.giveExperiencePoints(-getRerollPlayerExperienceCost());
+        return this.mayReroll() && EntityUtils.getPlayerTotalExperience(player) >= this.getRerollPlayerExperienceCost();
+    }
 
-        randomizeStats();
+    public boolean reroll() {
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
+
+        if (!(entity instanceof Player player) || !this.mayPlayerReroll())
+            return false;
+
+        player.giveExperiencePoints(-this.getRerollPlayerExperienceCost());
+
+        this.randomizeStats();
 
         return true;
     }
 
     public int getResetPlayerExperienceCost() {
-        return getLevel() * 250;
+        return this.getLevel() * 250;
     }
 
     public boolean mayReset() {
-        return getLevel() > 0 && isUnlocked();
+        return this.getLevel() > 0 && this.isUnlocked();
     }
 
-    public boolean mayPlayerReset(Player player) {
-        var template = getTemplate();
+    public boolean mayPlayerReset() {
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
+
+        if (!(entity instanceof Player player))
+            return false;
+
+        var template = this.getTemplate();
 
         return template != null && !template.getStats().isEmpty()
-                && mayReset()
-                && EntityUtils.getPlayerTotalExperience(player) >= getResetPlayerExperienceCost();
+                && this.mayReset()
+                && EntityUtils.getPlayerTotalExperience(player) >= this.getResetPlayerExperienceCost();
     }
 
-    public boolean reset(Player player) {
-        if (!mayPlayerReset(player))
+    public boolean reset() {
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
+
+        if (!(entity instanceof Player player) || !this.mayPlayerReset())
             return false;
 
         player.giveExperiencePoints(-getResetPlayerExperienceCost());
 
-        abilitiesData.getRelicData().getLevelingData().addPoints(getLevel() * getTemplate().getRequiredPoints());
-        setLevel(0);
+        this.getAbilitiesData().getRelicData().getLevelingData().addPoints(this.getLevel() * this.getTemplate().getRequiredPoints());
+
+        this.setLevel(0);
 
         return true;
     }

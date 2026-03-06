@@ -19,12 +19,16 @@ public class ResearchData {
         this.abilityData = abilityData;
     }
 
+    public AbilityData getAbilityData() {
+        return this.abilityData;
+    }
+
     public ResearchComponent getComponent() {
-        return abilityData.getComponent().getResearch();
+        return this.getAbilityData().getComponent().getResearch();
     }
 
     public void setComponent(ResearchComponent component) {
-        abilityData.setComponent(abilityData.getComponent().toBuilder()
+        this.getAbilityData().setComponent(this.getAbilityData().getComponent().toBuilder()
                 .research(component)
                 .build());
     }
@@ -71,7 +75,7 @@ public class ResearchData {
     }
 
     public boolean isResearched() {
-        return abilityData.getTemplate().getResearchTemplate().getStars().isEmpty() || getComponent().isResearched();
+        return this.getAbilityData().getTemplate().getResearchTemplate().getStars().isEmpty() || this.getComponent().isResearched();
     }
 
     public void setResearched(boolean researched) {
@@ -81,8 +85,8 @@ public class ResearchData {
     }
 
     public Multimap<Integer, Integer> getCorrectLinks() {
-        Multimap<Integer, Integer> schema = abilityData.getTemplate().getResearchTemplate().getLinks();
-        Multimap<Integer, Integer> links = getLinks();
+        Multimap<Integer, Integer> schema = this.getAbilityData().getTemplate().getResearchTemplate().getLinks();
+        Multimap<Integer, Integer> links = this.getLinks();
 
         if (schema.isEmpty())
             return LinkedHashMultimap.create();
@@ -98,8 +102,8 @@ public class ResearchData {
     }
 
     public Multimap<Integer, Integer> getIncorrectLinks() {
-        Multimap<Integer, Integer> schema = abilityData.getTemplate().getResearchTemplate().getLinks();
-        Multimap<Integer, Integer> links = getLinks();
+        Multimap<Integer, Integer> schema = this.getAbilityData().getTemplate().getResearchTemplate().getLinks();
+        Multimap<Integer, Integer> links = this.getLinks();
 
         if (schema.isEmpty())
             return LinkedHashMultimap.create();
@@ -115,8 +119,8 @@ public class ResearchData {
     }
 
     public double getResearchPercentage() {
-        Multimap<Integer, Integer> schema = abilityData.getTemplate().getResearchTemplate().getLinks();
-        Multimap<Integer, Integer> links = getLinks();
+        Multimap<Integer, Integer> schema = this.getAbilityData().getTemplate().getResearchTemplate().getLinks();
+        Multimap<Integer, Integer> links = this.getLinks();
 
         if (schema.isEmpty())
             return 0D;

@@ -5,9 +5,7 @@ import it.hurts.sskirillss.relics.api.relics.events.RelicExperienceChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.events.RelicLevelingPointsChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
 
 public class LevelingData {
@@ -18,13 +16,17 @@ public class LevelingData {
     }
 
     public LevelingComponent getComponent() {
-        return relicData.getComponent().getLeveling();
+        return this.getRelicData().getComponent().getLeveling();
     }
 
     public void setComponent(LevelingComponent component) {
-        relicData.setComponent(relicData.getComponent().toBuilder()
+        this.getRelicData().setComponent(this.getRelicData().getComponent().toBuilder()
                 .leveling(component)
                 .build());
+    }
+
+    public RelicData getRelicData() {
+        return this.relicData;
     }
 
     public int getLevel() {
@@ -39,7 +41,7 @@ public class LevelingData {
 
     public boolean addLevel(int level) {
         var currentLevel = getLevel();
-        var maxLevel = relicData.calculateMaxLevel();
+        var maxLevel = this.getRelicData().calculateMaxLevel();
 
         var allowedDelta = level > 0
                 ? Math.min(level, maxLevel - currentLevel)
@@ -48,7 +50,7 @@ public class LevelingData {
         if (allowedDelta == 0)
             return false;
 
-        var event = new RelicLevelChangeEvent(relicData.getEntity(), relicData.getStack(), allowedDelta);
+        var event = new RelicLevelChangeEvent(this.getRelicData().getEntity(), this.getRelicData().getStack(), allowedDelta);
 
         if (NeoForge.EVENT_BUS.post(event).isCanceled() || event.getDelta() == 0)
             return false;
@@ -74,7 +76,7 @@ public class LevelingData {
     }
 
     public boolean addExperience(String ability, String experienceSource, double amount) {
-        var event = NeoForge.EVENT_BUS.post(new RelicExperienceChangeEvent(relicData.getEntity(), relicData.getStack(), ability, experienceSource, amount));
+        var event = NeoForge.EVENT_BUS.post(new RelicExperienceChangeEvent(this.getRelicData().getEntity(), this.getRelicData().getStack(), ability, experienceSource, amount));
 
         var delta = event.getDelta();
 
@@ -93,7 +95,7 @@ public class LevelingData {
         var xp = getExperience();
         var level = getLevel();
         var oldLevel = level;
-        var maxLevel = relicData.calculateMaxLevel();
+        var maxLevel = this.getRelicData().calculateMaxLevel();
 
         while ((amount > 0 && level < maxLevel) || (amount < 0 && level > 0)) {
             if (amount > 0) {
@@ -147,22 +149,22 @@ public class LevelingData {
     }
 
     public boolean addPoints(int amount) {
-        var event = new RelicLevelingPointsChangeEvent(relicData.getEntity(), relicData.getStack(), amount);
+        var event = new RelicLevelingPointsChangeEvent(this.getRelicData().getEntity(), this.getRelicData().getStack(), amount);
 
         if (NeoForge.EVENT_BUS.post(event).isCanceled())
             return false;
 
         var delta = event.getDelta();
         var currentPoints = getPoints();
-        var maxLevel = relicData.calculateMaxLevel();
+        var maxLevel = this.getRelicData().calculateMaxLevel();
         var newPoints = currentPoints + delta;
 
         if (newPoints < 0) {
             var deficit = -newPoints;
 
-            var abilitiesData = relicData.getAbilitiesData();
+            var abilitiesData = this.getRelicData().getAbilitiesData();
 
-            var abilities = abilitiesData.getAbilityIds().stream()
+            var abilities = abilitiesData.getAbilityIDs().stream()
                     .filter(ability -> abilitiesData.getAbilityData(ability).getLevel() > 0)
                     .toList();
 
@@ -221,13 +223,13 @@ public class LevelingData {
         if (level <= 0)
             return 0;
 
-        var template = relicData.getTemplate().getLeveling();
+        var template = this.getRelicData().getTemplate().getLeveling();
         var operation = template.getScalingModel();
 
         var total = 0D;
 
         for (int i = 0; i < level; i++)
-            total += operation.evaluate(relicData.getEntity(), relicData.getStack(), template.getInitialCost(), template.getStep(), i);
+            total += operation.evaluate(this.getRelicData().getEntity(), this.getRelicData().getStack(), template.getInitialCost(), template.getStep(), i);
 
         return (int) Math.floor(total);
     }
@@ -248,30 +250,30 @@ public class LevelingData {
     public boolean isPointsMismatch() {
         int current = getPoints();
 
-        var abilitiesData = relicData.getAbilitiesData();
+        var abilitiesData = this.getRelicData().getAbilitiesData();
 
-        for (var data : relicData.getTemplate().getAbilities().getAbilities().values())
+        for (var data : this.getRelicData().getTemplate().getAbilities().getAbilities().values())
             current += abilitiesData.getAbilityData(data.getId()).getComponent().getPoints() * data.getRequiredPoints();
 
         return current != getLevel();
     }
 
-    public boolean mayPlayerRankup(Player player) {
-        var levelingTemplate = relicData.getTemplate().getLeveling();
+    public boolean mayPlayerRankup() {
+        var levelingTemplate = this.getRelicData().getTemplate().getLeveling();
 
-        return getLevel() == relicData.calculateMaxLevel() && getRank() < levelingTemplate.getMaxRank();
+        return getLevel() == this.getRelicData().calculateMaxLevel() && getRank() < levelingTemplate.getMaxRank();
     }
 
-    public boolean rankup(Player player) {
-        if (!mayPlayerRankup(player))
+    public boolean rankup() {
+        if (!mayPlayerRankup())
             return false;
 
         addRank(1);
         setLevel(0);
         setPoints(0);
 
-        for (var ability : relicData.getTemplate().getAbilities().getAbilities().values())
-            relicData.getAbilitiesData().getAbilityData(ability.getId()).setLevel(0);
+        for (var ability : this.getRelicData().getTemplate().getAbilities().getAbilities().values())
+            this.getRelicData().getAbilitiesData().getAbilityData(ability.getId()).setLevel(0);
 
         return true;
     }

@@ -18,15 +18,19 @@ public class AbilityStatData {
         this.stat = stat;
     }
 
+    public AbilityData getAbilityData() {
+        return this.abilityData;
+    }
+
     public String getId() {
-        return stat;
+        return this.stat;
     }
 
     @Nullable
     public AbilityStatTemplate getTemplate() {
-        var abilityTemplate = abilityData.getTemplate();
+        var abilityTemplate = this.getAbilityData().getTemplate();
 
-        return abilityTemplate == null ? null : abilityTemplate.getStats().get(stat);
+        return abilityTemplate == null ? null : abilityTemplate.getStats().get(this.getId());
     }
 
     public StatComponent getComponent() {
@@ -35,8 +39,8 @@ public class AbilityStatData {
         if (statTemplate == null)
             return null;
 
-        var abilityComponent = abilityData.getComponent();
-        var statComponent = abilityComponent.getStats().get(stat);
+        var abilityComponent = this.getAbilityData().getComponent();
+        var statComponent = abilityComponent.getStats().get(this.getId());
 
         if (statComponent != null)
             return statComponent;
@@ -47,18 +51,18 @@ public class AbilityStatData {
                 .initialQuality(new Random().nextInt(11))
                 .build();
 
-        abilityData.setComponent(abilityComponent.toBuilder()
-                .stat(stat, statComponent)
+        this.getAbilityData().setComponent(abilityComponent.toBuilder()
+                .stat(this.getId(), statComponent)
                 .build());
 
         return statComponent;
     }
 
     public void setComponent(StatComponent component) {
-        var abilityComponent = abilityData.getComponent();
+        var abilityComponent = this.getAbilityData().getComponent();
 
-        abilityData.setComponent(abilityComponent.toBuilder()
-                .stat(stat, component)
+        this.getAbilityData().setComponent(abilityComponent.toBuilder()
+                .stat(this.getId(), component)
                 .build());
     }
 
@@ -139,7 +143,7 @@ public class AbilityStatData {
         var threshold = template.getThresholdValue();
 
         return MathUtils.round(Mth.clamp(template.getUpgradeModifier().getScalingModel()
-                .evaluate(abilityData.getAbilitiesData().getRelicData().getEntity(), abilityData.getAbilitiesData().getRelicData().getStack(), value, template.getUpgradeModifier().getModifier(), points), threshold.getMinValue(), threshold.getMaxValue()), 5);
+                .evaluate(this.getAbilityData().getAbilitiesData().getRelicData().getEntity(), this.getAbilityData().getAbilitiesData().getRelicData().getStack(), value, template.getUpgradeModifier().getModifier(), points), threshold.getMinValue(), threshold.getMaxValue()), 5);
     }
 
     public double getValueFromQuality(int quality) {
@@ -166,6 +170,6 @@ public class AbilityStatData {
     }
 
     public double getValue() {
-        return getValueForLevel(abilityData.getLevel());
+        return this.getValueForLevel(this.getAbilityData().getLevel());
     }
 }

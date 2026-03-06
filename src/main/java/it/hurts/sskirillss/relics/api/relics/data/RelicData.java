@@ -38,15 +38,15 @@ public class RelicData {
     }
 
     public RelicTemplate getTemplate() {
-        return this.relic.getRelicTemplate(entity, stack);
+        return this.getRelic().getRelicTemplate(this.getEntity(), this.getStack());
     }
 
     public RelicComponent getComponent() {
-        return this.stack.getOrDefault(RelicsDataComponents.RELIC, RelicComponent.EMPTY);
+        return this.getStack().getOrDefault(RelicsDataComponents.RELIC, RelicComponent.EMPTY);
     }
 
     public void setComponent(RelicComponent component) {
-        this.stack.set(RelicsDataComponents.RELIC, component);
+        this.getStack().set(RelicsDataComponents.RELIC, component);
     }
 
     public AbilitiesData getAbilitiesData() {

@@ -10,18 +10,22 @@ public class RelicStatisticData {
         this.relicData = relicData;
     }
 
+    public RelicData getRelicData() {
+        return this.relicData;
+    }
+
     public RelicStatisticComponent getComponent() {
-        return relicData.getComponent().getStatistic();
+        return this.getRelicData().getComponent().getStatistic();
     }
 
     public void setComponent(RelicStatisticComponent component) {
-        relicData.setComponent(relicData.getComponent().toBuilder()
+        this.getRelicData().setComponent(this.getRelicData().getComponent().toBuilder()
                 .statistic(component)
                 .build());
     }
 
     public RelicStatisticTemplate getTemplate() {
-        return relicData.getTemplate().getStatistic();
+        return this.getRelicData().getTemplate().getStatistic();
     }
 
     public RelicMetricData getMetricData(String metric) {

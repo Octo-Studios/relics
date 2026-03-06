@@ -311,7 +311,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         var canUse = isEnoughLevel && isLockUnlocked && isAbilityResearched;
 
-        var canUpgrade = abilityData.mayPlayerUpgrade(player);
+        var canUpgrade = abilityData.mayPlayerUpgrade();
 
         var canBeLeveledUp = abilityData.getTemplate().getInitialMaxLevel() > 0;
         var hasStats = !abilityData.getTemplate().getStats().isEmpty();
@@ -695,7 +695,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     entries.add(Component.literal(" "));
 
                     entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.unresearched")));
-                } else if (abilityData.mayPlayerUpgrade(player)) {
+                } else if (abilityData.mayPlayerUpgrade()) {
                     entries.add(Component.literal(" "));
 
                     entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.ready_to_upgrade")));

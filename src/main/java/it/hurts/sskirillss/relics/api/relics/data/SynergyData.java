@@ -25,15 +25,15 @@ public class SynergyData {
     }
 
     public AbilitiesData getAbilitiesData() {
-        return abilitiesData;
+        return this.abilitiesData;
     }
 
     public String getId() {
-        return synergy;
+        return this.synergy;
     }
 
     public SynergyTemplate getTemplate() {
-        return abilitiesData.getTemplate().getSynergies().get(synergy);
+        return this.getAbilitiesData().getTemplate().getSynergies().get(this.getId());
     }
 
     public SynergyStatData getStatData(String stat) {
@@ -51,7 +51,7 @@ public class SynergyData {
         if (conditions.isEmpty())
             return 0D;
 
-        var entity = abilitiesData.getRelicData().getEntity();
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
 
         if (entity == null)
             return 0D;
@@ -76,7 +76,7 @@ public class SynergyData {
             if (relic == null)
                 continue;
 
-            var relicStacks = findRelicStacks(entity, relic, condition.getRelicContainers());
+            var relicStacks = this.findRelicStacks(relic, condition.getRelicContainers());
 
             if (relicStacks.isEmpty())
                 continue;
@@ -91,7 +91,7 @@ public class SynergyData {
                 for (var abilityCondition : abilityConditions) {
                     var abilityData = conditionAbilitiesData.getAbilityData(abilityCondition.getId());
 
-                    stackProgress += calculateAbilityProgress(abilityData, abilityCondition);
+                    stackProgress += this.calculateAbilityProgress(abilityData, abilityCondition);
                 }
 
                 if (stackProgress > bestProgress)
@@ -116,24 +116,24 @@ public class SynergyData {
         if (template == null)
             return null;
 
-        var abilitiesComponent = abilitiesData.getComponent();
-        var synergyComponent = abilitiesComponent.getSynergies().get(synergy);
+        var abilitiesComponent = this.getAbilitiesData().getComponent();
+        var synergyComponent = abilitiesComponent.getSynergies().get(this.getId());
 
         if (synergyComponent != null)
             return synergyComponent;
 
         synergyComponent = SynergyComponent.EMPTY;
 
-        abilitiesData.setComponent(abilitiesComponent.toBuilder()
-                .synergy(synergy, synergyComponent)
+        this.getAbilitiesData().setComponent(abilitiesComponent.toBuilder()
+                .synergy(this.getId(), synergyComponent)
                 .build());
 
         return synergyComponent;
     }
 
     public void setComponent(SynergyComponent component) {
-        abilitiesData.setComponent(abilitiesData.getComponent().toBuilder()
-                .synergy(synergy, component)
+        this.getAbilitiesData().setComponent(this.getAbilitiesData().getComponent().toBuilder()
+                .synergy(this.getId(), component)
                 .build());
     }
 
@@ -174,21 +174,17 @@ public class SynergyData {
         if (conditions.isEmpty())
             return true;
 
-        var entity = abilitiesData.getRelicData().getEntity();
-
-        if (entity == null)
-            return false;
-
-        return conditions.stream().allMatch(condition -> isRelicConditionSatisfied(entity, condition));
+        return conditions.stream().allMatch(this::isRelicConditionSatisfied);
     }
 
-    private boolean isRelicConditionSatisfied(LivingEntity entity, RelicConditionTemplate condition) {
+    private boolean isRelicConditionSatisfied(RelicConditionTemplate condition) {
+        var entity = this.getAbilitiesData().getRelicData().getEntity();
         var relic = condition.getRelic().get();
 
         if (relic == null)
             return false;
 
-        var relicStacks = findRelicStacks(entity, relic, condition.getRelicContainers());
+        var relicStacks = this.findRelicStacks(relic, condition.getRelicContainers());
 
         if (relicStacks.isEmpty())
             return false;
@@ -196,10 +192,10 @@ public class SynergyData {
         for (var stack : relicStacks) {
             var relicData = relic.getRelicData(entity, stack);
 
-            if (!isRelicDataSatisfied(relicData, condition))
+            if (!this.isRelicDataSatisfied(relicData, condition))
                 continue;
 
-            if (areAbilityConditionsSatisfied(relicData, condition.getAbilityConditions()))
+            if (this.areAbilityConditionsSatisfied(relicData, condition.getAbilityConditions()))
                 return true;
         }
 
@@ -261,9 +257,9 @@ public class SynergyData {
         return Math.clamp(progress, 0D, 1D);
     }
 
-    private List<ItemStack> findRelicStacks(LivingEntity entity, IRelicItem relic, List<RelicContainer> containers) {
+    private List<ItemStack> findRelicStacks(IRelicItem relic, List<RelicContainer> containers) {
         return containers.stream()
-                .flatMap(container -> container.gatherRelics().apply(entity).stream())
+                .flatMap(container -> container.gatherRelics().apply(this.getAbilitiesData().getRelicData().getEntity()).stream())
                 .filter(stack -> stack.getItem() == relic)
                 .toList();
     }

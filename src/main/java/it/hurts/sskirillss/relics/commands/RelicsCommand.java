@@ -263,7 +263,7 @@ public class RelicsCommand {
 
                                                             var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
 
-                                                            (ability.equals("all") ? abilitiesData.getAbilityIds() : Set.of(ability)).forEach(entry -> {
+                                                            (ability.equals("all") ? abilitiesData.getAbilityIDs() : Set.of(ability)).forEach(entry -> {
                                                                 var abilityData = abilitiesData.getAbilityData(entry);
 
                                                                 abilityData.setLevel(switch (action) {
@@ -301,7 +301,7 @@ public class RelicsCommand {
 
                                                                     var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
 
-                                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIds().toArray(new String[0]) : new String[]{ability})
+                                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIDs().toArray(new String[0]) : new String[]{ability})
                                                                             .forEach(abilityEntry -> {
                                                                                 var abilityData = abilitiesData.getAbilityData(abilityEntry);
 
@@ -342,7 +342,7 @@ public class RelicsCommand {
 
                                                                     var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
 
-                                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIds().toArray(new String[0]) : new String[]{ability})
+                                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIDs().toArray(new String[0]) : new String[]{ability})
                                                                             .forEach(abilityEntry -> {
                                                                                 var abilityData = abilitiesData.getAbilityData(abilityEntry);
 
@@ -383,7 +383,7 @@ public class RelicsCommand {
 
                                                                     var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
 
-                                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIds().toArray(new String[0]) : new String[]{ability})
+                                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIDs().toArray(new String[0]) : new String[]{ability})
                                                                             .forEach(abilityEntry -> {
                                                                                 var abilityData = abilitiesData.getAbilityData(abilityEntry);
 
@@ -420,7 +420,7 @@ public class RelicsCommand {
 
                                                     var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
 
-                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIds().toArray(new String[0]) : new String[]{ability})
+                                                    Stream.of(ability.equals("all") ? abilitiesData.getAbilityIDs().toArray(new String[0]) : new String[]{ability})
                                                             .forEach(abilityEntry -> {
                                                                 var abilityData = abilitiesData.getAbilityData(abilityEntry);
 

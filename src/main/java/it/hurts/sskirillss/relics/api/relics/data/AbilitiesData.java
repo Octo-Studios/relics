@@ -17,24 +17,24 @@ public class AbilitiesData {
     }
 
     public RelicData getRelicData() {
-        return relicData;
+        return this.relicData;
     }
 
     public AbilitiesComponent getComponent() {
-        return this.relicData.getComponent().getAbilities();
+        return this.getRelicData().getComponent().getAbilities();
     }
 
     public void setComponent(AbilitiesComponent component) {
-        this.relicData.setComponent(this.relicData.getComponent().toBuilder()
+        this.getRelicData().setComponent(this.getRelicData().getComponent().toBuilder()
                 .abilities(component)
                 .build());
     }
 
     public AbilitiesTemplate getTemplate() {
-        return this.relicData.getTemplate().getAbilities();
+        return this.getRelicData().getTemplate().getAbilities();
     }
 
-    public Set<String> getAbilityIds() {
+    public Set<String> getAbilityIDs() {
         return this.getTemplate().getAbilities().keySet();
     }
 
@@ -45,7 +45,7 @@ public class AbilitiesData {
         return new AbilityData(this, ability);
     }
 
-    public Map<String, AbilityData> getAbilityDataMap() {
+    public Map<String, AbilityData> getAbilities() {
         return this.getTemplate().getAbilities().keySet().stream()
                 .collect(Collectors.toMap(
                         id -> id,
@@ -55,11 +55,7 @@ public class AbilitiesData {
                 ));
     }
 
-    public Collection<AbilityData> getAbilities() {
-        return this.getAbilityDataMap().values();
-    }
-
-    public Set<String> getSynergyIds() {
+    public Set<String> getSynergyIDs() {
         return this.getTemplate().getSynergies().keySet();
     }
 
@@ -70,7 +66,7 @@ public class AbilitiesData {
         return new SynergyData(this, synergy);
     }
 
-    public Map<String, SynergyData> getSynergyDataMap() {
+    public Map<String, SynergyData> getSynergies() {
         return this.getTemplate().getSynergies().keySet().stream()
                 .collect(Collectors.toMap(
                         id -> id,
@@ -80,21 +76,17 @@ public class AbilitiesData {
                 ));
     }
 
-    public Collection<SynergyData> getSynergies() {
-        return this.getSynergyDataMap().values();
-    }
-
     public boolean hasUnlockedUpgradeableAbility() {
-        return this.getAbilityIds().stream().anyMatch(ability -> {
-            var abilityData = getAbilityData(ability);
+        return this.getAbilityIDs().stream().anyMatch(ability -> {
+            var abilityData = this.getAbilityData(ability);
 
             return abilityData != null && abilityData.canBeUpgraded() && abilityData.isUnlocked();
         });
     }
 
     public boolean hasUnlockedAbility() {
-        return this.getAbilityIds().stream().anyMatch(ability -> {
-            var abilityData = getAbilityData(ability);
+        return this.getAbilityIDs().stream().anyMatch(ability -> {
+            var abilityData = this.getAbilityData(ability);
 
             return abilityData != null && abilityData.isUnlocked();
         });

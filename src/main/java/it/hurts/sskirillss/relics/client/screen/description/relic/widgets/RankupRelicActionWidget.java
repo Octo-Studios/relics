@@ -26,7 +26,7 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
 
     @Override
     public boolean isLocked() {
-        return !(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.getRelicData(minecraft.player, getScreen().getStack()).getLevelingData().mayPlayerRankup(minecraft.player);
+        return !(getScreen().getStack().getItem() instanceof IRelicItem relic) || !relic.getRelicData(minecraft.player, getScreen().getStack()).getLevelingData().mayPlayerRankup();
     }
 
     @Override

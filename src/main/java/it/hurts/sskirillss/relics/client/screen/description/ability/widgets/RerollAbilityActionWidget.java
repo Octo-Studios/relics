@@ -39,7 +39,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
             return true;
 
-        return !relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerReroll(minecraft.player);
+        return !relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerReroll();
     }
 
     @Override
@@ -148,7 +148,7 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
         var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility());
         var isWarning = abilityData.calculateQuality() == abilityData.getMaxQuality();
-        var isQuick = Screen.hasShiftDown() && abilityData.mayPlayerReroll(player);
+        var isQuick = Screen.hasShiftDown() && abilityData.mayPlayerReroll();
 
         var color = (isWarning && Screen.hasShiftDown()) || isQuick ? (float) (1.05F + (Math.sin((player.tickCount + (getAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;
 

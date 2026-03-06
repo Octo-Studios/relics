@@ -10,18 +10,22 @@ public class AbilityStatisticData {
         this.abilityData = abilityData;
     }
 
+    public AbilityData getAbilityData() {
+        return this.abilityData;
+    }
+
     public AbilityStatisticComponent getComponent() {
-        return abilityData.getComponent().getStatistic();
+        return this.getAbilityData().getComponent().getStatistic();
     }
 
     public void setComponent(AbilityStatisticComponent component) {
-        abilityData.setComponent(abilityData.getComponent().toBuilder()
+        this.getAbilityData().setComponent(this.getAbilityData().getComponent().toBuilder()
                 .statistic(component)
                 .build());
     }
 
     public AbilityStatisticTemplate getTemplate() {
-        return abilityData.getTemplate().getStatistic();
+        return this.getAbilityData().getTemplate().getStatistic();
     }
 
     public AbilityMetricData getMetricData(String metric) {

@@ -11,18 +11,22 @@ public class SynergyStatData {
         this.stat = stat;
     }
 
+    public SynergyData getSynergyData() {
+        return this.synergyData;
+    }
+
     public String getId() {
-        return stat;
+        return this.stat;
     }
 
     public SynergyStatTemplate getTemplate() {
-        var synergyTemplate = synergyData.getTemplate();
+        var synergyTemplate = this.getSynergyData().getTemplate();
 
-        return synergyTemplate == null ? null : synergyTemplate.getStats().get(stat);
+        return synergyTemplate == null ? null : synergyTemplate.getStats().get(this.getId());
     }
 
     public double getValue() {
-        return getValueForProgress(synergyData.getProgress());
+        return this.getValueForProgress(this.getSynergyData().getProgress());
     }
 
     public double getValueForProgress(double progress) {
