@@ -5,6 +5,7 @@ import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.common.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -116,6 +117,19 @@ public class GuiGraphicsMixin {
         if (player == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
+        var optional = RelicsRelicStyles.getStyle(stack.getItem());
+
+        if (optional.isEmpty())
+            return;
+
+        var style = optional.get();
+
+        var startColor = style.getFlawlessStartColor(player, stack);
+        var endColor = style.getFlawlessEndColor(player, stack);
+
+        if (startColor == null || endColor == null)
+            return;
+
         var guiGraphics = (GuiGraphics) (Object) this;
         var poseStack = guiGraphics.pose();
 
@@ -136,7 +150,7 @@ public class GuiGraphicsMixin {
 
                 var length = 0.85F + ((i % 2 == 0 ? Math.sin(time * 0.25F) : Math.cos(time * 0.25F)) * 0.1F);
 
-                RenderUtils.renderFlatBeam(guiGraphics, partialTicks, (float) length, 0.45F, 0xFFFFFF00, 0x00FF0000);
+                RenderUtils.renderFlatBeam(guiGraphics, partialTicks, (float) length, 0.45F, startColor.getARGB(), endColor.getARGB());
 
                 poseStack.popPose();
             }

@@ -8,7 +8,6 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import net.minecraft.client.Minecraft;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -16,7 +15,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 import org.lwjgl.opengl.GL11;
 
-@EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
 public class TooltipBorderHandler {
     @SubscribeEvent
     public static void onTooltipDisplay(TooltipDisplayEvent event) {
@@ -30,6 +29,30 @@ public class TooltipBorderHandler {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
+        var optional = RelicsRelicStyles.getStyle(stack.getItem());
+
+        if (optional.isEmpty())
+            return;
+
+        var style = optional.get();
+
+        var frameTexture = style.getTooltipFrameTexture(player, stack);
+        var starTexture = style.getTooltipStarTexture(player, stack);
+
+        if (frameTexture == null || starTexture == null)
+            return;
+
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        RenderSystem.setShaderTexture(0, frameTexture);
+
+        Minecraft.getInstance().getTextureManager().getTexture(frameTexture).bind();
+
+        int texWidth = GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
+        int texHeight = GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
+
+        if (texHeight == 16 || texWidth == 16)
+            return;
+
         var graphics = event.getGraphics();
         var poseStack = graphics.pose();
 
@@ -38,21 +61,6 @@ public class TooltipBorderHandler {
 
         var x = event.getX();
         var y = event.getY();
-
-        var id = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
-
-        var texture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/tooltip/frame/" + id + "/frame.png");
-
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-        RenderSystem.setShaderTexture(0, texture);
-
-        Minecraft.getInstance().getTextureManager().getTexture(texture).bind();
-
-        int texWidth = GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
-        int texHeight = GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
-
-        if (texHeight == 0 || texWidth == 0)
-            return;
 
         var patternWidth = 160;
         var patternHeight = 64;
@@ -69,24 +77,22 @@ public class TooltipBorderHandler {
 
         poseStack.translate(0, 0, 410.0);
 
-        var animation = AnimationData.fromMcmeta(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/tooltip/frame/" + id + "/frame.png.mcmeta"));
+        var animation = AnimationData.fromMcmeta(ResourceLocation.fromNamespaceAndPath(Relics.MODID, frameTexture.getPath() + ".mcmeta"));
 
         int frame = animation.getFrameByTime(player.tickCount).getKey();
 
         int offset = patternHeight * frame;
 
-        graphics.blit(texture, x - cornerWidth / 2 - 3, y - cornerHeight / 2 - 3, 0, offset, cornerWidth, cornerHeight, texWidth, texHeight);
-        graphics.blit(texture, x + width - cornerWidth / 2 + 3, y - cornerHeight / 2 - 3, patternWidth - cornerWidth, offset, cornerWidth, cornerHeight, texWidth, texHeight);
+        graphics.blit(frameTexture, x - cornerWidth / 2 - 3, y - cornerHeight / 2 - 3, 0, offset, cornerWidth, cornerHeight, texWidth, texHeight);
+        graphics.blit(frameTexture, x + width - cornerWidth / 2 + 3, y - cornerHeight / 2 - 3, patternWidth - cornerWidth, offset, cornerWidth, cornerHeight, texWidth, texHeight);
 
-        graphics.blit(texture, x - cornerWidth / 2 - 3, y + height - cornerHeight / 2 + 3, 0, (patternHeight - cornerHeight) + offset, cornerWidth, cornerHeight, texWidth, texHeight);
-        graphics.blit(texture, x + width - cornerWidth / 2 + 3, y + height - cornerHeight / 2 + 3, patternWidth - cornerWidth, (patternHeight - cornerHeight) + offset, cornerWidth, cornerHeight, texWidth, texHeight);
+        graphics.blit(frameTexture, x - cornerWidth / 2 - 3, y + height - cornerHeight / 2 + 3, 0, (patternHeight - cornerHeight) + offset, cornerWidth, cornerHeight, texWidth, texHeight);
+        graphics.blit(frameTexture, x + width - cornerWidth / 2 + 3, y + height - cornerHeight / 2 + 3, patternWidth - cornerWidth, (patternHeight - cornerHeight) + offset, cornerWidth, cornerHeight, texWidth, texHeight);
 
-        graphics.blit(texture, x + (width - middleWidth) / 2, y - middleHeight + 1, cornerWidth, offset, middleWidth, middleHeight, texWidth, texHeight);
-        graphics.blit(texture, x + (width - middleWidth) / 2, y + height - 1, cornerWidth, middleHeight + offset, middleWidth, middleHeight, texWidth, texHeight);
+        graphics.blit(frameTexture, x + (width - middleWidth) / 2, y - middleHeight + 1, cornerWidth, offset, middleWidth, middleHeight, texWidth, texHeight);
+        graphics.blit(frameTexture, x + (width - middleWidth) / 2, y + height - 1, cornerWidth, middleHeight + offset, middleWidth, middleHeight, texWidth, texHeight);
 
-        texture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/tooltip/frame/" + id + "/star.png");
-
-        RenderSystem.setShaderTexture(0, texture);
+        RenderSystem.setShaderTexture(0, starTexture);
 
         var xOff = 0;
 
@@ -97,7 +103,7 @@ public class TooltipBorderHandler {
 
             RenderSystem.setShaderColor(color, color, color, 1F);
 
-            graphics.blit(texture, x + width / 2 - 14 + xOff, y - 10, (isAliquot ? 0 : 3), 0, isAliquot ? 3 : 2, 5, 5, 5);
+            graphics.blit(starTexture, x + width / 2 - 14 + xOff, y - 10, (isAliquot ? 0 : 3), 0, isAliquot ? 3 : 2, 5, 5, 5);
 
             RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
