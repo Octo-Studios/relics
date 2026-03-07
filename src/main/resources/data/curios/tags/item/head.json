@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "relics:piglin_mask"
+    "relics:piglin_mask",
+    "relics:chef_hat"
   ]
 }

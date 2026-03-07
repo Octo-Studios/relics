@@ -3,6 +3,8 @@ package it.hurts.sskirillss.relics.init;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.items.GoldenToothItem;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
+import it.hurts.sskirillss.relics.items.CookedMeatballItem;
+import it.hurts.sskirillss.relics.items.RawMeatballItem;
 import it.hurts.sskirillss.relics.items.RelicExperienceBottleItem;
 import it.hurts.sskirillss.relics.items.relics.ChorusStaffItem;
 import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
@@ -16,6 +18,7 @@ import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
 import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
 import it.hurts.sskirillss.relics.items.relics.feet.RollerSkateItem;
 import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
+import it.hurts.sskirillss.relics.items.relics.head.ChefHatItem;
 import it.hurts.sskirillss.relics.items.relics.head.PiglinMaskItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
@@ -32,6 +35,8 @@ public class RelicsItems {
     public static final DeferredHolder<Item, Item> RELIC_EXPERIENCE_BOTTLE = ITEMS.register("relic_experience_bottle", RelicExperienceBottleItem::new);
     public static final DeferredHolder<Item, Item> GOLDEN_TOOTH = ITEMS.register("golden_tooth", GoldenToothItem::new);
     public static final DeferredHolder<Item, Item> PET_BONE = ITEMS.register("pet_bone", PetBoneItem::new);
+    public static final DeferredHolder<Item, Item> RAW_MEATBALL = ITEMS.register("raw_meatball", RawMeatballItem::new);
+    public static final DeferredHolder<Item, Item> COOKED_MEATBALL = ITEMS.register("cooked_meatball", CookedMeatballItem::new);
 
 //    public static final DeferredHolder<Item, RelicItem> MAGMA_WALKER = ITEMS.register("magma_walker", MagmaWalkerItem::new);
 //    public static final DeferredHolder<Item, RelicItem> AQUA_WALKER = ITEMS.register("aqua_walker", AquaWalkerItem::new);
@@ -57,6 +62,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> CHORUS_STAFF = ITEMS.register("chorus_staff", ChorusStaffItem::new);
     public static final DeferredHolder<Item, RelicItem> CLOT_OF_TIME = ITEMS.register("clot_of_time", ClotOfTimeItem::new);
     public static final DeferredHolder<Item, RelicItem> PIGLIN_MASK = ITEMS.register("piglin_mask", PiglinMaskItem::new);
+    public static final DeferredHolder<Item, RelicItem> CHEF_HAT = ITEMS.register("chef_hat", ChefHatItem::new);
     public static final DeferredHolder<Item, RelicItem> CUT_GLASS_BOOT = ITEMS.register("cut_glass_boot", CutGlassBootItem::new);
     public static final DeferredHolder<Item, RelicItem> RIDER_FLUTE = ITEMS.register("rider_flute", RiderFluteItem::new);
     public static final DeferredHolder<Item, RelicItem> RING_OF_THE_SEVEN_DEADLY_SINS = ITEMS.register("ring_of_the_seven_deadly_sins", RingOfTheSevenDeadlySinsItem::new);

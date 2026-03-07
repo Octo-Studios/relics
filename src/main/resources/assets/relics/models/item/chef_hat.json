@@ -1,0 +1,14 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "relics:item/chef_hat"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "relics:flawless": 1
+      },
+      "model": "relics:item/chef_hat_flawless"
+    }
+  ]
+}

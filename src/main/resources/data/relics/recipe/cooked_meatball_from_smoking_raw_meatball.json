@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:smoking",
+  "category": "food",
+  "ingredient": {
+    "item": "relics:raw_meatball"
+  },
+  "result": {
+    "id": "relics:cooked_meatball",
+    "count": 1
+  },
+  "experience": 0.35,
+  "cookingtime": 100
+}
