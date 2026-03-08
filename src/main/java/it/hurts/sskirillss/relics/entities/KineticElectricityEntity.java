@@ -173,29 +173,11 @@ public class KineticElectricityEntity extends ThrowableProjectile {
     }
 
     private void spawnChainParticles(Level level, Vec3 start, Vec3 end) {
-        var distance = start.distanceTo(end);
-        var segments = Math.max(3, (int) (distance * 3D));
-        var previousPoint = start;
+        var random = level.random;
+        var color = FlawlessUtils.getColor(this.isFlawless(), new Color(120 + random.nextInt(50), 190 + random.nextInt(50), 255));
+        var particle = ParticleUtils.constructSimpleSpark(color, 0.2F + random.nextFloat() * 0.1F, 3, 0.85F);
 
-        for (var i = 1; i <= segments; i++) {
-            var t = (double) i / segments;
-            var nextPoint = start.add(end.subtract(start).scale(t));
-
-            if (i < segments) {
-                var jitter = 0.25D;
-
-                nextPoint = nextPoint.add((random.nextDouble() * 2D - 1D) * jitter, (random.nextDouble() * 2D - 1D) * jitter, (random.nextDouble() * 2D - 1D) * jitter);
-            }
-
-            var color = FlawlessUtils.getColor(this.isFlawless(), new Color(120 + random.nextInt(50), 190 + random.nextInt(50), 255));
-            var particle = ParticleUtils.constructSimpleSpark(color, 0.2F + random.nextFloat() * 0.1F, 3, 0.85F);
-            var motion = new Vec3((random.nextDouble() * 2D - 1D) * 0.005D, (random.nextDouble() * 2D - 1D) * 0.005D, (random.nextDouble() * 2D - 1D) * 0.005D);
-            var amount = Math.max(1, (int) Math.ceil(previousPoint.distanceTo(nextPoint) * 14D));
-
-            ParticleUtils.createLine(particle, level, previousPoint, nextPoint, amount, motion);
-
-            previousPoint = nextPoint;
-        }
+        ParticleUtils.createLightning(level, start, end, 3, 3D, 0.25D, 14D, 0.005D, particle);
     }
 
     private record ChainSegment(Vec3 start, Vec3 end) {

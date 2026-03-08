@@ -130,7 +130,36 @@ public class ParticleUtils {
         }
     }
 
-    public static void createLine(ParticleOptions particle, Level level, Vec3 start, Vec3 end, int amount) {
-        createLine(particle, level, start, end, amount, Vec3.ZERO);
+    public static void createLightning(Level level, Vec3 start, Vec3 end, int minSegments, double segmentsPerBlock, double jitter, double particlesPerBlock, double motionScale, ParticleOptions particle) {
+        if (!level.isClientSide())
+            return;
+
+        var random = level.random;
+        var distance = start.distanceTo(end);
+        var segments = Math.max(minSegments, (int) (distance * segmentsPerBlock));
+        var previousPoint = start;
+
+        for (var i = 1; i <= segments; i++) {
+            var t = (double) i / segments;
+            var nextPoint = start.add(end.subtract(start).scale(t));
+
+            if (i < segments) {
+                nextPoint = nextPoint.add(
+                        (random.nextDouble() * 2D - 1D) * jitter,
+                        (random.nextDouble() * 2D - 1D) * jitter,
+                        (random.nextDouble() * 2D - 1D) * jitter
+                );
+            }
+            var motion = new Vec3(
+                    (random.nextDouble() * 2D - 1D) * motionScale,
+                    (random.nextDouble() * 2D - 1D) * motionScale,
+                    (random.nextDouble() * 2D - 1D) * motionScale
+            );
+            var amount = Math.max(1, (int) Math.ceil(previousPoint.distanceTo(nextPoint) * particlesPerBlock));
+
+            createLine(particle, level, previousPoint, nextPoint, amount, motion);
+
+            previousPoint = nextPoint;
+        }
     }
 }

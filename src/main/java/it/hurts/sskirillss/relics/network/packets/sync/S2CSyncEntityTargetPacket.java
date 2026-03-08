@@ -21,8 +21,8 @@ public class S2CSyncEntityTargetPacket implements CustomPacketPayload {
     public static final CustomPacketPayload.Type<S2CSyncEntityTargetPacket> TYPE = new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "entity_target"));
 
     public static final StreamCodec<ByteBuf, S2CSyncEntityTargetPacket> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT, S2CSyncEntityTargetPacket::getTargetId,
             ByteBufCodecs.INT, S2CSyncEntityTargetPacket::getSourceId,
+            ByteBufCodecs.INT, S2CSyncEntityTargetPacket::getTargetId,
             S2CSyncEntityTargetPacket::new
     );
 

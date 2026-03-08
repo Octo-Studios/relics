@@ -88,7 +88,6 @@ public class ClientHandler {
         RelicsRelicRenderers.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootRenderer::new);
 
         EntityTrailRegistry.registerProvider(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveEntity.TrailProvider::new);
-        EntityTrailRegistry.registerProvider(RelicsEntities.ELECTRIC_SPARK.get(), ElectricSparkEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.REFLECTIVE_ORB.get(), ReflectiveOrbEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.SPORE.get(), SporeEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.DEATH_ESSENCE.get(), DeathEssenceEntity.TrailProvider::new);
