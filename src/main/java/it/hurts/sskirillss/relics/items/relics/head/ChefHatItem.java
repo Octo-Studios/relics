@@ -18,13 +18,16 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
-
 public class ChefHatItem extends RelicItem {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
@@ -159,13 +162,44 @@ public class ChefHatItem extends RelicItem {
 
     @EventBusSubscriber
     public static class CommonEvents {
+        private static final String FIRE_DEATH_TAG = "relics:chef_hat_fire_death";
+
         @SubscribeEvent
-        public static void onLivingDeath(LivingDeathEvent event) {
-            if (!(event.getSource().getEntity() instanceof Player source) || source.level().isClientSide())
+        public static void onLivingDamage(LivingDamageEvent.Pre event) {
+            var target = event.getEntity();
+
+            if (target.level().isClientSide())
                 return;
 
+            target.getPersistentData().remove(FIRE_DEATH_TAG);
+
+            if (target.getHealth() - event.getNewDamage() > 0F)
+                return;
+
+            if (target.getRemainingFireTicks() > 0 || event.getSource().is(DamageTypeTags.IS_FIRE))
+                target.getPersistentData().putBoolean(FIRE_DEATH_TAG, true);
+        }
+
+        @SubscribeEvent
+        public static void onLivingDeath(LivingDeathEvent event) {
             var target = event.getEntity();
+
+            var source = event.getSource().getEntity() instanceof Player player ? player : null;
+
+            if (source == null && target.getKillCredit() instanceof Player player)
+                source = player;
+
+            if (source == null || source.level().isClientSide())
+                return;
+
             var random = source.getRandom();
+            var fireAspectHolder = source.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.FIRE_ASPECT);
+            var cookedByFireAspect = event.getSource().is(DamageTypeTags.IS_PLAYER_ATTACK)
+                    && source.getMainHandItem().getEnchantmentLevel(fireAspectHolder) > 0;
+            var cookedByFire = target.getPersistentData().getBoolean(FIRE_DEATH_TAG)
+                    || target.getRemainingFireTicks() > 0
+                    || event.getSource().is(DamageTypeTags.IS_FIRE)
+                    || cookedByFireAspect;
 
             for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.CHEF_HAT.get())) {
                 var relic = (ChefHatItem) stack.getItem();
@@ -182,18 +216,18 @@ public class ChefHatItem extends RelicItem {
                 if (random.nextDouble() > chance)
                     continue;
 
-                var amount = 1;
-
-                var cookedDrop = abilityData.isRankModifierUnlocked("cooked_meatball") || target.getRemainingFireTicks() > 0;
+                var cookedDrop = abilityData.isRankModifierUnlocked("cooked_meatball") || cookedByFire;
                 var item = cookedDrop
                         ? RelicsItems.COOKED_MEATBALL.get()
                         : RelicsItems.RAW_MEATBALL.get();
 
-                target.spawnAtLocation(new ItemStack(item, amount));
+                target.spawnAtLocation(new ItemStack(item, 1));
 
-                relic.getRelicData(source, stack).getLevelingData().addExperience("satiety", "drop", amount);
-                abilityData.getStatisticData().getMetricData("meatballs_dropped").addValue(amount);
+                relic.getRelicData(source, stack).getLevelingData().addExperience("satiety", "drop", 1);
+                abilityData.getStatisticData().getMetricData("meatballs_dropped").addValue(1);
             }
+
+            target.getPersistentData().remove(FIRE_DEATH_TAG);
         }
     }
 }
