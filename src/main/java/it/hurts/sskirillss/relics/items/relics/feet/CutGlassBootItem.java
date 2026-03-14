@@ -601,7 +601,7 @@ public class CutGlassBootItem extends RelicItem {
         public static void onFluidCollision(FluidCollisionEvent event) {
             var entity = event.getEntity();
 
-            if (entity.isShiftKeyDown() || entity.isInFluidType())
+            if (entity.isInFluidType())
                 return;
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CUT_GLASS_BOOT.get())) {
