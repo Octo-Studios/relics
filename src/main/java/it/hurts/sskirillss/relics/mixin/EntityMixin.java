@@ -2,96 +2,110 @@ package it.hurts.sskirillss.relics.mixin;
 
 import it.hurts.sskirillss.relics.api.events.common.EntityBlockSpeedFactorEvent;
 import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
-import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.misc.mixin.FluidWalkGraceAccessor;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.common.NeoForge;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
-public class EntityMixin {
+public class EntityMixin implements FluidWalkGraceAccessor {
+    @Unique
+    private int relics$fluidWalkGraceTicks;
+
+    @Unique
+    private static final int[][] FLUID_OFFSETS = {
+            {1, 0, 1}, {1, 0, 0}, {1, -1, 0}, {1, 0, -1},
+            {0, 0, 1}, {0, 0, 0}, {0, -1, 0}, {0, 0, -1},
+            {-1, 0, 1}, {-1, 0, 0}, {-1, -1, 0}, {-1, 0, -1}
+    };
+
     @ModifyVariable(method = "move", ordinal = 1, index = 3, name = "vec32", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))
     public Vec3 fluidCollision(Vec3 original) {
-        if (!((Entity) (Object) this instanceof LivingEntity entity))
+        if (!((Entity) (Object) this instanceof LivingEntity entity) || original.y > 0)
             return original;
 
-        if (original.y > 0)
-            return original;
+        var level = entity.getCommandSenderWorld();
+        var sourcePos = entity.blockPosition();
+        var mutablePos = new BlockPos.MutableBlockPos();
+        var entityShape = Shapes.create(entity.getBoundingBox().inflate(0.5));
 
-        Level level = entity.getCommandSenderWorld();
+        var highestY = original.y;
 
-        int[][] offsets = {
-                {1, 0, 1}, {1, 0, 0}, {1, -1, 0}, {1, 0, -1},
-                {0, 0, 1}, {0, 0, 0}, {0, -1, 0}, {0, 0, -1},
-                {-1, 0, 1}, {-1, 0, 0}, {-1, -1, 0}, {-1, 0, -1}
-        };
-
-        double highestValue = original.y;
         FluidState highestFluid = null;
 
-        for (int[] offset : offsets) {
-            BlockPos sourcePos = entity.blockPosition();
-            BlockPos pos = new BlockPos(sourcePos.getX() + offset[0], sourcePos.getY() + offset[1], sourcePos.getZ() + offset[2]);
+        for (var offset : FLUID_OFFSETS) {
+            mutablePos.set(
+                    sourcePos.getX() + offset[0],
+                    sourcePos.getY() + offset[1],
+                    sourcePos.getZ() + offset[2]
+            );
 
-            FluidState fluidState = level.getFluidState(pos);
+            var fluidState = level.getFluidState(mutablePos);
 
             if (fluidState.isEmpty())
                 continue;
 
-            VoxelShape shape = Shapes.block().move(pos.getX(), pos.getY() + fluidState.getOwnHeight(), pos.getZ());
+            var shape = Shapes.block().move(
+                    mutablePos.getX(),
+                    mutablePos.getY() + fluidState.getOwnHeight(),
+                    mutablePos.getZ()
+            );
 
-            if (Shapes.joinIsNotEmpty(shape, Shapes.create(entity.getBoundingBox().inflate(0.5)), BooleanOp.AND)) {
-                double height = shape.max(Direction.Axis.Y) - entity.getY() - 1;
+            if (!Shapes.joinIsNotEmpty(shape, entityShape, BooleanOp.AND))
+                continue;
 
-                if (highestValue < height) {
-                    highestValue = height;
-                    highestFluid = fluidState;
-                }
+            var height = shape.max(Direction.Axis.Y) - entity.getY() - 1;
+
+            if (height > highestY) {
+                highestY = height;
+                highestFluid = fluidState;
             }
         }
 
         if (highestFluid == null)
             return original;
 
-        FluidCollisionEvent event = new FluidCollisionEvent(entity, highestFluid);
+        var event = new FluidCollisionEvent(entity, highestFluid);
 
         NeoForge.EVENT_BUS.post(event);
 
-        if (event.isCanceled()) {
-            entity.fallDistance = 0F;
-            entity.setOnGround(true);
+        if (!event.isCanceled())
+            return original;
 
-            return new Vec3(original.x, highestValue, original.z);
-        }
+        entity.fallDistance = 0F;
 
-        return original;
+        entity.setOnGround(true);
+
+        relics$fluidWalkGraceTicks = 2;
+
+        return new Vec3(original.x, highestY, original.z);
     }
 
-//    @Inject(at = @At(value = "RETURN"), method = "isInWaterOrRain", cancellable = true)
-//    public void setWet(CallbackInfoReturnable<Boolean> info) {
-//        Entity entity = (Entity) (Object) this;
-//
-//        if (!(entity instanceof LivingEntity))
-//            return;
-//
-//        if (!EntityUtils.findEquippedCurio(entity, RelicsItems.DROWNED_BELT.get()).isEmpty())
-//            info.setReturnValue(true);
-//    }
+    @Inject(method = "baseTick()V", at = @At("TAIL"))
+    private void relics$tickFluidWalkGrace(CallbackInfo ci) {
+        if (relics$fluidWalkGraceTicks > 0)
+            relics$fluidWalkGraceTicks--;
+    }
+
+    @Override
+    public boolean relics$hasFluidWalkGrace() {
+        return relics$fluidWalkGraceTicks > 0;
+    }
 
     @Inject(method = "getBlockSpeedFactor", at = @At("RETURN"), cancellable = true)
     public void getBlockSpeedFactor(CallbackInfoReturnable<Float> cir) {
