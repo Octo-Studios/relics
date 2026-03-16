@@ -22,6 +22,7 @@ import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCateg
 import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
 import it.hurts.sskirillss.relics.init.*;
+import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
@@ -38,6 +39,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+import java.util.List;
 
 @EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
 public class ClientHandler {
@@ -66,6 +68,23 @@ public class ClientHandler {
                         var maxStacks = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sacrifice").getStatData("stacks").getValue();
 
                         return stacks == 0 ? 0 : stacks < maxStacks ? 1 : 2;
+                    });
+            ItemProperties.register(RelicsItems.CLOT_OF_TIME.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "enabled"),
+                    (stack, world, entity, id) -> {
+                        var cooldown = stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_COOLDOWN, 0);
+                        var path = stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<ClotOfTimeItem.PathPointData>of());
+
+                        return (entity != null && entity.isUsingItem()) || (cooldown <= 0 && path.size() >= 2) ? 1F : 0F;
+                    });
+            ItemProperties.register(RelicsItems.RIDER_FLUTE.get(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "full"),
+                    (stack, world, entity, id) -> {
+                        var relic = (RiderFluteItem) stack.getItem();
+                        var slots = relic.getHorseSlots(stack);
+
+                        if (slots.isEmpty())
+                            return 0F;
+
+                        return slots.get(relic.getSelectedHorseSlotIndex(stack)).isStored() ? 1F : 0F;
                     });
 
             for (var item : BuiltInRegistries.ITEM.stream().toList()) {

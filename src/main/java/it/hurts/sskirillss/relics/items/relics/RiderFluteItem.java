@@ -74,7 +74,7 @@ public class RiderFluteItem extends RelicItem {
                                 .rankModifier(5, "resistance")
                                 .stat(AbilityStatTemplate.builder("max_slots")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("heal")

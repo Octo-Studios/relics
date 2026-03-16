@@ -1,0 +1,34 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "relics:item/clot_of_time_disabled"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "relics:enabled": 0
+      },
+      "model": "relics:item/clot_of_time_disabled"
+    },
+    {
+      "predicate": {
+        "relics:enabled": 1
+      },
+      "model": "relics:item/clot_of_time_enabled"
+    },
+    {
+      "predicate": {
+        "relics:flawless": 1,
+        "relics:enabled": 0
+      },
+      "model": "relics:item/clot_of_time_disabled_flawless"
+    },
+    {
+      "predicate": {
+        "relics:flawless": 1,
+        "relics:enabled": 1
+      },
+      "model": "relics:item/clot_of_time_enabled_flawless"
+    }
+  ]
+}

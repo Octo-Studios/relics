@@ -355,7 +355,7 @@ public class ClotOfTimeItem extends RelicItem {
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        return this.getRelicData(null, stack).getAbilitiesData().getAbilityData("rewind").canPlayerUse(null);
+        return this.getRelicData(null, stack).getAbilitiesData().getAbilityData("rewind").canPlayerUse(null) && stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<ClotOfTimeItem.PathPointData>of()).size() >= 2;
     }
 
     @Override

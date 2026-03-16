@@ -15,7 +15,6 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
-import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.core.registries.Registries;
@@ -26,8 +25,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
+
 public class ChefHatItem extends RelicItem {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
@@ -42,11 +41,11 @@ public class ChefHatItem extends RelicItem {
                                         .initialValue(0.1D, 0.15D)
                                         .thresholdValue(0D, 1D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
-                                        .formatValue(value -> MathUtils.round(value * 100, 2))
+                                        .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("healing")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.25D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -72,10 +71,6 @@ public class ChefHatItem extends RelicItem {
                                                 .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
                                                 .rankModifierVisibilityState("meatball_healing", VisibilityState.OBFUSCATED)
                                                 .build())
-                                        .build())
-                                .research(ResearchTemplate.builder()
-                                        .star(0, 6, 12).star(1, 11, 8).star(2, 16, 12).star(3, 11, 16)
-                                        .link(0, 1).link(1, 2).link(2, 3).link(3, 0)
                                         .build())
                                 .build())
                         .build())
@@ -162,24 +157,6 @@ public class ChefHatItem extends RelicItem {
 
     @EventBusSubscriber
     public static class CommonEvents {
-        private static final String FIRE_DEATH_TAG = "relics:chef_hat_fire_death";
-
-        @SubscribeEvent
-        public static void onLivingDamage(LivingDamageEvent.Pre event) {
-            var target = event.getEntity();
-
-            if (target.level().isClientSide())
-                return;
-
-            target.getPersistentData().remove(FIRE_DEATH_TAG);
-
-            if (target.getHealth() - event.getNewDamage() > 0F)
-                return;
-
-            if (target.getRemainingFireTicks() > 0 || event.getSource().is(DamageTypeTags.IS_FIRE))
-                target.getPersistentData().putBoolean(FIRE_DEATH_TAG, true);
-        }
-
         @SubscribeEvent
         public static void onLivingDeath(LivingDeathEvent event) {
             var target = event.getEntity();
@@ -196,8 +173,7 @@ public class ChefHatItem extends RelicItem {
             var fireAspectHolder = source.level().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.FIRE_ASPECT);
             var cookedByFireAspect = event.getSource().is(DamageTypeTags.IS_PLAYER_ATTACK)
                     && source.getMainHandItem().getEnchantmentLevel(fireAspectHolder) > 0;
-            var cookedByFire = target.getPersistentData().getBoolean(FIRE_DEATH_TAG)
-                    || target.getRemainingFireTicks() > 0
+            var cookedByFire = target.getRemainingFireTicks() > 0
                     || event.getSource().is(DamageTypeTags.IS_FIRE)
                     || cookedByFireAspect;
 
@@ -226,8 +202,6 @@ public class ChefHatItem extends RelicItem {
                 relic.getRelicData(source, stack).getLevelingData().addExperience("satiety", "drop", 1);
                 abilityData.getStatisticData().getMetricData("meatballs_dropped").addValue(1);
             }
-
-            target.getPersistentData().remove(FIRE_DEATH_TAG);
         }
     }
 }

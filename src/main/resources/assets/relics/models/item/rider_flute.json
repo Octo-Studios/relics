@@ -1,7 +1,35 @@
 {
   "parent": "item/generated",
-    "textures": {
-        "layer0": "relics:item/rider_flute"
+  "textures": {
+    "layer0": "relics:item/rider_flute_empty"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "relics:full": 0
+      },
+      "model": "relics:item/rider_flute_empty"
+    },
+    {
+      "predicate": {
+        "relics:full": 1
+      },
+      "model": "relics:item/rider_flute_full"
+    },
+    {
+      "predicate": {
+        "relics:flawless": 1,
+        "relics:full": 0
+      },
+      "model": "relics:item/rider_flute_empty_flawless"
+    },
+    {
+      "predicate": {
+        "relics:flawless": 1,
+        "relics:full": 1
+      },
+      "model": "relics:item/rider_flute_full_flawless"
     }
+  ]
 }
 

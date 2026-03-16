@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "relics:item/cooked_meatball"
+    "layer0": "relics:item/clot_of_time_disabled"
   }
 }
