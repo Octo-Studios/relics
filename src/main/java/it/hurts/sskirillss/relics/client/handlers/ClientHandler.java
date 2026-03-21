@@ -96,29 +96,30 @@ public class ClientHandler {
             }
         });
 
-        RelicsRelicRenderers.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateRenderer::new);
-        RelicsRelicRenderers.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
-        RelicsRelicRenderers.register(RelicsItems.KINETIC_BELT.get(), KineticBeltRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.KINETIC_BELT.get(), KineticBeltRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.LEAFY_MANTLE.get(), LeafyMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.PIGLIN_MASK.get(), PiglinMaskRenderer::new);
-        RelicsRelicRenderers.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.CHEF_HAT.get(), ChefHatRenderer::new);
 
-        EntityTrailRegistry.registerProvider(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.SELF_SACRIFICE_PROJECTILE.get(), SelfSacrificeProjectileEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.REFLECTIVE_ORB.get(), ReflectiveOrbEntity.TrailProvider::new);
-        EntityTrailRegistry.registerProvider(RelicsEntities.SPORE.get(), SporeEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.DEATH_ESSENCE.get(), DeathEssenceEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.LIFE_ESSENCE.get(), LifeEssenceEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.ROLLER_SPARK.get(), RollerSparkEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.GOLDEN_TOOTH.get(), GoldenToothEntity.TrailProvider::new);
-        EntityTrailRegistry.registerProvider(RelicsEntities.SELF_SACRIFICE_PROJECTILE.get(), SelfSacrificeProjectileEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.SPORE.get(), SporeEntity.TrailProvider::new);
 
-        DescriptionCategories.registerCategory(RelicDescriptionCategory::new);
         DescriptionCategories.registerCategory(AbilityDescriptionCategory::new);
         DescriptionCategories.registerCategory(SynergyDescriptionCategory::new);
+        DescriptionCategories.registerCategory(RelicDescriptionCategory::new);
 
         DescriptionSubcategories.registerSubcategory(AbilityDescriptionDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(SynergyDescriptionDescriptionSubcategory::new);
@@ -139,12 +140,15 @@ public class ClientHandler {
         RelicsRelicStyles.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootStyle::new);
         RelicsRelicStyles.register(RelicsItems.KINETIC_BELT.get(), KineticBeltStyle::new);
         RelicsRelicStyles.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateStyle::new);
+        RelicsRelicStyles.register(RelicsItems.CLOT_OF_TIME.get(), ClotOfTimeStyle::new);
         RelicsRelicStyles.register(RelicsItems.PIGLIN_MASK.get(), PiglinMaskStyle::new);
+        RelicsRelicStyles.register(RelicsItems.RIDER_FLUTE.get(), RiderFluteStyle::new);
+        RelicsRelicStyles.register(RelicsItems.CHEF_HAT.get(), ChefHatStyle::new);
 
-        RelicsPostEffects.register(LensPostEffect::new);
-        RelicsPostEffects.register(DistortionPostEffect::new);
-        RelicsPostEffects.register(SevenDeadlySinsPostEffect::new);
         RelicsPostEffects.register(ChromaticAberrationPostEffect::new);
+        RelicsPostEffects.register(SevenDeadlySinsPostEffect::new);
+        RelicsPostEffects.register(DistortionPostEffect::new);
+        RelicsPostEffects.register(LensPostEffect::new);
 
         RelicsRelicStyles.init();
         RelicsPostEffects.init();
@@ -154,13 +158,14 @@ public class ClientHandler {
     public static void registerLayers(final EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(ReflectiveNecklaceModel.LAYER, ReflectiveNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(JellyfishNecklaceModel.LAYER, JellyfishNecklaceModel::constructLayerDefinition);
+        event.registerLayerDefinition(MidnightMantleModel.LAYER, MidnightMantleModel::constructLayerDefinition);
+        event.registerLayerDefinition(CutGlassBootModel.LAYER, CutGlassBootModel::constructLayerDefinition);
         event.registerLayerDefinition(KineticBeltModel.LAYER, KineticBeltModel::constructLayerDefinition);
         event.registerLayerDefinition(SpringyBootModel.LAYER, SpringyBootModel::constructLayerDefinition);
-        event.registerLayerDefinition(MidnightMantleModel.LAYER, MidnightMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(LeafyMantleModel.LAYER, LeafyMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(RollerSkateModel.LAYER, RollerSkateModel::constructLayerDefinition);
         event.registerLayerDefinition(PiglinMaskModel.LAYER, PiglinMaskModel::constructLayerDefinition);
-        event.registerLayerDefinition(CutGlassBootModel.LAYER, CutGlassBootModel::constructLayerDefinition);
+        event.registerLayerDefinition(ChefHatModel.LAYER, ChefHatModel::constructLayerDefinition);
     }
 
     @SubscribeEvent

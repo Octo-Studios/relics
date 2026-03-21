@@ -8,27 +8,27 @@
       "predicate": {
         "relics:enabled": 0
       },
-      "model": "relics:item/clot_of_time_disabled"
+      "model": "relics:item/clot_of_time_2d_disabled"
     },
     {
       "predicate": {
         "relics:enabled": 1
       },
-      "model": "relics:item/clot_of_time_enabled"
+      "model": "relics:item/clot_of_time_2d_enabled"
     },
     {
       "predicate": {
         "relics:flawless": 1,
         "relics:enabled": 0
       },
-      "model": "relics:item/clot_of_time_disabled_flawless"
+      "model": "relics:item/clot_of_time_2d_disabled_flawless"
     },
     {
       "predicate": {
         "relics:flawless": 1,
         "relics:enabled": 1
       },
-      "model": "relics:item/clot_of_time_enabled_flawless"
+      "model": "relics:item/clot_of_time_2d_enabled_flawless"
     }
   ]
 }

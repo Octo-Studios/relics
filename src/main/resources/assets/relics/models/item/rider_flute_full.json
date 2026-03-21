@@ -1,6 +1,21 @@
 {
-  "parent": "item/generated",
+  "parent": "neoforge:item/default",
+  "base": {
+    "parent": "relics:item/rider_flute_full_3d"
+  },
   "textures": {
-    "layer0": "relics:item/rider_flute_full"
+    "particle": "relics:item/rider_flute_full"
+  },
+  "loader": "neoforge:separate_transforms",
+  "perspectives": {
+    "ground": {
+      "parent": "relics:item/rider_flute_2d_full"
+    },
+    "gui": {
+      "parent": "relics:item/rider_flute_2d_full"
+    },
+    "fixed": {
+      "parent": "relics:item/rider_flute_2d_full"
+    }
   }
 }

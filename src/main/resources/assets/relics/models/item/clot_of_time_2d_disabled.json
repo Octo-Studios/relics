@@ -1,0 +1,6 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "relics:item/clot_of_time_disabled"
+  }
+}

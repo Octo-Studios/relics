@@ -1,6 +1,21 @@
 {
-  "parent": "item/generated",
+  "parent": "neoforge:item/default",
+  "base": {
+    "parent": "relics:item/clot_of_time_3d_enabled"
+  },
   "textures": {
-    "layer0": "relics:item/clot_of_time_enabled"
+    "particle": "relics:item/clot_of_time_enabled"
+  },
+  "loader": "neoforge:separate_transforms",
+  "perspectives": {
+    "ground": {
+      "parent": "relics:item/clot_of_time_2d_enabled"
+    },
+    "gui": {
+      "parent": "relics:item/clot_of_time_2d_enabled"
+    },
+    "fixed": {
+      "parent": "relics:item/clot_of_time_2d_enabled"
+    }
   }
 }
