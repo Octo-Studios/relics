@@ -1,7 +1,7 @@
 {
   "parent": "neoforge:item/default",
   "base": {
-    "parent": "relics:item/rider_flute_full_3d"
+    "parent": "relics:item/rider_flute_full_3d_flawless"
   },
   "textures": {
     "particle": "relics:item/rider_flute_full_flawless"

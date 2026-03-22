@@ -1,7 +1,7 @@
 {
   "parent": "neoforge:item/default",
   "base": {
-    "parent": "relics:item/clot_of_time_3d_enabled"
+    "parent": "relics:item/clot_of_time_3d_enabled_flawless"
   },
   "textures": {
     "particle": "relics:item/clot_of_time_enabled_flawless"
