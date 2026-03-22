@@ -15,6 +15,7 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.core.registries.Registries;
@@ -71,6 +72,10 @@ public class ChefHatItem extends RelicItem {
                                                 .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
                                                 .rankModifierVisibilityState("meatball_healing", VisibilityState.OBFUSCATED)
                                                 .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 3, 12).star(1, 11, 14).star(2, 18, 9).star(3, 17, 13).star(4, 4, 17).star(5, 12, 7)
+                                        .link(2, 3).link(3, 1).link(0, 4).link(4, 1).link(5, 0).link(5, 2)
                                         .build())
                                 .build())
                         .build())

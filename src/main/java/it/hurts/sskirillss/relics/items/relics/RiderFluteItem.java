@@ -18,6 +18,7 @@ import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.rider_flute.C2SCycleRiderFluteSlot;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
@@ -117,6 +118,10 @@ public class RiderFluteItem extends RelicItem {
                                                 .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
                                                 .rankModifierVisibilityState("resistance", VisibilityState.OBFUSCATED)
                                                 .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 11, 22).star(1, 13, 4).star(2, 13, 8).star(3, 8, 4).star(4, 8, 7).star(5, 3, 13).star(6, 5, 17).star(7, 17, 14).star(8, 12, 19).star(9, 12, 13).star(10, 11, 26)
+                                        .link(4, 3).link(4, 2).link(2, 1).link(6, 5).link(5, 4).link(8, 6).link(7, 2).link(8, 7).link(8, 0).link(6, 9).link(9, 2).link(10, 0)
                                         .build())
                                 .build())
                         .build())

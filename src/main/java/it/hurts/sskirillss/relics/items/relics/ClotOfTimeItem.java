@@ -17,6 +17,7 @@ import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -82,6 +83,10 @@ public class ClotOfTimeItem extends RelicItem {
                                                 .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
                                                 .rankModifierVisibilityState("health_rewind", VisibilityState.OBFUSCATED)
                                                 .build())
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 4, 5).star(1, 6, 8).star(2, 6, 14).star(3, 12, 8).star(4, 12, 15).star(5, 14, 21).star(6, 17, 20).star(7, 18, 17)
+                                        .link(0, 1).link(1, 3).link(2, 1).link(4, 3).link(4, 2).link(4, 7).link(7, 6).link(6, 5).link(5, 4)
                                         .build())
                                 .build())
                         .build())
