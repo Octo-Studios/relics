@@ -11,26 +11,26 @@ import java.util.List;
 public class ChefHatStyle extends RelicStyle {
     @Override
     public OctoColor getTopTooltipBorderColor(LivingEntity entity, ItemStack stack) {
-        return new OctoColor(0xff3c1230);
+        return new OctoColor(0xff714f40);
     }
 
     @Override
     public OctoColor getBottomTooltipBorderColor(LivingEntity entity, ItemStack stack) {
-        return new OctoColor(0xff544d20);
+        return new OctoColor(0xff4a2c1e);
     }
 
     @Override
     public OctoColor getTopTooltipBackgroundColor(LivingEntity entity, ItemStack stack) {
-        return new OctoColor(0xf0190312);
+        return new OctoColor(0xf0190e06);
     }
 
     @Override
     public OctoColor getBottomTooltipBackgroundColor(LivingEntity entity, ItemStack stack) {
-        return new OctoColor(0xf0130c01);
+        return new OctoColor(0xf00e0805);
     }
 
     @Override
     public List<OctoColor> getItemNameColors(LivingEntity entity, ItemStack stack) {
-        return Arrays.asList(new OctoColor(0xFFb345cb), new OctoColor(0xFFe4eb64));
+        return Arrays.asList(new OctoColor(0xFFdbdbdb), new OctoColor(0xFFb9b2b2));
     }
 }
