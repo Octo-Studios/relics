@@ -49,7 +49,7 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
         var relic = (IRelicItem) stack.getItem();
 
         var rank = relic.getRelicData(player, stack).getLevelingData().getRank();
-        var maxRank = relic.getRelicTemplate(player, stack).getLeveling().getMaxRank();
+        var maxRank = relic.getRelicData(player, stack).getLevelingData().getTemplate().getMaxRank();
         var isMaxRank = rank >= maxRank;
 
         var level = relic.getRelicData(player, stack).getLevelingData().getLevel();

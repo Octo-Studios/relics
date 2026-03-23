@@ -2,7 +2,7 @@ package it.hurts.sskirillss.relics.network.packets.description.ability;
 
 import io.netty.buffer.ByteBuf;
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.events.leveling.AbilityModeSwitchEvent;
+import it.hurts.sskirillss.relics.api.events.relic.abilities.ability.AbilityModeSwitchEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.network.packets.description.IRelicValidator;

@@ -1,11 +1,11 @@
 package it.hurts.sskirillss.relics.api.relics.data;
 
-import it.hurts.sskirillss.relics.api.relics.LevelingComponent;
-import it.hurts.sskirillss.relics.api.relics.events.RelicExperienceChangeEvent;
-import it.hurts.sskirillss.relics.api.relics.events.RelicLevelChangeEvent;
-import it.hurts.sskirillss.relics.api.relics.events.RelicLevelingPointsChangeEvent;
+import it.hurts.sskirillss.relics.api.events.relic.leveling.RelicExperienceChangeEvent;
+import it.hurts.sskirillss.relics.api.events.relic.leveling.RelicLevelChangeEvent;
+import it.hurts.sskirillss.relics.api.events.relic.leveling.RelicLevelingPointsChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import net.minecraft.world.entity.player.Player;
+import it.hurts.sskirillss.relics.api.relics.LevelingComponent;
+import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import net.neoforged.neoforge.common.NeoForge;
 
 public class LevelingData {
@@ -13,6 +13,10 @@ public class LevelingData {
 
     public LevelingData(RelicData relicData) {
         this.relicData = relicData;
+    }
+
+    public LevelingTemplate getTemplate() {
+        return this.getRelicData().getTemplate().getLeveling();
     }
 
     public LevelingComponent getComponent() {

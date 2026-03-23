@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
-import it.hurts.sskirillss.relics.api.events.leveling.AbilityModeSwitchEvent;
+import it.hurts.sskirillss.relics.api.events.relic.abilities.ability.AbilityModeSwitchEvent;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -547,7 +547,7 @@ public class MidnightMantleItem extends RelicItem {
 
         @SubscribeEvent
         public static void onAbilityModeSwitch(AbilityModeSwitchEvent event) {
-            var entity = event.getEntity();
+            var entity = event.getBearer();
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();

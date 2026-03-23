@@ -106,11 +106,11 @@ public class UpgradeAbilityActionWidget extends AbstractAbilityActionWidget {
         var hasExperience = requiredExperience <= currentExperience;
 
         var currentLevelingPoints = relic.getRelicData(player, stack).getLevelingData().getPoints();
-        var requiredLevelingPoints = relic.getRelicTemplate(player, stack).getAbilities().getAbilities().get(ability).getRequiredPoints();
+        var requiredLevelingPoints = relic.getRelicData(player, stack).getAbilitiesData().getAbilities().get(ability).getTemplate().getRequiredPoints();
         var hasLevelingPoints = requiredLevelingPoints <= currentLevelingPoints;
 
         var level = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getLevel();
-        var maxLevel = relic.getRelicTemplate(player, stack).getAbilities().getAbilities().get(ability).getInitialMaxLevel();
+        var maxLevel = relic.getRelicData(player, stack).getAbilitiesData().getAbilities().get(ability).getTemplate().getInitialMaxLevel();
         var isMaxLevel = level >= maxLevel;
 
         description.add(Component.translatable("relics.description.ability.levelup.title")

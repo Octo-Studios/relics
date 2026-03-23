@@ -46,7 +46,6 @@ import org.jetbrains.annotations.ApiStatus;
  * @see IRelicItem
  */
 public interface IRelicTemplateHolder {
-
     /**
      * Returns the {@link RelicTemplate} that defines the default behavior of this relic item.
      * <p>
@@ -59,7 +58,7 @@ public interface IRelicTemplateHolder {
      * As part of decomposition or orchestration, it is encouraged to reuse specialized methods like {@link #constructDefaultAbilitiesTemplate()}, {@link #constructDefaultLevelingTemplate()}, and {@link #constructDefaultLootTemplate()} to encapsulate and isolate logic related to each specific aspect of the relic template.
      * </p>
      */
-    @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     default RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(constructDefaultAbilitiesTemplate())
@@ -73,7 +72,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the default {@link AbilitiesTemplate} associated with this relic
      */
-    @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     default AbilitiesTemplate constructDefaultAbilitiesTemplate() {
         return AbilitiesTemplate.builder().build();
     }
@@ -83,7 +82,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the default {@link LevelingTemplate} used for this relic
      */
-    @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     default LevelingTemplate constructDefaultLevelingTemplate() {
         return LevelingTemplate.builder().build();
     }
@@ -93,7 +92,7 @@ public interface IRelicTemplateHolder {
      *
      * @return the default {@link LootTemplate} for this relic
      */
-    @ApiStatus.OverrideOnly
+    @ApiStatus.Internal
     default LootTemplate constructDefaultLootTemplate() {
         return LootTemplate.builder().build();
     }
@@ -103,7 +102,8 @@ public interface IRelicTemplateHolder {
      *
      * @param data the new {@link RelicTemplate} to store for this holder
      */
-    default void setRelicTemplate(RelicTemplate data) {
+    @ApiStatus.Internal
+    default void setDefaultRelicTemplate(RelicTemplate data) {
         RelicStorage.RELIC_TEMPLATES.put(this, data);
     }
 
@@ -200,19 +200,5 @@ public interface IRelicTemplateHolder {
     @ApiStatus.Internal
     default MetricTemplate getDefaultMetricTemplate(String metric) {
         return getDefaultStatisticTemplate().getMetrics().get(metric);
-    }
-
-    /**
-     * Returns the {@link RelicTemplate} associated with the given entity and item context.
-     * <p>
-     * By default, this returns the static default template. Override to implement dynamic context-based behavior (e.g., scaling with player data or item NBT).
-     * </p>
-     *
-     * @param entity the holder of the item
-     * @param stack  the item stack instance
-     * @return the contextual {@link RelicTemplate}
-     */
-    default RelicTemplate getRelicTemplate(LivingEntity entity, ItemStack stack) {
-        return getDefaultRelicTemplate();
     }
 }

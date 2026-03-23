@@ -38,7 +38,7 @@ public class RelicConfigData implements OctoConfig {
 
     @Override
     public void onLoadObject(Object object) {
-        relic.setRelicTemplate(((RelicConfigData) object).toData(relic));
+        relic.setDefaultRelicTemplate(((RelicConfigData) object).toData(relic));
 
         RelicLootModifier.processRelicCache(relic);
     }
