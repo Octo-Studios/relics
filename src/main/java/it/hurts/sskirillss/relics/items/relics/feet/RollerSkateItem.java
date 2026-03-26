@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.items.relics.feet;
 
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.events.common.EntityBlockSpeedFactorEvent;
-import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
+import it.hurts.sskirillss.relics.api.events.utility.EntityBlockSpeedFactorEvent;
+import it.hurts.sskirillss.relics.api.events.utility.LivingSlippingEvent;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -15,7 +15,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
+import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
@@ -35,7 +35,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import org.joml.Vector3f;
 import top.theillusivec4.curios.api.SlotContext;
 
-public class RollerSkateItem extends RelicItem {
+public class RollerSkateItem extends WearableRelicItem {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()

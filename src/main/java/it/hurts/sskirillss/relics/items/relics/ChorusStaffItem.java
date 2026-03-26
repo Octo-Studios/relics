@@ -352,11 +352,6 @@ public class ChorusStaffItem extends RelicItem {
         return this.getMaxCharge(null, stack);
     }
 
-    @Override
-    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
-        return false;
-    }
-
     @EventBusSubscriber
     public static class CommonEvents {
         @SubscribeEvent

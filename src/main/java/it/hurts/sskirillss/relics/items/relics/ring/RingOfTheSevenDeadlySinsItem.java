@@ -4,7 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.events.common.ContainerSlotClickEvent;
+import it.hurts.sskirillss.relics.api.events.utility.ContainerSlotClickEvent;
 import it.hurts.sskirillss.relics.api.relics.*;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
@@ -16,7 +16,7 @@ import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.misc.ICreativeTabContent;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
+import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
@@ -58,7 +58,7 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 
-public class RingOfTheSevenDeadlySinsItem extends RelicItem implements ICreativeTabContent {
+public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements ICreativeTabContent {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()

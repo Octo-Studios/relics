@@ -20,6 +20,7 @@ import it.hurts.sskirillss.relics.items.relics.feet.RollerSkateItem;
 import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
 import it.hurts.sskirillss.relics.items.relics.head.ChefHatItem;
 import it.hurts.sskirillss.relics.items.relics.head.PiglinMaskItem;
+import it.hurts.sskirillss.relics.items.relics.charm.ExperienceDisperserItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
 import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import it.hurts.sskirillss.relics.items.relics.ring.RingOfTheSevenDeadlySinsItem;
@@ -68,6 +69,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> RING_OF_THE_SEVEN_DEADLY_SINS = ITEMS.register("ring_of_the_seven_deadly_sins", RingOfTheSevenDeadlySinsItem::new);
     public static final DeferredHolder<Item, RelicItem> SPHERE_OF_SELF_SACRIFICE = ITEMS.register("sphere_of_self_sacrifice", SphereOfSelfSacrifice::new);
     public static final DeferredHolder<Item, RelicItem> HUNTING_BELT = ITEMS.register("hunting_belt", HuntingBeltItem::new);
+    public static final DeferredHolder<Item, RelicItem> EXPERIENCE_DISPERSER = ITEMS.register("experience_disperser", ExperienceDisperserItem::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);

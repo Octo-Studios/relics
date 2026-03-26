@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
-import it.hurts.sskirillss.relics.api.events.common.LivingSlippingEvent;
+import it.hurts.sskirillss.relics.api.events.utility.LivingSlippingEvent;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;

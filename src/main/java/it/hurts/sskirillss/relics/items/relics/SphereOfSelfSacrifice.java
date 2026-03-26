@@ -295,11 +295,6 @@ public class SphereOfSelfSacrifice extends RelicItem {
         return (int) this.getRelicData(null, stack).getAbilitiesData().getAbilityData("sacrifice").getStatData("stacks").getValue();
     }
 
-    @Override
-    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
-        return false;
-    }
-
     public record HealingStack(float totalHeal, int remainingTicks, int totalTicks) {
         public static final Codec<HealingStack> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.FLOAT.fieldOf("heal_per_tick").forGetter(HealingStack::encodedHealPerTick),

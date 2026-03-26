@@ -15,6 +15,7 @@ import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
+import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
@@ -29,7 +30,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 
 import java.util.Comparator;
 
-public class ReflectiveNecklaceItem extends RelicItem {
+public class ReflectiveNecklaceItem extends WearableRelicItem {
     public static final int ORB_SEARCH_RADIUS = 16;
 
     @Override

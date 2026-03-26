@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.mixin;
 
-import it.hurts.sskirillss.relics.api.events.common.EntityBlockSpeedFactorEvent;
-import it.hurts.sskirillss.relics.api.events.common.FluidCollisionEvent;
+import it.hurts.sskirillss.relics.api.events.utility.EntityBlockSpeedFactorEvent;
+import it.hurts.sskirillss.relics.api.events.utility.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.misc.mixin.FluidWalkGraceAccessor;
 import net.minecraft.core.BlockPos;

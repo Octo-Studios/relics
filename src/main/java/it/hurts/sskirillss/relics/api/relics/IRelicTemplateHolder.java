@@ -58,7 +58,6 @@ public interface IRelicTemplateHolder {
      * As part of decomposition or orchestration, it is encouraged to reuse specialized methods like {@link #constructDefaultAbilitiesTemplate()}, {@link #constructDefaultLevelingTemplate()}, and {@link #constructDefaultLootTemplate()} to encapsulate and isolate logic related to each specific aspect of the relic template.
      * </p>
      */
-    @ApiStatus.Internal
     default RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(constructDefaultAbilitiesTemplate())

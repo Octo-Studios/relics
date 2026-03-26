@@ -1,0 +1,9 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "relics:item/experience_disperser"
+  },
+  "overrides": [
+    { "predicate": { "relics:flawless": 1 }, "model": "relics:item/experience_disperser_flawless" }
+  ]
+}

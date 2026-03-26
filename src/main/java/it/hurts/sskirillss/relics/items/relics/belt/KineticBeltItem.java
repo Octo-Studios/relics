@@ -16,6 +16,7 @@ import it.hurts.sskirillss.relics.api.relics.synergies.stats.SynergyStatTemplate
 import it.hurts.sskirillss.relics.entities.KineticElectricityEntity;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
+import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -41,7 +42,7 @@ import top.theillusivec4.curios.api.SlotContext;
 
 import java.awt.*;
 
-public class KineticBeltItem extends RelicItem {
+public class KineticBeltItem extends WearableRelicItem {
     private static final double ELECTRICITY_MIN_DISTANCE_SQR = 1D;
     private static final double ELECTRICITY_MAX_LINK_DISTANCE_SQR = 100D;
 

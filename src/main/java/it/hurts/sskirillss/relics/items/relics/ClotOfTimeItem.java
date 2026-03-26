@@ -363,11 +363,6 @@ public class ClotOfTimeItem extends RelicItem {
         return this.getRelicData(null, stack).getAbilitiesData().getAbilityData("rewind").canPlayerUse(null) && stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<ClotOfTimeItem.PathPointData>of()).size() >= 2;
     }
 
-    @Override
-    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
-        return false;
-    }
-
     public record PathPointData(double x, double y, double z, float yRot, float xRot, float health, String dimension) {
         public static final Codec<PathPointData> CODEC = RecordCodecBuilder.create(instance -> instance.group(
                 Codec.DOUBLE.fieldOf("x").forGetter(PathPointData::x),

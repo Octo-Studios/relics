@@ -1,6 +1,6 @@
 package it.hurts.sskirillss.relics.mixin;
 
-import it.hurts.sskirillss.relics.api.events.common.ContainerSlotClickEvent;
+import it.hurts.sskirillss.relics.api.events.utility.ContainerSlotClickEvent;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;

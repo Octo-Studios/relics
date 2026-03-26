@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.mixin;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.events.common.TooltipDisplayEvent;
+import it.hurts.sskirillss.relics.api.events.utility.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.utils.RenderUtils;

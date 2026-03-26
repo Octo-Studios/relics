@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.api.events.common;
+package it.hurts.sskirillss.relics.api.events.utility;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

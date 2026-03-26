@@ -661,11 +661,6 @@ public class RiderFluteItem extends RelicItem {
         }
     }
 
-    @Override
-    public boolean canEquipFromUse(SlotContext slotContext, ItemStack stack) {
-        return false;
-    }
-
     public record RiderFluteTooltip(List<RiderFluteTooltipEntry> slots, int selectedSlot) implements TooltipComponent {
 
     }

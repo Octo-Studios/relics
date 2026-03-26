@@ -1,14 +1,17 @@
 package it.hurts.sskirillss.relics.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsHotkeys;
+import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -23,6 +26,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
 
@@ -95,5 +99,57 @@ public class ItemMixin {
                 }
             }
         }
+    }
+
+    @ModifyReturnValue(method = "getName", at = @At("RETURN"))
+    private Component getName(Component original, ItemStack stack) {
+        var item = stack.getItem();
+
+        if (!(item instanceof IRelicItem) || original == null)
+            return original;
+
+        var text = original.getString();
+
+        if (text.isEmpty())
+            return original;
+
+        var optional = RelicsRelicStyles.getStyle(item);
+
+        if (optional.isEmpty())
+            return original;
+
+        var colors = optional.get().getItemNameColors(null, stack);
+
+        if (colors.isEmpty())
+            return original;
+
+        var result = Component.empty();
+        var length = text.length();
+
+        var spread = Math.max(1F, length * 1.25F);
+        var speed = 1F;
+        var time = System.nanoTime() * 1e-9F;
+        var colorCount = colors.size();
+
+        for (var i = 0; i < length; i++) {
+            var x = i / spread - time * speed;
+            var tri = 1F - Math.abs((x % 2F) - 1F);
+            var w = 0.5F - 0.5F * (float) Math.cos(tri * Math.PI);
+
+            var scaled = w * (colorCount - 1);
+            var idx1 = (int) Math.floor(scaled);
+            var idx2 = (idx1 + 1) % colorCount;
+            var localT = scaled - idx1;
+
+            var color = colors.get(idx1).lerp(colors.get(idx2), localT);
+            var rgb = color.getARGB() & 0xFFFFFF;
+
+            result.append(
+                    Component.literal(String.valueOf(text.charAt(i)))
+                            .setStyle(original.getStyle().withColor(TextColor.fromRgb(rgb)))
+            );
+        }
+
+        return result;
     }
 }
