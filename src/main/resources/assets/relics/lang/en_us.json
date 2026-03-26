@@ -481,6 +481,5 @@
 
   "info.relics.researching.wrong_container": "Working with a relic in this inventory is not possible. Move the item to the player's main inventory and try again.",
 
-  "key.relics.active_abilities_list": "Open Active Abilities Interface",
   "key.relics.research_relic": "Research Relic Under Cursor"
 }
