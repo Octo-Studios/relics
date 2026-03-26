@@ -339,12 +339,23 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                 else if (modifier < -0.0001D)
                     this.getRelicData(player, stack).getAbilitiesData().getAbilityData("gluttony").getStatisticData().getMetricData("negative_duration").addValue(1D / 20D);
 
-                var blacklist = Lists.newArrayList(Attributes.GRAVITY, Attributes.SCALE);
+                var blacklist = Lists.newArrayList(
+                        "minecraft:generic.gravity",
+                        "minecraft:generic.scale",
+                        "additionalentityattributes:genric.width",
+                        "additionalentityattributes:genric.height",
+                        "additionalentityattributes:genric.hitbox_scale",
+                        "additionalentityattributes:genric.hitbox_width",
+                        "additionalentityattributes:genric.hitbox_height",
+                        "additionalentityattributes:genric.model_scale",
+                        "additionalentityattributes:genric.model_width",
+                        "additionalentityattributes:genric.model_height"
+                );
 
                 for (var instance : entity.getAttributes().attributes.values()) {
                     var attribute = instance.getAttribute();
 
-                    if (blacklist.contains(attribute))
+                    if (blacklist.contains(attribute.getRegisteredName()))
                         continue;
 
                     EntityUtils.resetAttribute(entity, stack, attribute, (float) modifier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
