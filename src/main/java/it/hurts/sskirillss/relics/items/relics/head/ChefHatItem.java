@@ -85,7 +85,7 @@ public class ChefHatItem extends WearableRelicItem {
                         .step(100)
                         .build())
                 .loot(LootTemplate.builder()
-                        .entry(LootEntries.NETHER_LIKE, LootEntries.THE_NETHER)
+                        .entry(LootEntries.VILLAGE)
                         .build())
                 .build();
     }

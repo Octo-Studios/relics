@@ -17,6 +17,7 @@ import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
@@ -95,6 +96,7 @@ public class ClotOfTimeItem extends RelicItem {
                         .step(100)
                         .build())
                 .loot(LootTemplate.builder()
+                        .entry(LootEntries.THE_END, LootEntries.END_LIKE)
                         .build())
                 .build();
     }
