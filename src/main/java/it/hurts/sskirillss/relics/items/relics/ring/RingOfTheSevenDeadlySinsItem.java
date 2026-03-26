@@ -342,14 +342,14 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                 var blacklist = Lists.newArrayList(
                         "minecraft:generic.gravity",
                         "minecraft:generic.scale",
-                        "additionalentityattributes:genric.width",
-                        "additionalentityattributes:genric.height",
-                        "additionalentityattributes:genric.hitbox_scale",
-                        "additionalentityattributes:genric.hitbox_width",
-                        "additionalentityattributes:genric.hitbox_height",
-                        "additionalentityattributes:genric.model_scale",
-                        "additionalentityattributes:genric.model_width",
-                        "additionalentityattributes:genric.model_height"
+                        "additionalentityattributes:generic.width",
+                        "additionalentityattributes:generic.height",
+                        "additionalentityattributes:generic.hitbox_scale",
+                        "additionalentityattributes:generic.hitbox_width",
+                        "additionalentityattributes:generic.hitbox_height",
+                        "additionalentityattributes:generic.model_scale",
+                        "additionalentityattributes:generic.model_width",
+                        "additionalentityattributes:generic.model_height"
                 );
 
                 for (var instance : entity.getAttributes().attributes.values()) {
