@@ -19,7 +19,7 @@ public class AbstractContainerMenuMixin {
         if (index < 0)
             return;
 
-        if (clickType != ClickType.PICKUP && clickType != ClickType.QUICK_MOVE && clickType != ClickType.SWAP)
+        if (clickType != ClickType.PICKUP && clickType != ClickType.QUICK_MOVE && clickType != ClickType.SWAP && clickType != ClickType.THROW)
             return;
 
         var menu = (AbstractContainerMenu) (Object) this;
@@ -29,7 +29,13 @@ public class AbstractContainerMenuMixin {
 
         var slot = menu.slots.get(index);
 
-        if (!(slot instanceof ResultSlot) && slot.allowModification(player) && menu.canTakeItemForPickAll(menu.getCarried(), slot) && slot.isActive()) {
+        var shouldProcess = !(slot instanceof ResultSlot) && slot.isActive() && (
+                clickType == ClickType.THROW
+                        ? slot.mayPickup(player)
+                        : slot.allowModification(player) && menu.canTakeItemForPickAll(menu.getCarried(), slot)
+        );
+
+        if (shouldProcess) {
             var event = new ContainerSlotClickEvent(player, menu, slot, clickType, action == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY, menu.getCarried(), slot.getItem());
 
             NeoForge.EVENT_BUS.post(event);

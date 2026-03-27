@@ -791,14 +791,15 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
         }
 
         @SubscribeEvent
-        public static void onSlitClick(ContainerSlotClickEvent event) {
+        public static void onSlotClick(ContainerSlotClickEvent event) {
             var entity = event.getEntity();
 
-            if (!entity.level().isClientSide() || entity.isCreative() || !(event.getSlot() instanceof CurioSlot slot)
+            if (entity.isCreative() || !(event.getSlot() instanceof CurioSlot slot)
                     || !(event.getSlotStack().getItem() instanceof RingOfTheSevenDeadlySinsItem))
                 return;
 
-            NetworkHandler.sendToServer(new C2SHurtPlayer(slot.getIdentifier(), slot.getSlotIndex()));
+            if (entity.level().isClientSide())
+                NetworkHandler.sendToServer(new C2SHurtPlayer(slot.getIdentifier(), slot.getSlotIndex()));
 
             event.setCanceled(true);
         }
