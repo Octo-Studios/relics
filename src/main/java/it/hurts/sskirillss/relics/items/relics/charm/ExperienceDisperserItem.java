@@ -13,7 +13,6 @@ import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -40,7 +39,19 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                                 .rankModifier(1, "same_item")
                                 .rankModifier(3, "player_xp")
                                 .rankModifier(5, "max_level")
-                                .stat(AbilityStatTemplate.builder("ratio")
+                                .stat(AbilityStatTemplate.builder("distribution_ratio")
+                                        .initialValue(0.05D, 0.15D)
+                                        .thresholdValue(0D, 1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .formatValue(value -> MathUtils.round(value * 100D, 1))
+                                        .build())
+                                .stat(AbilityStatTemplate.builder("same_item_bonus")
+                                        .initialValue(0.05D, 0.15D)
+                                        .thresholdValue(0D, 1D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .formatValue(value -> MathUtils.round(value * 100D, 1))
+                                        .build())
+                                .stat(AbilityStatTemplate.builder("player_xp_ratio")
                                         .initialValue(0.05D, 0.15D)
                                         .thresholdValue(0D, 1D)
                                         .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
@@ -110,19 +121,39 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 if (sourceAtMaxLevel && !ability.isRankModifierUnlocked("max_level"))
                     continue;
 
-                var ratio = ability.getStatData("ratio").getValue();
+                var ratio = ability.getStatData("distribution_ratio").getValue();
+                var sameItemBonus = ability.getStatData("same_item_bonus").getValue();
 
                 if (ratio <= 0D)
+                    continue;
+
+                var targets = new ArrayList<ItemStack>();
+                var sourceExcluded = false;
+
+                for (var relicStack : relics) {
+                    if (relicStack.getItem() instanceof ExperienceDisperserItem)
+                        continue;
+
+                    if (!sourceExcluded && (relicStack == event.getStack() || ItemStack.isSameItemSameComponents(relicStack, event.getStack()))) {
+                        sourceExcluded = true;
+                        continue;
+                    }
+
+                    if (canReceiveExperience(player, relicStack))
+                        targets.add(relicStack);
+                }
+
+                if (targets.isEmpty())
                     continue;
 
                 var triggered = false;
                 var distributed = 0D;
 
-                for (var relicStack : relics) {
+                for (var relicStack : targets) {
                     var transfer = event.getDelta() * ratio;
 
                     if (ability.isRankModifierUnlocked("same_item") && relicStack.getItem() == event.getStack().getItem())
-                        transfer *= 1D + ratio;
+                        transfer *= 1D + sameItemBonus;
 
                     if (transfer <= 0D || !(relicStack.getItem() instanceof IRelicItem relic))
                         continue;
@@ -171,16 +202,29 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 if (!ability.canPlayerUse(player) || !ability.isRankModifierUnlocked("player_xp"))
                     continue;
 
-                var ratio = ability.getStatData("ratio").getValue();
+                var ratio = ability.getStatData("player_xp_ratio").getValue();
+                var targets = new ArrayList<ItemStack>();
+
+                for (var relicStack : relics) {
+                    if (relicStack.getItem() instanceof ExperienceDisperserItem)
+                        continue;
+
+                    if (canReceiveExperience(player, relicStack))
+                        targets.add(relicStack);
+                }
+
+                if (targets.isEmpty())
+                    continue;
+
                 var distributed = event.getAmount() * ratio;
-                var split = distributed / relics.size();
+                var split = distributed / targets.size();
 
                 if (split <= 0D)
                     continue;
 
                 var triggered = false;
 
-                for (var relicStack : relics) {
+                for (var relicStack : targets) {
                     if (!(relicStack.getItem() instanceof IRelicItem relic))
                         continue;
 
@@ -197,10 +241,8 @@ public class ExperienceDisperserItem extends WearableRelicItem {
 
                     var units = getWholeUnitDelta(before, convertedMetric.getValue());
 
-                    if (units > 0) {
-                        disperser.getRelicData(player, disperserStack).getLevelingData().addExperience("dispersion", "trigger", units);
+                    if (units > 0)
                         stats.getMetricData("player_xp_conversions").addValue(units);
-                    }
                 }
             }
         }
@@ -211,6 +253,19 @@ public class ExperienceDisperserItem extends WearableRelicItem {
             var to = (int) Math.floor(after + epsilon);
 
             return Math.max(0, to - from);
+        }
+
+        private static boolean canReceiveExperience(Player player, ItemStack stack) {
+            if (!(stack.getItem() instanceof IRelicItem relic))
+                return false;
+
+            var data = relic.getRelicData(player, stack);
+            var leveling = data.getLevelingData();
+            var level = leveling.getLevel();
+            var experience = leveling.getExperience();
+            var maxForCurrentLevel = leveling.getTotalExperienceBetweenLevels(level, level + 1);
+
+            return !data.isMaxLevel() && experience + 1.0E-9D < maxForCurrentLevel;
         }
 
         private static List<ItemStack> getEquippedRelics(Player player) {
