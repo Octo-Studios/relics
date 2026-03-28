@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.synergy.SynergyDescriptionScreen;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.client.gui.GuiGraphics;
@@ -50,7 +51,7 @@ public class SynergyPageScrollbarWidget extends AbstractDescriptionWidget implem
         if (!this.isLocked()) {
             int usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT - 4;
             int sliderX = this.getX() + SLIDER_OFFSET_X;
-            int sliderY = this.getY() + SLIDER_OFFSET_Y + (int) Math.round(this.getScrollPosition(partialTick) * usableTrackHeight);
+            int sliderY = this.getY() + SLIDER_OFFSET_Y + (int) Math.round(this.getScrollPosition(RenderUtils.getPartialTick(false)) * usableTrackHeight);
 
             poseStack.translate(sliderX + SLIDER_WIDTH / 2F, sliderY, 0);
 

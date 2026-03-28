@@ -6,6 +6,7 @@ import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScre
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.misc.TextJustificator;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -53,7 +54,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
             var overflowLines = Math.max(0, totalLines - MAX_LINES);
 
             var maxScrollPx = overflowLines * lineStep + VERTICAL_PADDING * 3;
-            var offset = scroll.getScrollPosition(partialTick);
+            var offset = scroll.getScrollPosition(RenderUtils.getPartialTick(false));
             var shiftY = offset * maxScrollPx;
 
             poseStack.translate(0, -shiftY, 0);

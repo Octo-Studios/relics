@@ -486,8 +486,6 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
 
         int y = getHeight() / 2;
 
-        float partialTicks = minecraft.getTimer().getGameTimeDeltaPartialTick(false);
-
         poseStack.translate((getX() + (getWidth() / 2F)), (getY() + (getHeight() / 2F)), 0);
 
         DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, height, -((renderWidth + 19) / 2), y);

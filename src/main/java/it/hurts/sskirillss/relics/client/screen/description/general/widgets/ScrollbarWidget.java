@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.client.screen.base.IScrollableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.client.gui.GuiGraphics;
@@ -51,7 +52,7 @@ public class ScrollbarWidget extends AbstractDescriptionWidget implements ITicki
         if (!this.isLocked()) {
             int usableTrackHeight = TRACK_HEIGHT - SLIDER_HEIGHT - 4;
             int sliderX = this.getX() + SLIDER_OFFSET_X;
-            int sliderY = this.getY() + SLIDER_OFFSET_Y + (int) Math.round(this.getScrollPosition(partialTick) * usableTrackHeight);
+            int sliderY = this.getY() + SLIDER_OFFSET_Y + (int) Math.round(this.getScrollPosition(RenderUtils.getPartialTick(false)) * usableTrackHeight);
 
             var color = (float) (((AbstractWidget) container).isHovered() ? 1D + Math.sin(System.currentTimeMillis() * 0.01D) * 0.1D : 1D);
 

@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.*;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.init.RelicsCoreShaders;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,6 +21,15 @@ import org.joml.Vector2f;
 import java.util.List;
 
 public class RenderUtils {
+    public static float getPartialTick(boolean ignorePause){
+        var tracker = Minecraft.getInstance().getTimer();
+
+        if (ignorePause && tracker instanceof DeltaTracker.Timer timer)
+            return timer.deltaTickResidual;
+
+        return tracker.getGameTimeDeltaPartialTick(true);
+    }
+
     public static void drawOutlinedText(GuiGraphics guiGraphics, MutableComponent text, float x, float y, int textColor, int outlineColor) {
         Font font = Minecraft.getInstance().font;
 

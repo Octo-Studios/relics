@@ -23,6 +23,7 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -519,7 +520,7 @@ public class ClotOfTimeItem extends RelicItem {
             if (cursor < 0D || cursor > lastIndex)
                 cursor = lastIndex;
 
-            var partial = Mth.clamp(event.getPartialTick().getGameTimeDeltaPartialTick(false), 0F, 1F);
+            var partial = Mth.clamp(RenderUtils.getPartialTick(false), 0F, 1F);
             var speed = 1.05D + Math.min(3D, Math.max(0, player.getTicksUsingItem() - 1) * 0.03D);
 
             cursor = Math.max(0D, cursor - speed * partial);

@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.init.RelicsHotkeys;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -121,7 +122,7 @@ public class DescriptionHandler {
 
     public static MutableComponent drawProgressBar(String style) {
         var string = new StringBuilder(style);
-        var percentage = Mth.lerp(Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true), ticksCountOld, ticksCount) / REQUIRED_TIME;
+        var percentage = Mth.lerp(RenderUtils.getPartialTick(false), ticksCountOld, ticksCount) / REQUIRED_TIME;
         var offset = (int) Math.min(string.length(), Math.floor(string.length() * percentage));
 
         var component = Component.literal("");

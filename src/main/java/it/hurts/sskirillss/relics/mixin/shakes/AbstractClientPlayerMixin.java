@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.mixin.shakes;
 
 import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
-import net.minecraft.client.Minecraft;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.client.player.AbstractClientPlayer;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -15,7 +15,7 @@ public class AbstractClientPlayerMixin {
         var modifier = 0F;
 
         for (var effect : ShakeManager.SHAKES.values())
-            modifier += effect.getShakeFOV((AbstractClientPlayer) (Object) this, Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true));
+            modifier += effect.getShakeFOV((AbstractClientPlayer) (Object) this, RenderUtils.getPartialTick(false));
 
         if (modifier != 0F)
             cir.setReturnValue(cir.getReturnValue() + modifier);

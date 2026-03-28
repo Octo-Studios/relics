@@ -28,6 +28,7 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
 import it.hurts.sskirillss.relics.utils.ClientScheduler;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -288,6 +289,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         var player = this.minecraft.player;
+        var partialTicks = RenderUtils.getPartialTick(false);
 
         if (player == null || !(this.screen.stack.getItem() instanceof IRelicItem relic))
             return;
@@ -369,7 +371,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         if (isLockUnlocked) {
             if (!isAbilityResearched) {
-                var time = minecraft.player.tickCount + (ability.length() * 10F) + partialTick;
+                var time = minecraft.player.tickCount + (ability.length() * 10F) + partialTicks;
 
                 GUIRenderer.begin(DescriptionTextures.RESEARCH, poseStack)
                         .pos((float) Math.sin(time * 0.25F), (float) Math.cos(time * 0.25F) + 0.5F - 2)
@@ -404,7 +406,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     GUIRenderer.begin(DescriptionTextures.UPGRADE, poseStack)
                             .pos(0, -1)
                             .patternSize(20, 20)
-                            .scale(0.9F + ((float) (Math.sin((player.tickCount + partialTick) * 0.25F) * 0.05F)))
+                            .scale(0.9F + ((float) (Math.sin((player.tickCount + partialTicks) * 0.25F) * 0.05F)))
                             .animation(AnimationData.construct(200, 20, 2))
                             .end();
                 }
@@ -715,8 +717,6 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         int height = tooltip.size() * 5;
 
         int y = getHeight() / 2;
-
-        float partialTicks = minecraft.getTimer().getGameTimeDeltaPartialTick(false);
 
         poseStack.translate((getX() + (getWidth() / 2F)), (getY() + (getHeight() / 2F)), 0);
 

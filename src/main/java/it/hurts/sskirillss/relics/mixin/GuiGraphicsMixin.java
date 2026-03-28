@@ -53,7 +53,7 @@ public class GuiGraphicsMixin {
         var guiGraphics = (GuiGraphics) (Object) this;
         var poseStack = guiGraphics.pose();
 
-        var partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+        var partialTicks = RenderUtils.getPartialTick(false);
 
         var time = (stack.getItem().hashCode() / 1000F) + player.tickCount + partialTicks;
         var color = (float) (1F + Math.sin(time * 0.45F) * 0.1F);
@@ -133,7 +133,7 @@ public class GuiGraphicsMixin {
         var guiGraphics = (GuiGraphics) (Object) this;
         var poseStack = guiGraphics.pose();
 
-        var partialTicks = Minecraft.getInstance().getTimer().getGameTimeDeltaPartialTick(true);
+        var partialTicks = RenderUtils.getPartialTick(false);
 
         var time = seed + player.tickCount + partialTicks;
 

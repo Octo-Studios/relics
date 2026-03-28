@@ -7,6 +7,7 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import it.hurts.sskirillss.relics.utils.data.SpriteMirror;
@@ -42,7 +43,7 @@ public class LeafyMantleHideLayer implements LayeredDraw.Layer {
             return;
 
         var maxProgress = relic.getMaxProgress();
-        var partialTick = deltaTracker.getGameTimeDeltaPartialTick(false);
+        var partialTick = RenderUtils.getPartialTick(false);
 
         var progressRatio = (float) TransitionType.QUAD.apply(EaseType.EASE_IN_OUT, Math.min(1F, (progress + (partialTick * (relic.isHiding(stack) ? 1 : -1))) / maxProgress));
 

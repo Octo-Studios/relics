@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.misc.TextJustificator;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -37,7 +38,7 @@ public class RelicDescriptionContainerWidget extends DescriptionContainerWidget 
         var scroll = getScrollbar();
 
         if (scroll != null) {
-            var offset = scroll.getScrollPosition(partialTick);
+            var offset = scroll.getScrollPosition(RenderUtils.getPartialTick(false));
 
             poseStack.translate(0, -(offset * ((lines.size() - DescriptionContainerWidget.MAX_LINES) * (lineOffset))), 0);
         }

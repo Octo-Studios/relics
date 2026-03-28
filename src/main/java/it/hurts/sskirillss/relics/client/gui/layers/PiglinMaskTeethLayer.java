@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.head.PiglinMaskItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import it.hurts.sskirillss.relics.utils.data.SpriteMirror;
@@ -48,7 +49,7 @@ public class PiglinMaskTeethLayer implements LayeredDraw.Layer {
             return;
 
         var poseStack = guiGraphics.pose();
-        var partialTicks = deltaTracker.getGameTimeDeltaPartialTick(true);
+        var partialTicks = RenderUtils.getPartialTick(false);
 
         var maxStacks = PiglinMaskItem.getMaxStacks();
 
