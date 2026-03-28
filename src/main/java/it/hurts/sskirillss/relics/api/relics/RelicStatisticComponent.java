@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 
@@ -13,6 +14,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode
 public class RelicStatisticComponent {
     @Singular
     private final Map<String, RelicMetricComponent> metrics;

@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 import java.util.Optional;
@@ -11,6 +12,7 @@ import java.util.Optional;
 @Getter
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode
 public class StatComponent {
     private final Optional<Double> overrideValue;
     private final int initialQuality;

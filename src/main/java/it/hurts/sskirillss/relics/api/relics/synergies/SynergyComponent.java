@@ -8,6 +8,7 @@ import it.hurts.sskirillss.relics.api.relics.ResearchComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Singular;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 @Getter
 @AllArgsConstructor
 @Builder(toBuilder = true)
+@EqualsAndHashCode
 public class SynergyComponent {
     private final String mode;
 
