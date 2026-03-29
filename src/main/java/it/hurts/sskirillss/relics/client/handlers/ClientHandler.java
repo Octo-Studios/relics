@@ -130,6 +130,7 @@ public class ClientHandler {
 
         RelicsRelicStyles.register(RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), RingOfTheSevenDeadlySinsStyle::new);
         RelicsRelicStyles.register(RelicsItems.SPHERE_OF_SELF_SACRIFICE.get(), SphereOfSelfSacrificeStyle::new);
+        RelicsRelicStyles.register(RelicsItems.EXPERIENCE_DISPERSER.get(), ExperienceDisperserStyle::new);
         RelicsRelicStyles.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleStyle::new);

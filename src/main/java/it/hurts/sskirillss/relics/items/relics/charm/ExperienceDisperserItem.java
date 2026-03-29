@@ -17,6 +17,7 @@ import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.world.entity.player.Player;
@@ -41,20 +42,17 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                                 .rankModifier(5, "max_level")
                                 .stat(AbilityStatTemplate.builder("distribution_ratio")
                                         .initialValue(0.05D, 0.15D)
-                                        .thresholdValue(0D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1619D)
                                         .formatValue(value -> MathUtils.round(value * 100D, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("same_item_bonus")
-                                        .initialValue(0.05D, 0.15D)
-                                        .thresholdValue(0D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .initialValue(0.15D, 0.25D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0857D)
                                         .formatValue(value -> MathUtils.round(value * 100D, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("player_xp_ratio")
-                                        .initialValue(0.05D, 0.15D)
-                                        .thresholdValue(0D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .initialValue(0.025D, 0.05D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2571D)
                                         .formatValue(value -> MathUtils.round(value * 100D, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -75,6 +73,10 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                                                 .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
                                         .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 12, 24).star(1, 4, 15).star(2, 4, 8).star(3, 9, 9).star(4, 7, 4).star(5, 14, 4).star(6, 16, 8).star(7, 13, 16)
+                                        .link(0, 1).link(1, 2).link(2, 3).link(3, 4).link(4, 5).link(5, 6).link(6, 7)
+                                        .build())
                                 .build())
                         .build())
                 .leveling(LevelingTemplate.builder()
@@ -82,7 +84,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                         .step(150)
                         .build())
                 .loot(LootTemplate.builder()
-                        .entry(LootEntries.OVERWORLD, LootEntries.VILLAGE)
+                        .entry(LootEntries.WILDCARD)
                         .build())
                 .build();
     }
