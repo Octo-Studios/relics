@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.relic.abilities.ability.AbilityModeSwitchEvent;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
@@ -13,7 +14,6 @@ import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate
 import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.ConstellationStarEntity;
 import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.FallingStarEntity;
 import it.hurts.sskirillss.relics.init.*;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -23,6 +23,9 @@ import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -46,6 +49,15 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import top.theillusivec4.curios.api.SlotContext;
 
 public class MidnightMantleItem extends WearableRelicItem {
+    private static ResourceLocation getPhaseAttributeId(ItemStack stack, Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, SlotContext slotContext) {
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
+                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
+                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.value()).getPath()
+                        + "_" + slotContext.identifier()
+                        + "_" + slotContext.index()
+                        + "_phase");
+    }
+
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -55,22 +67,22 @@ public class MidnightMantleItem extends WearableRelicItem {
                                 .rankModifier(1, "switch")
                                 .stat(AbilityStatTemplate.builder("attack_damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.07273D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("attack_speed")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.07273D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("max_health")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0727D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.03636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("health_regeneration")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0727D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.03636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
@@ -80,7 +92,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                                         .build())
                                 .stat(AbilityStatTemplate.builder("modifier")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.09091D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -120,7 +132,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                                 .stat(AbilityStatTemplate.builder("brightness")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0545D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.03636D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("cooldown")
@@ -131,7 +143,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1636D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.07273D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -304,6 +316,18 @@ public class MidnightMantleItem extends WearableRelicItem {
         this.setInvisibilityCooldown(stack, this.getInvisibilityCooldown(stack) + cooldown);
     }
 
+    public int getStarfallCooldown(ItemStack stack) {
+        return stack.getOrDefault(RelicsDataComponents.MIDNIGHT_MANTLE_STARFALL_COOLDOWN.get(), 0);
+    }
+
+    public void setStarfallCooldown(ItemStack stack, int cooldown) {
+        stack.set(RelicsDataComponents.MIDNIGHT_MANTLE_STARFALL_COOLDOWN.get(), Math.max(cooldown, 0));
+    }
+
+    public void addStarfallCooldown(ItemStack stack, int cooldown) {
+        this.setStarfallCooldown(stack, this.getStarfallCooldown(stack) + cooldown);
+    }
+
     public int getPhaseDuration(ItemStack stack) {
         return stack.getOrDefault(RelicsDataComponents.MIDNIGHT_MANTLE_PHASE_DURATION, 0);
     }
@@ -352,7 +376,9 @@ public class MidnightMantleItem extends WearableRelicItem {
         var skyDarken = level.getSkyDarken();
         var maxSkyDarken = 11D;
 
-        return ((1D - (skyDarken / maxSkyDarken)) * skyBrightness + blockBrightness) / (maxBrightness * 2D) <= this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatData("brightness").getValue();
+        var brightness = ((1D - (skyDarken / maxSkyDarken)) * skyBrightness + blockBrightness) / maxBrightness;
+
+        return brightness <= this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatData("brightness").getValue();
     }
 
     @Override
@@ -362,6 +388,9 @@ public class MidnightMantleItem extends WearableRelicItem {
 
         if (level.isClientSide())
             return;
+
+        if (this.getStarfallCooldown(stack) > 0)
+            this.addStarfallCooldown(stack, -1);
 
         if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity)) {
             var mode = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode();
@@ -375,8 +404,14 @@ public class MidnightMantleItem extends WearableRelicItem {
                 var attackEffectiveness = mode.equals("full_moon") ? totalEffectiveness : 0D;
                 var healEffectiveness = mode.equals("new_moon") ? totalEffectiveness : 0D;
 
-                EntityUtils.resetAttribute(entity, stack, Attributes.ATTACK_SPEED, (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("attack_speed").getValue() * attackEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-                EntityUtils.resetAttribute(entity, stack, Attributes.MAX_HEALTH, (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("max_health").getValue() * healEffectiveness), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                EntityUtils.resetAttribute(entity, Attributes.ATTACK_SPEED,
+                        (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("attack_speed").getValue() * attackEffectiveness),
+                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
+                        getPhaseAttributeId(stack, Attributes.ATTACK_SPEED, slotContext));
+                EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH,
+                        (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("max_health").getValue() * healEffectiveness),
+                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
+                        getPhaseAttributeId(stack, Attributes.MAX_HEALTH, slotContext));
             }
 
             if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").isRankModifierUnlocked("switch") && this.getPhaseDuration(stack) > 0)
@@ -410,8 +445,10 @@ public class MidnightMantleItem extends WearableRelicItem {
 
         var entity = slotContext.entity();
 
-        EntityUtils.removeAttribute(entity, stack, Attributes.ATTACK_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        EntityUtils.removeAttribute(entity, stack, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        EntityUtils.removeAttribute(entity, Attributes.ATTACK_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
+                getPhaseAttributeId(stack, Attributes.ATTACK_SPEED, slotContext));
+        EntityUtils.removeAttribute(entity, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
+                getPhaseAttributeId(stack, Attributes.MAX_HEALTH, slotContext));
     }
 
     @EventBusSubscriber
@@ -622,6 +659,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                 var relic = (MidnightMantleItem) stack.getItem();
 
                 if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").canPlayerUse(entity)
+                        || relic.getStarfallCooldown(stack) > 0
                         || random.nextFloat() > relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("chance").getValue())
                     continue;
 
@@ -647,6 +685,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                     star.setBounceChance((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("bounce_chance").getValue());
 
                 level.addFreshEntity(star);
+                relic.setStarfallCooldown(stack, 20);
 
                 if (!level.isClientSide()) {
                     relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatisticData().getMetricData("total_stars").addValue(1);

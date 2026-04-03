@@ -42,7 +42,9 @@ public class FlawlessUtils {
         var saturation = Math.min(1f, Math.max(0f, 0.55f + 0.35f * hsb[1]));
         var brightness = Math.min(1f, Math.max(0f, 0.72f + 0.28f * hsb[2]));
 
-        return Color.getHSBColor(goldenHue, saturation, brightness);
+        var rgb = Color.HSBtoRGB(goldenHue, saturation, brightness);
+
+        return new Color((rgb >> 16) & 0xFF, (rgb >> 8) & 0xFF, rgb & 0xFF, color.getAlpha());
     }
 
     public static Color getColor(LivingEntity entity, ItemStack stack, Color color) {

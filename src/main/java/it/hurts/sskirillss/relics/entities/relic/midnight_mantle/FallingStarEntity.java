@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.entities.relic.midnight_mantle;
 
+import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.dev.shake.Shake;
 import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
 import it.hurts.sskirillss.relics.entities.MidnightMantleShockwaveBlockEntity;
@@ -8,7 +9,7 @@ import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
-import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.WorldUtils;
@@ -28,11 +29,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Random;
 
 public class FallingStarEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<Float> BOUNCE_CHANCE = SynchedEntityData.defineId(FallingStarEntity.class, EntityDataSerializers.FLOAT);
@@ -98,103 +100,6 @@ public class FallingStarEntity extends ThrowableProjectile {
 
         var level = this.level();
 
-        var ringInterval = 2;
-
-        var prevX = xOld;
-        var prevY = yOld + getBbHeight() / 2F;
-        var prevZ = zOld;
-
-        var currX = getX();
-        var currY = getY() + getBbHeight() / 2F;
-        var currZ = getZ();
-
-        var dx = currX - prevX;
-        var dy = currY - prevY;
-        var dz = currZ - prevZ;
-
-        var distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
-
-        var step = 0.1;
-
-        var segments = (int) Math.ceil(distance / step);
-
-        var swirlRadius = 0.01F;
-
-        var blueStart = new Color(50, 100, 255);
-        var blueEnd = new Color(150, 200, 255);
-
-        for (var i = 0; i <= segments; i++) {
-            var t = segments > 0 ? (float) i / segments : 0F;
-
-            var bx = prevX + dx * t;
-            var by = prevY + dy * t;
-            var bz = prevZ + dz * t;
-
-            var vx = (float) (Math.cos(t * Math.PI * 2) * swirlRadius);
-            var vz = (float) (Math.sin(t * Math.PI * 2) * swirlRadius);
-            var vy = swirlRadius;
-
-            var r = (int) (blueStart.getRed() * (1 - t) + blueEnd.getRed() * t);
-            var g = (int) (blueStart.getGreen() * (1 - t) + blueEnd.getGreen() * t);
-            var b = (int) (blueStart.getBlue() * (1 - t) + blueEnd.getBlue() * t);
-
-            var color = new Color(r, g, b);
-
-            level.addParticle(ParticleUtils.constructSimpleSpark(this.isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : color, 0.5F, 30, 0.925F), true, bx, by, bz, vx, vy, vz);
-        }
-
-        if (tickCount % ringInterval == 0) {
-            var motion = getDeltaMovement();
-
-            if (motion.lengthSqr() > 1e-6) {
-                var dir = motion.normalize();
-
-                var v1 = dir.cross(new Vec3(0, 1, 0)).normalize();
-
-                if (v1.lengthSqr() < 1e-6)
-                    v1 = dir.cross(new Vec3(1, 0, 0)).normalize();
-
-                var v2 = dir.cross(v1).normalize();
-
-                var ringCount = 50;
-                var ringRadius = 0.25F;
-                var radialSpeed = 0.05F;
-                var tangentialSpeed = 0.02F;
-                var upwardSpeed = 0.001F;
-
-                var purpleStart = new Color(128, 0, 255);
-                var purpleEnd = new Color(255, 128, 255);
-
-                for (var j = 0; j < ringCount; j++) {
-                    var a = 2 * Math.PI * j / ringCount;
-
-                    var offset = v1.scale((float) Math.cos(a) * ringRadius)
-                            .add(v2.scale((float) Math.sin(a) * ringRadius));
-
-                    var px = currX + offset.x;
-                    var py = currY + offset.y;
-                    var pz = currZ + offset.z;
-
-                    var radial = offset.normalize();
-                    var tangential = radial.cross(dir).normalize();
-
-                    var vel = radial.scale(radialSpeed)
-                            .add(tangential.scale(tangentialSpeed))
-                            .add(new Vec3(0, upwardSpeed, 0));
-
-                    var tRing = j / (float) (ringCount - 1);
-
-                    var rr = (int) (purpleStart.getRed() * (1 - tRing) + purpleEnd.getRed() * tRing);
-                    var rg = (int) (purpleStart.getGreen() * (1 - tRing) + purpleEnd.getGreen() * tRing);
-                    var rb = (int) (purpleStart.getBlue() * (1 - tRing) + purpleEnd.getBlue() * tRing);
-
-                    var ringColor = new Color(rr, rg, rb);
-
-                    level.addParticle(ParticleUtils.constructSimpleSpark(this.isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : ringColor, 0.5F, 20, 0.9F), true, px, py, pz, (float) vel.x, (float) vel.y, (float) vel.z);
-                }
-            }
-        }
-
         if (!level.isClientSide() && tickCount > (250 + this.bounces * 150))
             this.discard();
 
@@ -212,7 +117,54 @@ public class FallingStarEntity extends ThrowableProjectile {
                 .radius(16)
                 .build());
 
-        if (level.isClientSide() || this.noPhysics || !level.getBlockState(center).blocksMotion())
+        if (level.isClientSide())
+            return;
+        var position = this.position();
+
+        var ringParticleCount = 250 + random.nextInt(250);
+
+        for (var i = 0; i < ringParticleCount; i++) {
+            var angle = 2 * Math.PI * i / ringParticleCount;
+            var velocity = new Vec3(Math.cos(angle), 0.15D + random.nextDouble() * 0.1D, Math.sin(angle)).normalize().scale(0.5 + random.nextDouble() * 0.25D);
+
+            var color = this.isFlawless() ? new Color(255, 215, 0) : new Color(50 + random.nextInt(150), 50 + random.nextInt(150), 255);
+
+            NetworkHandler.sendToClientsTrackingEntity(new S2CSpawnParticle(ParticleUtils.constructSimpleSpark(color, 0.75F + random.nextFloat() * 0.25F, 5 + random.nextInt(5), 0.8F), position.toVector3f(), velocity.toVector3f()), this);
+        }
+
+        var burstParticleCount = 250 + random.nextInt(100);
+
+        for (var i = 0; i < burstParticleCount; i++) {
+            var velocity = new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).normalize().scale(0.1 + random.nextDouble() * 0.25);
+            var color = this.isFlawless() ? new Color(255, 235, 100) : new Color(100 + random.nextInt(155), 100 + random.nextInt(155), 255);
+
+            NetworkHandler.sendToClientsTrackingEntity(new S2CSpawnParticle(ParticleUtils.constructSimpleSpark(color, 0.25F + random.nextFloat(), 10 + random.nextInt(10), 0.9F), position.toVector3f(), velocity.toVector3f()), this);
+        }
+
+        var trailCount = 10;
+        var pointCount = 75;
+        var maxDistance = 5;
+
+        for (var i = 0; i < trailCount; i++) {
+            var direction = new Vec3(random.nextGaussian(), random.nextDouble(), random.nextGaussian()).normalize();
+
+            for (var j = 1; j <= pointCount; j++) {
+                var t = j / (double) pointCount;
+
+                var spacedT = Math.pow(t, 1.5);
+
+                var px = position.x + direction.x * spacedT * maxDistance;
+                var py = position.y + direction.y * spacedT * maxDistance;
+                var pz = position.z + direction.z * spacedT * maxDistance;
+
+                var color = this.isFlawless() ? new Color(255, 200, 50) : new Color(80 + random.nextInt(100), 80 + random.nextInt(100), 255);
+                var spark = ParticleUtils.constructSimpleSpark(color, (float) (1F * (1 - t) + 0.1F), 15 + random.nextInt(15), 0.5F);
+
+                NetworkHandler.sendToClientsTrackingEntity(new S2CSpawnParticle(spark, new Vector3f((float) px, (float) py, (float) pz), new Vector3f((float) (direction.x * 0.02F), (float) (direction.y * 0.02F), (float) (direction.z * 0.02F))), this);
+            }
+        }
+
+        if (this.noPhysics || !level.getBlockState(center).blocksMotion())
             return;
 
         var radius = Math.max(this.getRadius() - this.bounces, 1);
@@ -231,8 +183,6 @@ public class FallingStarEntity extends ThrowableProjectile {
 
             ServerScheduler.schedule(finalStep, () -> {
                 var height = 0.25F;
-
-                var localRandom = new Random();
 
                 poses.stream().filter(pos -> {
                     var dx = pos.getX() - center.getX();
@@ -268,22 +218,6 @@ public class FallingStarEntity extends ThrowableProjectile {
                     shockwave.setKnockback(0.75F);
 
                     level.addFreshEntity(shockwave);
-
-                    for (int i = 0; i < 5; i++) {
-                        var angle = localRandom.nextFloat() * Math.PI * 2;
-
-                        var rad = (finalStep + 0.5F + (localRandom.nextFloat() - 0.5F) * 0.3F);
-
-                        var px = (float) (surfacePos.getX() + Math.cos(angle) * rad + 0.5F) + MathUtils.randomFloat(random) * 0.5F;
-                        var py = surfacePos.getY() + 1F + localRandom.nextFloat() * 0.2F + MathUtils.randomFloat(random) * 0.5F;
-                        var pz = (float) (surfacePos.getZ() + Math.sin(angle) * rad + 0.5F) + MathUtils.randomFloat(random) * 0.5F;
-
-                        var vx = (float) Math.cos(angle) * 0.1F;
-                        var vy = finalStep * 0.025F + localRandom.nextFloat() * 0.05F;
-                        var vz = (float) Math.sin(angle) * 0.1F;
-
-                        NetworkHandler.sendToClientsTrackingEntity(new S2CSpawnParticle(ParticleUtils.constructSimpleSpark(this.isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(50 + random.nextInt(50), 50 + random.nextInt(100), 255), 0.35F + random.nextFloat() * 0.25F, 10 + random.nextInt(20), 0.9F), new Vector3f(px, py, pz), new Vector3f(vx, vy, vz)), shockwave);
-                    }
                 });
             });
         }
@@ -359,5 +293,52 @@ public class FallingStarEntity extends ThrowableProjectile {
     @Override
     protected double getDefaultGravity() {
         return 0.03D;
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static class TrailProvider extends EntityTrailProvider<FallingStarEntity> {
+        public TrailProvider(FallingStarEntity entity) {
+            super(entity);
+        }
+
+        @Override
+        public Vec3 getTrailPosition(float partialTicks) {
+            return this.entity.getPosition(partialTicks).add(0D, this.entity.getBbHeight() / 2D, 0D);
+        }
+
+        @Override
+        public int getTrailUpdateFrequency() {
+            return 1;
+        }
+
+        @Override
+        public boolean isTrailAlive() {
+            return this.entity.isAlive();
+        }
+
+        @Override
+        public boolean isTrailGrowing() {
+            return this.entity.tickCount > 0;
+        }
+
+        @Override
+        public int getTrailMaxLength() {
+            return 10;
+        }
+
+        @Override
+        public int getTrailFadeInColor() {
+            return FlawlessUtils.getColor(entity.isFlawless(), 0xFF0080FF);
+        }
+
+        @Override
+        public int getTrailFadeOutColor() {
+            return FlawlessUtils.getColor(entity.isFlawless(), 0x8000FFFF);
+        }
+
+        @Override
+        public double getTrailScale() {
+            return 0.25F;
+        }
     }
 }

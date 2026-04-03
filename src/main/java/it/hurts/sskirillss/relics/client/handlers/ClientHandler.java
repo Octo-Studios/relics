@@ -21,6 +21,7 @@ import it.hurts.sskirillss.relics.description_categories.RelicDescriptionCategor
 import it.hurts.sskirillss.relics.description_categories.SynergyDescriptionCategory;
 import it.hurts.sskirillss.relics.description_subcategories.*;
 import it.hurts.sskirillss.relics.entities.*;
+import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.FallingStarEntity;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
@@ -111,6 +112,7 @@ public class ClientHandler {
         EntityTrailRegistry.registerProvider(RelicsEntities.REFLECTIVE_ORB.get(), ReflectiveOrbEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.DEATH_ESSENCE.get(), DeathEssenceEntity.TrailProvider::new);
+        EntityTrailRegistry.registerProvider(RelicsEntities.FALLING_STAR.get(), FallingStarEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.LIFE_ESSENCE.get(), LifeEssenceEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.LEAVES_BLOCK.get(), LeavesBlockEntity.TrailProvider::new);
         EntityTrailRegistry.registerProvider(RelicsEntities.ROLLER_SPARK.get(), RollerSparkEntity.TrailProvider::new);
@@ -190,7 +192,7 @@ public class ClientHandler {
     public static void entityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(RelicsEntities.SHADOW_GLAIVE.get(), ShadowGlaiveRenderer::new);
         event.registerEntityRenderer(RelicsEntities.CONSTELLATION_STAR.get(), ConstellationStarRenderer::new);
-        event.registerEntityRenderer(RelicsEntities.FALLING_STAR.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.FALLING_STAR.get(), FallingStarRenderer::new);
         event.registerEntityRenderer(RelicsEntities.ELECTRIC_SPARK.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.ROLLER_SPARK.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SHOCKWAVE_BLOCK.get(), ShockwaveBlockRenderer::new);
