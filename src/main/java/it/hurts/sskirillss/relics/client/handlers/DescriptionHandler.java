@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.handlers;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
@@ -96,10 +97,14 @@ public class DescriptionHandler {
         ticksCount++;
 
         if (ticksCountOld >= REQUIRED_TIME) {
-            Minecraft.getInstance().setScreen(new RelicDescriptionScreen(player, player.containerMenu.containerId, id, screen));
+            var screenStack = DescriptionUtils.gatherRelicStack(player, id);
 
-            ticksCount = 0;
-            ticksCountOld = 0;
+            if (!screenStack.isEmpty()) {
+                Minecraft.getInstance().setScreen(new RelicDescriptionScreen(player, player.containerMenu.containerId, id, screen));
+
+                ticksCount = 0;
+                ticksCountOld = 0;
+            }
         }
     }
 
