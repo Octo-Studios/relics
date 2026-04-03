@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.items.relics.necklace;
 
 import com.google.common.collect.Lists;
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -12,7 +13,6 @@ import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.entities.ElectricSparkEntity;
 import it.hurts.sskirillss.relics.init.*;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -20,7 +20,9 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,6 +41,9 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class JellyfishNecklaceItem extends WearableRelicItem {
+    private static final ResourceLocation REGEN_MAX_HEALTH_ATTRIBUTE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "jellyfish_necklace_regeneration_max_health");
+    private static final ResourceLocation REGEN_RETENTION_ATTRIBUTE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "jellyfish_necklace_regeneration_retention");
+
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -271,50 +276,73 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
         var entity = slotContext.entity();
         var level = entity.level();
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration").canPlayerUse(entity)) {
-            var multiplier = (float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration").getStatData("max_health").getValue();
+        var activeRegenerationStacks = RelicStackingUtils.findActiveStacks(entity, RelicsItems.JELLYFISH_NECKLACE.get(),
+                equippedStack -> equippedStack.getItem() == this
+                        && this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").canPlayerUse(entity));
+
+        if (RelicStackingUtils.isControllerStack(stack, activeRegenerationStacks)) {
+            var multiplier = (float) RelicStackingUtils.sumValue(entity, stack, "regeneration", "max_health");
+            var retentionUnlocked = activeRegenerationStacks.stream().anyMatch(
+                    equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").isRankModifierUnlocked("retention"));
 
             if (entity.isInLiquid() || entity.isInRain()) {
                 var boostedMaxHealth = entity.getMaxHealth() * multiplier;
 
-                EntityUtils.resetAttribute(entity, stack, Attributes.MAX_HEALTH, multiplier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-                EntityUtils.removeAttribute(entity, stack, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE);
+                EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH, multiplier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, REGEN_MAX_HEALTH_ATTRIBUTE);
+                EntityUtils.removeAttribute(entity, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE, REGEN_RETENTION_ATTRIBUTE);
 
                 entity.setHealth(entity.getHealth() + Math.min(entity.getAbsorptionAmount(), boostedMaxHealth));
             } else {
-                EntityUtils.removeAttribute(entity, stack, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                EntityUtils.removeAttribute(entity, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, REGEN_MAX_HEALTH_ATTRIBUTE);
 
-                if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration").isRankModifierUnlocked("retention") && !EntityUtils.hasAttribute(entity, stack, Attributes.MAX_HEALTH)
-                        && !EntityUtils.hasAttribute(entity, stack, Attributes.MAX_ABSORPTION)) {
+                if (retentionUnlocked && !EntityUtils.hasAttribute(entity, Attributes.MAX_HEALTH, REGEN_MAX_HEALTH_ATTRIBUTE)
+                        && !EntityUtils.hasAttribute(entity, Attributes.MAX_ABSORPTION, REGEN_RETENTION_ATTRIBUTE)) {
                     var baseMaxHealth = entity.getMaxHealth();
                     var currentHealth = entity.getHealth();
                     var extraHealth = Math.max(0F, currentHealth - baseMaxHealth);
 
                     entity.setHealth(Math.min(currentHealth, baseMaxHealth));
 
-                    EntityUtils.resetAttribute(entity, stack, Attributes.MAX_ABSORPTION, extraHealth, AttributeModifier.Operation.ADD_VALUE);
-
+                    EntityUtils.resetAttribute(entity, Attributes.MAX_ABSORPTION, extraHealth, AttributeModifier.Operation.ADD_VALUE, REGEN_RETENTION_ATTRIBUTE);
                     entity.setAbsorptionAmount(extraHealth);
                 }
             }
         }
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").canPlayerUse(entity) && !this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getMode().equals("disabled")) {
+        var activeShockStacks = RelicStackingUtils.findActiveStacks(entity, RelicsItems.JELLYFISH_NECKLACE.get(),
+                equippedStack -> equippedStack.getItem() == this && this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").canPlayerUse(entity)
+                        && !this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getMode().equals("disabled"));
+
+        if (RelicStackingUtils.isControllerStack(stack, activeShockStacks)) {
             var cooldown = this.getCooldown(stack);
-            var rings = this.getRings(stack);
+            var maxRings = (int) Math.ceil(RelicStackingUtils.sumValue(entity, stack, "shock", "rings",
+                    abilityData -> !abilityData.getMode().equals("disabled")));
+            var rings = Math.min(this.getRings(stack), maxRings);
+            if (rings != this.getRings(stack))
+                this.setRings(stack, rings);
 
-            if (rings < this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("rings").getValue()) {
-                var maxCooldown = (int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("cooldown").getValue();
+            var cooldownTicks = (int) Math.round(RelicStackingUtils.bestValue(entity, stack, "shock", "cooldown", abilityData -> !abilityData.getMode().equals("disabled")) * 20D);
+            var radius = RelicStackingUtils.bestValue(entity, stack, "shock", "radius", abilityData -> !abilityData.getMode().equals("disabled"));
+            var knockback = RelicStackingUtils.bestValue(entity, stack, "shock", "knockback", abilityData -> !abilityData.getMode().equals("disabled"));
+            var paralysis = RelicStackingUtils.bestValue(entity, stack, "shock", "paralysis", abilityData -> !abilityData.getMode().equals("disabled"));
+            var distance = RelicStackingUtils.bestValue(entity, stack, "shock", "distance", abilityData -> !abilityData.getMode().equals("disabled"));
+            var bounces = (int) Math.round(RelicStackingUtils.bestValue(entity, stack, "shock", "bounces", abilityData -> !abilityData.getMode().equals("disabled")));
+            var damage = RelicStackingUtils.bestValue(entity, stack, "shock", "damage", abilityData -> !abilityData.getMode().equals("disabled"));
+            var conductorUnlocked = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("conductor"));
+            var chargeUnlocked = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("charge"));
+            var damageModifier = conductorUnlocked ? RelicStackingUtils.maxValue(entity, stack, "shock", "damage_modifier", abilityData -> !abilityData.getMode().equals("disabled")) : 0D;
+            var chargeDurationTicks = (int) Math.round(RelicStackingUtils.bestValue(entity, stack, "shock", "duration", abilityData -> !abilityData.getMode().equals("disabled")) * 20D);
+            var flawless = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).isFlawless());
 
+            if (rings < maxRings) {
                 if (cooldown > 0)
                     this.addCooldown(stack, -1);
                 else {
                     this.addRings(stack, 1);
-                    this.setCooldown(stack, maxCooldown * 20);
+                    this.setCooldown(stack, cooldownTicks);
 
                     if (!level.isClientSide()) {
                         this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatisticData().getMetricData("rings_accumulated").addValue(1);
-
                         this.getRelicData(entity, stack).getLevelingData().addExperience("shock", "rings_accumulating", 1);
                     }
                 }
@@ -331,28 +359,25 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             var collidedEntities = level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(0.5F), predicate);
 
             if (rings > 0 && !collidedEntities.isEmpty()) {
-                var radius = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("radius").getValue();
-
                 for (var target : level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(0.5F).inflate(radius), predicate)) {
                     var diff = target.position().add(0, target.getBbHeight() / 2D, 0).subtract(entity.position());
-                    var knockback = 0.5D * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("knockback").getValue();
-                    var paralysis = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("paralysis").getValue();
+                    var totalKnockback = 0.5D * knockback;
 
                     target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, true));
 
                     if (!level.isClientSide())
                         this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatisticData().getMetricData("rings_paralysis").addValue(paralysis);
 
-                    target.setDeltaMovement(diff.normalize().multiply(knockback, knockback / 2F, knockback));
+                    target.setDeltaMovement(diff.normalize().multiply(totalKnockback, totalKnockback / 2F, totalKnockback));
 
                     var spark = new ElectricSparkEntity(RelicsEntities.ELECTRIC_SPARK.get(), level);
 
-                    spark.setDamageModifier(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("conductor") ? (float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("damage_modifier").getValue() : 0F);
-                    spark.setDistance((float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("distance").getValue());
-                    spark.setBounces((int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("bounces").getValue());
-                    spark.setDamage((float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("damage").getValue());
+                    spark.setDamageModifier(conductorUnlocked ? (float) damageModifier : 0F);
+                    spark.setDistance((float) distance);
+                    spark.setBounces(bounces);
+                    spark.setDamage((float) damage);
                     spark.setPos(entity.position().add(0F, entity.getBbHeight() / 2F, 0D));
-                    spark.setFlawless(this.getRelicData(entity, stack).isFlawless());
+                    spark.setFlawless(flawless);
                     spark.setTarget(target);
                     spark.setOwner(entity);
                     spark.setStack(stack);
@@ -367,11 +392,8 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
 
                 this.addRings(stack, -1);
 
-                if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("charge")) {
-                    var maxDuration = (int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("duration").getValue();
-
-                    this.setDuration(stack, maxDuration * 20);
-                }
+                if (chargeUnlocked)
+                    this.setDuration(stack, chargeDurationTicks);
             }
 
             if (!affectedEntities.isEmpty())
@@ -381,13 +403,30 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                                 .collect(Collectors.toSet())::contains))
                         .toArray(String[]::new));
 
-            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("charge")) {
+            if (chargeUnlocked) {
                 var duration = this.getDuration(stack);
 
                 if (duration > 0)
                     this.addDuration(stack, -1);
                 else
                     this.setDamagedEntities(stack, new ArrayList<>());
+            }
+
+            var controllerCooldown = this.getCooldown(stack);
+            var controllerRings = this.getRings(stack);
+            var controllerDuration = this.getDuration(stack);
+            var controllerDamagedEntities = this.getDamagedEntities(stack);
+            var controllerAffectedEntities = this.getAffectedEntities(stack);
+
+            for (var equippedStack : activeShockStacks) {
+                if (equippedStack == stack)
+                    continue;
+
+                this.setCooldown(equippedStack, controllerCooldown);
+                this.setRings(equippedStack, controllerRings);
+                this.setDuration(equippedStack, controllerDuration);
+                this.setDamagedEntities(equippedStack, new ArrayList<>(controllerDamagedEntities));
+                this.setAffectedEntities(equippedStack, new ArrayList<>(controllerAffectedEntities));
             }
         }
     }
@@ -400,9 +439,56 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             return;
 
         var entity = slotContext.entity();
+        var activeRegenerationStacks = EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get()).stream()
+                .filter(equippedStack -> equippedStack != stack)
+                .filter(equippedStack -> equippedStack.getItem() == this
+                        && this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").canPlayerUse(entity))
+                .toList();
+        var inWaterOrRain = entity.isInLiquid() || entity.isInRain();
 
-        EntityUtils.removeAttribute(entity, stack, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE);
-        EntityUtils.removeAttribute(entity, stack, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        if (activeRegenerationStacks.isEmpty()) {
+            EntityUtils.removeAttribute(entity, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE, REGEN_RETENTION_ATTRIBUTE);
+            EntityUtils.removeAttribute(entity, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, REGEN_MAX_HEALTH_ATTRIBUTE);
+            entity.setAbsorptionAmount(Math.min(entity.getAbsorptionAmount(), entity.getMaxAbsorption()));
+
+            return;
+        }
+
+        var remainingMultiplier = (float) activeRegenerationStacks.stream()
+                .mapToDouble(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").getStatData("max_health").getValue())
+                .sum();
+        var retentionUnlocked = activeRegenerationStacks.stream()
+                .anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").isRankModifierUnlocked("retention"));
+
+        if (inWaterOrRain) {
+            EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH, remainingMultiplier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, REGEN_MAX_HEALTH_ATTRIBUTE);
+            EntityUtils.removeAttribute(entity, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE, REGEN_RETENTION_ATTRIBUTE);
+            entity.setAbsorptionAmount(Math.min(entity.getAbsorptionAmount(), entity.getMaxAbsorption()));
+
+            return;
+        }
+
+        EntityUtils.removeAttribute(entity, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, REGEN_MAX_HEALTH_ATTRIBUTE);
+
+        if (!retentionUnlocked) {
+            EntityUtils.removeAttribute(entity, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE, REGEN_RETENTION_ATTRIBUTE);
+            entity.setAbsorptionAmount(Math.min(entity.getAbsorptionAmount(), entity.getMaxAbsorption()));
+
+            return;
+        }
+
+        var retentionCap = Math.max(0F, entity.getMaxHealth() * remainingMultiplier);
+        var keptAbsorption = Math.min(entity.getAbsorptionAmount(), retentionCap);
+
+        if (keptAbsorption <= 0F) {
+            EntityUtils.removeAttribute(entity, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE, REGEN_RETENTION_ATTRIBUTE);
+            entity.setAbsorptionAmount(Math.min(entity.getAbsorptionAmount(), entity.getMaxAbsorption()));
+
+            return;
+        }
+
+        EntityUtils.resetAttribute(entity, Attributes.MAX_ABSORPTION, keptAbsorption, AttributeModifier.Operation.ADD_VALUE, REGEN_RETENTION_ATTRIBUTE);
+        entity.setAbsorptionAmount(keptAbsorption);
     }
 
     @EventBusSubscriber
@@ -447,36 +533,42 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                 return;
 
             var level = entity.level();
+            var stacks = EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get()).stream()
+                    .filter(stack -> stack.getItem() instanceof JellyfishNecklaceItem relic
+                            && relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").canPlayerUse(entity)
+                            && !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getMode().equals("disabled"))
+                    .toList();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {
-                var relic = (JellyfishNecklaceItem) stack.getItem();
+            if (stacks.isEmpty())
+                return;
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").canPlayerUse(entity) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getMode().equals("disabled")
-                        || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("charge"))
-                    continue;
+            var stack = stacks.getFirst();
+            var relic = (JellyfishNecklaceItem) stack.getItem();
+            var chargeUnlocked = stacks.stream().anyMatch(
+                    equippedStack -> relic.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("charge"));
 
-                var duration = relic.getDuration(stack);
+            if (!chargeUnlocked)
+                return;
 
-                if (duration <= 0)
-                    continue;
+            if (relic.getDuration(stack) <= 0)
+                return;
 
-                var targets = relic.getDamagedEntities(stack);
-                var target = event.getEntity();
-                var uuid = target.getStringUUID();
+            var targets = relic.getDamagedEntities(stack);
+            var target = event.getEntity();
+            var uuid = target.getStringUUID();
 
-                if (!targets.contains(uuid)) {
-                    var paralysis = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatData("paralysis").getValue();
+            if (!targets.contains(uuid)) {
+                var paralysis = RelicStackingUtils.bestValue(entity, stack, "shock", "paralysis",
+                        abilityData -> !abilityData.getMode().equals("disabled"));
 
-                    target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, false));
+                target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, false));
 
-                    if (!level.isClientSide()) {
-                        relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatisticData().getMetricData("hit_paralysis").addValue(paralysis);
-
-                        relic.getRelicData(entity, stack).getLevelingData().addExperience("shock", "hit_paralysis", paralysis);
-                    }
-
-                    relic.addDamagedEntities(stack, uuid);
+                if (!level.isClientSide()) {
+                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatisticData().getMetricData("hit_paralysis").addValue(paralysis);
+                    relic.getRelicData(entity, stack).getLevelingData().addExperience("shock", "hit_paralysis", paralysis);
                 }
+
+                relic.addDamagedEntities(stack, uuid);
             }
         }
     }
