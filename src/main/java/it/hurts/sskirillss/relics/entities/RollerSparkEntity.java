@@ -64,7 +64,7 @@ public class RollerSparkEntity extends ThrowableProjectile {
 
         super.tick();
 
-        if (this.tickCount > 100 || motion.length() < 0.1F)
+        if (this.tickCount > 100 || motion.length() < 0.1F || this.isInLiquid())
             this.discard();
 
         this.bounced = false;
