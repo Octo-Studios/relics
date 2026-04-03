@@ -14,7 +14,7 @@
     "PlayerMixin",
     "PiglinAiMixin",
     "ScreenMixin",
-    "compat.sophisticatedbackpacks.FeedingUpgradeWrapperMixin",
+    "compat.sophisticatedbackpacks.BackpackItemMixin",
     "compat.sophisticatedbackpacks.UpgradeWrapperBaseAccessor"
   ],
   "minVersion": "0.8",
