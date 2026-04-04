@@ -16,6 +16,7 @@ import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
+import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
@@ -38,6 +39,20 @@ public class HuntingBeltItem extends WearableRelicItem {
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
+                        .ability(AbilityTemplate.builder("slots")
+                                .requiredPoints(2)
+                                .initialMaxLevel(5)
+                                .maxLevelRankModifier(0.1)
+                                .stat(AbilityStatTemplate.builder("amount")
+                                        .initialValue(1D, 2D)
+                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
+                                        .formatValue(value -> (int) (MathUtils.round(value, 0)))
+                                        .build())
+                                .research(ResearchTemplate.builder()
+                                        .star(0, 6, 12).star(1, 8, 17).star(2, 6, 23).star(3, 15, 23).star(4, 13, 17).star(5, 15, 12)
+                                        .link(0, 5).link(5, 4).link(4, 3).link(3, 2).link(2, 1).link(1, 0)
+                                        .build())
+                                .build())
                         .ability(AbilityTemplate.builder("pack")
                                 .rankModifier(1, "leader")
                                 .rankModifier(3, "relentless")
@@ -101,6 +116,13 @@ public class HuntingBeltItem extends WearableRelicItem {
                 .loot(LootTemplate.builder()
                         .entry(LootEntries.VILLAGE)
                         .build())
+                .build();
+    }
+
+    @Override
+    public RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
+        return RelicSlotModifier.builder()
+                .modifier("charm", (int) Math.round(getRelicData(entity, stack).getAbilitiesData().getAbilityData("slots").getStatData("amount").getValue()))
                 .build();
     }
 

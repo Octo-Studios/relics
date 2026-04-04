@@ -144,7 +144,7 @@
   "item.relics.kinetic_belt": "Kinetic Belt",
   "relics.description.kinetic_belt.description": "Once belonging to a master of aerial arts and a student of the ancient school of aeroforms, this belt is made from materials that defy the usual laws of physics. Thin plates sewn into the fabric respond not to body weight, but to movement — as if the very air obeys the wearer. Those who have mastered the art of handling this relic speak of a feeling of almost complete union with the air: every step becomes a leap, every leap — a flight, and every fall — just a push for the next takeoff.",
   "relics.description.kinetic_belt.ability.slots": "Arsenal Expansion",
-  "relics.description.kinetic_belt.ability.slots.description": "Increases the maximum number of equipped amulets by %1$s.",
+  "relics.description.kinetic_belt.ability.slots.description": "Increases the maximum number of equipped charms by %1$s.",
   "relics.description.kinetic_belt.ability.gliding": "Gliding",
   "relics.description.kinetic_belt.ability.gliding.mode.enabled": "Enabled",
   "relics.description.kinetic_belt.ability.gliding.mode.disabled": "Disabled",
@@ -371,6 +371,8 @@
 
   "item.relics.hunting_belt": "Hunting Belt",
   "relics.description.hunting_belt.description": "This belt was worn by hunters who learned to rely not only on their own hand, but also on the fangs of their companions. Worn leather and bone charms preserve the memory of dozens of shared battles. The belt strengthens the bond between its owner and their pets, turning them into a single deadly pack.",
+  "relics.description.hunting_belt.ability.slots": "Arsenal Expansion",
+  "relics.description.hunting_belt.ability.slots.description": "Increases the maximum number of equipped charms by %1$s.",
   "relics.description.hunting_belt.ability.pack": "Pack",
   "relics.description.hunting_belt.ability.pack.description": "Increases the damage dealt by the relic bearer’s pets by %1$s%%.",
   "relics.description.hunting_belt.ability.pack.rank_modifier.leader": "Pets within a radius of %2$s blocks reduce the damage taken by the relic bearer by %3$s%% for each pet, up to a maximum of 5 pets.",
