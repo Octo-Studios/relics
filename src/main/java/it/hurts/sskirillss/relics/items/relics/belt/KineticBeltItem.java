@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.belt;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -15,7 +16,6 @@ import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicCondition
 import it.hurts.sskirillss.relics.api.relics.synergies.stats.SynergyStatTemplate;
 import it.hurts.sskirillss.relics.entities.KineticElectricityEntity;
 import it.hurts.sskirillss.relics.init.*;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -28,6 +28,8 @@ import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -45,6 +47,15 @@ import java.awt.*;
 public class KineticBeltItem extends WearableRelicItem {
     private static final double ELECTRICITY_MIN_DISTANCE_SQR = 1D;
     private static final double ELECTRICITY_MAX_LINK_DISTANCE_SQR = 100D;
+
+    private static ResourceLocation getGravityAttributeId(ItemStack stack, SlotContext slotContext) {
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
+                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
+                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(Attributes.GRAVITY.value()).getPath()
+                        + "_" + slotContext.identifier()
+                        + "_" + slotContext.index()
+                        + "_gliding");
+    }
 
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
@@ -206,8 +217,11 @@ public class KineticBeltItem extends WearableRelicItem {
 
         var entity = slotContext.entity();
         var level = entity.level();
+        var gravityAttributeId = getGravityAttributeId(stack, slotContext);
 
         if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")) {
+            EntityUtils.removeAttribute(entity, Attributes.GRAVITY, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);
+
             if (!level.isClientSide())
                 this.clearLastElectricityEntityId(stack);
 
@@ -223,7 +237,7 @@ public class KineticBeltItem extends WearableRelicItem {
 
         var onGround = entity.onGround();
 
-        var hasAttribute = EntityUtils.hasAttribute(entity, stack, Attributes.GRAVITY);
+        var hasAttribute = EntityUtils.hasAttribute(entity, Attributes.GRAVITY, gravityAttributeId);
 
         if (level.isClientSide()) {
             if (entity instanceof LocalPlayer player) {
@@ -287,7 +301,7 @@ public class KineticBeltItem extends WearableRelicItem {
             }
 
             if (!hasAttribute)
-                EntityUtils.applyAttribute(entity, stack, Attributes.GRAVITY, (float) -Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue(), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                EntityUtils.applyAttribute(entity, Attributes.GRAVITY, (float) -Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue(), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);
 
             var prevPosition = new Vec3(entity.xOld, entity.yOld, entity.zOld);
             var position = entity.position();
@@ -331,7 +345,7 @@ public class KineticBeltItem extends WearableRelicItem {
                 }
             }
         } else if (hasAttribute)
-            EntityUtils.removeAttribute(entity, stack, Attributes.GRAVITY, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.removeAttribute(entity, Attributes.GRAVITY, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);
     }
 
     @EventBusSubscriber
@@ -360,22 +374,28 @@ public class KineticBeltItem extends WearableRelicItem {
             var original = event.getNewDamage();
 
             if (event.getSource().getDirectEntity() instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity source) {
+                double strikeTotal = 0D;
+
                 for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.KINETIC_BELT.get())) {
                     var relic = (KineticBeltItem) stack.getItem();
 
-                    if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(source) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
+                    if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(source) || relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
                             || !relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").isRankModifierUnlocked("strike") || !relic.isActive(stack))
                         continue;
 
-                    var additional = original * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("damage").getValue();
+                    var additional = original * relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getStatData("damage").getValue();
 
-                    relic.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "strike", additional);
+                    relic.getRelicData(source, stack).getLevelingData().addExperience("gliding", "strike", additional);
 
-                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatisticData().getMetricData("damage").addValue(additional);
+                    relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getStatisticData().getMetricData("damage").addValue(additional);
 
-                    event.setNewDamage((float) (original + additional));
+                    strikeTotal += additional;
                 }
+
+                event.setNewDamage((float) (event.getNewDamage() + strikeTotal));
             }
+
+            double resistanceTotal = 0D;
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
                 var relic = (KineticBeltItem) stack.getItem();
@@ -390,8 +410,10 @@ public class KineticBeltItem extends WearableRelicItem {
 
                 relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatisticData().getMetricData("resistance").addValue(additional);
 
-                event.setNewDamage((float) (original - additional));
+                resistanceTotal += additional;
             }
+
+            event.setNewDamage((float) Math.max(0D, event.getNewDamage() - resistanceTotal));
         }
     }
 }

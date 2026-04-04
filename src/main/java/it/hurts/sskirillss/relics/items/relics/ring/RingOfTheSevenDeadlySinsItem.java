@@ -26,7 +26,10 @@ import it.hurts.sskirillss.relics.network.packets.item.ring_of_the_seven_deadly_
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
@@ -58,7 +61,18 @@ import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.common.inventory.CurioSlot;
 
+import java.util.ArrayList;
+
 public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements ICreativeTabContent {
+    private static ResourceLocation getGluttonyAttributeId(ItemStack stack, Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, SlotContext slotContext) {
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
+                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
+                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.value()).getPath()
+                        + "_" + slotContext.identifier()
+                        + "_" + slotContext.index()
+                        + "_gluttony");
+    }
+
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -358,7 +372,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                     if (blacklist.contains(attribute.getRegisteredName()))
                         continue;
 
-                    EntityUtils.resetAttribute(entity, stack, attribute, (float) modifier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+                    EntityUtils.resetAttribute(entity, attribute, (float) modifier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, getGluttonyAttributeId(stack, attribute, slotContext));
                 }
             }
         }
@@ -438,7 +452,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
         var entity = slotContext.entity();
 
         for (var instance : entity.getAttributes().attributes.values())
-            EntityUtils.removeAttribute(entity, stack, instance.getAttribute(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.removeAttribute(entity, instance.getAttribute(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, getGluttonyAttributeId(stack, instance.getAttribute(), slotContext));
     }
 
     @Override
@@ -487,45 +501,78 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             var attackerEye = attacker.getEyeY();
             var verticalDelta = attackerEye - targetEye;
 
-            if (verticalDelta > 0) {
-                for (var stack : EntityUtils.findEquippedCurios(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
+            if (verticalDelta <= 0)
+                return;
+
+            var attackerRings = EntityUtils.findEquippedCurios(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), stack -> {
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+
+                return relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("pride").canPlayerUse(attacker);
+            });
+
+            if (!attackerRings.isEmpty()) {
+                var totalBonus = 0D;
+                var ringBonuses = new ArrayList<Double>(attackerRings.size());
+
+                for (var stack : attackerRings) {
                     var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
-
-                    if (!relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("pride").canPlayerUse(attacker))
-                        continue;
-
                     var perBlock = relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("pride").getStatData("multiplier").getValue();
                     var bonus = verticalDelta * perBlock;
 
-                    var extraDamage = original * bonus;
+                    ringBonuses.add(bonus);
+                    totalBonus += bonus;
+                }
 
-                    event.setNewDamage((float) (original * (1 + bonus)));
+                if (totalBonus > 0) {
+                    event.setNewDamage((float) (original * (1 + totalBonus)));
 
-                    relic.getRelicData(attacker, stack).getLevelingData().addExperience("pride", "height_advantage", extraDamage);
-                    relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("pride").getStatisticData().getMetricData("additional_damage").addValue(extraDamage);
+                    for (var i = 0; i < attackerRings.size(); i++) {
+                        var stack = attackerRings.get(i);
+                        var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+                        var extraDamage = original * ringBonuses.get(i);
+
+                        relic.getRelicData(attacker, stack).getLevelingData().addExperience("pride", "height_advantage", extraDamage);
+                        relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("pride").getStatisticData().getMetricData("additional_damage").addValue(extraDamage);
+                    }
 
                     return;
                 }
             }
 
-            if (verticalDelta > 0 && target instanceof LivingEntity victim) {
-                for (var stack : EntityUtils.findEquippedCurios(victim, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
+            if (target instanceof LivingEntity victim) {
+                var victimRings = EntityUtils.findEquippedCurios(victim, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), stack -> {
                     var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                    if (!relic.getRelicData(victim, stack).getAbilitiesData().getAbilityData("pride").canPlayerUse(victim))
-                        continue;
+                    return relic.getRelicData(victim, stack).getAbilitiesData().getAbilityData("pride").canPlayerUse(victim);
+                });
 
+                if (victimRings.isEmpty())
+                    return;
+
+                var totalPenalty = 0D;
+                var ringPenalties = new ArrayList<Double>(victimRings.size());
+
+                for (var stack : victimRings) {
+                    var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
                     var perBlock = relic.getRelicData(victim, stack).getAbilitiesData().getAbilityData("pride").getStatData("multiplier").getValue();
                     var penalty = verticalDelta * perBlock;
 
-                    var extraDamage = original * penalty;
+                    ringPenalties.add(penalty);
+                    totalPenalty += penalty;
+                }
 
-                    event.setNewDamage((float) (original * (1 + penalty)));
+                if (totalPenalty <= 0)
+                    return;
+
+                event.setNewDamage((float) (original * (1 + totalPenalty)));
+
+                for (var i = 0; i < victimRings.size(); i++) {
+                    var stack = victimRings.get(i);
+                    var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+                    var extraDamage = original * ringPenalties.get(i);
 
                     relic.getRelicData(victim, stack).getLevelingData().addExperience("pride", "height_advantage", Math.abs(extraDamage));
                     relic.getRelicData(victim, stack).getAbilitiesData().getAbilityData("pride").getStatisticData().getMetricData("damage_received").addValue(extraDamage);
-
-                    break;
                 }
             }
         }
@@ -533,26 +580,44 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
         @SubscribeEvent
         public static void onLivingHurt2(LivingDamageEvent.Pre event) {
             var target = event.getEntity();
-            var damage = event.getNewDamage();
+            var speed = target.getKnownMovement().multiply(1, 0, 1).length();
 
-            for (var stack : EntityUtils.findEquippedCurios(target, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
+            if (speed <= 0)
+                return;
+
+            var rings = EntityUtils.findEquippedCurios(target, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), stack -> {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("sloth").canPlayerUse(target))
-                    continue;
+                return relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("sloth").canPlayerUse(target);
+            });
 
-                var speed = target.getKnownMovement().multiply(1, 0, 1).length();
+            if (rings.isEmpty())
+                return;
+
+            var baseDamage = event.getNewDamage();
+            var totalPenalty = 0D;
+            var ringPenalties = new ArrayList<Double>(rings.size());
+
+            for (var stack : rings) {
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
                 var speedMultiplier = relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("sloth").getStatData("speed").getValue();
+                var penalty = speed * speedMultiplier;
 
-                if (speed > 0) {
-                    var penalty = speed * speedMultiplier;
+                ringPenalties.add(penalty);
+                totalPenalty += penalty;
+            }
 
-                    var extraDamage = damage * penalty;
+            if (totalPenalty <= 0)
+                return;
 
-                    event.setNewDamage((float) (damage * (1 + penalty)));
+            event.setNewDamage((float) (baseDamage * (1 + totalPenalty)));
 
-                    relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("sloth").getStatisticData().getMetricData("damage_from_moving").addValue(extraDamage);
-                }
+            for (var i = 0; i < rings.size(); i++) {
+                var stack = rings.get(i);
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+                var extraDamage = baseDamage * ringPenalties.get(i);
+
+                relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("sloth").getStatisticData().getMetricData("damage_from_moving").addValue(extraDamage);
             }
         }
 
@@ -561,24 +626,30 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             if (!(event.getSource().getEntity() instanceof LivingEntity attacker))
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
+            var rings = EntityUtils.findEquippedCurios(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), stack -> {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").canPlayerUse(attacker))
-                    continue;
+                return relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").canPlayerUse(attacker);
+            });
 
-                var now = attacker.level().getGameTime();
+            if (rings.isEmpty())
+                return;
 
+            var now = attacker.level().getGameTime();
+            var baseDamage = event.getNewDamage();
+            var totalModifier = 1D;
+            var ringModifiers = new ArrayList<Double>(rings.size());
+
+            for (var stack : rings) {
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
                 var windowTicks = Math.max(1, (int) Math.round(relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatData("window").getValue() * 20D));
                 var state = stack.getOrDefault(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_WRATH.get(), WrathData.create(now));
-
                 var delta = now - state.lastHitTick();
 
                 double modifier = 1D;
 
                 if (delta < windowTicks) {
-                    double mid = windowTicks / 2D;
-
+                    var mid = windowTicks / 2D;
                     var earlyMultiplier = relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatData("early_multiplier").getValue();
                     var lateMultiplier = relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatData("late_multiplier").getValue();
 
@@ -595,13 +666,19 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                     }
                 }
 
-                var baseDamage = event.getNewDamage();
-                var extraDamage = baseDamage * (modifier - 1);
+                ringModifiers.add(modifier);
+                totalModifier *= modifier;
+            }
+
+            event.setNewDamage((float) (baseDamage * totalModifier));
+
+            for (var i = 0; i < rings.size(); i++) {
+                var stack = rings.get(i);
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+                var modifier = ringModifiers.get(i);
+                var extraDamage = baseDamage * (modifier - 1D);
 
                 relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatisticData().getMetricData("windows").addValue(1);
-
-                event.setNewDamage((float) (baseDamage * modifier));
-
                 relic.getRelicData(attacker, stack).getLevelingData().addExperience("wrath", "timing", Math.abs(extraDamage));
 
                 if (extraDamage > 0)
@@ -610,8 +687,6 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                     relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatisticData().getMetricData("reduced_damage").addValue(Math.abs(extraDamage));
 
                 stack.set(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_WRATH.get(), new WrathData(now));
-
-                break;
             }
         }
 
@@ -629,40 +704,59 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
         }
 
         private static boolean applyEnvy(LivingDamageEvent.Pre event, LivingEntity wearer, LivingEntity other, boolean wearerIsAttacker) {
-            for (var stack : EntityUtils.findEquippedCurios(wearer, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
+            var rings = EntityUtils.findEquippedCurios(wearer, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), stack -> {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
 
-                if (!relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").canPlayerUse(wearer))
-                    continue;
+                return relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").canPlayerUse(wearer);
+            });
 
-                var wearerHp = wearer.getHealth();
-                var otherHp = other.getHealth();
+            if (rings.isEmpty())
+                return false;
 
-                var diff = (otherHp - wearerHp) / 5F;
+            var wearerHp = wearer.getHealth();
+            var otherHp = other.getHealth();
+            var diff = (otherHp - wearerHp) / 5F;
+            var stat = wearerIsAttacker ? "outgoing_damage_multiplier" : "incoming_damage_multiplier";
+            var modifiers = new ArrayList<Double>(rings.size());
+            var totalModifier = 0D;
 
-                var stat = wearerIsAttacker ? "outgoing_damage_multiplier" : "incoming_damage_multiplier";
+            for (var stack : rings) {
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
                 var perPoint = Math.abs(relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").getStatData(stat).getValue());
                 var modifier = (wearerIsAttacker ? diff : -diff) * perPoint;
 
-                if (modifier <= 0)
-                    return false;
+                modifiers.add(modifier);
 
-                var baseDamage = event.getNewDamage();
-                var extraDamage = baseDamage * modifier;
-
-                event.setNewDamage((float) (baseDamage * (1 + modifier)));
-
-                relic.getRelicData(wearer, stack).getLevelingData().addExperience("envy", "health_gap", Math.abs(extraDamage));
-
-                if (wearerIsAttacker && extraDamage > 0)
-                    relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").getStatisticData().getMetricData("offensive_shift").addValue(extraDamage);
-                else if (!wearerIsAttacker && extraDamage > 0)
-                    relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").getStatisticData().getMetricData("defensive_shift").addValue(extraDamage);
-
-                return true;
+                if (modifier > 0)
+                    totalModifier += modifier;
             }
 
-            return false;
+            if (totalModifier <= 0)
+                return false;
+
+            var baseDamage = event.getNewDamage();
+
+            event.setNewDamage((float) (baseDamage * (1 + totalModifier)));
+
+            for (var i = 0; i < rings.size(); i++) {
+                var modifier = modifiers.get(i);
+
+                if (modifier <= 0)
+                    continue;
+
+                var stack = rings.get(i);
+                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+                var extraDamage = baseDamage * modifier;
+
+                relic.getRelicData(wearer, stack).getLevelingData().addExperience("envy", "health_gap", extraDamage);
+
+                if (wearerIsAttacker)
+                    relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").getStatisticData().getMetricData("offensive_shift").addValue(extraDamage);
+                else
+                    relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").getStatisticData().getMetricData("defensive_shift").addValue(extraDamage);
+            }
+
+            return true;
         }
 
         @SubscribeEvent
@@ -671,6 +765,8 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
 
             if (player == null)
                 return;
+
+            long totalDeadlineExtension = 0L;
 
             for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
@@ -706,10 +802,14 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
 
                 relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatisticData().getMetricData("breeding_attempts").addValue(1);
 
-                var deadline = level.getGameTime() + (long) (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatData("time").getValue() * 20);
+                totalDeadlineExtension += (long) (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatData("time").getValue() * 20);
+            }
 
-                CommonEvents.applyLustDeadline(parentA, deadline);
-                CommonEvents.applyLustDeadline(parentB, deadline);
+            if (totalDeadlineExtension > 0L) {
+                var deadline = player.level().getGameTime() + totalDeadlineExtension;
+
+                CommonEvents.applyLustDeadline(event.getParentA(), deadline);
+                CommonEvents.applyLustDeadline(event.getParentB(), deadline);
             }
         }
 

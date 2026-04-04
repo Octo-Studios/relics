@@ -17,11 +17,12 @@ public class CookedMeatballItem extends ItemBase {
     @Override
     public int getUseDuration(ItemStack stack, LivingEntity entity) {
         var duration = super.getUseDuration(stack, entity);
+        var multiplier = ChefHatItem.getMeatballConsumptionSpeedMultiplier(entity);
 
-        if (!ChefHatItem.canQuicklyEatMeatballs(entity))
+        if (multiplier <= 1D)
             return duration;
 
-        return Math.max(1, (int) Math.ceil(duration / 3D));
+        return Math.max(1, (int) Math.ceil(duration / multiplier));
     }
 
     @Override

@@ -218,6 +218,12 @@ public class EntityUtils {
                 .orElse(List.of());
     }
 
+    public static List<ItemStack> findEquippedCurios(Entity entity, Item item, Predicate<ItemStack> predicate) {
+        return EntityUtils.findEquippedCurios(entity, item).stream()
+                .filter(predicate)
+                .toList();
+    }
+
     public static long getExperienceForLevel(int level) {
         return level >= 30 ? 112 + (level - 30) * 9L : level >= 15 ? 37 + (level - 15) * 5 : 7 + level * 2L;
     }

@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.belt;
 
+import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -9,12 +10,10 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
-import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
-import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -33,6 +32,8 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
+
+import java.util.ArrayList;
 
 public class HuntingBeltItem extends WearableRelicItem {
     @Override
@@ -141,11 +142,12 @@ public class HuntingBeltItem extends WearableRelicItem {
             var totalModifier = 0D;
             var ignoreInvulnerability = false;
 
-            for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get())) {
+            for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get(), stack -> {
                 var relic = (HuntingBeltItem) stack.getItem();
 
-                if (!relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner))
-                    continue;
+                return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner);
+            })) {
+                var relic = (HuntingBeltItem) stack.getItem();
 
                 totalModifier += relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatData("damage_modifier").getValue();
                 ignoreInvulnerability |= relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").isRankModifierUnlocked("relentless");
@@ -172,35 +174,75 @@ public class HuntingBeltItem extends WearableRelicItem {
             if (original <= 0F)
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.HUNTING_BELT.get())) {
+            var allActiveBelts = EntityUtils.findEquippedCurios(player, RelicsItems.HUNTING_BELT.get(), stack -> {
                 var relic = (HuntingBeltItem) stack.getItem();
 
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(player)
-                        || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").isRankModifierUnlocked("leader"))
-                    continue;
+                return relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(player);
+            });
+            var leaderBelts = allActiveBelts.stream()
+                    .filter(stack -> {
+                        var relic = (HuntingBeltItem) stack.getItem();
 
+                        return relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").isRankModifierUnlocked("leader");
+                    })
+                    .toList();
+
+            if (leaderBelts.isEmpty())
+                return;
+
+            var maxRadius = 0D;
+
+            for (var stack : leaderBelts) {
+                var relic = (HuntingBeltItem) stack.getItem();
                 var radius = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getStatData("pet_radius").getValue();
 
-                var pets = player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius),
-                        target -> target instanceof OwnableEntity ownable && ownable.getOwner() != null
-                                && ownable.getOwner().getUUID().equals(player.getUUID()));
+                maxRadius = Math.max(maxRadius, radius);
+            }
 
-                if (pets.isEmpty())
-                    continue;
+            var nearbyPets = player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(maxRadius),
+                    target -> target instanceof OwnableEntity ownable && ownable.getOwner() != null
+                            && ownable.getOwner().getUUID().equals(player.getUUID()));
 
-                var reduction = Math.min(pets.size(), 5) * relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getStatData("resistance_per_pet").getValue();
+            if (nearbyPets.isEmpty())
+                return;
+
+            var beltResisted = new ArrayList<Double>(leaderBelts.size());
+            var totalResisted = 0D;
+
+            for (var stack : leaderBelts) {
+                var relic = (HuntingBeltItem) stack.getItem();
+                var radius = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getStatData("pet_radius").getValue();
+                var resistancePerPet = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getStatData("resistance_per_pet").getValue();
+                var petsInRange = nearbyPets.stream().filter(pet -> pet.distanceToSqr(player) <= radius * radius).count();
+
+                var reduction = Math.min(petsInRange, 5L) * resistancePerPet;
                 var clamped = Math.clamp(reduction, 0D, 0.9D);
                 var resisted = original * clamped;
 
-                if (resisted <= 0F)
+                beltResisted.add(resisted);
+                totalResisted += resisted;
+            }
+
+            if (totalResisted <= 0D)
+                return;
+
+            var maxResisted = original * 0.9D;
+            var scale = totalResisted > maxResisted ? maxResisted / totalResisted : 1D;
+            var appliedResisted = totalResisted * scale;
+
+            event.setNewDamage((float) (original - appliedResisted));
+
+            for (var i = 0; i < leaderBelts.size(); i++) {
+                var resisted = beltResisted.get(i) * scale;
+
+                if (resisted <= 0D)
                     continue;
 
-                event.setNewDamage((float) (original - resisted));
+                var stack = leaderBelts.get(i);
+                var relic = (HuntingBeltItem) stack.getItem();
 
                 relic.getRelicData(player, stack).getLevelingData().addExperience("pack", "pet_resistance", resisted);
                 relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getStatisticData().getMetricData("damage_resisted").addValue(resisted);
-
-                break;
             }
         }
 
@@ -217,11 +259,12 @@ public class HuntingBeltItem extends WearableRelicItem {
             if (damage <= 0F)
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get())) {
+            for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get(), stack -> {
                 var relic = (HuntingBeltItem) stack.getItem();
 
-                if (!relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner))
-                    continue;
+                return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner);
+            })) {
+                var relic = (HuntingBeltItem) stack.getItem();
 
                 relic.getRelicData(owner, stack).getLevelingData().addExperience("pack", "pet_damage", 1);
                 relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatisticData().getMetricData("pet_attacks").addValue(1);
@@ -237,14 +280,26 @@ public class HuntingBeltItem extends WearableRelicItem {
                 return;
 
             if (entity instanceof OwnableEntity ownable && ownable.getOwner() instanceof LivingEntity owner) {
-                for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get())) {
-                    var relic = (HuntingBeltItem) stack.getItem();
+                var revivalBelts = EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get(), stack -> {
+                            var relic = (HuntingBeltItem) stack.getItem();
 
-                    if (!relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner)
-                            || !relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").isRankModifierUnlocked("revival"))
-                        continue;
+                            return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner);
+                        }).stream()
+                        .filter(stack -> {
+                            var relic = (HuntingBeltItem) stack.getItem();
 
-                    var requiredHealth = CommonEvents.getReviveHealthRequirement(relic, owner, stack, entity);
+                            return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").isRankModifierUnlocked("revival");
+                        })
+                        .toList();
+
+                if (!revivalBelts.isEmpty()) {
+                    var requiredHealth = Double.MAX_VALUE;
+
+                    for (var stack : revivalBelts) {
+                        var relic = (HuntingBeltItem) stack.getItem();
+                        requiredHealth = Math.min(requiredHealth, CommonEvents.getReviveHealthRequirement(relic, owner, stack, entity));
+                    }
+
                     var boneStack = new ItemStack(RelicsItems.PET_BONE.get());
 
                     boneStack.set(RelicsDataComponents.PET_BONE_DATA.get(),
@@ -253,10 +308,12 @@ public class HuntingBeltItem extends WearableRelicItem {
                     entity.spawnAtLocation(boneStack);
                     entity.getPersistentData().putBoolean(BONE_DROP_TAG, true);
 
-                    relic.getRelicData(owner, stack).getLevelingData().addExperience("pack", "bone_drop", 1);
-                    relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatisticData().getMetricData("pet_bones").addValue(1);
+                    for (var stack : revivalBelts) {
+                        var relic = (HuntingBeltItem) stack.getItem();
 
-                    break;
+                        relic.getRelicData(owner, stack).getLevelingData().addExperience("pack", "bone_drop", 1);
+                        relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatisticData().getMetricData("pet_bones").addValue(1);
+                    }
                 }
             }
 

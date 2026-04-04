@@ -37,24 +37,26 @@ public abstract class PiglinAiMixin {
 
         var player = optional.get();
 
-        var bestStack = ItemStack.EMPTY;
-        var bestValue = 0;
+        var eligibleStacks = new ArrayList<ItemStack>();
+        var totalValue = 0;
 
         for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.PIGLIN_MASK.get())) {
             var relic = (PiglinMaskItem) stack.getItem();
+            var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter");
 
-            if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").isRankModifierUnlocked("pocket"))
+            if (!ability.canPlayerUse(player) || !ability.isRankModifierUnlocked("pocket"))
                 continue;
 
-            var value = (int) relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").getStatData("items_count").getValue();
+            var value = (int) ability.getStatData("items_count").getValue();
 
-            if (value > bestValue) {
-                bestValue = value;
-                bestStack = stack;
-            }
+            if (value <= 0)
+                continue;
+
+            eligibleStacks.add(stack);
+            totalValue += value;
         }
 
-        if (bestValue <= 0)
+        if (totalValue <= 0)
             return operation.call(itemEntity);
 
         var stack = itemEntity.getItem();
@@ -62,7 +64,7 @@ public abstract class PiglinAiMixin {
         if (!stack.is(ItemTags.PIGLIN_LOVED))
             return operation.call(itemEntity);
 
-        var toSplit = Math.min(stack.getCount(), bestValue);
+        var toSplit = Math.min(stack.getCount(), totalValue);
 
         if (toSplit < 1)
             return operation.call(itemEntity);
@@ -73,11 +75,26 @@ public abstract class PiglinAiMixin {
             itemEntity.discard();
         else itemEntity.setItem(stack);
 
-        if (taken.getCount() > 1 && !bestStack.isEmpty()) {
-            var relic = (PiglinMaskItem) bestStack.getItem();
+        if (taken.getCount() > 1 && !eligibleStacks.isEmpty()) {
+            var remaining = taken.getCount();
 
-            relic.getRelicData(player, bestStack).getLevelingData().addExperience("barter", "pickup", taken.getCount() - 1);
-            relic.getRelicData(player, bestStack).getAbilitiesData().getAbilityData("barter").getStatisticData().getMetricData("currency").addValue(taken.getCount());
+            for (var maskStack : eligibleStacks) {
+                if (remaining <= 0)
+                    break;
+
+                var relic = (PiglinMaskItem) maskStack.getItem();
+                var ability = relic.getRelicData(player, maskStack).getAbilitiesData().getAbilityData("barter");
+                var contribution = Math.min((int) ability.getStatData("items_count").getValue(), remaining);
+
+                if (contribution <= 0)
+                    continue;
+
+                if (contribution > 1)
+                    relic.getRelicData(player, maskStack).getLevelingData().addExperience("barter", "pickup", contribution - 1);
+
+                ability.getStatisticData().getMetricData("currency").addValue(contribution);
+                remaining -= contribution;
+            }
         }
 
         return taken;

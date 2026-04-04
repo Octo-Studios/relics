@@ -24,6 +24,8 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -119,6 +121,15 @@ public class RollerSkateItem extends WearableRelicItem {
                 .build();
     }
 
+    private static ResourceLocation getAttributeId(ItemStack stack, net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, SlotContext slotContext) {
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
+                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
+                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.value()).getPath()
+                        + "_" + slotContext.identifier()
+                        + "_" + slotContext.index()
+                        + "_skating");
+    }
+
     public int getDuration(ItemStack stack) {
         return stack.getOrDefault(RelicsDataComponents.ROLLER_SKATE_DURATION, 0);
     }
@@ -142,6 +153,8 @@ public class RollerSkateItem extends WearableRelicItem {
 
         var level = entity.level();
         var random = level.getRandom();
+        var movementSpeedAttributeId = getAttributeId(stack, Attributes.MOVEMENT_SPEED, slotContext);
+        var stepHeightAttributeId = getAttributeId(stack, Attributes.STEP_HEIGHT, slotContext);
 
         var duration = this.getDuration(stack);
 
@@ -160,10 +173,15 @@ public class RollerSkateItem extends WearableRelicItem {
             this.addDuration(stack, -1);
 
         if (duration > 0) {
-            EntityUtils.resetAttribute(entity, stack, Attributes.MOVEMENT_SPEED, (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("speed").getValue() / this.getMaxDuration() * this.getDuration(stack)), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.resetAttribute(entity, Attributes.MOVEMENT_SPEED, (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("speed").getValue() / this.getMaxDuration() * this.getDuration(stack)), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, movementSpeedAttributeId);
 
             if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").isRankModifierUnlocked("step_height"))
-                EntityUtils.resetAttribute(entity, stack, Attributes.STEP_HEIGHT, (float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("step_height").getValue(), AttributeModifier.Operation.ADD_VALUE);
+                EntityUtils.resetAttribute(entity, Attributes.STEP_HEIGHT, (float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("step_height").getValue(), AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
+            else
+                EntityUtils.removeAttribute(entity, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
+        } else {
+            EntityUtils.removeAttribute(entity, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, movementSpeedAttributeId);
+            EntityUtils.removeAttribute(entity, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
         }
 
         if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").isRankModifierUnlocked("sparkling")) {
@@ -219,8 +237,8 @@ public class RollerSkateItem extends WearableRelicItem {
 
         LivingEntity entity = slotContext.entity();
 
-        EntityUtils.removeAttribute(entity, stack, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        EntityUtils.removeAttribute(entity, stack, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE);
+        EntityUtils.removeAttribute(entity, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, getAttributeId(stack, Attributes.MOVEMENT_SPEED, slotContext));
+        EntityUtils.removeAttribute(entity, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE, getAttributeId(stack, Attributes.STEP_HEIGHT, slotContext));
     }
 
     @EventBusSubscriber(modid = Relics.MODID)
@@ -232,17 +250,19 @@ public class RollerSkateItem extends WearableRelicItem {
             if (entity.isInLiquid() || entity.isFallFlying() || !entity.onGround())
                 return;
 
-            var stack = EntityUtils.findEquippedCurio(entity, RelicsItems.ROLLER_SKATE.get());
-
-            if (stack.isEmpty())
+            var stacks = EntityUtils.findEquippedCurios(entity, RelicsItems.ROLLER_SKATE.get());
+            if (stacks.isEmpty())
                 return;
-
-            var relic = (RollerSkateItem) stack.getItem();
 
             var base = 0.6F;
             var max = 1F;
             var diff = max - base;
-            var modifier = diff / relic.getMaxDuration() * relic.getDuration(stack);
+            var modifier = 0F;
+
+            for (var stack : stacks) {
+                var relic = (RollerSkateItem) stack.getItem();
+                modifier = Math.max(modifier, diff / relic.getMaxDuration() * relic.getDuration(stack));
+            }
 
             event.setFriction(base + modifier);
         }
@@ -252,9 +272,7 @@ public class RollerSkateItem extends WearableRelicItem {
             if (!(event.getEntity() instanceof LivingEntity entity) || entity.isInLiquid() || entity.isFallFlying() || !entity.onGround())
                 return;
 
-            var stack = EntityUtils.findEquippedCurio(entity, RelicsItems.ROLLER_SKATE.get());
-
-            if (stack.isEmpty())
+            if (EntityUtils.findEquippedCurios(entity, RelicsItems.ROLLER_SKATE.get()).isEmpty())
                 return;
 
             event.setSpeedFactor(1F);
@@ -263,9 +281,10 @@ public class RollerSkateItem extends WearableRelicItem {
         @SubscribeEvent
         public static void onLivingDamage(LivingDamageEvent.Pre event) {
             var entity = event.getEntity();
+            var original = event.getOriginalDamage();
+            double resistedTotal = 0D;
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.ROLLER_SKATE.get())) {
-                var original = event.getOriginalDamage();
                 var relic = (RollerSkateItem) stack.getItem();
 
                 var duration = relic.getDuration(stack);
@@ -275,12 +294,15 @@ public class RollerSkateItem extends WearableRelicItem {
 
                 var modifier = (float) (original * (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("resistance").getValue() * ((float) duration / relic.getMaxDuration())));
 
-                event.setNewDamage(original - modifier);
-
                 relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatisticData().getMetricData("damage_resisted").addValue(modifier);
 
                 relic.getRelicData(entity, stack).getLevelingData().addExperience("skating", "resisting_damage", modifier);
+
+                resistedTotal += modifier;
             }
+
+            if (resistedTotal > 0D)
+                event.setNewDamage((float) Math.max(0D, original - resistedTotal));
         }
     }
 }

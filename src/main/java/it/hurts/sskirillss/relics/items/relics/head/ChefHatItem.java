@@ -90,9 +90,11 @@ public class ChefHatItem extends WearableRelicItem {
                 .build();
     }
 
-    public static boolean canQuicklyEatMeatballs(LivingEntity entity) {
+    public static double getMeatballConsumptionSpeedMultiplier(LivingEntity entity) {
         if (entity == null)
-            return false;
+            return 1D;
+
+        var count = 0;
 
         for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CHEF_HAT.get())) {
             if (!(stack.getItem() instanceof ChefHatItem relic))
@@ -101,10 +103,10 @@ public class ChefHatItem extends WearableRelicItem {
             var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("satiety");
 
             if (abilityData.canPlayerUse(entity) && abilityData.isRankModifierUnlocked("quick_meal"))
-                return true;
+                count++;
         }
 
-        return false;
+        return count <= 0 ? 1D : 3D * count;
     }
 
     public static void onMeatballConsumed(LivingEntity entity, boolean cooked) {

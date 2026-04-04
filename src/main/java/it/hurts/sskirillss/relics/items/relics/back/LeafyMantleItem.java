@@ -69,7 +69,7 @@ public class LeafyMantleItem extends WearableRelicItem {
                                 .stat(AbilityStatTemplate.builder("cooldown")
                                         .thresholdValue(0D, Double.MAX_VALUE)
                                         .initialValue(15D, 10D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.01636D)
+                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.01429D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -280,7 +280,7 @@ public class LeafyMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
                 var relic = (LeafyMantleItem) stack.getItem();
 
-                if (!relic.isHiding(stack))
+                if (!relic.isHiding(stack) || relic.getCurrentProgress(stack) < relic.getMaxProgress())
                     continue;
 
                 if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) && relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").isRankModifierUnlocked("absorption"))
@@ -438,6 +438,17 @@ public class LeafyMantleItem extends WearableRelicItem {
 
         @SubscribeEvent
         public static void onLivingHurt(LivingIncomingDamageEvent event) {
+            if (event.getAmount() > 0) {
+                var entity = event.getEntity();
+
+                for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
+                    var relic = (LeafyMantleItem) stack.getItem();
+
+                    relic.setHiding(stack, false);
+                    relic.setCurrentProgress(stack, 0);
+                }
+            }
+
             CommonEvents.onInteract(event.getEntity());
         }
 

@@ -49,15 +49,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import top.theillusivec4.curios.api.SlotContext;
 
 public class MidnightMantleItem extends WearableRelicItem {
-    private static ResourceLocation getPhaseAttributeId(ItemStack stack, Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, SlotContext slotContext) {
-        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
-                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
-                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.value()).getPath()
-                        + "_" + slotContext.identifier()
-                        + "_" + slotContext.index()
-                        + "_phase");
-    }
-
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -304,6 +295,16 @@ public class MidnightMantleItem extends WearableRelicItem {
                 .build();
     }
 
+    private static ResourceLocation getPhaseAttributeId(ItemStack stack, Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, SlotContext slotContext) {
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
+                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
+                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.value()).getPath()
+                        + "_" + slotContext.identifier()
+                        + "_" + slotContext.index()
+                        + "_phase");
+    }
+
+
     public int getInvisibilityCooldown(ItemStack stack) {
         return stack.getOrDefault(RelicsDataComponents.MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN.get(), 0);
     }
@@ -517,7 +518,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                 if (!entity.level().isClientSide()) {
                     relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatisticData().getMetricData("additional_damage").addValue(damage);
 
-                    relic.getRelicData(entity, stack).getLevelingData().addExperience("phase", "damage_dealing", damage);
+                    relic.getRelicData(entity, stack).getLevelingData().addExperience("phase", "damage_dealing", 1 + entity.getRandom().nextInt((int) damage));
                 }
             }
         }
@@ -541,7 +542,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                 if (!entity.level().isClientSide()) {
                     relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatisticData().getMetricData("additional_damage").addValue(damage);
 
-                    relic.getRelicData(entity, stack).getLevelingData().addExperience("invisibility", "damage_dealing", damage);
+                    relic.getRelicData(entity, stack).getLevelingData().addExperience("invisibility", "damage_dealing", 1);
                 }
 
                 relic.setInvisibilityCooldown(stack, (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatData("cooldown").getValue());

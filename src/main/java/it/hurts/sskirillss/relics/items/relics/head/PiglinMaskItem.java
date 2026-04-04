@@ -310,22 +310,37 @@ public class PiglinMaskItem extends WearableRelicItem {
             if (!(event.getSource().getEntity() instanceof LivingEntity source))
                 return;
 
+            var originalDamage = event.getNewDamage();
+
+            if (originalDamage <= 0F)
+                return;
+
+            var uniqueStacks = new java.util.ArrayList<ItemStack>();
+
             for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.PIGLIN_MASK.get())) {
+                if (uniqueStacks.stream().noneMatch(existing -> existing == stack))
+                    uniqueStacks.add(stack);
+            }
+
+            var totalModifier = 0D;
+
+            for (var stack : uniqueStacks) {
                 var relic = (PiglinMaskItem) stack.getItem();
 
                 if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").isRankModifierUnlocked("frenzy"))
                     continue;
 
-                var damage = event.getNewDamage();
                 var stacks = relic.getStacks(stack);
                 var multiplier = stacks >= PiglinMaskItem.getMaxStacks() ? 3 : 1;
-
-                var modifier = damage * relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("attack_damage").getValue() * stacks * multiplier;
-
-                event.setNewDamage((float) (damage + modifier));
+                var modifier = originalDamage * relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("attack_damage").getValue() * stacks * multiplier;
 
                 relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatisticData().getMetricData("additional_damage").addValue(modifier);
+
+                totalModifier += modifier;
             }
+
+            if (totalModifier > 0D)
+                event.setNewDamage((float) (originalDamage + totalModifier));
         }
 
         @SubscribeEvent
@@ -336,9 +351,20 @@ public class PiglinMaskItem extends WearableRelicItem {
             var entity = event.getEntity();
 
             var level = source.level();
+            if (level.isClientSide())
+                return;
+
             var random = level.getRandom();
+            var stacks = new java.util.ArrayList<ItemStack>();
 
             for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.PIGLIN_MASK.get())) {
+                if (stacks.stream().noneMatch(existing -> existing == stack))
+                    stacks.add(stack);
+            }
+
+            var totalAmount = 0;
+
+            for (var stack : stacks) {
                 var relic = (PiglinMaskItem) stack.getItem();
 
                 if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").canPlayerUse(source))
@@ -347,18 +373,18 @@ public class PiglinMaskItem extends WearableRelicItem {
                 var amount = MathUtils.multicast(random, relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("chance").getValue(), (int) Math.ceil(entity.getMaxHealth() / relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("health").getValue()));
 
                 relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatisticData().getMetricData("teeth_dropped").addValue(amount);
+                relic.getRelicData(source, stack).getLevelingData().addExperience("looting", "drop", amount);
+                totalAmount += amount;
+            }
 
-                for (int i = 0; i < amount; i++) {
-                    var tooth = new GoldenToothEntity(RelicsEntities.GOLDEN_TOOTH.get(), level);
+            for (int i = 0; i < totalAmount; i++) {
+                var tooth = new GoldenToothEntity(RelicsEntities.GOLDEN_TOOTH.get(), level);
 
-                    tooth.setStacks(1);
-                    tooth.setPos(entity.getEyePosition());
-                    tooth.setDeltaMovement(MathUtils.randomFloat(random) * 0.35F, 0.25F + random.nextFloat() * 0.25F, MathUtils.randomFloat(random) * 0.35F);
+                tooth.setStacks(1);
+                tooth.setPos(entity.getEyePosition());
+                tooth.setDeltaMovement(MathUtils.randomFloat(random) * 0.35F, 0.25F + random.nextFloat() * 0.25F, MathUtils.randomFloat(random) * 0.35F);
 
-                    level.addFreshEntity(tooth);
-
-                    relic.getRelicData(source, stack).getLevelingData().addExperience("looting", "drop", 1);
-                }
+                level.addFreshEntity(tooth);
             }
         }
     }
