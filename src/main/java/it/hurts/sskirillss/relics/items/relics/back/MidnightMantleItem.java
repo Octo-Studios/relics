@@ -518,7 +518,8 @@ public class MidnightMantleItem extends WearableRelicItem {
                 if (!entity.level().isClientSide()) {
                     relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatisticData().getMetricData("additional_damage").addValue(damage);
 
-                    relic.getRelicData(entity, stack).getLevelingData().addExperience("phase", "damage_dealing", 1 + entity.getRandom().nextInt((int) damage));
+                    if (damage > 0)
+                        relic.getRelicData(entity, stack).getLevelingData().addExperience("phase", "damage_dealing", 1 + entity.getRandom().nextInt((int) damage));
                 }
             }
         }
