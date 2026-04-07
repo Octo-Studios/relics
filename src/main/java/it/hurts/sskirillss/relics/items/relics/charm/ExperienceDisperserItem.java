@@ -262,12 +262,8 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 return false;
 
             var data = relic.getRelicData(player, stack);
-            var leveling = data.getLevelingData();
-            var level = leveling.getLevel();
-            var experience = leveling.getExperience();
-            var maxForCurrentLevel = leveling.getTotalExperienceBetweenLevels(level, level + 1);
 
-            return !data.isMaxLevel() && experience + 1.0E-9D < maxForCurrentLevel;
+            return !data.isMaxLevel();
         }
 
         private static List<ItemStack> getEquippedRelics(Player player) {

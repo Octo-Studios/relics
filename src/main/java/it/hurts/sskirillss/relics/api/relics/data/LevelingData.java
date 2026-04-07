@@ -105,8 +105,15 @@ public class LevelingData {
             if (amount > 0) {
                 var requirement = getTotalExperienceBetweenLevels(level, level + 1) - xp;
 
-                if (amount >= requirement) {
+                if (requirement <= 1.0E-7D) {
+                    level++;
+
+                    xp = 0;
+                } else if (amount + 1.0E-7D >= requirement) {
                     amount -= requirement;
+
+                    if (amount < 0D)
+                        amount = 0D;
 
                     level++;
 
