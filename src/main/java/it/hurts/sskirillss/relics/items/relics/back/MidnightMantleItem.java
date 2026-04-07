@@ -22,7 +22,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -473,13 +472,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             var entity = event.getEntity();
             var level = entity.level();
 
-            var box = entity.getBoundingBox();
-
-            var min = BlockPos.containing(Math.floor(box.minX) - 1, Math.floor(box.minY), Math.floor(box.minZ) - 1);
-            var max = BlockPos.containing(Math.floor(box.maxX) + 1, Math.floor(entity.getEyeY()) + 1, Math.floor(box.maxZ) + 1);
-
-            // WHY!? (cuz of thread locks lol)
-            if (!level.hasChunksAt(min, max))
+            if (!level.isClientSide() && level.getServer() != null && !level.getServer().isSameThread())
                 return;
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
