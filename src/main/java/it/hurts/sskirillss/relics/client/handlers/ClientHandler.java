@@ -178,6 +178,8 @@ public class ClientHandler {
                 renderer.addLayer(new WingsLayer<>(renderer));
 
                 renderer.addLayer(new NecklaceLayer<>(renderer));
+                renderer.addLayer(new BraceletLayer<>(renderer));
+                renderer.addLayer(new HandsLayer<>(renderer));
                 renderer.addLayer(new BeltLayer<>(renderer));
                 renderer.addLayer(new BackLayer<>(renderer));
                 renderer.addLayer(new FeetLayer<>(renderer));
