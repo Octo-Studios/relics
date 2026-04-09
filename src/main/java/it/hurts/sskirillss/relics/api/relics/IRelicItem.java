@@ -39,18 +39,4 @@ public interface IRelicItem extends IRelicTemplateHolder {
     default RelicConfigData constructDefaultConfigData(@NotNull RelicConfigData config) {
         return config;
     }
-
-    // TODO: Probably remove?
-    @Nullable
-    @ApiStatus.Internal
-    default RelicAttributeModifier getRelicAttributeModifiers(LivingEntity entity, ItemStack stack) {
-        return RelicAttributeModifier.builder().build();
-    }
-
-    // TODO: Probably remove?
-    @Nullable
-    @ApiStatus.Internal
-    default RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
-        return RelicSlotModifier.builder().build();
-    }
 }

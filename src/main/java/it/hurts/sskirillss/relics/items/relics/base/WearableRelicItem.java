@@ -9,8 +9,10 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
@@ -20,13 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WearableRelicItem extends RelicItem implements ICurioItem {
+    public WearableRelicItem() {
+        super();
+    }
+
+    public WearableRelicItem(Item.Properties properties) {
+        super(properties);
+    }
+
     @Override
     @Deprecated(forRemoval = true)
     public Multimap<Holder<Attribute>, AttributeModifier> getAttributeModifiers(SlotContext slotContext, ResourceLocation id, ItemStack stack) {
         Multimap<Holder<Attribute>, AttributeModifier> modifiers = LinkedHashMultimap.create();
 
-        RelicAttributeModifier attributes = getRelicAttributeModifiers(slotContext.entity(), stack);
-        RelicSlotModifier slots = getSlotModifiers(slotContext.entity(), stack);
+        var attributes = this.getRelicAttributeModifiers(slotContext.entity(), stack);
+        var slots = this.getSlotModifiers(slotContext.entity(), stack);
 
         if (attributes != null)
             attributes.getAttributes().forEach(attribute ->
@@ -38,6 +48,14 @@ public class WearableRelicItem extends RelicItem implements ICurioItem {
             slots.getModifiers().forEach((slot, count) -> CuriosApi.addSlotModifier(modifiers, slot, id, count, AttributeModifier.Operation.ADD_VALUE));
 
         return modifiers;
+    }
+
+    public RelicAttributeModifier getRelicAttributeModifiers(LivingEntity entity, ItemStack stack) {
+        return RelicAttributeModifier.builder().build();
+    }
+
+    public RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
+        return RelicSlotModifier.builder().build();
     }
 
     @Override
