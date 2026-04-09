@@ -36,7 +36,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
-import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -363,7 +362,8 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                         "additionalentityattributes:generic.hitbox_height",
                         "additionalentityattributes:generic.model_scale",
                         "additionalentityattributes:generic.model_width",
-                        "additionalentityattributes:generic.model_height"
+                        "additionalentityattributes:generic.model_height",
+                        "ars_nouveau:ars_nouveau.perk.weight"
                 );
 
                 for (var instance : entity.getAttributes().attributes.values()) {
