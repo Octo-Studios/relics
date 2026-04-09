@@ -363,7 +363,8 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                         "additionalentityattributes:generic.model_scale",
                         "additionalentityattributes:generic.model_width",
                         "additionalentityattributes:generic.model_height",
-                        "ars_nouveau:ars_nouveau.perk.weight"
+                        "ars_nouveau:ars_nouveau.perk.weight",
+                        "ars_nouveau:ars_nouveau.perk.wixie"
                 );
 
                 for (var instance : entity.getAttributes().attributes.values()) {
