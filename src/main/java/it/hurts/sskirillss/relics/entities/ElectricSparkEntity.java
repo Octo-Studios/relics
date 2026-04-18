@@ -5,8 +5,6 @@ import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
-import it.hurts.sskirillss.relics.utils.FlawlessUtils;
-import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
@@ -21,7 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -163,9 +160,6 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
             return;
         }
 
-        if (level.isClientSide())
-            this.spawnChainParticles(level, currentTarget);
-
         if (this.getEyePosition().distanceTo(currentTarget.getEyePosition()) <= 1.5F) {
             currentTarget.invulnerableTime = 0;
 
@@ -193,23 +187,14 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
 
                 this.setTarget(null);
             }
-        } else
-            this.setDeltaMovement(currentTarget.getEyePosition().subtract(this.getEyePosition()).normalize().scale(1.75F));
+        } else {
+            var targetEye = currentTarget.getEyePosition();
+
+            this.setPos(targetEye.x, targetEye.y - this.getBbHeight() * 0.5F, targetEye.z);
+            this.setDeltaMovement(0D, 0D, 0D);
+        }
     }
 
-    private void spawnChainParticles(Level level, LivingEntity currentTarget) {
-        var start = this.position().add(0, this.getBbHeight() * 0.5F, 0);
-        var end = currentTarget.position().add(0, currentTarget.getBbHeight() * 0.5F, 0);
-
-        if (start.distanceToSqr(end) < 0.01D)
-            return;
-
-        var random = level.random;
-        var color = FlawlessUtils.getColor(this.isFlawless(), new Color(120 + random.nextInt(50), 190 + random.nextInt(50), 255));
-        var particle = ParticleUtils.constructSimpleSpark(color, 0.2F + random.nextFloat() * 0.1F, 3, 0.85F);
-
-        ParticleUtils.createLightning(level, start, end, 3, 3D, 0.25D, 14D, 0.005D, particle);
-    }
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(BOUNCES, 0);

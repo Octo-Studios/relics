@@ -49,9 +49,6 @@ import top.theillusivec4.curios.api.SlotContext;
 import java.awt.*;
 
 public class KineticBeltItem extends WearableRelicItem {
-    private static final double ELECTRICITY_MIN_DISTANCE_SQR = 1D;
-    private static final double ELECTRICITY_MAX_LINK_DISTANCE_SQR = 100D;
-
     private static ResourceLocation getGravityAttributeId(ItemStack stack, SlotContext slotContext) {
         return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
                 BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
@@ -195,17 +192,13 @@ public class KineticBeltItem extends WearableRelicItem {
         if (raw instanceof ChainedElectricityEntity electricity && electricity.isAlive())
             return electricity;
 
-        this.clearLastElectricityEntityId(stack);
+        this.setLastElectricityEntityId(stack, -1);
 
         return null;
     }
 
     private void setLastElectricityEntityId(ItemStack stack, int entityId) {
         stack.set(RelicsDataComponents.KINETIC_BELT_LAST_ELECTRICITY_ID, entityId);
-    }
-
-    private void clearLastElectricityEntityId(ItemStack stack) {
-        stack.set(RelicsDataComponents.KINETIC_BELT_LAST_ELECTRICITY_ID, -1);
     }
 
     @Override
@@ -227,7 +220,7 @@ public class KineticBeltItem extends WearableRelicItem {
             EntityUtils.removeAttribute(entity, Attributes.GRAVITY, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);
 
             if (!level.isClientSide())
-                this.clearLastElectricityEntityId(stack);
+                this.setLastElectricityEntityId(stack, -1);
 
             return;
         }
@@ -237,7 +230,7 @@ public class KineticBeltItem extends WearableRelicItem {
         var isLanded = this.isLanded(stack);
 
         if (!level.isClientSide() && !isActive)
-            this.clearLastElectricityEntityId(stack);
+            this.setLastElectricityEntityId(stack, -1);
 
         var onGround = entity.onGround();
 
@@ -288,7 +281,7 @@ public class KineticBeltItem extends WearableRelicItem {
 
                 NetworkHandler.sendToServer(new C2SChainedElectricityPacket(
                         entity.getX(),
-                        entity.getY(),
+                        entity.getY() + entity.getBbHeight() / 3F,
                         entity.getZ(),
                         (float) synergy.getStatData("damage").getValue(),
                         (int) synergy.getStatData("lifetime").getValue(),
