@@ -408,7 +408,7 @@
   "item.relics.clot_of_time": "Clot of Time",
   "relics.description.clot_of_time.description": "This clot resembles a frozen drop of cosmos, within whose depths fragments of past moments slowly rotate. It is said to appear in places where time once cracked. In the hands of the relic's bearer, the clot allows them to briefly turn time back, as if erasing their own mistakes along traces that have not yet had time to fade.",
   "relics.description.clot_of_time.ability.rewind": "Transgression",
-  "relics.description.clot_of_time.ability.rewind.description": "While holding RMB, smoothly returns the relic's bearer along the recently traveled path in time up to %1$s seconds назад. After the rewind ends, the ability goes on cooldown for the same amount of time the relic was used continuously without interruption.",
+  "relics.description.clot_of_time.ability.rewind.description": "While holding RMB, smoothly returns the relic's bearer along the recently traveled path in time up to %1$s seconds. After the rewind ends, the ability goes on cooldown for the same amount of time the relic was used continuously without interruption.",
   "relics.description.clot_of_time.ability.rewind.rank_modifier.invulnerability": "During the rewind, the relic's bearer does not take damage.",
   "relics.description.clot_of_time.ability.rewind.rank_modifier.health_rewind": "During the rewind, restores health to the value it had at the corresponding point along the path, but never reduces the current health.",
   "relics.description.clot_of_time.ability.rewind.rank_modifier.oblivion": "While the ability is active, all nearby entities lose sight of the relic's bearer.",
