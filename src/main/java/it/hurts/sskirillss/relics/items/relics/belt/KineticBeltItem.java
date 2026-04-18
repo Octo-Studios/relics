@@ -14,8 +14,11 @@ import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.AbilityConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.stats.SynergyStatTemplate;
-import it.hurts.sskirillss.relics.entities.KineticElectricityEntity;
-import it.hurts.sskirillss.relics.init.*;
+import it.hurts.sskirillss.relics.entities.ChainedElectricityEntity;
+import it.hurts.sskirillss.relics.init.RelicsDataComponents;
+import it.hurts.sskirillss.relics.init.RelicsItems;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
+import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -23,6 +26,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.item.jellyfish_necklace.C2SChainedElectricityPacket;
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -180,7 +184,7 @@ public class KineticBeltItem extends WearableRelicItem {
         return stack.getOrDefault(RelicsDataComponents.KINETIC_BELT_LANDED, false);
     }
 
-    private KineticElectricityEntity getLastElectricityEntity(LivingEntity owner, ItemStack stack) {
+    private ChainedElectricityEntity getLastElectricityEntity(LivingEntity owner, ItemStack stack) {
         var entityId = stack.getOrDefault(RelicsDataComponents.KINETIC_BELT_LAST_ELECTRICITY_ID, -1);
 
         if (entityId < 0)
@@ -188,7 +192,7 @@ public class KineticBeltItem extends WearableRelicItem {
 
         var raw = owner.level().getEntity(entityId);
 
-        if (raw instanceof KineticElectricityEntity electricity && electricity.isAlive())
+        if (raw instanceof ChainedElectricityEntity electricity && electricity.isAlive())
             return electricity;
 
         this.clearLastElectricityEntityId(stack);
@@ -278,26 +282,20 @@ public class KineticBeltItem extends WearableRelicItem {
                 this.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "gliding", 1);
             }
 
-            if (!level.isClientSide() && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").isUnlocked() && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getMode().equals("enabled")) {
-                var previous = this.getLastElectricityEntity(entity, stack);
-                var position = entity.position();
-                var distanceToPreviousSqr = previous == null ? 0D : previous.position().distanceToSqr(position);
+            if (level.isClientSide() && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").isUnlocked()
+                    && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getMode().equals("enabled")) {
+                var synergy = this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity");
 
-                if (previous == null || distanceToPreviousSqr >= ELECTRICITY_MIN_DISTANCE_SQR) {
-                    var electricity = new KineticElectricityEntity(RelicsEntities.KINETIC_ELECTRICITY.get(), level);
-
-                    electricity.setLifetime((int) this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getStatData("lifetime").getValue());
-                    electricity.setDamage((float) this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getStatData("damage").getValue());
-                    electricity.setFlawless(this.getRelicData(entity, stack).isFlawless());
-                    electricity.setPos(position);
-                    electricity.setOwner(entity);
-
-                    if (previous != null && distanceToPreviousSqr <= ELECTRICITY_MAX_LINK_DISTANCE_SQR)
-                        electricity.setPreviousEntity(previous);
-
-                    level.addFreshEntity(electricity);
-                    this.setLastElectricityEntityId(stack, electricity.getId());
-                }
+                NetworkHandler.sendToServer(new C2SChainedElectricityPacket(
+                        entity.getX(),
+                        entity.getY(),
+                        entity.getZ(),
+                        (float) synergy.getStatData("damage").getValue(),
+                        (int) synergy.getStatData("lifetime").getValue(),
+                        this.getRelicData(entity, stack).isFlawless(),
+                        slotContext.identifier(),
+                        slotContext.index()
+                ));
             }
 
             if (!hasAttribute)

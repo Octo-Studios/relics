@@ -104,8 +104,8 @@ public class RelicsEntities {
                     .build("self_sacrifice_projectile")
     );
 
-    public static final DeferredHolder<EntityType<?>, EntityType<KineticElectricityEntity>> KINETIC_ELECTRICITY = ENTITIES.register("kinetic_electricity", () ->
-            EntityType.Builder.<KineticElectricityEntity>of(KineticElectricityEntity::new, MobCategory.MISC)
+    public static final DeferredHolder<EntityType<?>, EntityType<ChainedElectricityEntity>> KINETIC_ELECTRICITY = ENTITIES.register("kinetic_electricity", () ->
+            EntityType.Builder.<ChainedElectricityEntity>of(ChainedElectricityEntity::new, MobCategory.MISC)
                     .sized(0.4F, 0.4F)
                     .build("kinetic_electricity")
     );

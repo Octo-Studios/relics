@@ -11,7 +11,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -22,11 +21,11 @@ import org.jetbrains.annotations.Nullable;
 import java.awt.*;
 import java.util.UUID;
 
-public class KineticElectricityEntity extends ThrowableProjectile {
-    private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(KineticElectricityEntity.class, EntityDataSerializers.FLOAT);
-    private static final EntityDataAccessor<Integer> LIFETIME = SynchedEntityData.defineId(KineticElectricityEntity.class, EntityDataSerializers.INT);
-    private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(KineticElectricityEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Integer> PREVIOUS_ENTITY_ID = SynchedEntityData.defineId(KineticElectricityEntity.class, EntityDataSerializers.INT);
+public class ChainedElectricityEntity extends ThrowableProjectile {
+    private static final EntityDataAccessor<Float> DAMAGE = SynchedEntityData.defineId(ChainedElectricityEntity.class, EntityDataSerializers.FLOAT);
+    private static final EntityDataAccessor<Integer> LIFETIME = SynchedEntityData.defineId(ChainedElectricityEntity.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Boolean> FLAWLESS = SynchedEntityData.defineId(ChainedElectricityEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Integer> PREVIOUS_ENTITY_ID = SynchedEntityData.defineId(ChainedElectricityEntity.class, EntityDataSerializers.INT);
 
     @Getter
     @Setter
@@ -34,7 +33,7 @@ public class KineticElectricityEntity extends ThrowableProjectile {
     @Nullable
     private UUID previousEntityUuid;
 
-    public KineticElectricityEntity(EntityType<? extends KineticElectricityEntity> type, Level level) {
+    public ChainedElectricityEntity(EntityType<? extends ChainedElectricityEntity> type, Level level) {
         super(type, level);
     }
 
@@ -76,7 +75,7 @@ public class KineticElectricityEntity extends ThrowableProjectile {
             this.previousEntityUuid = previous.getUUID();
     }
 
-    public void setPreviousEntity(KineticElectricityEntity previous) {
+    public void setPreviousEntity(ChainedElectricityEntity previous) {
         this.getEntityData().set(PREVIOUS_ENTITY_ID, previous.getId());
         this.previousEntityUuid = previous.getUUID();
     }
@@ -121,13 +120,13 @@ public class KineticElectricityEntity extends ThrowableProjectile {
     }
 
     @Nullable
-    private KineticElectricityEntity resolvePreviousEntity(Level level) {
+    private ChainedElectricityEntity resolvePreviousEntity(Level level) {
         var previousId = this.getPreviousEntityId();
 
         if (previousId >= 0) {
             var previousRawById = level.getEntity(previousId);
 
-            if (previousRawById instanceof KineticElectricityEntity previous && previous.isAlive()) {
+            if (previousRawById instanceof ChainedElectricityEntity previous && previous.isAlive()) {
                 if (!level.isClientSide())
                     this.previousEntityUuid = previous.getUUID();
 
@@ -140,7 +139,7 @@ public class KineticElectricityEntity extends ThrowableProjectile {
 
         var previousRawByUuid = serverLevel.getEntity(this.previousEntityUuid);
 
-        if (!(previousRawByUuid instanceof KineticElectricityEntity previous) || !previous.isAlive())
+        if (!(previousRawByUuid instanceof ChainedElectricityEntity previous) || !previous.isAlive())
             return null;
 
         this.getEntityData().set(PREVIOUS_ENTITY_ID, previous.getId());
