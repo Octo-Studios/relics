@@ -84,6 +84,11 @@ public class ChainedElectricityEntity extends ThrowableProjectile {
         return this.getEntityData().get(PREVIOUS_ENTITY_ID);
     }
 
+    @Nullable
+    public ChainedElectricityEntity getPreviousEntity() {
+        return this.resolvePreviousEntity(this.level());
+    }
+
     @Override
     public void tick() {
         super.tick();
@@ -91,12 +96,8 @@ public class ChainedElectricityEntity extends ThrowableProjectile {
         var level = this.getCommandSenderWorld();
         var segment = this.resolveChainSegment(level);
 
-        if (segment != null) {
-            if (level.isClientSide())
-                this.spawnChainParticles(level, segment.start(), segment.end());
-            else
-                this.hurtEntitiesOnChain(level, segment.start(), segment.end());
-        }
+        if (segment != null && !level.isClientSide())
+            this.hurtEntitiesOnChain(level, segment.start(), segment.end());
 
         if (this.tickCount > this.getLifetime() * 20)
             this.discard();
