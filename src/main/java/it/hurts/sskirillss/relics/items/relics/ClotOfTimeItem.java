@@ -116,7 +116,42 @@ public class ClotOfTimeItem extends RelicItem {
     }
 
     private void setCooldown(ItemStack stack, int cooldown) {
-        stack.set(RelicsDataComponents.CLOT_OF_TIME_COOLDOWN, Math.max(0, cooldown));
+        var clamped = Math.max(0, cooldown);
+
+        if (stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_COOLDOWN, 0) != clamped)
+            stack.set(RelicsDataComponents.CLOT_OF_TIME_COOLDOWN, clamped);
+    }
+
+    private static void setRewindCursor(ItemStack stack, double cursor) {
+        if (Double.compare(stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D), cursor) != 0)
+            stack.set(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, cursor);
+    }
+
+    private static void setPath(ItemStack stack, List<PathPointData> path) {
+        if (!stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<PathPointData>of()).equals(path))
+            stack.set(RelicsDataComponents.CLOT_OF_TIME_PATH, path);
+    }
+
+    private static boolean shouldAppendPoint(Player player, PathPointData lastPoint, String currentDimension) {
+        var lastDimension = lastPoint.dimension().isBlank() ? currentDimension : lastPoint.dimension();
+
+        return !lastDimension.equals(currentDimension)
+                || player.distanceToSqr(lastPoint.x(), lastPoint.y(), lastPoint.z()) > 1.0E-6D
+                || Math.abs(Mth.wrapDegrees(player.getYRot() - lastPoint.yRot())) > 0.1F
+                || Math.abs(player.getXRot() - lastPoint.xRot()) > 0.1F
+                || Math.abs(player.getHealth() - lastPoint.health()) > 1.0E-3F;
+    }
+
+    private static List<PathPointData> buildUpdatedPath(List<PathPointData> storedPath, int rememberedTicks, PathPointData newPoint) {
+        var keepFrom = Math.max(0, storedPath.size() - (rememberedTicks - 1));
+        var path = new ArrayList<PathPointData>(Math.min(rememberedTicks, storedPath.size() + 1));
+
+        for (int index = keepFrom; index < storedPath.size(); index++)
+            path.add(storedPath.get(index));
+
+        path.add(newPoint);
+
+        return path;
     }
 
     @Override
@@ -127,7 +162,7 @@ public class ClotOfTimeItem extends RelicItem {
             return InteractionResultHolder.pass(stack);
 
         if (!level.isClientSide()) {
-            stack.set(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
+            setRewindCursor(stack, -1D);
 
             this.setCooldown(stack, 0);
 
@@ -203,8 +238,8 @@ public class ClotOfTimeItem extends RelicItem {
                         serverPlayer.setDeltaMovement(Vec3.ZERO);
                         serverPlayer.fallDistance = 0F;
 
-                        stack.set(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
-                        stack.set(RelicsDataComponents.CLOT_OF_TIME_PATH, path);
+                        setRewindCursor(stack, -1D);
+                        setPath(stack, path);
 
                         player.stopUsingItem();
 
@@ -316,8 +351,8 @@ public class ClotOfTimeItem extends RelicItem {
             path.removeLast();
 
         if (cursor <= 0D) {
-            stack.set(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
-            stack.set(RelicsDataComponents.CLOT_OF_TIME_PATH, path);
+            setRewindCursor(stack, -1D);
+            setPath(stack, path);
 
             if (this.getCooldown(stack) <= 0)
                 this.setCooldown(stack, Math.max(1, player.getTicksUsingItem()));
@@ -327,8 +362,8 @@ public class ClotOfTimeItem extends RelicItem {
             return;
         }
 
-        stack.set(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, cursor);
-        stack.set(RelicsDataComponents.CLOT_OF_TIME_PATH, path);
+        setRewindCursor(stack, cursor);
+        setPath(stack, path);
     }
 
     @Override
@@ -377,8 +412,8 @@ public class ClotOfTimeItem extends RelicItem {
                 Codec.STRING.optionalFieldOf("dimension", "").forGetter(PathPointData::dimension)
         ).apply(instance, PathPointData::new));
 
-        public static PathPointData fromPlayer(Player player) {
-            return new PathPointData(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.getHealth(), player.level().dimension().location().toString());
+        public static PathPointData fromPlayer(Player player, String dimension) {
+            return new PathPointData(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.getHealth(), dimension);
         }
     }
 
@@ -415,9 +450,12 @@ public class ClotOfTimeItem extends RelicItem {
                 return;
 
             var usingSlot = -1;
+            var currentDimension = player.level().dimension().location().toString();
 
             if (player.isUsingItem() && player.getUseItem().getItem() instanceof ClotOfTimeItem)
                 usingSlot = player.getUsedItemHand() == InteractionHand.MAIN_HAND ? player.getInventory().selected : Inventory.SLOT_OFFHAND;
+
+            PathPointData pointToAppend = null;
 
             for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
                 var stack = player.getInventory().getItem(i);
@@ -428,15 +466,15 @@ public class ClotOfTimeItem extends RelicItem {
                 var rememberedTicks = relic.getRememberedTicks(player, stack);
 
                 if (rememberedTicks <= 0) {
-                    stack.set(RelicsDataComponents.CLOT_OF_TIME_PATH, List.of());
-                    stack.set(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
+                    setPath(stack, List.of());
+                    setRewindCursor(stack, -1D);
                     relic.setCooldown(stack, 0);
 
                     continue;
                 }
 
                 var cursor = stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
-                var path = new ArrayList<>(stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<PathPointData>of()));
+                var storedPath = stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<PathPointData>of());
                 var usingThisStack = i == usingSlot;
                 var justStoppedRewind = false;
 
@@ -455,11 +493,10 @@ public class ClotOfTimeItem extends RelicItem {
                     relic.setCooldown(stack, Math.max(relic.getCooldown(stack), Math.max(1, player.getTicksUsingItem())));
 
                 if (!usingThisStack && cursor >= 0D) {
-                    stack.set(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
+                    setRewindCursor(stack, -1D);
 
-                    if (!path.isEmpty()) {
-                        var lastPoint = path.getLast();
-                        var currentDimension = player.level().dimension().location().toString();
+                    if (!storedPath.isEmpty()) {
+                        var lastPoint = storedPath.getLast();
                         var lastDimension = lastPoint.dimension().isBlank() ? currentDimension : lastPoint.dimension();
 
                         if (!lastDimension.equals(currentDimension))
@@ -482,12 +519,13 @@ public class ClotOfTimeItem extends RelicItem {
                         relic.setCooldown(stack, cooldown - 1);
                 }
 
-                path.add(PathPointData.fromPlayer(player));
+                if (!storedPath.isEmpty() && !shouldAppendPoint(player, storedPath.getLast(), currentDimension))
+                    continue;
 
-                if (path.size() > rememberedTicks)
-                    path = new ArrayList<>(path.subList(path.size() - rememberedTicks, path.size()));
+                if (pointToAppend == null)
+                    pointToAppend = PathPointData.fromPlayer(player, currentDimension);
 
-                stack.set(RelicsDataComponents.CLOT_OF_TIME_PATH, path);
+                setPath(stack, buildUpdatedPath(storedPath, rememberedTicks, pointToAppend));
             }
         }
     }
