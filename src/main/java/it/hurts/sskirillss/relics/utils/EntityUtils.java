@@ -21,10 +21,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
-import top.theillusivec4.curios.api.SlotResult;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
@@ -199,29 +197,45 @@ public class EntityUtils {
         if (!(entity instanceof Player player))
             return ItemStack.EMPTY;
 
-        Optional<ImmutableTriple<String, Integer, ItemStack>> optional = CuriosApi.getCuriosHelper().findEquippedCurio(item, player);
+        return CuriosApi.getCuriosInventory(player)
+                .map(inventory -> {
+                    var equipped = inventory.getEquippedCurios();
 
-        if (optional.isEmpty())
-            return ItemStack.EMPTY;
+                    for (var i = 0; i < equipped.getSlots(); i++) {
+                        var stack = equipped.getStackInSlot(i);
 
-        return optional.get().getRight();
+                        if (!stack.isEmpty() && stack.getItem() == item)
+                            return stack;
+                    }
+
+                    return ItemStack.EMPTY;
+                })
+                .orElse(ItemStack.EMPTY);
     }
 
     public static List<ItemStack> findEquippedCurios(Entity entity, Item item) {
-        if (!(entity instanceof Player player))
-            return List.of();
-
-        return CuriosApi.getCuriosInventory(player)
-                .map(inventory -> inventory.findCurios(item).stream()
-                        .map(SlotResult::stack)
-                        .toList())
-                .orElse(List.of());
+        return EntityUtils.findEquippedCurios(entity, item, (stack) -> true);
     }
 
     public static List<ItemStack> findEquippedCurios(Entity entity, Item item, Predicate<ItemStack> predicate) {
-        return EntityUtils.findEquippedCurios(entity, item).stream()
-                .filter(predicate)
-                .toList();
+        if (!(entity instanceof LivingEntity livingEntity))
+            return List.of();
+
+        return CuriosApi.getCuriosInventory(livingEntity)
+                .map(inventory -> {
+                    var equipped = inventory.getEquippedCurios();
+                    List<ItemStack> result = new ArrayList<>();
+
+                    for (var i = 0; i < equipped.getSlots(); i++) {
+                        var stack = equipped.getStackInSlot(i);
+
+                        if (!stack.isEmpty() && stack.getItem() == item && predicate.test(stack))
+                            result.add(stack);
+                    }
+
+                    return result;
+                })
+                .orElse(List.of());
     }
 
     public static long getExperienceForLevel(int level) {
