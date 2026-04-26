@@ -48,6 +48,10 @@
   "relics.description.researching.tab.experience": "Experience Sources",
 
   "relics.description.researching.general.extra_info": "Hold [Shift] for detailed information",
+  "relics.description.researching.general.discord.title": "Official Discord",
+  "relics.description.researching.general.discord.description": "Click to join the Relics Discord server.",
+  "relics.description.researching.general.documentation.title": "Documentation",
+  "relics.description.researching.general.documentation.description": "Click to open documentation for this relic.",
 
   "relics.description.researching.relic.info.level": "Relic Level:",
   "relics.description.researching.relic.info.quality": "Relic Quality:",

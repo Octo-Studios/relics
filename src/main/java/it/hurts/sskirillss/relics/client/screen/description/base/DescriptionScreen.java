@@ -66,6 +66,8 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
         this.addRenderableWidget(new RankPlateWidget(this.x + 313, this.y + 102, this));
         this.addRenderableWidget(new LevelingPointsPlateWidget(this.x + 313, this.y + 127, this));
         this.addRenderableWidget(new PlayerExperiencePlateWidget(this.x + 313, this.y + 152, this));
+        this.addRenderableWidget(new DocumentationWidget(this.x + 316, this.y + 179, this));
+        this.addRenderableWidget(new DiscordWidget(this.x + 349, this.y + 179, this));
     }
 
     protected void initTopScroll() {

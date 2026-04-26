@@ -49,6 +49,11 @@
 
   "relics.description.researching.general.extra_info": "Удерживай [Шифт] для подробной информации",
 
+  "relics.description.researching.general.discord.title": "Официальный Discord",
+  "relics.description.researching.general.discord.description": "Нажми, чтобы присоединиться к Discord-серверу Relics.",
+  "relics.description.researching.general.documentation.title": "Документация",
+  "relics.description.researching.general.documentation.description": "Нажми, чтобы открыть документацию по этой реликвии.",
+
   "relics.description.researching.relic.info.level": "Уровень реликвии:",
   "relics.description.researching.relic.info.quality": "Качество реликвии:",
   "relics.description.researching.relic.info.extra_info": "Качество реликвии представляет собой среднее арифметическое качества всех разблокированных на данный момент способностей и измеряется в виде очков от 1 до 5 с шагом в 0.5. Является исключительно визуальной метрикой и показывает насколько стартовые случайные характеристики предмета близки к идеально возможным. Для повышения общего качества реликвии необходимо рассматривать каждую способность по отдельности.",
