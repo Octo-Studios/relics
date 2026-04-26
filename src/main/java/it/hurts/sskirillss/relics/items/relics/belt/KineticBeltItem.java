@@ -275,22 +275,6 @@ public class KineticBeltItem extends WearableRelicItem {
                 this.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "gliding", 1);
             }
 
-            if (level.isClientSide() && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").isUnlocked()
-                    && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getMode().equals("enabled")) {
-                var synergy = this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity");
-
-                NetworkHandler.sendToServer(new C2SChainedElectricityPacket(
-                        entity.getX(),
-                        entity.getY() + entity.getBbHeight() / 3F,
-                        entity.getZ(),
-                        (float) synergy.getStatData("damage").getValue(),
-                        (int) synergy.getStatData("lifetime").getValue(),
-                        this.getRelicData(entity, stack).isFlawless(),
-                        slotContext.identifier(),
-                        slotContext.index()
-                ));
-            }
-
             if (!hasAttribute)
                 EntityUtils.applyAttribute(entity, Attributes.GRAVITY, (float) -Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue(), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);
 
@@ -315,6 +299,23 @@ public class KineticBeltItem extends WearableRelicItem {
             var sideOffset = 0.4D;
             var backOffset = 0.2D;
             var speedBackOffset = backOffset + Math.min(horizontalDistance * 0.5D, 1.4D);
+            var electricitySpawnPosition = prevPosition.add(laggedMovementDelta).subtract(forward.scale(speedBackOffset));
+
+            if (level.isClientSide() && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").isUnlocked()
+                    && this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity").getMode().equals("enabled")) {
+                var synergy = this.getRelicData(entity, stack).getAbilitiesData().getSynergyData("electricity");
+
+                NetworkHandler.sendToServer(new C2SChainedElectricityPacket(
+                        electricitySpawnPosition.x,
+                        electricitySpawnPosition.y + entity.getBbHeight() / 2F - 0.15F,
+                        electricitySpawnPosition.z,
+                        (float) synergy.getStatData("damage").getValue(),
+                        (int) synergy.getStatData("lifetime").getValue(),
+                        this.getRelicData(entity, stack).isFlawless(),
+                        slotContext.identifier(),
+                        slotContext.index()
+                ));
+            }
 
             for (var i = 0; i <= spawnCount; i++) {
                 var t = spawnCount == 0 ? 0 : (double) i / spawnCount;
