@@ -225,7 +225,6 @@ public class KineticBeltItem extends WearableRelicItem {
             return;
         }
         var random = level.getRandom();
-
         var isActive = this.isActive(stack);
         var isLanded = this.isLanded(stack);
 
@@ -285,7 +284,6 @@ public class KineticBeltItem extends WearableRelicItem {
             var horizontalDistance = horizontalDelta.length();
             var trailLagFactor = Math.clamp(0.3D + horizontalDistance * 0.18D, 0.3D, 0.85D);
             var laggedMovementDelta = movementDelta.scale(1D - trailLagFactor);
-
             var distance = laggedMovementDelta.length();
             var spawnStep = 0.075D;
             int spawnCount = (int) (distance / spawnStep) + 1;
@@ -295,7 +293,6 @@ public class KineticBeltItem extends WearableRelicItem {
             var forward = horizontalDelta.lengthSqr() > 1.0E-6D ? horizontalDelta.normalize() : facingForward;
             var right = forward.cross(new Vec3(0, 1, 0)).normalize();
             var left = right.scale(-1);
-
             var sideOffset = 0.4D;
             var backOffset = 0.2D;
             var speedBackOffset = backOffset + Math.min(horizontalDistance * 0.5D, 1.4D);

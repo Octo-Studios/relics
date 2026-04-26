@@ -5,6 +5,8 @@ import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.FlawlessUtils;
+import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
@@ -24,6 +26,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.awt.Color;
 
 public class ElectricSparkEntity extends ThrowableProjectile implements ITargetableEntity {
     private static final EntityDataAccessor<Integer> BOUNCES = SynchedEntityData.defineId(ElectricSparkEntity.class, EntityDataSerializers.INT);
@@ -160,6 +163,9 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
             return;
         }
 
+        if (level.isClientSide())
+            this.spawnArcParticles(level, currentTarget);
+
         if (this.getEyePosition().distanceTo(currentTarget.getEyePosition()) <= 1.5F) {
             currentTarget.invulnerableTime = 0;
 
@@ -193,6 +199,16 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
             this.setPos(targetEye.x, targetEye.y - this.getBbHeight() * 0.5F, targetEye.z);
             this.setDeltaMovement(0D, 0D, 0D);
         }
+    }
+
+    private void spawnArcParticles(Level level, LivingEntity target) {
+        var random = level.random;
+        var start = this.position().add(0, this.getBbHeight() * 0.5F, 0);
+        var end = target.position().add(0, target.getBbHeight() * 0.5F, 0);
+        var color = FlawlessUtils.getColor(this.isFlawless(), new Color(120 + random.nextInt(50), 190 + random.nextInt(50), 255));
+        var particle = ParticleUtils.constructSimpleSpark(color, 0.18F + random.nextFloat() * 0.08F, 3, 0.85F);
+
+        ParticleUtils.createLightning(level, start, end, 2, 2.5D, 0.2D, 10D, 0.005D, particle);
     }
 
     @Override

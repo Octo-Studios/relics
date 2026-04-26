@@ -96,6 +96,9 @@ public class ChainedElectricityEntity extends ThrowableProjectile {
         var level = this.getCommandSenderWorld();
         var segment = this.resolveChainSegment(level);
 
+        if (segment != null && level.isClientSide())
+            this.spawnChainParticles(level, segment.start(), segment.end());
+
         if (segment != null && !level.isClientSide())
             this.hurtEntitiesOnChain(level, segment.start(), segment.end());
 
