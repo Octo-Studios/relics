@@ -283,7 +283,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
         if (RelicStackingUtils.isControllerStack(stack, activeRegenerationStacks)) {
             var multiplier = (float) RelicStackingUtils.sumValue(entity, stack, "regeneration", "max_health");
             var retentionUnlocked = activeRegenerationStacks.stream().anyMatch(
-                    equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").isRankModifierUnlocked("retention"));
+                    equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").getRankModifierData("retention").isUnlocked());
 
             if (entity.isInLiquid() || entity.isInRain()) {
                 var boostedMaxHealth = entity.getMaxHealth() * multiplier;
@@ -328,8 +328,8 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             var distance = RelicStackingUtils.bestValue(entity, stack, "shock", "distance", abilityData -> !abilityData.getMode().equals("disabled"));
             var bounces = (int) Math.round(RelicStackingUtils.bestValue(entity, stack, "shock", "bounces", abilityData -> !abilityData.getMode().equals("disabled")));
             var damage = RelicStackingUtils.bestValue(entity, stack, "shock", "damage", abilityData -> !abilityData.getMode().equals("disabled"));
-            var conductorUnlocked = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("conductor"));
-            var chargeUnlocked = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("charge"));
+            var conductorUnlocked = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getRankModifierData("conductor").isUnlocked());
+            var chargeUnlocked = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getRankModifierData("charge").isUnlocked());
             var damageModifier = conductorUnlocked ? RelicStackingUtils.maxValue(entity, stack, "shock", "damage_modifier", abilityData -> !abilityData.getMode().equals("disabled")) : 0D;
             var chargeDurationTicks = (int) Math.round(RelicStackingUtils.bestValue(entity, stack, "shock", "duration", abilityData -> !abilityData.getMode().equals("disabled")) * 20D);
             var flawless = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).isFlawless());
@@ -458,7 +458,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                 .mapToDouble(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").getStatData("max_health").getValue())
                 .sum();
         var retentionUnlocked = activeRegenerationStacks.stream()
-                .anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").isRankModifierUnlocked("retention"));
+                .anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").getRankModifierData("retention").isUnlocked());
 
         if (inWaterOrRain) {
             EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH, remainingMultiplier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, REGEN_MAX_HEALTH_ATTRIBUTE);
@@ -539,7 +539,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             var stack = stacks.getFirst();
             var relic = (JellyfishNecklaceItem) stack.getItem();
             var chargeUnlocked = stacks.stream().anyMatch(
-                    equippedStack -> relic.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").isRankModifierUnlocked("charge"));
+                    equippedStack -> relic.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getRankModifierData("charge").isUnlocked());
 
             if (!chargeUnlocked)
                 return;

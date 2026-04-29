@@ -103,7 +103,7 @@ public class BlockMixin {
 
                                 NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(livingEntity.getId(), motion.multiply(1F, -1F, 1F).toVector3f()), livingEntity);
                             } else {
-                                if (relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").isRankModifierUnlocked("shockwave")) {
+                                if (relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("shockwave").isUnlocked()) {
                                     var delayTicks = waveIndex * 20;
 
                                     var center = livingEntity.blockPosition();

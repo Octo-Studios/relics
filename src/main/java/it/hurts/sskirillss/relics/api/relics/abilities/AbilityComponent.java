@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.api.relics.abilities;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.api.relics.LockComponent;
+import it.hurts.sskirillss.relics.api.relics.RankModifierComponent;
 import it.hurts.sskirillss.relics.api.relics.ResearchComponent;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
@@ -25,9 +26,11 @@ public class AbilityComponent {
     private final LockComponent lock;
     private final AbilityStatisticComponent statistic;
     private final String mode;
+    @Singular
+    private final Map<String, RankModifierComponent> rankModifiers;
     private final int points;
 
-    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), ResearchComponent.EMPTY, LockComponent.EMPTY, AbilityStatisticComponent.EMPTY, "", 0);
+    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), ResearchComponent.EMPTY, LockComponent.EMPTY, AbilityStatisticComponent.EMPTY, "", Map.of(), 0);
 
     public static final Codec<AbilityComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -36,6 +39,7 @@ public class AbilityComponent {
                     LockComponent.CODEC.fieldOf("lock").forGetter(AbilityComponent::getLock),
                     AbilityStatisticComponent.CODEC.optionalFieldOf("statistic", AbilityStatisticComponent.EMPTY).forGetter(AbilityComponent::getStatistic),
                     Codec.STRING.optionalFieldOf("mode", "").forGetter(AbilityComponent::getMode),
+                    Codec.unboundedMap(Codec.STRING, RankModifierComponent.CODEC).optionalFieldOf("rank_modifiers", Map.of()).forGetter(AbilityComponent::getRankModifiers),
                     Codec.INT.fieldOf("points").forGetter(AbilityComponent::getPoints)
             ).apply(instance, AbilityComponent::new)
     );

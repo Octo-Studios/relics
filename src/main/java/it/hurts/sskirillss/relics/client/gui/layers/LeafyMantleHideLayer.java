@@ -34,7 +34,7 @@ public class LeafyMantleHideLayer implements LayeredDraw.Layer {
 
         var stack = EntityUtils.findEquippedCurio(player, RelicsItems.LEAFY_MANTLE.get());
 
-        if (!(stack.getItem() instanceof LeafyMantleItem relic) || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("camouflage").isRankModifierUnlocked("disappearance"))
+        if (!(stack.getItem() instanceof LeafyMantleItem relic) || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("disappearance").isUnlocked())
             return;
 
         var progress = relic.getCurrentProgress(stack);

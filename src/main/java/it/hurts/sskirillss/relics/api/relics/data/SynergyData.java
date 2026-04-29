@@ -39,7 +39,6 @@ public class SynergyData {
     public SynergyStatData getStatData(String stat) {
         return new SynergyStatData(this, stat);
     }
-
     public double getProgress() {
         var template = getTemplate();
 
@@ -157,6 +156,10 @@ public class SynergyData {
         setComponent(getComponent().toBuilder()
                 .mode(mode)
                 .build());
+    }
+
+    public SynergyRankModifierData getRankModifierData(String rankModifier) {
+        return new SynergyRankModifierData(this, rankModifier);
     }
 
     public boolean isEnabled() {

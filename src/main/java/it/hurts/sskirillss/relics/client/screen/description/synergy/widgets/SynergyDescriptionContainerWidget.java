@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.screen.description.synergy.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RankModifierToggleWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.misc.TextJustificator;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
@@ -22,6 +23,7 @@ import java.util.stream.IntStream;
 
 public class SynergyDescriptionContainerWidget extends DescriptionContainerWidget {
     private static final int VERTICAL_PADDING = 1;
+    private static final String RANK_MODIFIER_CONDITION_INDENT = "    ";
 
     public SynergyDescriptionContainerWidget(DescriptionScreen screen) {
         super(screen);
@@ -49,6 +51,8 @@ public class SynergyDescriptionContainerWidget extends DescriptionContainerWidge
 
         var scroll = this.getScrollbar();
 
+        var shiftY = 0D;
+
         if (scroll != null) {
             var lineStep = this.minecraft.font.lineHeight + 1;
             var totalLines = layout.size();
@@ -56,7 +60,7 @@ public class SynergyDescriptionContainerWidget extends DescriptionContainerWidge
 
             var maxScrollPx = overflowLines * lineStep + VERTICAL_PADDING * 3;
             var offset = scroll.getScrollPosition(RenderUtils.getPartialTick(false));
-            var shiftY = offset * maxScrollPx;
+            shiftY = offset * maxScrollPx;
 
             poseStack.translate(0, -shiftY, 0);
         }
@@ -109,14 +113,20 @@ public class SynergyDescriptionContainerWidget extends DescriptionContainerWidge
         rawLines.add(new TextJustificator.LineEntry(descriptionComponent, true));
 
         for (var entry : template.getRankModifiers().entries()) {
+            var unlocked = relic.getRelicData(player, stack).getLevelingData().getRank() >= entry.getKey();
+            var condition = Component.literal(unlocked ? RANK_MODIFIER_CONDITION_INDENT : "")
+                    .append(Component.translatable("relics.description.ability.rank_modifier.condition.rank", entry.getKey()))
+                    .withStyle(ChatFormatting.BOLD);
+
             rawLines.add(new TextJustificator.LineEntry(Component.literal(""), false));
-            rawLines.add(new TextJustificator.LineEntry(Component.translatable("relics.description.ability.rank_modifier.condition.rank", entry.getKey())
-                    .withStyle(ChatFormatting.BOLD), false));
+            rawLines.add(new TextJustificator.LineEntry(condition, false));
 
             var description = Component.literal("● ").append(Component.translatable("relics.description." + itemId + ".ability." + ability + ".rank_modifier." + entry.getValue(), (Object[]) tokens));
 
-            if (relic.getRelicData(player, stack).getLevelingData().getRank() < entry.getKey())
+            if (!unlocked)
                 description = ScreenUtils.randomizeAllCharacters(description, this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
+            else if (!synergyData.getRankModifierData(entry.getValue()).isEnabled())
+                description = description.withStyle(ChatFormatting.STRIKETHROUGH);
 
             rawLines.add(new TextJustificator.LineEntry(description, true));
         }
@@ -136,5 +146,40 @@ public class SynergyDescriptionContainerWidget extends DescriptionContainerWidge
         var step = minecraft.font.lineHeight + 1;
 
         return (lines.size() * step / 2 + VERTICAL_PADDING * 6);
+    }
+
+    public List<RankModifierToggleWidget.Entry> getRankModifierToggleEntries() {
+        var player = minecraft.player;
+        var screen = (SynergyDescriptionScreen) getScreen();
+        var stack = screen.getStack();
+        var synergy = screen.getSelectedSynergy();
+
+        if (player == null || stack == null || !(stack.getItem() instanceof IRelicItem relic))
+            return List.of();
+
+        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(synergy);
+        var template = synergyData.getTemplate();
+
+        if (template == null)
+            return List.of();
+
+        var data = this.constructDescriptionData();
+        var rankModifiers = template.getRankModifiers().entries().stream().toList();
+        var result = new ArrayList<RankModifierToggleWidget.Entry>();
+        var rank = synergyData.getAbilitiesData().getRelicData().getLevelingData().getRank();
+        var lineIndex = TextJustificator.layoutJustifiedLines(this.minecraft.font, List.of(data.rawLines().getFirst()), data.dynamicComponents(), 320).size();
+        var rawLineIndex = 1;
+
+        for (var modifier : rankModifiers) {
+            lineIndex += TextJustificator.layoutJustifiedLines(this.minecraft.font, List.of(data.rawLines().get(rawLineIndex++)), data.dynamicComponents(), 320).size();
+
+            if (rank >= modifier.getKey())
+                result.add(new RankModifierToggleWidget.Entry(modifier.getValue(), lineIndex));
+
+            lineIndex += TextJustificator.layoutJustifiedLines(this.minecraft.font, List.of(data.rawLines().get(rawLineIndex++)), data.dynamicComponents(), 320).size();
+            lineIndex += TextJustificator.layoutJustifiedLines(this.minecraft.font, List.of(data.rawLines().get(rawLineIndex++)), data.dynamicComponents(), 320).size();
+        }
+
+        return result;
     }
 }

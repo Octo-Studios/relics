@@ -199,7 +199,7 @@ public class RiderFluteItem extends RelicItem {
 
         var ability = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("stable");
 
-        if (!ability.canPlayerUse(entity) || !ability.isRankModifierUnlocked("regeneration"))
+        if (!ability.canPlayerUse(entity) || !ability.getRankModifierData("regeneration").isUnlocked())
             return;
 
         var amount = (float) ability.getStatData("heal").getValue();
@@ -236,7 +236,7 @@ public class RiderFluteItem extends RelicItem {
         if (changed)
             this.setHorseSlots(stack, slots);
 
-        if (healedTotal > 0D && ability.canPlayerUse(entity) && ability.isRankModifierUnlocked("regeneration")) {
+        if (healedTotal > 0D && ability.canPlayerUse(entity) && ability.getRankModifierData("regeneration").isUnlocked()) {
             this.getRelicData(entity, stack).getLevelingData().addExperience("stable", "healing", healedTotal);
             ability.getStatisticData().getMetricData("healed_health").addValue(healedTotal);
         }
@@ -253,7 +253,7 @@ public class RiderFluteItem extends RelicItem {
 
         var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
 
-        if (!ability.canPlayerUse(player) || !ability.isRankModifierUnlocked("recall"))
+        if (!ability.canPlayerUse(player) || !ability.getRankModifierData("recall").isUnlocked())
             return;
 
         var slots = this.getHorseSlots(stack);
@@ -292,7 +292,7 @@ public class RiderFluteItem extends RelicItem {
         if (changed)
             this.setHorseSlots(stack, slots);
 
-        if (recalled > 0D && ability.canPlayerUse(player) && ability.isRankModifierUnlocked("recall")) {
+        if (recalled > 0D && ability.canPlayerUse(player) && ability.getRankModifierData("recall").isUnlocked()) {
             this.getRelicData(player, stack).getLevelingData().addExperience("stable", "recall", recalled);
             ability.getStatisticData().getMetricData("captured_mounts").addValue(recalled);
         }
@@ -587,7 +587,7 @@ public class RiderFluteItem extends RelicItem {
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
         var entries = new ArrayList<RiderFluteTooltipEntry>();
         var ability = this.getRelicData(null, stack).getAbilitiesData().getAbilityData("stable");
-        var regenerationActive = ability.canPlayerUse(null) && ability.isRankModifierUnlocked("regeneration");
+        var regenerationActive = ability.canPlayerUse(null) && ability.getRankModifierData("regeneration").isUnlocked();
 
         for (var slot : this.getHorseSlots(stack)) {
             var id = ResourceLocation.tryParse(slot.entityType());
@@ -795,7 +795,7 @@ public class RiderFluteItem extends RelicItem {
 
                 var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
 
-                if (!ability.canPlayerUse(player) || !ability.isRankModifierUnlocked("resistance"))
+                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("resistance").isUnlocked())
                     continue;
 
                 total += ability.getStatData("resistance").getValue();
@@ -847,7 +847,7 @@ public class RiderFluteItem extends RelicItem {
 
                 var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
 
-                if (!ability.canPlayerUse(player) || !ability.isRankModifierUnlocked("resistance"))
+                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("resistance").isUnlocked())
                     continue;
 
                 relic.getRelicData(player, stack).getLevelingData().addExperience("stable", "resistance", blocked);

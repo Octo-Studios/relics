@@ -12,8 +12,10 @@ import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RankModifierToggleWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.AbilityDescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -138,6 +140,10 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         this.addRenderableWidget(container);
         this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
+
+        if (container instanceof AbilityDescriptionContainerWidget abilityContainer)
+            for (var entry : abilityContainer.getRankModifierToggleEntries())
+                this.addRenderableWidget(new RankModifierToggleWidget(abilityContainer, entry.rankModifier(), entry.lineIndex(), false));
 
         this.initModeButtons();
     }

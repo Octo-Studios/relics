@@ -120,7 +120,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 if (!ability.canPlayerUse(player))
                     continue;
 
-                if (sourceAtMaxLevel && !ability.isRankModifierUnlocked("max_level"))
+                if (sourceAtMaxLevel && !ability.getRankModifierData("max_level").isUnlocked())
                     continue;
 
                 var ratio = ability.getStatData("distribution_ratio").getValue();
@@ -154,7 +154,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 for (var relicStack : targets) {
                     var transfer = event.getDelta() * ratio;
 
-                    if (ability.isRankModifierUnlocked("same_item") && relicStack.getItem() == event.getStack().getItem())
+                    if (ability.getRankModifierData("same_item").isUnlocked() && relicStack.getItem() == event.getStack().getItem())
                         transfer *= 1D + sameItemBonus;
 
                     if (transfer <= 0D || !(relicStack.getItem() instanceof IRelicItem relic))
@@ -201,7 +201,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 var disperser = (ExperienceDisperserItem) disperserStack.getItem();
                 var ability = disperser.getRelicData(player, disperserStack).getAbilitiesData().getAbilityData("dispersion");
 
-                if (!ability.canPlayerUse(player) || !ability.isRankModifierUnlocked("player_xp"))
+                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("player_xp").isUnlocked())
                     continue;
 
                 var ratio = ability.getStatData("player_xp_ratio").getValue();

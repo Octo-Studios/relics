@@ -12,6 +12,7 @@ import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.*;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RankModifierToggleWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.synergy.widgets.*;
@@ -129,6 +130,10 @@ public class SynergyDescriptionScreen extends DescriptionScreen implements ITabb
 
         this.addRenderableWidget(container);
         this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
+
+        if (container instanceof SynergyDescriptionContainerWidget synergyContainer)
+            for (var entry : synergyContainer.getRankModifierToggleEntries())
+                this.addRenderableWidget(new RankModifierToggleWidget(synergyContainer, entry.rankModifier(), entry.lineIndex(), true));
 
         this.initModeButtons();
     }

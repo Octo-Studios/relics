@@ -102,7 +102,7 @@ public class ChefHatItem extends WearableRelicItem {
 
             var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("satiety");
 
-            if (abilityData.canPlayerUse(entity) && abilityData.isRankModifierUnlocked("quick_meal"))
+            if (abilityData.canPlayerUse(entity) && abilityData.getRankModifierData("quick_meal").isUnlocked())
                 count++;
         }
 
@@ -130,7 +130,7 @@ public class ChefHatItem extends WearableRelicItem {
             relic.getRelicData(entity, stack).getLevelingData().addExperience("satiety", "consume", 1);
             abilityData.getStatisticData().getMetricData(consumedMetric).addValue(1);
 
-            if (!abilityData.isRankModifierUnlocked("meatball_healing"))
+            if (!abilityData.getRankModifierData("meatball_healing").isUnlocked())
                 continue;
 
             var healing = abilityData.getStatData("healing").getValue();
@@ -200,7 +200,7 @@ public class ChefHatItem extends WearableRelicItem {
                 if (random.nextDouble() > chance)
                     continue;
 
-                var cookedDrop = abilityData.isRankModifierUnlocked("cooked_meatball") || cookedByFire;
+                var cookedDrop = abilityData.getRankModifierData("cooked_meatball").isUnlocked() || cookedByFire;
                 var item = cookedDrop
                         ? RelicsItems.COOKED_MEATBALL.get()
                         : RelicsItems.RAW_MEATBALL.get();

@@ -44,7 +44,7 @@ public abstract class PiglinAiMixin {
             var relic = (PiglinMaskItem) stack.getItem();
             var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter");
 
-            if (!ability.canPlayerUse(player) || !ability.isRankModifierUnlocked("pocket"))
+            if (!ability.canPlayerUse(player) || !ability.getRankModifierData("pocket").isUnlocked())
                 continue;
 
             var value = (int) ability.getStatData("items_count").getValue();

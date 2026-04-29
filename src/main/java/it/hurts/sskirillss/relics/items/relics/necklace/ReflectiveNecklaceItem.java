@@ -133,9 +133,9 @@ public class ReflectiveNecklaceItem extends WearableRelicItem {
 
                     var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
 
-                    orb.setPiercings(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").isRankModifierUnlocked("piercing") ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("piercings").getValue() : 0);
-                    orb.setBounces(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").isRankModifierUnlocked("bounce") ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("bounces").getValue() : 0);
-                    orb.setStun(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").isRankModifierUnlocked("stun") ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("stun").getValue() : 0);
+                    orb.setPiercings(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getRankModifierData("piercing").isUnlocked() ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("piercings").getValue() : 0);
+                    orb.setBounces(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getRankModifierData("bounce").isUnlocked() ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("bounces").getValue() : 0);
+                    orb.setStun(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getRankModifierData("stun").isUnlocked() ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("stun").getValue() : 0);
                     orb.setLifetime((int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("lifetime").getValue() * 20));
                     orb.setFlawless(relic.getRelicData(entity, stack).isFlawless());
                     orb.setPos(entity.getEyePosition());

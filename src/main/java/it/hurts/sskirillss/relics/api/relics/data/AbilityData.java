@@ -1,7 +1,5 @@
 package it.hurts.sskirillss.relics.api.relics.data;
 
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimaps;
 import it.hurts.sskirillss.relics.api.relics.LockComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
@@ -12,7 +10,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,6 +84,10 @@ public class AbilityData {
         return new LockData(this);
     }
 
+    public AbilityRankModifierData getRankModifierData(String rankModifier) {
+        return new AbilityRankModifierData(this, rankModifier);
+    }
+
     public int getLevel() {
         return getComponent().getPoints();
     }
@@ -116,17 +117,6 @@ public class AbilityData {
         setComponent(getComponent().toBuilder()
                 .mode(mode)
                 .build());
-    }
-
-    public boolean isRankModifierUnlocked(String rankModifier) {
-        var template = getTemplate();
-
-        if (template == null)
-            return false;
-
-        var modifiers = Multimaps.invertFrom(template.getRankModifiers(), HashMultimap.create());
-
-        return this.getAbilitiesData().getRelicData().getLevelingData().getRank() >= Collections.max(modifiers.get(rankModifier));
     }
 
     public void randomizeStats() {

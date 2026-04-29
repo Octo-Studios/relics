@@ -29,6 +29,11 @@ public abstract class DescriptionContainerWidget extends AbstractDescriptionWidg
     }
 
     @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return false;
+    }
+
+    @Override
     public void playDownSound(SoundManager handler) {
 
     }

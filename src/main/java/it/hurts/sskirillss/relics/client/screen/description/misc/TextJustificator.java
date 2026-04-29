@@ -165,13 +165,6 @@ public class TextJustificator {
                 continue;
             }
 
-            if (tok.isSpace && line.isEmpty()) {
-                tok = new Token(" ", tok.style, true);
-                tokW = splitter.stringWidth(tok.asFT());
-
-                tokens.set(i, tok);
-            }
-
             line.add(tok);
             lineWidth += tokW;
 
@@ -352,14 +345,6 @@ public class TextJustificator {
                     continue;
                 }
 
-                if (w.isSpace() && current.isEmpty()) {
-                    w = new Word(Component.literal(" ").withStyle(w.component.getStyle()), false);
-
-                    wWidth = spaceWidth;
-
-                    words.set(i, w);
-                }
-
                 current.add(w);
 
                 used += wWidth;
@@ -404,7 +389,7 @@ public class TextJustificator {
 
             for (var w : words) {
                 if (w.isSpace()) {
-                    totalW += spaceWidth;
+                    totalW += (int) Math.ceil(splitter.stringWidth(w.component));
 
                     spaceSlots++;
                 } else {
@@ -419,7 +404,7 @@ public class TextJustificator {
             if (!justify || spaceSlots == 0 || totalW >= maximumLineWidth) {
                 for (var w : words) {
                     if (w.isSpace()) {
-                        x += spaceWidth;
+                        x += (int) Math.ceil(splitter.stringWidth(w.component));
 
                         continue;
                     }
@@ -459,7 +444,7 @@ public class TextJustificator {
 
                         seen++;
 
-                        x += spaceWidth + add * spaceWidth;
+                        x += (int) Math.ceil(splitter.stringWidth(w.component)) + add * spaceWidth;
 
                         continue;
                     }

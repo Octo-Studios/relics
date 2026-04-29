@@ -456,7 +456,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
 //
 //            entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.low_level", Component.literal(String.valueOf(requiredLevel)).withStyle(ChatFormatting.BOLD))));
 //        } else {
-//            if (!synergyData.getLockData().isUnlocked()) {
+//            if (!synergyData.getLockData()) {
 //                entries.add(Component.literal(" "));
 //
 //                entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.ready_to_unlock", Component.literal(String.valueOf(synergyData.getLockData().getMaxUnlocks() - synergyData.getLockData().getUnlocks())).withStyle(ChatFormatting.BOLD))));
