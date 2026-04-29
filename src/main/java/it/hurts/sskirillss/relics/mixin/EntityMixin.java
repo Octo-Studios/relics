@@ -5,95 +5,83 @@ import it.hurts.sskirillss.relics.api.events.utility.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.misc.mixin.FluidWalkGraceAccessor;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.BooleanOp;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.common.NeoForge;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.ModifyVariable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Mixin(Entity.class)
 public class EntityMixin implements FluidWalkGraceAccessor {
     @Unique
     private int relics$fluidWalkGraceTicks;
 
+    @Redirect(method = "collectColliders", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/Level;getBlockCollisions(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/phys/AABB;)Ljava/lang/Iterable;"))
+    private static Iterable<VoxelShape> relics$getBlockCollisions(Level level, Entity entity, AABB box) {
+        var collisions = new ArrayList<VoxelShape>();
+
+        for (var shape : level.getBlockCollisions(entity, box))
+            collisions.add(shape);
+
+        if (!(entity instanceof LivingEntity livingEntity))
+            return collisions;
+
+        collisions.addAll(relics$getFluidCollisions(level, livingEntity, box));
+
+        return collisions;
+    }
+
     @Unique
-    private static final int[][] FLUID_OFFSETS = {
-            {1, 0, 1}, {1, 0, 0}, {1, -1, 0}, {1, 0, -1},
-            {0, 0, 1}, {0, 0, 0}, {0, -1, 0}, {0, 0, -1},
-            {-1, 0, 1}, {-1, 0, 0}, {-1, -1, 0}, {-1, 0, -1}
-    };
+    private static List<VoxelShape> relics$getFluidCollisions(Level level, LivingEntity entity, AABB box) {
+        var result = new ArrayList<VoxelShape>();
 
-    @ModifyVariable(method = "move", ordinal = 1, index = 3, name = "vec32", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))
-    public Vec3 fluidCollision(Vec3 original) {
-        if (!((Entity) (Object) this instanceof LivingEntity entity) || original.y > 0)
-            return original;
+        var minX = Mth.floor(box.minX);
+        var maxX = Mth.floor(box.maxX - 1.0E-7D);
+        var minY = Mth.floor(box.minY);
+        var maxY = Mth.floor(box.maxY - 1.0E-7D);
+        var minZ = Mth.floor(box.minZ);
+        var maxZ = Mth.floor(box.maxZ - 1.0E-7D);
 
-        var level = entity.getCommandSenderWorld();
-        var sourcePos = entity.blockPosition();
         var mutablePos = new BlockPos.MutableBlockPos();
-        var entityShape = Shapes.create(entity.getBoundingBox().inflate(0.5));
 
-        var highestY = original.y;
+        for (var x = minX; x <= maxX; x++) {
+            for (var y = minY; y <= maxY; y++) {
+                for (var z = minZ; z <= maxZ; z++) {
+                    mutablePos.set(x, y, z);
 
-        FluidState highestFluid = null;
+                    var fluidState = level.getFluidState(mutablePos);
 
-        for (var offset : FLUID_OFFSETS) {
-            mutablePos.set(
-                    sourcePos.getX() + offset[0],
-                    sourcePos.getY() + offset[1],
-                    sourcePos.getZ() + offset[2]
-            );
+                    if (fluidState.isEmpty())
+                        continue;
 
-            var fluidState = level.getFluidState(mutablePos);
+                    var event = new FluidCollisionEvent(entity, fluidState);
 
-            if (fluidState.isEmpty())
-                continue;
+                    NeoForge.EVENT_BUS.post(event);
 
-            var shape = Shapes.block().move(
-                    mutablePos.getX(),
-                    mutablePos.getY() + fluidState.getOwnHeight(),
-                    mutablePos.getZ()
-            );
+                    if (!event.isCanceled())
+                        continue;
 
-            if (!Shapes.joinIsNotEmpty(shape, entityShape, BooleanOp.AND))
-                continue;
-
-            var height = shape.max(Direction.Axis.Y) - entity.getY() - 1;
-
-            if (height > highestY) {
-                highestY = height;
-                highestFluid = fluidState;
+                    result.add(Shapes.box(0D, 0D, 0D, 1D, fluidState.getOwnHeight(), 1D).move(x, y, z));
+                }
             }
         }
 
-        if (highestFluid == null)
-            return original;
-
-        var event = new FluidCollisionEvent(entity, highestFluid);
-
-        NeoForge.EVENT_BUS.post(event);
-
-        if (!event.isCanceled())
-            return original;
-
-        entity.fallDistance = 0F;
-
-        entity.setOnGround(true);
-
-        relics$fluidWalkGraceTicks = 2;
-
-        return new Vec3(original.x, highestY, original.z);
+        return result;
     }
 
     @Inject(method = "baseTick()V", at = @At("TAIL"))
