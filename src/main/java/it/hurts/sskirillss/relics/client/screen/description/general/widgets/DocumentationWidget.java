@@ -28,7 +28,7 @@ public class DocumentationWidget extends AbstractDescriptionWidget implements IH
     private final DescriptionScreen screen;
 
     public DocumentationWidget(int x, int y, DescriptionScreen screen) {
-        super(x, y, 16, 16);
+        super(x, y, 14, 14);
 
         this.screen = screen;
     }
@@ -64,15 +64,18 @@ public class DocumentationWidget extends AbstractDescriptionWidget implements IH
 
         var color = (float) (1.05F + (Math.sin((player.tickCount + partialTick + 20F) * 0.2F) * 0.1F));
 
-        if (isHovered())
-            color += 0.15F;
-
         poseStack.translate(this.getX() + Math.sin((player.tickCount + partialTick) * 0.075F), this.getY() + Math.cos((player.tickCount + partialTick) * 0.075F) * 0.5F, 100);
 
         GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/documentation.png"), poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .color(color, color, color, 1F)
                 .end();
+
+        if (this.isHovered())
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/documentation_outline.png"), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(-1, -1)
+                    .end();
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 

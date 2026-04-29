@@ -12,30 +12,21 @@ import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
 
 import java.util.List;
 
-public class DiscordWidget extends AbstractDescriptionWidget implements IHoverableWidget {
-    private static final String DISCORD_URL = "https://discord.gg/pHren9yxzW";
-
+public class OptionsWidget extends AbstractDescriptionWidget implements IHoverableWidget {
     @Getter
     private final DescriptionScreen screen;
 
-    public DiscordWidget(int x, int y, DescriptionScreen screen) {
+    public OptionsWidget(int x, int y, DescriptionScreen screen) {
         super(x, y, 14, 14);
 
         this.screen = screen;
-    }
-
-    @Override
-    public void onPress() {
-        Util.getPlatform().openUri(DISCORD_URL);
     }
 
     @Override
@@ -49,20 +40,21 @@ public class DiscordWidget extends AbstractDescriptionWidget implements IHoverab
 
         poseStack.pushPose();
 
-        var color = (float) (1.05F + (Math.sin((player.tickCount + partialTick) * 0.2F) * 0.1F));
+        var time = player.tickCount + partialTick;
+        var color = (float) (1.05F + (Math.sin((time + 10F) * 0.2F) * 0.1F));
 
         if (isHovered())
             color += 0.15F;
 
-        poseStack.translate(this.getX() + Math.cos((player.tickCount + partialTick) * 0.075F), this.getY() + Math.sin((player.tickCount + partialTick) * 0.075F) * 0.5F, 100);
+        poseStack.translate(this.getX() + Math.cos(time * 0.075F) * 0.5F, this.getY() - Math.sin(time * 0.075F) * 0.5F, 100);
 
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/discord.png"), poseStack)
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/options.png"), poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .color(color, color, color, 1F)
                 .end();
 
         if (this.isHovered())
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/discord_outline.png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/options_outline.png"), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(-1, -1)
                     .end();
@@ -74,27 +66,19 @@ public class DiscordWidget extends AbstractDescriptionWidget implements IHoverab
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        var poseStack = guiGraphics.pose();
+        PoseStack poseStack = guiGraphics.pose();
 
         List<FormattedCharSequence> tooltip = Lists.newArrayList();
 
-        var maxWidth = 150;
+        var maxWidth = 50;
         var renderWidth = 0;
+        var entry = Component.literal("WIP").withStyle(ChatFormatting.BOLD);
+        int entryWidth = minecraft.font.width(entry) / 2;
 
-        List<MutableComponent> entries = Lists.newArrayList(
-                Component.translatable("relics.description.researching.general.discord.title").withStyle(ChatFormatting.BOLD, ChatFormatting.UNDERLINE),
-                Component.literal(" "),
-                Component.translatable("relics.description.researching.general.discord.description")
-        );
+        if (entryWidth > renderWidth)
+            renderWidth = Math.min(entryWidth + 2, maxWidth);
 
-        for (var entry : entries) {
-            int entryWidth = (minecraft.font.width(entry) / 2);
-
-            if (entryWidth > renderWidth)
-                renderWidth = Math.min(entryWidth + 2, maxWidth);
-
-            tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
-        }
+        tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
 
         poseStack.pushPose();
         poseStack.translate(0F, 0F, 100);
@@ -105,9 +89,8 @@ public class DiscordWidget extends AbstractDescriptionWidget implements IHoverab
 
         var yOff = 0;
 
-        for (FormattedCharSequence entry : tooltip) {
-            guiGraphics.drawString(minecraft.font, entry, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
-
+        for (FormattedCharSequence line : tooltip) {
+            guiGraphics.drawString(minecraft.font, line, ((mouseX - renderWidth / 2) + 1) * 2, ((mouseY + yOff + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
             yOff += 5;
         }
 
