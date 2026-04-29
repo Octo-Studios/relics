@@ -183,11 +183,12 @@ public class ExperienceDisperserItem extends WearableRelicItem {
         }
 
         @SubscribeEvent
-        public static void onPlayerXpChange(PlayerXpEvent.XpChange event) {
-            if (event.getAmount() <= 0)
-                return;
-
+        public static void onPlayerXpPickup(PlayerXpEvent.PickupXp event) {
             var player = event.getEntity();
+            var orb = event.getOrb();
+
+            if (orb.getValue() <= 0)
+                return;
 
             if (player.level().isClientSide())
                 return;
@@ -218,8 +219,12 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 if (targets.isEmpty())
                     continue;
 
-                var distributed = event.getAmount() * ratio;
-                var split = distributed / targets.size();
+                var distributed = Math.min(orb.getValue(), (int) Math.floor(orb.getValue() * ratio));
+
+                if (distributed <= 0)
+                    continue;
+
+                var split = distributed / (double) targets.size();
 
                 if (split <= 0D)
                     continue;
@@ -235,6 +240,8 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 }
 
                 if (triggered) {
+                    orb.value -= distributed;
+
                     var stats = ability.getStatisticData();
                     var convertedMetric = stats.getMetricData("converted_player_experience");
                     var before = convertedMetric.getValue();
