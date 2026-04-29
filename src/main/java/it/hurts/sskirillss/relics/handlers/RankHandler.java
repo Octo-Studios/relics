@@ -6,10 +6,6 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 
-import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 @EventBusSubscriber
 public class RankHandler {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -25,27 +21,22 @@ public class RankHandler {
         var base = event.getTemplate();
         var rank = data.getLevelingData().getRank();
 
+        if (rank <= 0)
+            return;
+
         var abilities = base.getAbilities();
-
-        var updatedAbilitiesMap = abilities.getAbilities().entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
-                            var template = entry.getValue();
-
-                            var updatedMax = IntStream.range(0, rank)
-                                    .reduce(template.getInitialMaxLevel(), (level, i) -> level + (int) Math.ceil(level * template.getMaxLevelRankModifier()));
-
-                            return template.toBuilder()
-                                    .initialMaxLevel(updatedMax)
-                                    .build();
-                        }
-                ));
-
         var abilitiesBuilder = abilities.toBuilder();
 
-        updatedAbilitiesMap.forEach((key, template) -> abilitiesBuilder.ability(template.toBuilder()
-                .initialMaxLevel(template.getInitialMaxLevel())
-                .build()
-        ));
+        for (var template : abilities.getAbilities().values()) {
+            var updatedMax = template.getInitialMaxLevel();
+
+            for (var i = 0; i < rank; i++)
+                updatedMax += (int) Math.ceil(updatedMax * template.getMaxLevelRankModifier());
+
+            abilitiesBuilder.ability(template.toBuilder()
+                    .initialMaxLevel(updatedMax)
+                    .build());
+        }
 
         event.setTemplate(base.toBuilder()
                 .abilities(abilitiesBuilder.build())

@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.api.events.relic.GatherRelicTemplateEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
+import it.hurts.sskirillss.relics.handlers.CacheHandler;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,12 +40,16 @@ public class RelicData {
     }
 
     public RelicTemplate getTemplate() {
-        var template = this.getRelic().getDefaultRelicTemplate();
-        var event = new GatherRelicTemplateEvent(this.getEntity(), this.getStack(), template);
+        var key = new CacheHandler.TemplateCacheKey(this.getRelic(), this.getComponent());
 
-        NeoForge.EVENT_BUS.post(event);
+        return CacheHandler.getOrCreateTemplate(key, cacheKey -> {
+            var template = this.getRelic().getDefaultRelicTemplate();
+            var event = new GatherRelicTemplateEvent(this.getEntity(), this.getStack(), template);
 
-        return event.getTemplate();
+            NeoForge.EVENT_BUS.post(event);
+
+            return event.getTemplate();
+        });
     }
 
     public RelicComponent getComponent() {
