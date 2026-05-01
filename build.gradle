@@ -133,3 +133,24 @@ idea {
         downloadJavadoc = true
     }
 }
+
+publishing {
+    repositories {
+        maven {
+            name = "octo"
+            url = "https://maven.octo-studios.com/releases"
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = project.name
+            version = version
+            from components.java
+        }
+    }
+}

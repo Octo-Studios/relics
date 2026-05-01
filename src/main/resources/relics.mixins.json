@@ -11,11 +11,10 @@
     "GameDataMixin",
     "ItemMixin",
     "LivingEntityMixin",
-    "PlayerMixin",
     "PiglinAiMixin",
+    "PlayerMixin",
     "ScreenMixin",
-    "compat.sophisticatedbackpacks.BackpackItemMixin",
-    "compat.sophisticatedbackpacks.UpgradeWrapperBaseAccessor"
+    "compat.sophisticatedbackpacks.BackpackItemMixin"
   ],
   "minVersion": "0.8",
   "client": [
