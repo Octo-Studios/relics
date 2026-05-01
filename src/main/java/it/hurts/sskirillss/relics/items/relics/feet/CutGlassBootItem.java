@@ -152,7 +152,7 @@ public class CutGlassBootItem extends WearableRelicItem {
         if (state.getType() == Fluids.EMPTY)
             EntityUtils.removeAttribute(entity, attribute, operation, movementSpeedAttributeId);
         else {
-            var entry = this.getFluidEntries(entity, stack).get(state.getType().toString());
+            var entry = this.getFluidEntries(entity, stack).get(state.getFluidType().toString());
 
             if (entry != null)
                 EntityUtils.resetAttribute(entity, attribute, (float) (entry.getAmount() / 1000F * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("speed").getValue()) - 0.5F, operation, movementSpeedAttributeId);
