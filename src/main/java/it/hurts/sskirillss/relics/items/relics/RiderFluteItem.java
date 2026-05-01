@@ -540,6 +540,9 @@ public class RiderFluteItem extends RelicItem {
 
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
+        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable").canPlayerUse(player))
+            return InteractionResult.PASS;
+
         if (!this.isSupportedMount(entity))
             return InteractionResult.PASS;
 
@@ -565,6 +568,9 @@ public class RiderFluteItem extends RelicItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
+
+        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable").canPlayerUse(player))
+            return InteractionResultHolder.pass(stack);
 
         if (level.isClientSide())
             return InteractionResultHolder.sidedSuccess(stack, true);
