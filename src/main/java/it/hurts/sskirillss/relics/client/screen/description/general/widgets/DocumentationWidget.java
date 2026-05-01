@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.IDocsEntry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
@@ -14,6 +15,7 @@ import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -35,20 +37,17 @@ public class DocumentationWidget extends AbstractDescriptionWidget implements IH
 
     @Override
     public void onPress() {
-        Util.getPlatform().openUri(getDocumentationUrl());
-    }
+        var stack = this.screen.getStack();
 
-    private String getDocumentationUrl() {
-        var stack = screen.getStack();
-        var item = stack.getItem();
-        var key = BuiltInRegistries.ITEM.getKey(item);
-        var modId = key.getNamespace();
-        var base = "https://shatterbyte.com/docs/mods/" + modId + "/relics/";
+        if (!(stack.getItem() instanceof IDocsEntry entry))
+            return;
 
-        if (!(item instanceof IRelicItem))
-            return base;
+        var uri = entry.getURI(Minecraft.getInstance().player, stack);
 
-        return base + key.getPath() + "/";
+        if (uri == null)
+            return;
+
+        Util.getPlatform().openUri(uri);
     }
 
     @Override

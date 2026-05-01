@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.client.screen.description.base;
 
+import it.hurts.sskirillss.relics.api.relics.IDocsEntry;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
@@ -56,17 +57,23 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
     }
 
     protected void initSidebar() {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return;
+
         if (LogoWidget.getRemainingClicks() != 0)
             this.addRenderableWidget(new LogoWidget(this.x + 313, this.y + 53, this));
 
-        if (stack.getItem() instanceof IRelicItem relic && relic.getRelicData(minecraft.player, stack).getLevelingData().isPointsMismatch())
+        if (relic.getRelicData(minecraft.player, stack).getLevelingData().isPointsMismatch())
             this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
 
         this.addRenderableWidget(new RelicProgressPlateWidget(this.x + 313, this.y + 77, this));
         this.addRenderableWidget(new RankPlateWidget(this.x + 313, this.y + 102, this));
         this.addRenderableWidget(new LevelingPointsPlateWidget(this.x + 313, this.y + 127, this));
         this.addRenderableWidget(new PlayerExperiencePlateWidget(this.x + 313, this.y + 152, this));
-        this.addRenderableWidget(new DocumentationWidget(this.x + 314, this.y + 179, this));
+
+        if (relic instanceof IDocsEntry entry && entry.getURI(minecraft.player, stack) != null)
+            this.addRenderableWidget(new DocumentationWidget(this.x + 314, this.y + 179, this));
+
         this.addRenderableWidget(new OptionsWidget(this.x + 333, this.y + 179, this));
         this.addRenderableWidget(new DiscordWidget(this.x + 352, this.y + 179, this));
     }
