@@ -360,7 +360,7 @@ public class MidnightMantleItem extends WearableRelicItem {
 
         var effectiveness = 1 - (minDistance / 4D);
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isUnlocked() && this.getPhaseDuration(stack) > 0)
+        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled() && this.getPhaseDuration(stack) > 0)
             effectiveness *= 1F + this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("modifier").getValue();
 
         return effectiveness;
@@ -414,7 +414,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                         getPhaseAttributeId(stack, Attributes.MAX_HEALTH, slotContext));
             }
 
-            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isUnlocked() && this.getPhaseDuration(stack) > 0)
+            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled() && this.getPhaseDuration(stack) > 0)
                 this.addPhaseDuration(stack, -1);
         }
 
@@ -529,7 +529,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getRankModifierData("strike").isUnlocked()
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getRankModifierData("strike").isEnabled()
                         || relic.getInvisibilityCooldown(stack) > 0 || !relic.canHideInTheDarkness(entity, stack))
                     continue;
 
@@ -589,7 +589,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isUnlocked())
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled())
                     continue;
 
                 relic.setPhaseDuration(stack, (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("duration").getValue() * 20);
@@ -628,7 +628,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                 star.setOwner(entity);
                 star.setStack(stack);
 
-                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getRankModifierData("stun").isUnlocked())
+                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getRankModifierData("stun").isEnabled())
                     star.setStun((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("stun_duration").getValue());
 
                 level.addFreshEntity(star);
@@ -680,7 +680,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                 star.setStack(stack);
                 star.setPos(pos);
 
-                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getRankModifierData("bounce").isUnlocked())
+                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getRankModifierData("bounce").isEnabled())
                     star.setBounceChance((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("bounce_chance").getValue());
 
                 level.addFreshEntity(star);

@@ -167,7 +167,7 @@ public class ChorusStaffItem extends RelicItem {
         if (charge <= 0)
             return InteractionResultHolder.pass(stack);
 
-        if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getRankModifierData("ascent").isUnlocked()
+        if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getRankModifierData("ascent").isEnabled()
                 && hit.getType() == HitResult.Type.BLOCK && hit.getLocation().distanceTo(eyePos) <= radius) {
             var current = hit.getBlockPos();
 
@@ -272,10 +272,10 @@ public class ChorusStaffItem extends RelicItem {
                 this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatisticData().getMetricData("blinks_amount").addValue(1);
                 this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatisticData().getMetricData("distance_traveled").addValue(from.distanceTo(to));
 
-                if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getRankModifierData("safe_fall").isUnlocked())
+                if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getRankModifierData("safe_fall").isEnabled())
                     this.setSafeFall(stack, true);
 
-                if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getRankModifierData("flicker").isUnlocked()) {
+                if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getRankModifierData("flicker").isEnabled()) {
                     for (var mob : level.getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(32))) {
                         if (mob.getTarget() == player) {
                             mob.setTarget(null);
@@ -365,7 +365,7 @@ public class ChorusStaffItem extends RelicItem {
                 var stack = inventory.getItem(i);
 
                 if (stack.getItem() instanceof ChorusStaffItem relic) {
-                    if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getRankModifierData("safe_fall").isUnlocked() || !relic.shouldSafeFall(stack))
+                    if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getRankModifierData("safe_fall").isEnabled() || !relic.shouldSafeFall(stack))
                         continue;
 
                     relic.setSafeFall(stack, false);

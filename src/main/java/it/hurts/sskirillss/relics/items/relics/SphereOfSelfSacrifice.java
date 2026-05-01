@@ -155,7 +155,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
         if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").canPlayerUse(player))
             return InteractionResultHolder.pass(stack);
 
-        if (player.isShiftKeyDown() && this.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("salvo").isUnlocked()) {
+        if (player.isShiftKeyDown() && this.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("salvo").isEnabled()) {
             if (!level.isClientSide()) {
                 var hit = EntityUtils.rayTraceEntity(player, entity -> entity instanceof LivingEntity living && !living.isDeadOrDying() && !EntityUtils.isAlliedTo(player, living) && !living.is(player), 64D);
 
@@ -349,7 +349,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
                 if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").canPlayerUse(player))
                     continue;
 
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("salvation").isUnlocked())
+                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("salvation").isEnabled())
                     continue;
 
                 var stacks = relic.getHealingStacks(stack);
@@ -390,7 +390,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
                 if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").canPlayerUse(player))
                     continue;
 
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("resistance").isUnlocked())
+                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("resistance").isEnabled())
                     continue;
 
                 var stacks = relic.getHealingStacks(stack);

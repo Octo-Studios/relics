@@ -184,7 +184,7 @@ public class SpringyBootItem extends WearableRelicItem {
                 this.setLeaps(stack, 0);
             }
 
-            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("disappearance").isUnlocked() && leaps <= 0)
+            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("disappearance").isEnabled() && leaps <= 0)
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
         }
     }
@@ -240,7 +240,7 @@ public class SpringyBootItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
                 var relic = (SpringyBootItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").canPlayerUse(entity) || !relic.isLeaped(stack) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("strike").isUnlocked())
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").canPlayerUse(entity) || !relic.isLeaped(stack) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("strike").isEnabled())
                     continue;
 
                 var leaps = relic.getLeaps(stack);

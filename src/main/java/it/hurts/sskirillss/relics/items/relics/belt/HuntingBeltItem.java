@@ -150,7 +150,7 @@ public class HuntingBeltItem extends WearableRelicItem {
                 var relic = (HuntingBeltItem) stack.getItem();
 
                 totalModifier += relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatData("damage_modifier").getValue();
-                ignoreInvulnerability |= relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getRankModifierData("relentless").isUnlocked();
+                ignoreInvulnerability |= relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getRankModifierData("relentless").isEnabled();
             }
 
             if (ignoreInvulnerability)
@@ -183,7 +183,7 @@ public class HuntingBeltItem extends WearableRelicItem {
                     .filter(stack -> {
                         var relic = (HuntingBeltItem) stack.getItem();
 
-                        return relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getRankModifierData("leader").isUnlocked();
+                        return relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").getRankModifierData("leader").isEnabled();
                     })
                     .toList();
 
@@ -288,7 +288,7 @@ public class HuntingBeltItem extends WearableRelicItem {
                         .filter(stack -> {
                             var relic = (HuntingBeltItem) stack.getItem();
 
-                            return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getRankModifierData("revival").isUnlocked();
+                            return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getRankModifierData("revival").isEnabled();
                         })
                         .toList();
 

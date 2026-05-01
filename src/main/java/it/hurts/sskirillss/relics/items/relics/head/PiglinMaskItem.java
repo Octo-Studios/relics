@@ -257,7 +257,7 @@ public class PiglinMaskItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.PIGLIN_MASK.get())) {
                 var relic = (PiglinMaskItem) stack.getItem();
 
-                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("neutrality").getRankModifierData("legion").isUnlocked())
+                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("neutrality").getRankModifierData("legion").isEnabled())
                     continue;
 
                 for (var piglin : level.getEntitiesOfClass(Mob.class, source.getBoundingBox().inflate(32), mob -> mob instanceof Piglin || mob instanceof ZombifiedPiglin)) {
@@ -287,7 +287,7 @@ public class PiglinMaskItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(target, RelicsItems.PIGLIN_MASK.get())) {
                 var relic = (PiglinMaskItem) stack.getItem();
 
-                if (!relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("neutrality").getRankModifierData("legion").isUnlocked())
+                if (!relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("neutrality").getRankModifierData("legion").isEnabled())
                     continue;
 
                 for (var piglin : level.getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate(32), mob -> mob instanceof Piglin || mob instanceof ZombifiedPiglin)) {
@@ -327,7 +327,7 @@ public class PiglinMaskItem extends WearableRelicItem {
             for (var stack : uniqueStacks) {
                 var relic = (PiglinMaskItem) stack.getItem();
 
-                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getRankModifierData("frenzy").isUnlocked())
+                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getRankModifierData("frenzy").isEnabled())
                     continue;
 
                 var stacks = relic.getStacks(stack);

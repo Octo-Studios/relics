@@ -223,7 +223,7 @@ public class LeafyMantleItem extends WearableRelicItem {
             if (progress < this.getMaxProgress())
                 this.addCurrentProgress(stack, 1);
 
-            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("disappearance").isUnlocked())
+            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("disappearance").isEnabled())
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
 
             if (entity.tickCount % 20 == 0) {
@@ -283,7 +283,7 @@ public class LeafyMantleItem extends WearableRelicItem {
                 if (!relic.isHiding(stack) || relic.getCurrentProgress(stack) < relic.getMaxProgress())
                     continue;
 
-                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) && relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("absorption").isUnlocked())
+                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) && relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("absorption").isEnabled())
                     total += (float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatData("absorption").getValue();
             }
 
@@ -429,7 +429,7 @@ public class LeafyMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
                 var relic = (LeafyMantleItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("disappearance").isUnlocked())
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("disappearance").isEnabled())
                     continue;
 
                 ServerScheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatData("cooldown").getValue() * 20)));

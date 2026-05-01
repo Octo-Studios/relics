@@ -96,7 +96,7 @@ public class ExperienceSourceTemplate {
                 var relic = (IRelicItem) stack.getItem();
                 var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(ability);
 
-                return abilityData != null && abilityData.getRankModifierData(rankModifier).isUnlocked() ? VisibilityState.VISIBLE : state;
+                return abilityData != null && abilityData.getRankModifierData(rankModifier).isEnabled() ? VisibilityState.VISIBLE : state;
             });
         }
 

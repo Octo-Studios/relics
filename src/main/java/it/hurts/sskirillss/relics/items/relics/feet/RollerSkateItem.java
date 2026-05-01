@@ -175,7 +175,7 @@ public class RollerSkateItem extends WearableRelicItem {
         if (duration > 0) {
             EntityUtils.resetAttribute(entity, Attributes.MOVEMENT_SPEED, (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("speed").getValue() / this.getMaxDuration() * this.getDuration(stack)), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, movementSpeedAttributeId);
 
-            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("step_height").isUnlocked())
+            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("step_height").isEnabled())
                 EntityUtils.resetAttribute(entity, Attributes.STEP_HEIGHT, (float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("step_height").getValue(), AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
             else
                 EntityUtils.removeAttribute(entity, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
@@ -184,7 +184,7 @@ public class RollerSkateItem extends WearableRelicItem {
             EntityUtils.removeAttribute(entity, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
         }
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("sparkling").isUnlocked()) {
+        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("sparkling").isEnabled()) {
             var motion = entity.getDeltaMovement();
 
             var xMotion = motion.x;
@@ -289,7 +289,7 @@ public class RollerSkateItem extends WearableRelicItem {
 
                 var duration = relic.getDuration(stack);
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("resistance").isUnlocked() || duration <= 0)
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("resistance").isEnabled() || duration <= 0)
                     continue;
 
                 var modifier = (float) (original * (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("resistance").getValue() * ((float) duration / relic.getMaxDuration())));
