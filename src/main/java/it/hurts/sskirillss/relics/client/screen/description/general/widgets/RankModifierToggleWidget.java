@@ -149,10 +149,10 @@ public class RankModifierToggleWidget extends AbstractDescriptionWidget {
         var scrollbar = this.container.getScrollbar();
         var scroll = 0D;
 
-        if (scrollbar != null && !scrollbar.isLocked()) {
+        if (scrollbar != null) {
             var lineCount = Math.max(0D, (this.container.getContentHeight() - 6D) / LINE_STEP);
             var overflowLines = Math.max(0D, lineCount - DescriptionContainerWidget.MAX_LINES);
-            var maxScrollPx = overflowLines <= 0D ? 0D : overflowLines * LINE_STEP + 1.5D;
+            var maxScrollPx = overflowLines * LINE_STEP + 1.5D;
 
             scroll = scrollbar.getScrollPosition(RenderUtils.getPartialTick(false)) * maxScrollPx;
         }
