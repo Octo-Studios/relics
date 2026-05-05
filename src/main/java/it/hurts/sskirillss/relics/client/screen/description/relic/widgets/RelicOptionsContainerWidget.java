@@ -14,6 +14,8 @@ import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import net.minecraft.sounds.SoundEvents;
 
 import java.util.List;
 import java.util.function.BiConsumer;
@@ -113,11 +115,17 @@ public class RelicOptionsContainerWidget extends DescriptionContainerWidget {
                 continue;
 
             this.toggleOption(data, index);
+            this.playDownSound(this.minecraft.getSoundManager());
 
             return true;
         }
 
         return false;
+    }
+
+    @Override
+    public void playDownSound(net.minecraft.client.sounds.SoundManager handler) {
+        handler.play(SimpleSoundInstance.forUI(SoundEvents.UI_BUTTON_CLICK, 1F));
     }
 
     private void toggleOption(RelicData data, int index) {
