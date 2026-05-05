@@ -623,7 +623,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                 star.setDamage((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("explosion_damage").getValue());
                 star.setTremor((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("tremor_duration").getValue());
                 star.setLifetime((int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("star_lifetime").getValue());
-                star.setFlawless(relic.getRelicData(entity, stack).isFlawless());
+                star.setFlawless(relic.getRelicData(entity, stack).isVisuallyFlawless());
                 star.setPos(entity.getEyePosition());
                 star.setOwner(entity);
                 star.setStack(stack);
@@ -674,7 +674,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                 star.setDamage((float) (event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("damage").getValue()));
                 star.setRadius((int) Math.round(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("radius").getValue()));
                 star.setStun((int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("stun").getValue() * 20));
-                star.setFlawless(relic.getRelicData(entity, stack).isFlawless());
+                star.setFlawless(relic.getRelicData(entity, stack).isVisuallyFlawless());
                 star.setDeltaMovement(motion);
                 star.setOwner(entity);
                 star.setStack(stack);
@@ -695,3 +695,4 @@ public class MidnightMantleItem extends WearableRelicItem {
         }
     }
 }
+

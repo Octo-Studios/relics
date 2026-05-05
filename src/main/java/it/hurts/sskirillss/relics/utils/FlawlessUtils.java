@@ -17,7 +17,7 @@ public class FlawlessUtils {
     }
 
     public static int getColor(LivingEntity entity, ItemStack stack, int color) {
-        return getColor(stack.getItem() instanceof IRelicItem relic && relic.getRelicData(entity, stack).isFlawless(), color);
+        return getColor(stack.getItem() instanceof IRelicItem relic && relic.getRelicData(entity, stack).isVisuallyFlawless(), color);
     }
 
     public static Color getColor(boolean flawless, Color color) {
@@ -48,7 +48,7 @@ public class FlawlessUtils {
     }
 
     public static Color getColor(LivingEntity entity, ItemStack stack, Color color) {
-        return getColor(stack.getItem() instanceof IRelicItem relic && relic.getRelicData(entity, stack).isFlawless(), color);
+        return getColor(stack.getItem() instanceof IRelicItem relic && relic.getRelicData(entity, stack).isVisuallyFlawless(), color);
     }
 
     public static ResourceLocation getTexture(boolean flawless, ResourceLocation location) {
@@ -56,6 +56,6 @@ public class FlawlessUtils {
     }
 
     public static ResourceLocation getTexture(LivingEntity entity, ItemStack stack, ResourceLocation location) {
-        return getTexture(stack.getItem() instanceof IRelicItem relic && relic.getRelicData(entity, stack).isFlawless(), location);
+        return getTexture(stack.getItem() instanceof IRelicItem relic && relic.getRelicData(entity, stack).isVisuallyFlawless(), location);
     }
 }

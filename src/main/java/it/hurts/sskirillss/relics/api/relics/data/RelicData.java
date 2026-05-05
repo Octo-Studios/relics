@@ -72,6 +72,10 @@ public class RelicData {
         return new RelicStatisticData(this);
     }
 
+    public RelicOptionsData getOptionsData() {
+        return new RelicOptionsData(this);
+    }
+
     public int calculateMaxLevel() {
         return this.getTemplate().getAbilities().getAbilities().values().stream()
                 .mapToInt(template -> template.getInitialMaxLevel() * template.getRequiredPoints())
@@ -156,5 +160,9 @@ public class RelicData {
 
     public boolean isFlawless() {
         return this.calculateProgress() >= 1F;
+    }
+
+    public boolean isVisuallyFlawless() {
+        return this.isFlawless() && this.getOptionsData().isVisuallyFlawless();
     }
 }

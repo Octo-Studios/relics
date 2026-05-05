@@ -46,7 +46,7 @@ public class CutGlassBootRenderer implements IRelicRenderer {
 
             this.model.feetPart.copyFrom(part);
 
-            this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityTranslucent(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/cut_glass_boot.png")))), relic.getRelicData(entity, stack).isFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+            this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityTranslucent(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/cut_glass_boot.png")))), relic.getRelicData(entity, stack).isVisuallyFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
             poseStack.popPose();
         }

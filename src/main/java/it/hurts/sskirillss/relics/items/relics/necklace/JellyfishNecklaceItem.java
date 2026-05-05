@@ -332,7 +332,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             var chargeUnlocked = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getRankModifierData("charge").isEnabled());
             var damageModifier = conductorUnlocked ? RelicStackingUtils.maxValue(entity, stack, "shock", "damage_modifier", abilityData -> !abilityData.getMode().equals("disabled")) : 0D;
             var chargeDurationTicks = (int) Math.round(RelicStackingUtils.bestValue(entity, stack, "shock", "duration", abilityData -> !abilityData.getMode().equals("disabled")) * 20D);
-            var flawless = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).isFlawless());
+            var flawless = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).isVisuallyFlawless());
 
             if (rings < maxRings) {
                 if (cooldown > 0)
@@ -567,3 +567,4 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
         }
     }
 }
+

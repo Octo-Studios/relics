@@ -137,7 +137,7 @@ public class GuiGraphicsMixin {
 
         var time = seed + player.tickCount + partialTicks;
 
-        if (relic.getRelicData(player, stack).isFlawless()) {
+        if (relic.getRelicData(player, stack).isVisuallyFlawless()) {
             var beams = 8;
 
             for (int i = 0; i < beams; i++) {
@@ -157,3 +157,4 @@ public class GuiGraphicsMixin {
         }
     }
 }
+

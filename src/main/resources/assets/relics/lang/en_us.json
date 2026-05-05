@@ -7,6 +7,7 @@
 
   "relics.description.researching.bookmarks.relic_description": "Relic Description",
   "relics.description.researching.bookmarks.relic_statistic": "Relic Statistics",
+  "relics.description.researching.bookmarks.relic_options": "Relic Options",
 
   "relics.description.researching.bookmarks.ability_description": "Ability Description",
   "relics.description.researching.bookmarks.ability_experience": "Ability Experience Sources",
@@ -52,6 +53,8 @@
   "relics.description.researching.general.discord.description": "Click to join the Relics Discord server.",
   "relics.description.researching.general.documentation.title": "Documentation",
   "relics.description.researching.general.documentation.description": "Click to open documentation for this relic.",
+
+  "relics.description.researching.relic.options.flawless_visual": "Show visual effects for flawless relics",
 
   "relics.description.researching.relic.info.level": "Relic Level:",
   "relics.description.researching.relic.info.quality": "Relic Quality:",

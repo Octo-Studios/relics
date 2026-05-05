@@ -198,7 +198,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
                         projectile.setDeltaMovement(look.scale(0.25F).add(offset.normalize().scale(0.25F)).add(0, 0.05F, 0));
                         projectile.setDamage(projectileDamage);
                         projectile.setTarget(target);
-                        projectile.setFlawless(this.getRelicData(player, stack).isFlawless());
+                        projectile.setFlawless(this.getRelicData(player, stack).isVisuallyFlawless());
 
                         level.addFreshEntity(projectile);
 

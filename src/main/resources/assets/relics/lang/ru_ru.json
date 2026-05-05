@@ -7,6 +7,7 @@
 
   "relics.description.researching.bookmarks.relic_description": "Описание реликвии",
   "relics.description.researching.bookmarks.relic_statistic": "Статистика реликвии",
+  "relics.description.researching.bookmarks.relic_options": "Опции реликвии",
 
   "relics.description.researching.bookmarks.ability_description": "Описание способности",
   "relics.description.researching.bookmarks.ability_experience": "Источники опыта способности",
@@ -53,6 +54,8 @@
   "relics.description.researching.general.discord.description": "Нажми, чтобы присоединиться к Discord-серверу Relics.",
   "relics.description.researching.general.documentation.title": "Документация",
   "relics.description.researching.general.documentation.description": "Нажми, чтобы открыть документацию по этой реликвии.",
+
+  "relics.description.researching.relic.options.flawless_visual": "Показывать эффекты идеальных реликвий",
 
   "relics.description.researching.relic.info.level": "Уровень реликвии:",
   "relics.description.researching.relic.info.quality": "Качество реликвии:",

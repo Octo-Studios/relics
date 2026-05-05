@@ -51,11 +51,11 @@ public class MidnightMantleRenderer implements IRelicRenderer {
 
         var mode = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode();
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_" + (relic.getRelicData(entity, stack).isFlawless() ? "flawless" : mode) + ".png"))), relic.getRelicData(entity, stack).isFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_" + (relic.getRelicData(entity, stack).isVisuallyFlawless() ? "flawless" : mode) + ".png"))), relic.getRelicData(entity, stack).isVisuallyFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         float flicker = 0.75F + 0.25F * Mth.sin(time * 0.15F);
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_stars_" + mode + ".png")))), relic.getRelicData(entity, stack).isFlawless() ? LightTexture.FULL_BRIGHT : LightTexture.pack((int) (15 * flicker), (int) (15 * flicker)), OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/midnight_mantle_stars_" + mode + ".png")))), relic.getRelicData(entity, stack).isVisuallyFlawless() ? LightTexture.FULL_BRIGHT : LightTexture.pack((int) (15 * flicker), (int) (15 * flicker)), OverlayTexture.NO_OVERLAY);
 
         if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity)) {
             var deltaX = (float) (Mth.lerp(partialTicks, player.xCloakO, player.xCloak) - Mth.lerp(partialTicks, player.xo, player.getX()));

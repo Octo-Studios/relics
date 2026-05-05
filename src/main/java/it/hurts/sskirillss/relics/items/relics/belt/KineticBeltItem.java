@@ -308,7 +308,7 @@ public class KineticBeltItem extends WearableRelicItem {
                         electricitySpawnPosition.z,
                         (float) synergy.getStatData("damage").getValue(),
                         (int) synergy.getStatData("lifetime").getValue(),
-                        this.getRelicData(entity, stack).isFlawless(),
+                        this.getRelicData(entity, stack).isVisuallyFlawless(),
                         slotContext.identifier(),
                         slotContext.index()
                 ));
@@ -330,7 +330,7 @@ public class KineticBeltItem extends WearableRelicItem {
                     var vy = (random.nextFloat() * 2 - 1) * 0.01F;
                     var vz = (random.nextFloat() * 2 - 1) * 0.01F;
 
-                    level.addParticle(ParticleUtils.constructSimpleSpark(this.getRelicData(entity, stack).isFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(random.nextInt(50), 75 + random.nextInt(100), 255), 0.1F + random.nextFloat() * 0.15F, 100 + random.nextInt(20), 0.995F), x, y, z, vx, vy, vz);
+                    level.addParticle(ParticleUtils.constructSimpleSpark(this.getRelicData(entity, stack).isVisuallyFlawless() ? new Color(200 + random.nextInt(50), 150 + random.nextInt(50), 0) : new Color(random.nextInt(50), 75 + random.nextInt(100), 255), 0.1F + random.nextFloat() * 0.15F, 100 + random.nextInt(20), 0.995F), x, y, z, vx, vy, vz);
                 }
             }
         } else if (hasAttribute)
@@ -406,3 +406,4 @@ public class KineticBeltItem extends WearableRelicItem {
         }
     }
 }
+

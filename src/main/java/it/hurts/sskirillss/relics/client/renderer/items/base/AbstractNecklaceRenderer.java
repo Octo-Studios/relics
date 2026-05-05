@@ -51,7 +51,7 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
 
         var vertexConsumer = ItemRenderer.getArmorFoilBuffer(bufferSource, RenderType.entityTranslucentCull(FlawlessUtils.getTexture(player, stack, texture)), stack.hasFoil());
 
-        this.model.getBodyPart().getChild("neck").render(poseStack, vertexConsumer, relic.getRelicData(player, stack).isFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+        this.model.getBodyPart().getChild("neck").render(poseStack, vertexConsumer, relic.getRelicData(player, stack).isVisuallyFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         var deltaX = Mth.lerp(partialTicks, player.xCloakO, player.xCloak) - Mth.lerp(partialTicks, player.xo, player.getX());
         var deltaY = Mth.lerp(partialTicks, player.yCloakO, player.yCloak) - Mth.lerp(partialTicks, player.yo, player.getY());
@@ -112,7 +112,7 @@ public abstract class AbstractNecklaceRenderer<T extends LivingEntity, M extends
         if (atk > 0F)
             pendant.yRot -= Mth.sin(atk * (float) Math.PI) * 0.35F;
 
-        pendant.render(poseStack, vertexConsumer, relic.getRelicData(player, stack).isFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+        pendant.render(poseStack, vertexConsumer, relic.getRelicData(player, stack).isVisuallyFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
 

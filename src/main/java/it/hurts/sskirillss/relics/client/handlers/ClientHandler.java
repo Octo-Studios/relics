@@ -93,7 +93,7 @@ public class ClientHandler {
                     continue;
 
                 ItemProperties.register(item, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "flawless"),
-                        (stack, level, entity, id) -> relic.getRelicData(entity, stack).isFlawless() ? 1 : 0);
+                        (stack, level, entity, id) -> relic.getRelicData(entity, stack).isVisuallyFlawless() ? 1 : 0);
             }
         });
 
@@ -129,6 +129,7 @@ public class ClientHandler {
         DescriptionSubcategories.registerSubcategory(AbilityStatisticDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(RelicDescriptionDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(RelicStatisticDescriptionSubcategory::new);
+        DescriptionSubcategories.registerSubcategory(RelicOptionsSubcategory::new);
 
         RelicsRelicStyles.register(RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), RingOfTheSevenDeadlySinsStyle::new);
         RelicsRelicStyles.register(RelicsItems.SPHERE_OF_SELF_SACRIFICE.get(), SphereOfSelfSacrificeStyle::new);
@@ -225,3 +226,4 @@ public class ClientHandler {
         event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "piglin_mask/teeth"), new PiglinMaskTeethLayer());
     }
 }
+

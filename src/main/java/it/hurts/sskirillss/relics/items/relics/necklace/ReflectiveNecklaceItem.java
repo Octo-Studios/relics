@@ -137,7 +137,7 @@ public class ReflectiveNecklaceItem extends WearableRelicItem {
                     orb.setBounces(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getRankModifierData("bounce").isEnabled() ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("bounces").getValue() : 0);
                     orb.setStun(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getRankModifierData("stun").isEnabled() ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("stun").getValue() : 0);
                     orb.setLifetime((int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("lifetime").getValue() * 20));
-                    orb.setFlawless(relic.getRelicData(entity, stack).isFlawless());
+                    orb.setFlawless(relic.getRelicData(entity, stack).isVisuallyFlawless());
                     orb.setPos(entity.getEyePosition());
                     orb.setDamage(orbDamage);
                     orb.setOwner(entity);

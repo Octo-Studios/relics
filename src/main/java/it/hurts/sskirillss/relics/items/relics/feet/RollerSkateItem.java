@@ -222,7 +222,7 @@ public class RollerSkateItem extends WearableRelicItem {
                             var deltaZ = -directionZ * force + directionX * offset;
 
                             NetworkHandler.sendToServer(new C2SCreateSpark(slotContext.identifier(), slotContext.index(), entity.position().toVector3f(), new Vector3f(deltaX, deltaY, deltaZ), entity.getStringUUID(),
-                                    (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("damage").getValue() * speed), (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("ignite").getValue() * speed), this.getRelicData(entity, stack).isFlawless()));
+                                    (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("damage").getValue() * speed), (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("ignite").getValue() * speed), this.getRelicData(entity, stack).isVisuallyFlawless()));
                         }
                     }
                 }
@@ -306,3 +306,4 @@ public class RollerSkateItem extends WearableRelicItem {
         }
     }
 }
+

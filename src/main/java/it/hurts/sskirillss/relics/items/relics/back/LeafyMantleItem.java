@@ -383,7 +383,7 @@ public class LeafyMantleItem extends WearableRelicItem {
 
                         leaves.setParalysis((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatData("paralysis").getValue());
                         leaves.setDeltaMovement(perpendicular.scale(0.5F + random.nextFloat()));
-                        leaves.setFlawless(relic.getRelicData(entity, stack).isFlawless());
+                        leaves.setFlawless(relic.getRelicData(entity, stack).isVisuallyFlawless());
                         leaves.setPos(posVec.x(), posVec.y(), posVec.z());
                         leaves.setBlockState(level.getBlockState(pos));
                         leaves.setTarget(entity);
@@ -483,3 +483,4 @@ public class LeafyMantleItem extends WearableRelicItem {
         }
     }
 }
+
