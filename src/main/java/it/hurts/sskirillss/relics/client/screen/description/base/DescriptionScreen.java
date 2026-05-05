@@ -72,9 +72,9 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
         this.addRenderableWidget(new PlayerExperiencePlateWidget(this.x + 313, this.y + 152, this));
 
         if (relic instanceof IDocsEntry entry && entry.getURI(minecraft.player, stack) != null)
-            this.addRenderableWidget(new DocumentationWidget(this.x + 314, this.y + 179, this));
+            this.addRenderableWidget(new DocumentationWidget(this.x + 321, this.y + 179, this));
 
-        this.addRenderableWidget(new DiscordWidget(this.x + 352, this.y + 179, this));
+        this.addRenderableWidget(new DiscordWidget(this.x + 345, this.y + 179, this));
     }
 
     protected void initTopScroll() {
