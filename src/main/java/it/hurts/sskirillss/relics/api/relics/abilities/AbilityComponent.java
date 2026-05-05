@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.api.relics.LockComponent;
 import it.hurts.sskirillss.relics.api.relics.RankModifierComponent;
-import it.hurts.sskirillss.relics.api.relics.ResearchComponent;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
 import lombok.AllArgsConstructor;
@@ -22,7 +21,6 @@ import java.util.Map;
 public class AbilityComponent {
     @Singular
     private final Map<String, StatComponent> stats;
-    private final ResearchComponent research;
     private final LockComponent lock;
     private final AbilityStatisticComponent statistic;
     private final String mode;
@@ -30,12 +28,11 @@ public class AbilityComponent {
     private final Map<String, RankModifierComponent> rankModifiers;
     private final int points;
 
-    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), ResearchComponent.EMPTY, LockComponent.EMPTY, AbilityStatisticComponent.EMPTY, "", Map.of(), 0);
+    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), LockComponent.EMPTY, AbilityStatisticComponent.EMPTY, "", Map.of(), 0);
 
     public static final Codec<AbilityComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.unboundedMap(Codec.STRING, StatComponent.CODEC).fieldOf("stats").forGetter(AbilityComponent::getStats),
-                    ResearchComponent.CODEC.fieldOf("research").forGetter(AbilityComponent::getResearch),
                     LockComponent.CODEC.fieldOf("lock").forGetter(AbilityComponent::getLock),
                     AbilityStatisticComponent.CODEC.optionalFieldOf("statistic", AbilityStatisticComponent.EMPTY).forGetter(AbilityComponent::getStatistic),
                     Codec.STRING.optionalFieldOf("mode", "").forGetter(AbilityComponent::getMode),

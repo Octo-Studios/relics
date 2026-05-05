@@ -26,6 +26,7 @@ public class Relics {
         RelicsParticles.register(bus);
         RelicsMobEffects.register(bus);
         RelicsLootCodecs.register(bus);
+        RelicsAttachments.register(bus);
         RelicsCreativeTabs.register(bus);
         RelicsBlockEntities.register(bus);
         RelicsScalingModels.register(bus);

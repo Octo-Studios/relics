@@ -26,6 +26,7 @@ import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
 import it.hurts.sskirillss.relics.network.packets.research.PacketManageLink;
 import it.hurts.sskirillss.relics.network.packets.research.PacketResearchHint;
+import it.hurts.sskirillss.relics.network.packets.research.S2CSyncPlayerResearch;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
@@ -63,6 +64,7 @@ public class NetworkHandler {
         registrar.playToServer(C2SChangeAbilityRankModifier.TYPE, C2SChangeAbilityRankModifier.STREAM_CODEC, C2SChangeAbilityRankModifier::handle);
         registrar.playToServer(C2SChangeSynergyRankModifier.TYPE, C2SChangeSynergyRankModifier.STREAM_CODEC, C2SChangeSynergyRankModifier::handle);
         registrar.playToServer(C2SChangeRelicOptionFlawlessVisual.TYPE, C2SChangeRelicOptionFlawlessVisual.STREAM_CODEC, C2SChangeRelicOptionFlawlessVisual::handle);
+        registrar.playToClient(S2CSyncPlayerResearch.TYPE, S2CSyncPlayerResearch.STREAM_CODEC, S2CSyncPlayerResearch::handle);
 
         // === KINETIC BELT ===
         registrar.playToServer(C2SSetActive.TYPE, C2SSetActive.STREAM_CODEC, C2SSetActive::handle);

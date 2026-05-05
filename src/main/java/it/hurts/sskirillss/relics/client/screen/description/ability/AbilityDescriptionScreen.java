@@ -136,6 +136,9 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         this.initActionButtons();
 
+        if (abilityData.getResearchData().isResearched())
+            this.addRenderableWidget(new AbilityResearchWidget(x + 67, y + 65, this));
+
         var container = subcategory.getContainerWidget(this);
 
         this.addRenderableWidget(container);
