@@ -71,7 +71,7 @@ public class AbilityModeWidget extends AbstractDescriptionWidget {
                 .end();
 
         if (this.isHovered())
-            GUIRenderer.begin(step > 0 ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_right_selection.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_left_selection.png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_selection.png"), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(this.getX() - 1, this.getY() - 1)
                     .end();
