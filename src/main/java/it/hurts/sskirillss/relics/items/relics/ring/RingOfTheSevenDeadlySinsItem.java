@@ -1,6 +1,5 @@
 package it.hurts.sskirillss.relics.items.relics.ring;
 
-import com.google.common.collect.Lists;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.Relics;
@@ -11,10 +10,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
-import it.hurts.sskirillss.relics.init.RelicsDataComponents;
-import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.init.RelicsScalingModels;
+import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.misc.ICreativeTabContent;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -352,20 +348,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                 else if (modifier < -0.0001D)
                     this.getRelicData(player, stack).getAbilitiesData().getAbilityData("gluttony").getStatisticData().getMetricData("negative_duration").addValue(1D / 20D);
 
-                var blacklist = Lists.newArrayList(
-                        "minecraft:generic.gravity",
-                        "minecraft:generic.scale",
-                        "additionalentityattributes:generic.width",
-                        "additionalentityattributes:generic.height",
-                        "additionalentityattributes:generic.hitbox_scale",
-                        "additionalentityattributes:generic.hitbox_width",
-                        "additionalentityattributes:generic.hitbox_height",
-                        "additionalentityattributes:generic.model_scale",
-                        "additionalentityattributes:generic.model_width",
-                        "additionalentityattributes:generic.model_height",
-                        "ars_nouveau:ars_nouveau.perk.weight",
-                        "ars_nouveau:ars_nouveau.perk.wixie"
-                );
+                var blacklist = RelicsConfigs.RELICS_CONFIG.getRingOfSDSGluttonyAttributesBlacklist();
 
                 for (var instance : entity.getAttributes().attributes.values()) {
                     var attribute = instance.getAttribute();

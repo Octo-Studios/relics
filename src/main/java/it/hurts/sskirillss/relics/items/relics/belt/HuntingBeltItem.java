@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.init.RelicsConfigs;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
@@ -22,6 +23,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -279,7 +281,8 @@ public class HuntingBeltItem extends WearableRelicItem {
             if (entity.level().isClientSide())
                 return;
 
-            if (entity instanceof OwnableEntity ownable && ownable.getOwner() instanceof LivingEntity owner) {
+            if (entity instanceof OwnableEntity ownable && ownable.getOwner() instanceof LivingEntity owner
+                    && !RelicsConfigs.RELICS_CONFIG.getHuntingBeltRevivalEntitiesBlacklist().contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())) {
                 var revivalBelts = EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get(), stack -> {
                             var relic = (HuntingBeltItem) stack.getItem();
 
