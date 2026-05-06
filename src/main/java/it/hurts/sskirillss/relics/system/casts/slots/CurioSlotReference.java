@@ -8,6 +8,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 @Data
@@ -21,7 +22,12 @@ public class CurioSlotReference extends SlotReference {
     @Override
     public ItemStack gatherStack(Player player) {
         return CuriosApi.getCuriosInventory(player).map(itemHandler -> {
-            IDynamicStackHandler stackHandler = itemHandler.getCurios().get(getType()).getStacks();
+            ICurioStacksHandler curioHandler = itemHandler.getCurios().get(getType());
+
+            if (curioHandler == null)
+                return ItemStack.EMPTY;
+
+            IDynamicStackHandler stackHandler = curioHandler.getStacks();
 
             int index = getIndex();
 
