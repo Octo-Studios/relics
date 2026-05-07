@@ -34,6 +34,7 @@ public class RelicsDataComponents {
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Map<String, CutGlassBootItem.FluidEntry>>> CUT_GLASS_BOOT_FLUIDS = RelicsDataComponents.construct("cut_glass_boot/fluids", Codec.unboundedMap(Codec.STRING, CutGlassBootItem.FluidEntry.CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CUT_GLASS_BOOT_SELECTED_FLUID_INDEX = RelicsDataComponents.construct("cut_glass_boot/selected_fluid_index", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> CUT_GLASS_BOOT_SPEED_BLEND = RelicsDataComponents.construct("cut_glass_boot/speed_blend", Codec.FLOAT);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<RiderFluteItem.HorseSlotData>>> RIDER_FLUTE_SLOTS = RelicsDataComponents.construct("rider_flute/slots", Codec.list(RiderFluteItem.HorseSlotData.CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> RIDER_FLUTE_SELECTED_SLOT_INDEX = RelicsDataComponents.construct("rider_flute/selected_slot_index", Codec.INT);

@@ -136,7 +136,10 @@ public class CutGlassBootItem extends WearableRelicItem {
         var movementSpeedAttributeId = getMovementSpeedAttributeId(stack, slotContext);
 
         if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(entity)) {
+            this.setSpeedBlend(stack, 0F);
+
             EntityUtils.removeAttribute(entity, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, movementSpeedAttributeId);
+
             return;
         }
 
@@ -148,17 +151,49 @@ public class CutGlassBootItem extends WearableRelicItem {
 
         var attribute = Attributes.MOVEMENT_SPEED;
         var operation = AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL;
+        
+        var targetProgress = 0F;
+        var fluidAmount = 0;
+        var progressBeforeUpdate = this.getSpeedBlend(stack);
 
-        if (state.getType() == Fluids.EMPTY)
-            EntityUtils.removeAttribute(entity, attribute, operation, movementSpeedAttributeId);
-        else {
+        if (state.getType() != Fluids.EMPTY) {
             var entry = this.getFluidEntries(entity, stack).get(state.getFluidType().toString());
 
-            if (entry != null)
-                EntityUtils.resetAttribute(entity, attribute, (float) (entry.getAmount() / 1000F * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("speed").getValue()) - 0.5F, operation, movementSpeedAttributeId);
-            else
-                EntityUtils.removeAttribute(entity, attribute, operation, movementSpeedAttributeId);
+            if (entry != null) {
+                targetProgress = 20F;
+                fluidAmount = entry.getAmount();
+            }
         }
+
+        var progress = progressBeforeUpdate;
+
+        if (progress < targetProgress)
+            progress = Math.min(targetProgress, progress + 1F);
+        else if (progress > targetProgress)
+            progress = Math.max(targetProgress, progress - 1F);
+
+        this.setSpeedBlend(stack, progress);
+        
+        var maxModifier = (float) (fluidAmount / 1000F * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("speed").getValue());
+
+        if (targetProgress <= 0F && progressBeforeUpdate > 1.0E-4F) {
+            var attributeInstance = entity.getAttribute(attribute);
+
+            if (attributeInstance != null) {
+                var existing = attributeInstance.getModifier(movementSpeedAttributeId);
+
+                if (existing != null) {
+                    var ratioBeforeUpdate = progressBeforeUpdate / 20F;
+
+                    if (ratioBeforeUpdate > 1.0E-4F)
+                        maxModifier = (float) (existing.amount() / ratioBeforeUpdate);
+                }
+            }
+        }
+
+        var modifier = maxModifier * (progress / 20F);
+
+        EntityUtils.resetAttribute(entity, attribute, modifier, operation, movementSpeedAttributeId);
     }
 
     @Override
@@ -221,6 +256,14 @@ public class CutGlassBootItem extends WearableRelicItem {
         var copy = new HashMap<>(entries);
 
         stack.set(RelicsDataComponents.CUT_GLASS_BOOT_FLUIDS, copy);
+    }
+
+    public float getSpeedBlend(ItemStack stack) {
+        return Math.clamp(stack.getOrDefault(RelicsDataComponents.CUT_GLASS_BOOT_SPEED_BLEND, 0F), 0F, 20F);
+    }
+
+    public void setSpeedBlend(ItemStack stack, float value) {
+        stack.set(RelicsDataComponents.CUT_GLASS_BOOT_SPEED_BLEND, Math.clamp(value, 0F, 20F));
     }
 
     public void setFluidEntry(LivingEntity entity, ItemStack stack, FluidEntry entry) {
@@ -616,6 +659,9 @@ public class CutGlassBootItem extends WearableRelicItem {
             var entity = event.getEntity();
 
             if (entity.isInFluidType())
+                return;
+
+            if (entity.isShiftKeyDown())
                 return;
 
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CUT_GLASS_BOOT.get())) {
