@@ -160,7 +160,8 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                     if (transfer <= 0D || !(relicStack.getItem() instanceof IRelicItem relic))
                         continue;
 
-                    relic.getRelicData(player, relicStack).getLevelingData().addExperience(transfer);
+                    relic.getRelicData(player, relicStack).getLevelingData().addExperience("dispersion", "trigger", transfer);
+
                     triggered = true;
                     distributed += transfer;
                 }
@@ -176,6 +177,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
 
                     if (units > 0) {
                         disperser.getRelicData(player, disperserStack).getLevelingData().addExperience("dispersion", "trigger", units);
+
                         stats.getMetricData("distributions").addValue(units);
                     }
                 }
@@ -235,7 +237,8 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                     if (!(relicStack.getItem() instanceof IRelicItem relic))
                         continue;
 
-                    relic.getRelicData(player, relicStack).getLevelingData().addExperience(split);
+                    relic.getRelicData(player, relicStack).getLevelingData().addExperience("dispersion", "trigger", split);
+
                     triggered = true;
                 }
 
