@@ -7,6 +7,7 @@
 
   "relics.description.researching.bookmarks.relic_description": "Descrição da Relíquia",
   "relics.description.researching.bookmarks.relic_statistic": "Estatísticas da Relíquia",
+  "relics.description.researching.bookmarks.relic_options": "Opções do Relic",
 
   "relics.description.researching.bookmarks.ability_description": "Descrição da Habilidade",
   "relics.description.researching.bookmarks.ability_experience": "Fontes de Experiência da Habilidade",
@@ -52,6 +53,8 @@
   "relics.description.researching.general.discord.description": "Clique para entrar no servidor do Discord do Relics.",
   "relics.description.researching.general.documentation.title": "Documentação",
   "relics.description.researching.general.documentation.description": "Clique para abrir a documentação desta relíquia.",
+
+  "relics.description.researching.relic.options.flawless_visual": "Mostrar efeitos visuais para relíquias perfeitas",
 
   "relics.description.researching.relic.info.level": "Nível da Relíquia:",
   "relics.description.researching.relic.info.quality": "Qualidade da Relíquia:",
@@ -444,13 +447,13 @@
   "relics.description.experience_disperser.ability.dispersion": "Dispersão de Experiência",
   "relics.description.experience_disperser.ability.dispersion.description": "Quando qualquer uma das relíquias do portador ganha experiência, todas as relíquias equipadas recebem adicionalmente %1$s%% desse valor.",
   "relics.description.experience_disperser.ability.dispersion.rank_modifier.same_item": "Relíquias do mesmo tipo ganham %2$s%% a mais de experiência com o efeito de dispersão.",
-  "relics.description.experience_disperser.ability.dispersion.rank_modifier.player_xp": "%3$s%% da experiência ganha pelo jogador é distribuída adicionalmente entre todas as relíquias equipadas.",
+  "relics.description.experience_disperser.ability.dispersion.rank_modifier.player_xp": "%3$s%% da experiência ganha pelo jogador a partir de orbes de experiência é distribuída entre todas as relíquias equipadas.",
   "relics.description.experience_disperser.ability.dispersion.rank_modifier.max_level": "O efeito de dispersão é acionado mesmo se a relíquia que ganhou experiência já tiver atingido seu nível máximo.",
   "relics.description.experience_disperser.ability.dispersion.experience_source.trigger": "+1 ponto de experiência para cada ponto de experiência distribuído por dispersão.",
   "relics.description.experience_disperser.ability.dispersion.statistic.distributions": "Acionamentos de Dispersão",
   "relics.description.experience_disperser.ability.dispersion.statistic.distributed_experience": "Experiência Distribuída",
-  "relics.description.experience_disperser.ability.dispersion.statistic.player_xp_conversions": "Acionamentos de Conversão de Experiência do Jogador",
-  "relics.description.experience_disperser.ability.dispersion.statistic.converted_player_experience": "Experiência do Jogador Convertida",
+  "relics.description.experience_disperser.ability.dispersion.statistic.player_xp_conversions": "Conversões de Orbes de Experiência Acionadas",
+  "relics.description.experience_disperser.ability.dispersion.statistic.converted_player_experience": "Experiência de Orbes de Experiência Convertida",
 
   "item.relics.relic_experience_bottle": "Frasco de Experiência de Relíquia",
   "item.relics.golden_tooth": "Dente de Ouro",
