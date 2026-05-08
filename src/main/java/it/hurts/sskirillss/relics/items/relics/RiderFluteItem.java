@@ -199,7 +199,7 @@ public class RiderFluteItem extends RelicItem {
 
         var ability = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("stable");
 
-        if (!ability.canPlayerUse(entity) || !ability.getRankModifierData("regeneration").isEnabled())
+        if (!ability.getRankModifierData("regeneration").isEnabled())
             return;
 
         var amount = (float) ability.getStatData("heal").getValue();
@@ -236,8 +236,9 @@ public class RiderFluteItem extends RelicItem {
         if (changed)
             this.setHorseSlots(stack, slots);
 
-        if (healedTotal > 0D && ability.canPlayerUse(entity) && ability.getRankModifierData("regeneration").isEnabled()) {
+        if (healedTotal > 0D && ability.getRankModifierData("regeneration").isEnabled()) {
             this.getRelicData(entity, stack).getLevelingData().addExperience("stable", "healing", healedTotal);
+
             ability.getStatisticData().getMetricData("healed_health").addValue(healedTotal);
         }
     }
@@ -253,7 +254,7 @@ public class RiderFluteItem extends RelicItem {
 
         var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
 
-        if (!ability.canPlayerUse(player) || !ability.getRankModifierData("recall").isEnabled())
+        if (!ability.getRankModifierData("recall").isEnabled())
             return;
 
         var slots = this.getHorseSlots(stack);
@@ -292,8 +293,9 @@ public class RiderFluteItem extends RelicItem {
         if (changed)
             this.setHorseSlots(stack, slots);
 
-        if (recalled > 0D && ability.canPlayerUse(player) && ability.getRankModifierData("recall").isEnabled()) {
+        if (recalled > 0D && ability.getRankModifierData("recall").isEnabled()) {
             this.getRelicData(player, stack).getLevelingData().addExperience("stable", "recall", recalled);
+
             ability.getStatisticData().getMetricData("captured_mounts").addValue(recalled);
         }
     }
@@ -421,8 +423,7 @@ public class RiderFluteItem extends RelicItem {
 
         var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
 
-        if (ability.canPlayerUse(player))
-            ability.getStatisticData().getMetricData("captured_mounts").addValue(1);
+        ability.getStatisticData().getMetricData("captured_mounts").addValue(1);
 
         horse.discard();
         player.level().playSound(null, horse.blockPosition(), SoundEvents.CHICKEN_EGG, SoundSource.PLAYERS, 0.9F, 1F);
@@ -485,8 +486,7 @@ public class RiderFluteItem extends RelicItem {
 
         var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
 
-        if (ability.canPlayerUse(player))
-            ability.getStatisticData().getMetricData("released_mounts").addValue(1);
+        ability.getStatisticData().getMetricData("released_mounts").addValue(1);
 
         level.playSound(null, horse.blockPosition(), SoundEvents.BEEHIVE_EXIT, SoundSource.PLAYERS, 0.9F, 1F);
 
@@ -540,9 +540,6 @@ public class RiderFluteItem extends RelicItem {
 
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
-        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable").canPlayerUse(player))
-            return InteractionResult.PASS;
-
         if (!this.isSupportedMount(entity))
             return InteractionResult.PASS;
 
@@ -569,9 +566,6 @@ public class RiderFluteItem extends RelicItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
 
-        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable").canPlayerUse(player))
-            return InteractionResultHolder.pass(stack);
-
         if (level.isClientSide())
             return InteractionResultHolder.sidedSuccess(stack, true);
 
@@ -593,7 +587,7 @@ public class RiderFluteItem extends RelicItem {
     public Optional<TooltipComponent> getTooltipImage(ItemStack stack) {
         var entries = new ArrayList<RiderFluteTooltipEntry>();
         var ability = this.getRelicData(null, stack).getAbilitiesData().getAbilityData("stable");
-        var regenerationActive = ability.canPlayerUse(null) && ability.getRankModifierData("regeneration").isEnabled();
+        var regenerationActive = ability.getRankModifierData("regeneration").isEnabled();
 
         for (var slot : this.getHorseSlots(stack)) {
             var id = ResourceLocation.tryParse(slot.entityType());
@@ -658,7 +652,7 @@ public class RiderFluteItem extends RelicItem {
                 var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
                 var movement = horse.getKnownMovement().multiply(1D, 0D, 1D).length();
 
-                if (ability.canPlayerUse(player) && movement > 0D) {
+                if (movement > 0D) {
                     this.getRelicData(player, stack).getLevelingData().addExperience("stable", "riding", movement * 0.025D);
 
                     ability.getStatisticData().getMetricData("distance_traveled").addValue(movement);
@@ -801,7 +795,7 @@ public class RiderFluteItem extends RelicItem {
 
                 var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
 
-                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("resistance").isEnabled())
+                if (!ability.getRankModifierData("resistance").isEnabled())
                     continue;
 
                 total += ability.getStatData("resistance").getValue();
@@ -853,7 +847,7 @@ public class RiderFluteItem extends RelicItem {
 
                 var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
 
-                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("resistance").isEnabled())
+                if (!ability.getRankModifierData("resistance").isEnabled())
                     continue;
 
                 relic.getRelicData(player, stack).getLevelingData().addExperience("stable", "resistance", blocked);

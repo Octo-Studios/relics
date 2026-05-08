@@ -117,9 +117,6 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 var disperser = (ExperienceDisperserItem) disperserStack.getItem();
                 var ability = disperser.getRelicData(player, disperserStack).getAbilitiesData().getAbilityData("dispersion");
 
-                if (!ability.canPlayerUse(player))
-                    continue;
-
                 if (sourceAtMaxLevel && !ability.getRankModifierData("max_level").isEnabled())
                     continue;
 
@@ -204,7 +201,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 var disperser = (ExperienceDisperserItem) disperserStack.getItem();
                 var ability = disperser.getRelicData(player, disperserStack).getAbilitiesData().getAbilityData("dispersion");
 
-                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("player_xp").isEnabled())
+                if (!ability.getRankModifierData("player_xp").isEnabled())
                     continue;
 
                 var ratio = ability.getStatData("player_xp_ratio").getValue();

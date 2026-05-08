@@ -277,8 +277,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
         var level = entity.level();
 
         var activeRegenerationStacks = RelicStackingUtils.findActiveStacks(entity, RelicsItems.JELLYFISH_NECKLACE.get(),
-                equippedStack -> equippedStack.getItem() == this
-                        && this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").canPlayerUse(entity));
+                equippedStack -> equippedStack.getItem() == this);
 
         if (RelicStackingUtils.isControllerStack(stack, activeRegenerationStacks)) {
             var multiplier = (float) RelicStackingUtils.sumValue(entity, stack, "regeneration", "max_health");
@@ -310,7 +309,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
         }
 
         var activeShockStacks = RelicStackingUtils.findActiveStacks(entity, RelicsItems.JELLYFISH_NECKLACE.get(),
-                equippedStack -> equippedStack.getItem() == this && this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").canPlayerUse(entity)
+                equippedStack -> equippedStack.getItem() == this
                         && !this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getMode().equals("disabled"));
 
         if (RelicStackingUtils.isControllerStack(stack, activeShockStacks)) {
@@ -441,8 +440,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
         var entity = slotContext.entity();
         var activeRegenerationStacks = EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get()).stream()
                 .filter(equippedStack -> equippedStack != stack)
-                .filter(equippedStack -> equippedStack.getItem() == this
-                        && this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").canPlayerUse(entity))
+                .filter(equippedStack -> equippedStack.getItem() == this)
                 .toList();
         var inWaterOrRain = entity.isInLiquid() || entity.isInRain();
 
@@ -505,9 +503,6 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                 for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {
                     var relic = (JellyfishNecklaceItem) stack.getItem();
 
-                    if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration").canPlayerUse(entity))
-                        continue;
-
                     var health = Math.min(entity.getMaxHealth(), event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration").getStatData("regeneration").getValue());
 
                     event.setAmount((float) (event.getAmount() + health));
@@ -529,7 +524,6 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             var level = entity.level();
             var stacks = EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get()).stream()
                     .filter(stack -> stack.getItem() instanceof JellyfishNecklaceItem relic
-                            && relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").canPlayerUse(entity)
                             && !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getMode().equals("disabled"))
                     .toList();
 

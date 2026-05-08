@@ -216,7 +216,7 @@ public class KineticBeltItem extends WearableRelicItem {
         var level = entity.level();
         var gravityAttributeId = getGravityAttributeId(stack, slotContext);
 
-        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")) {
+        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")) {
             EntityUtils.removeAttribute(entity, Attributes.GRAVITY, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);
 
             if (!level.isClientSide())
@@ -346,7 +346,7 @@ public class KineticBeltItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
                 var relic = (KineticBeltItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
+                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
                         || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getRankModifierData("momentum").isEnabled() || !relic.isActive(stack))
                     continue;
 
@@ -368,7 +368,7 @@ public class KineticBeltItem extends WearableRelicItem {
                 for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.KINETIC_BELT.get())) {
                     var relic = (KineticBeltItem) stack.getItem();
 
-                    if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(source) || relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
+                    if (relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
                             || !relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getRankModifierData("strike").isEnabled() || !relic.isActive(stack))
                         continue;
 
@@ -389,7 +389,7 @@ public class KineticBeltItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
                 var relic = (KineticBeltItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
+                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
                         || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getRankModifierData("resistance").isEnabled() || !relic.isActive(stack))
                     continue;
 

@@ -135,14 +135,6 @@ public class CutGlassBootItem extends WearableRelicItem {
         var level = entity.level();
         var movementSpeedAttributeId = getMovementSpeedAttributeId(stack, slotContext);
 
-        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(entity)) {
-            this.setSpeedBlend(stack, 0F);
-
-            EntityUtils.removeAttribute(entity, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, movementSpeedAttributeId);
-
-            return;
-        }
-
         if (level.isClientSide())
             return;
 
@@ -331,9 +323,6 @@ public class CutGlassBootItem extends WearableRelicItem {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
-
-        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(player))
-            return InteractionResultHolder.pass(stack);
 
         var hitResult = Item.getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
 
@@ -667,9 +656,6 @@ public class CutGlassBootItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CUT_GLASS_BOOT.get())) {
                 var relic = (CutGlassBootItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(entity))
-                    continue;
-
                 var fluids = relic.getFluidEntries(entity, stack);
 
                 if (!fluids.containsKey(event.getFluid().getFluidType().toString()))
@@ -747,9 +733,6 @@ public class CutGlassBootItem extends WearableRelicItem {
 
         @Override
         public FluidStack getFluidInTank(int tank) {
-            if (!item.getRelicData(null, container).getAbilitiesData().getAbilityData("glass").canPlayerUse(null))
-                return FluidStack.EMPTY;
-
             var fluid = item.getSelectedFluid(null, container);
 
             if (fluid == Fluids.EMPTY)
@@ -780,9 +763,6 @@ public class CutGlassBootItem extends WearableRelicItem {
 
         @Override
         public int fill(FluidStack resource, FluidAction action) {
-            if (!item.getRelicData(null, container).getAbilitiesData().getAbilityData("glass").canPlayerUse(null))
-                return 0;
-
             if (resource.isEmpty())
                 return 0;
 
@@ -824,9 +804,6 @@ public class CutGlassBootItem extends WearableRelicItem {
 
         @Override
         public FluidStack drain(FluidStack resource, FluidAction action) {
-            if (!item.getRelicData(null, container).getAbilitiesData().getAbilityData("glass").canPlayerUse(null))
-                return FluidStack.EMPTY;
-
             if (resource.isEmpty())
                 return FluidStack.EMPTY;
 
@@ -851,9 +828,6 @@ public class CutGlassBootItem extends WearableRelicItem {
 
         @Override
         public FluidStack drain(int maxDrain, FluidAction action) {
-            if (!item.getRelicData(null, container).getAbilitiesData().getAbilityData("glass").canPlayerUse(null))
-                return FluidStack.EMPTY;
-
             if (maxDrain <= 0)
                 return FluidStack.EMPTY;
 

@@ -152,9 +152,6 @@ public class SphereOfSelfSacrifice extends RelicItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
 
-        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").canPlayerUse(player))
-            return InteractionResultHolder.pass(stack);
-
         if (player.isShiftKeyDown() && this.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("salvo").isEnabled()) {
             if (!level.isClientSide()) {
                 var hit = EntityUtils.rayTraceEntity(player, entity -> entity instanceof LivingEntity living && !living.isDeadOrDying() && !EntityUtils.isAlliedTo(player, living) && !living.is(player), 64D);
@@ -346,9 +343,6 @@ public class SphereOfSelfSacrifice extends RelicItem {
             for (var stack : EntityUtils.findItemsInInventory(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get())) {
                 var relic = (SphereOfSelfSacrifice) stack.getItem();
 
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").canPlayerUse(player))
-                    continue;
-
                 if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("salvation").isEnabled())
                     continue;
 
@@ -386,9 +380,6 @@ public class SphereOfSelfSacrifice extends RelicItem {
 
             for (var stack : EntityUtils.findItemsInInventory(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get())) {
                 var relic = (SphereOfSelfSacrifice) stack.getItem();
-
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").canPlayerUse(player))
-                    continue;
 
                 if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("resistance").isEnabled())
                     continue;

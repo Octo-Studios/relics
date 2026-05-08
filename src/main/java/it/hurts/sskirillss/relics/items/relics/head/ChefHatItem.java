@@ -102,7 +102,7 @@ public class ChefHatItem extends WearableRelicItem {
 
             var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("satiety");
 
-            if (abilityData.canPlayerUse(entity) && abilityData.getRankModifierData("quick_meal").isEnabled())
+            if (abilityData.getRankModifierData("quick_meal").isEnabled())
                 count++;
         }
 
@@ -123,9 +123,6 @@ public class ChefHatItem extends WearableRelicItem {
                 continue;
 
             var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("satiety");
-
-            if (!abilityData.canPlayerUse(entity))
-                continue;
 
             relic.getRelicData(entity, stack).getLevelingData().addExperience("satiety", "consume", 1);
             abilityData.getStatisticData().getMetricData(consumedMetric).addValue(1);
@@ -188,9 +185,6 @@ public class ChefHatItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.CHEF_HAT.get())) {
                 var relic = (ChefHatItem) stack.getItem();
                 var abilityData = relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("satiety");
-
-                if (!abilityData.canPlayerUse(source))
-                    continue;
 
                 var chance = abilityData.getStatData("chance").getValue();
 
