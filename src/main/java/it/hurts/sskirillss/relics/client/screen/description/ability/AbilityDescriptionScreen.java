@@ -136,9 +136,10 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         this.initActionButtons();
 
+        var researchTemplate = abilityData.getTemplate().getResearchTemplate();
         var researchData = abilityData.getResearchData();
 
-        if (researchData.isResearched() && !researchData.getLinks().isEmpty())
+        if (!researchTemplate.getStars().isEmpty() && researchData.isResearched())
             this.addRenderableWidget(new AbilityResearchWidget(x + 67, y + 65, this));
 
         var container = subcategory.getContainerWidget(this);
