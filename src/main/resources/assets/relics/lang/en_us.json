@@ -40,6 +40,7 @@
   "relics.description.researching.general.relic_rank.extra_info": "Obtained by manually increasing the relic's rank, which resets all upgrade progress but increases its maximum level.",
 
   "relics.description.researching.relic.card.low_level": "To unlock this ability, you must raise the relic level to %1$s!",
+  "relics.description.researching.relic.card.low_rank": "To unlock, you need to rank up the relic to %1$s!",
   "relics.description.researching.relic.card.unresearched": "To use this ability, you must complete the research!",
   "relics.description.researching.relic.card.ready_to_unlock": "Ability is ready to be unlocked! Clicks remaining: %1$s",
   "relics.description.researching.relic.card.ready_to_upgrade": "Ability is ready to be upgraded!",

@@ -31,6 +31,7 @@ public class AbilityTemplate {
     private final int initialMaxLevel;
     private final double maxLevelRankModifier;
     private final int requiredLevel;
+    private final int requiredRank;
     private final int requiredPoints;
     private final ResearchTemplate researchTemplate;
     private final AbilityStatisticTemplate statistic;
@@ -68,6 +69,7 @@ public class AbilityTemplate {
         private int initialMaxLevel = 10;
         private double maxLevelRankModifier = 0.25D;
         private int requiredLevel = 0;
+        private int requiredRank = 0;
         private int requiredPoints = 1;
         private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
         private AbilityStatisticTemplate statistic = AbilityStatisticTemplate.builder().build();
@@ -87,6 +89,7 @@ public class AbilityTemplate {
             this.initialMaxLevel = base.getInitialMaxLevel();
             this.maxLevelRankModifier = base.getMaxLevelRankModifier();
             this.requiredLevel = base.getRequiredLevel();
+            this.requiredRank = base.getRequiredRank();
             this.requiredPoints = base.getRequiredPoints();
             this.researchTemplate = base.getResearchTemplate();
             this.statistic = base.getStatistic();
@@ -131,6 +134,12 @@ public class AbilityTemplate {
             return this;
         }
 
+        public AbilityTemplateBuilder requiredRank(int requiredRank) {
+            this.requiredRank = requiredRank;
+
+            return this;
+        }
+
         public AbilityTemplateBuilder requiredPoints(int requiredPoints) {
             this.requiredPoints = requiredPoints;
 
@@ -168,7 +177,7 @@ public class AbilityTemplate {
         }
 
         public AbilityTemplate build() {
-            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredPoints, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers);
+            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredRank, this.requiredPoints, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers);
         }
     }
 }

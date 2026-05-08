@@ -48,7 +48,7 @@ public class AbilityData {
 
         abilityComponent = AbilityComponent.EMPTY;
 
-        if (template.getRequiredLevel() <= 0)
+        if (template.getRequiredLevel() <= 0 && template.getRequiredRank() <= 0)
             abilityComponent = abilityComponent.toBuilder()
                     .lock(LockComponent.builder()
                             .unlocks(new LockData(this).getMaxUnlocks())
@@ -197,6 +197,12 @@ public class AbilityData {
         var template = getTemplate();
 
         return template != null && this.getAbilitiesData().getRelicData().getLevelingData().getLevel() >= template.getRequiredLevel();
+    }
+
+    public boolean isEnoughRank() {
+        var template = getTemplate();
+
+        return template != null && this.getAbilitiesData().getRelicData().getLevelingData().getRank() >= template.getRequiredRank();
     }
 
     public boolean isEnabled() {
