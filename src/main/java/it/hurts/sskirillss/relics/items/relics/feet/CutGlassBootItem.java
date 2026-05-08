@@ -143,7 +143,7 @@ public class CutGlassBootItem extends WearableRelicItem {
 
         var attribute = Attributes.MOVEMENT_SPEED;
         var operation = AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL;
-        
+
         var targetProgress = 0F;
         var fluidAmount = 0;
         var progressBeforeUpdate = this.getSpeedBlend(stack);
@@ -157,6 +157,13 @@ public class CutGlassBootItem extends WearableRelicItem {
             }
         }
 
+        if (targetProgress > 0F && entity.tickCount % 20 == 0) {
+            if (entity.getKnownMovement().multiply(1, 0, 1).length() > 0)
+                this.getRelicData(entity, stack).getLevelingData().addExperience("glass", "standing", 1);
+
+            this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatisticData().getMetricData("duration").addValue(1);
+        }
+
         var progress = progressBeforeUpdate;
 
         if (progress < targetProgress)
@@ -165,8 +172,8 @@ public class CutGlassBootItem extends WearableRelicItem {
             progress = Math.max(targetProgress, progress - 1F);
 
         this.setSpeedBlend(stack, progress);
-        
-        var maxModifier = (float) (fluidAmount / 1000F * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("speed").getValue());
+
+        var maxModifier = (float) (-0.5F + fluidAmount / 1000F * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("speed").getValue());
 
         if (targetProgress <= 0F && progressBeforeUpdate > 1.0E-4F) {
             var attributeInstance = entity.getAttribute(attribute);
@@ -660,13 +667,6 @@ public class CutGlassBootItem extends WearableRelicItem {
 
                 if (!fluids.containsKey(event.getFluid().getFluidType().toString()))
                     continue;
-
-                if (entity.tickCount % 20 == 0) {
-                    if (entity.getKnownMovement().multiply(1, 0, 1).length() > 0)
-                        relic.getRelicData(entity, stack).getLevelingData().addExperience("glass", "standing", 1);
-
-                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatisticData().getMetricData("duration").addValue(1);
-                }
 
                 event.setCanceled(true);
             }
