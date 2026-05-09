@@ -5,8 +5,10 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.AbilityDescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.synergy.SynergyDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.synergy.widgets.SynergyDescriptionContainerWidget;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityRankModifier;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyRankModifier;
@@ -30,17 +32,18 @@ public class RankModifierToggleWidget extends AbstractDescriptionWidget {
 
     private final DescriptionContainerWidget container;
     private final String rankModifier;
-    private final int lineIndex;
+    private final int fallbackLineIndex;
     private final boolean synergy;
     private double renderX;
     private double renderY;
+    private boolean positionVisible;
 
     public RankModifierToggleWidget(DescriptionContainerWidget container, String rankModifier, int lineIndex, boolean synergy) {
         super(container.getX() + X_OFFSET, container.getY() + Y_OFFSET, WIDTH, HEIGHT);
 
         this.container = container;
         this.rankModifier = rankModifier;
-        this.lineIndex = lineIndex;
+        this.fallbackLineIndex = lineIndex;
         this.synergy = synergy;
     }
 
@@ -146,6 +149,14 @@ public class RankModifierToggleWidget extends AbstractDescriptionWidget {
     }
 
     private void updatePosition() {
+        var lineIndex = this.resolveLineIndex();
+
+        if (lineIndex < 0) {
+            this.positionVisible = false;
+
+            return;
+        }
+
         var scrollbar = this.container.getScrollbar();
         var scroll = 0D;
 
@@ -158,15 +169,34 @@ public class RankModifierToggleWidget extends AbstractDescriptionWidget {
         }
 
         this.renderX = this.container.getX() + X_OFFSET;
-        this.renderY = this.container.getY() + Y_OFFSET + this.lineIndex * LINE_STEP - scroll;
+        this.renderY = this.container.getY() + Y_OFFSET + lineIndex * LINE_STEP - scroll;
 
         this.setX((int) Math.floor(this.renderX));
         this.setY((int) Math.floor(this.renderY));
+
+        this.positionVisible = this.renderY + this.getHeight() >= this.container.getY()
+                && this.renderY <= this.container.getY() + this.container.getHeight();
+    }
+
+    private int resolveLineIndex() {
+        var entries = this.synergy && this.container instanceof SynergyDescriptionContainerWidget synergyContainer
+                ? synergyContainer.getRankModifierToggleEntries()
+                : !this.synergy && this.container instanceof AbilityDescriptionContainerWidget abilityContainer
+                ? abilityContainer.getRankModifierToggleEntries()
+                : null;
+
+        if (entries == null)
+            return this.fallbackLineIndex;
+
+        return entries.stream()
+                .filter(entry -> entry.rankModifier().equals(this.rankModifier))
+                .mapToInt(Entry::lineIndex)
+                .findFirst()
+                .orElse(-1);
     }
 
     private boolean isVisible() {
-        return this.renderY + this.getHeight() >= this.container.getY()
-                && this.renderY <= this.container.getY() + this.container.getHeight();
+        return this.positionVisible;
     }
 
     public record Entry(String rankModifier, int lineIndex) {
