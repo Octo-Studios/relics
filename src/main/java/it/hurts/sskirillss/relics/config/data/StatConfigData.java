@@ -24,15 +24,15 @@ public class StatConfigData {
     private double maxThresholdValue;
 
     @Prop(comment = "Type of mathematical operation used to calculate the stat's value based on the ability level.")
-    private String upgradeOperation;
-    @Prop(comment = "Modifier applied to the base value of the stat, depending on the [upgradeOperation] parameter.")
-    private double upgradeModifier;
+    private String scalingModel;
+    @Prop(comment = "Value the stat reaches when both the stat quality and ability level are at their maximum.")
+    private double targetValue;
 
     public AbilityStatTemplate toData(IRelicItem relic, String ability, String stat) {
         return relic.getDefaultStatTemplate(ability, stat).toBuilder()
                 .initialValue(minInitialValue, maxInitialValue)
                 .thresholdValue(minThresholdValue, maxThresholdValue)
-                .upgradeModifier(RelicsRegistries.SCALING_MODEL_REGISTRY.get(ResourceLocation.parse(upgradeOperation)), upgradeModifier)
+                .targetValue(RelicsRegistries.SCALING_MODEL_REGISTRY.get(ResourceLocation.parse(scalingModel)), targetValue)
                 .build();
     }
 }

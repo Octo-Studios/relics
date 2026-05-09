@@ -65,7 +65,7 @@ public class ClotOfTimeItem extends RelicItem {
                                 .rankModifier(5, "health_rewind")
                                 .stat(AbilityStatTemplate.builder("time")
                                         .initialValue(3D, 5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30.0075D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()

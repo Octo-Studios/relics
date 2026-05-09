@@ -9,4 +9,9 @@ public class AdditiveScalingModel extends ScalingModel {
     public double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, int iterations) {
         return baseValue + (modifier * iterations);
     }
+
+    @Override
+    public double calculateModifier(LivingEntity entity, ItemStack stack, double baseValue, double targetValue, int iterations) {
+        return iterations <= 0 ? 0D : (targetValue - baseValue) / iterations;
+    }
 }

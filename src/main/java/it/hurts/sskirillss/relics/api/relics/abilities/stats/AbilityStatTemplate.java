@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.api.relics.abilities.stats;
 
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.misc.InitialValue;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.misc.TargetValue;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.misc.ThresholdValue;
-import it.hurts.sskirillss.relics.api.relics.abilities.stats.misc.UpgradeModifier;
 import it.hurts.sskirillss.relics.api.scaling_models.ScalingModel;
 import it.hurts.sskirillss.relics.config.data.StatConfigData;
 import it.hurts.sskirillss.relics.init.RelicsRegistries;
@@ -18,7 +18,7 @@ import java.util.function.Function;
 public class AbilityStatTemplate {
     private final String id;
 
-    private final UpgradeModifier upgradeModifier;
+    private final TargetValue targetValue;
     private final InitialValue initialValue;
     private final ThresholdValue thresholdValue;
     private final Function<Double, ? extends Number> formatValue;
@@ -32,13 +32,13 @@ public class AbilityStatTemplate {
     }
 
     public StatConfigData toConfigData() {
-        return new StatConfigData(initialValue.getMinValue(), initialValue.getMaxValue(), thresholdValue.getMinValue(), thresholdValue.getMaxValue(), RelicsRegistries.SCALING_MODEL_REGISTRY.getKey(upgradeModifier.getScalingModel()).toString(), upgradeModifier.getModifier());
+        return new StatConfigData(initialValue.getMinValue(), initialValue.getMaxValue(), thresholdValue.getMinValue(), thresholdValue.getMaxValue(), RelicsRegistries.SCALING_MODEL_REGISTRY.getKey(targetValue.getScalingModel()).toString(), targetValue.getTargetValue());
     }
 
     public static class StatTemplateBuilder {
         private final String id;
 
-        private UpgradeModifier upgradeModifier = new UpgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D);
+        private TargetValue targetValue = new TargetValue(RelicsScalingModels.ADDITIVE.get(), 1D);
         private InitialValue initialValue = new InitialValue(0D, 0D);
         private ThresholdValue thresholdValue = new ThresholdValue(Double.MIN_VALUE, Double.MAX_VALUE);
         private Function<Double, ? extends Number> formatValue = Double::doubleValue;
@@ -50,14 +50,14 @@ public class AbilityStatTemplate {
         private StatTemplateBuilder(AbilityStatTemplate base) {
             this.id = base.getId();
 
-            this.upgradeModifier = base.getUpgradeModifier();
+            this.targetValue = base.getTargetValue();
             this.initialValue = base.getInitialValue();
             this.thresholdValue = base.getThresholdValue();
             this.formatValue = base.getFormatValue();
         }
 
-        public StatTemplateBuilder upgradeModifier(ScalingModel model, double step) {
-            this.upgradeModifier = new UpgradeModifier(model, step);
+        public StatTemplateBuilder targetValue(ScalingModel model, double targetValue) {
+            this.targetValue = new TargetValue(model, targetValue);
 
             return this;
         }
@@ -81,7 +81,7 @@ public class AbilityStatTemplate {
         }
 
         public AbilityStatTemplate build() {
-            return new AbilityStatTemplate(id, upgradeModifier, initialValue, thresholdValue, formatValue);
+            return new AbilityStatTemplate(id, targetValue, initialValue, thresholdValue, formatValue);
         }
     }
 }

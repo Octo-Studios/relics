@@ -6,7 +6,7 @@ import lombok.Data;
 
 @Data
 @AllArgsConstructor
-public class UpgradeModifier {
+public class TargetValue {
     private ScalingModel scalingModel;
-    private double modifier;
+    private double targetValue;
 }
