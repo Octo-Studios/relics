@@ -13,9 +13,8 @@ import net.neoforged.neoforge.client.event.RegisterShadersEvent;
 
 import java.io.IOException;
 
-@EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
 public class RelicsCoreShaders {
-
     public static ShaderInstance REVEAL_SHADER = null;
     public static RenderStateShard.ShaderStateShard REVEAL_SHADER_SHARD = new RenderStateShard.ShaderStateShard(()->REVEAL_SHADER);
 
@@ -26,5 +25,4 @@ public class RelicsCoreShaders {
                     REVEAL_SHADER = inst;
                 });
     }
-
 }

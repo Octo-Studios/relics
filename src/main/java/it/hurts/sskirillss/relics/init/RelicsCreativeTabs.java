@@ -15,7 +15,7 @@ import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber
 public class RelicsCreativeTabs {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, Relics.MODID);
 

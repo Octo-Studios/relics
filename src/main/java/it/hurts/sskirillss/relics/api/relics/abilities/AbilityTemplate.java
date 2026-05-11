@@ -6,6 +6,10 @@ import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationPredicateContext;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationPredicateType;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationType;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
@@ -19,6 +23,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 @Data
@@ -38,6 +43,7 @@ public class AbilityTemplate {
     private final List<String> modes;
     private final ExperienceSourcesTemplate experienceSources;
     private final Multimap<Integer, String> rankModifiers;
+    private final AbilityActivationTemplate activation;
 
     public static AbilityTemplateBuilder builder(String id) {
         return new AbilityTemplateBuilder(id);
@@ -76,6 +82,7 @@ public class AbilityTemplate {
         private List<String> modes = new ArrayList<>();
         private ExperienceSourcesTemplate experienceSources = ExperienceSourcesTemplate.builder().build();
         private Multimap<Integer, String> rankModifiers = LinkedHashMultimap.create();
+        private AbilityActivationTemplate activation = AbilityActivationTemplate.EMPTY;
 
         public AbilityTemplateBuilder(String id) {
             this.id = id;
@@ -96,6 +103,7 @@ public class AbilityTemplate {
             this.experienceSources = base.getExperienceSources();
             this.modes = base.getModes();
             this.rankModifiers = base.getRankModifiers();
+            this.activation = base.getActivation();
         }
 
         public AbilityTemplateBuilder icon(Function3<Player, ItemStack, String, String> icon) {
@@ -176,8 +184,46 @@ public class AbilityTemplate {
             return this;
         }
 
+        public AbilityTemplateBuilder activation(AbilityActivationTemplate activation) {
+            this.activation = activation;
+
+            return this;
+        }
+
+        public AbilityTemplateBuilder active(AbilityActivationTemplate activation) {
+            return activation(activation);
+        }
+
+        public AbilityTemplateBuilder active(AbilityActivationType type) {
+            return activation(AbilityActivationTemplate.builder(type).build());
+        }
+
+        public AbilityTemplateBuilder passive() {
+            return activation(AbilityActivationTemplate.EMPTY);
+        }
+
+        public AbilityTemplateBuilder activationPredicate(String id, AbilityActivationPredicateType type, Predicate<AbilityActivationPredicateContext> predicate) {
+            var builder = AbilityActivationTemplate.builder(this.activation.getType())
+                    .containers(this.activation.getContainers())
+                    .predicates(new LinkedHashMap<>(this.activation.getPredicates()))
+                    .cyclesModes(this.activation.isCyclesModes());
+
+            this.activation = builder.predicate(id, type, predicate).build();
+
+            return this;
+        }
+
         public AbilityTemplate build() {
-            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredRank, this.requiredPoints, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers);
+            var activation = this.activation;
+
+            if (!this.modes.isEmpty() && !activation.isActive())
+                activation = AbilityActivationTemplate.builder(AbilityActivationType.INSTANTANEOUS)
+                        .containers(activation.getContainers())
+                        .predicates(new LinkedHashMap<>(activation.getPredicates()))
+                        .cyclesModes()
+                        .build();
+
+            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredRank, this.requiredPoints, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers, activation);
         }
     }
 }

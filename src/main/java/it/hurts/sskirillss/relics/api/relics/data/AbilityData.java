@@ -1,14 +1,23 @@
 package it.hurts.sskirillss.relics.api.relics.data;
 
+import it.hurts.sskirillss.relics.api.events.relic.abilities.ability.AbilityModeSwitchEvent;
 import it.hurts.sskirillss.relics.api.relics.LockComponent;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationContext;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationComponent;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationPredicateContext;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationPredicateType;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationStage;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationType;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +56,13 @@ public class AbilityData {
             return abilityComponent;
 
         abilityComponent = AbilityComponent.EMPTY;
+
+        if (template.getActivation().getType() == AbilityActivationType.TOGGLEABLE)
+            abilityComponent = abilityComponent.toBuilder()
+                    .activation(abilityComponent.getActivation().toBuilder()
+                            .ticking(true)
+                            .build())
+                    .build();
 
         if (template.getRequiredLevel() <= 0 && template.getRequiredRank() <= 0)
             abilityComponent = abilityComponent.toBuilder()
@@ -117,6 +133,42 @@ public class AbilityData {
         setComponent(getComponent().toBuilder()
                 .mode(mode)
                 .build());
+    }
+
+    public String getNextMode() {
+        var template = getTemplate();
+
+        if (template == null)
+            return "";
+
+        var modes = template.getModes();
+
+        if (modes.isEmpty())
+            return "";
+
+        var mode = getMode();
+        var index = modes.indexOf(mode);
+
+        return modes.get(index < 0 || index >= modes.size() - 1 ? 0 : index + 1);
+    }
+
+    public boolean cycleMode(Player player) {
+        var template = getTemplate();
+
+        if (template == null || template.getModes().isEmpty())
+            return false;
+
+        var stack = this.getAbilitiesData().getRelicData().getStack();
+        var event = new AbilityModeSwitchEvent(player, stack, this.getId(), getMode(), getNextMode());
+
+        NeoForge.EVENT_BUS.post(event);
+
+        if (event.isCanceled())
+            return false;
+
+        setMode(event.getToMode());
+
+        return true;
     }
 
     public void randomizeStats() {
@@ -215,6 +267,151 @@ public class AbilityData {
 
     public boolean canPlayerUse(LivingEntity entity) {
         return isUnlocked();
+    }
+
+    public boolean isActive() {
+        var template = getTemplate();
+
+        return template != null && template.getActivation().isActive();
+    }
+
+    public AbilityActivationType getActivationType() {
+        var template = getTemplate();
+
+        return template == null ? AbilityActivationType.NONE : template.getActivation().getType();
+    }
+
+    public AbilityActivationComponent getActivationComponent() {
+        var component = getComponent();
+
+        return component == null ? AbilityActivationComponent.EMPTY : component.getActivation();
+    }
+
+    public void setActivationComponent(AbilityActivationComponent activation) {
+        setComponent(getComponent().toBuilder()
+                .activation(activation)
+                .build());
+    }
+
+    public int getActivationCooldown() {
+        return getActivationComponent().getCooldown();
+    }
+
+    public void setActivationCooldown(int cooldown) {
+        var value = Math.max(0, cooldown);
+
+        setActivationComponent(getActivationComponent().toBuilder()
+                .cooldown(value)
+                .cooldownCap(Math.max(getActivationComponent().getCooldownCap(), value))
+                .build());
+    }
+
+    public void addActivationCooldown(int cooldown) {
+        setActivationCooldown(getActivationCooldown() + cooldown);
+    }
+
+    public int getActivationCooldownCap() {
+        return getActivationComponent().getCooldownCap();
+    }
+
+    public boolean isActivationOnCooldown() {
+        return getActivationCooldown() > 0;
+    }
+
+    public boolean isActivationTicking() {
+        return isUnlocked() && getActivationComponent().isTicking();
+    }
+
+    public void setActivationTicking(boolean ticking) {
+        setActivationComponent(getActivationComponent().toBuilder()
+                .ticking(ticking)
+                .build());
+    }
+
+    public int getActivationCharge() {
+        return getActivationComponent().getCharge();
+    }
+
+    public void setActivationCharge(int charge) {
+        setActivationComponent(getActivationComponent().toBuilder()
+                .charge(Math.max(0, charge))
+                .build());
+    }
+
+    public boolean testActivationPredicate(Player player, String predicate) {
+        var template = getTemplate();
+
+        if (template == null)
+            return false;
+
+        var predicateTemplate = template.getActivation().getPredicates().get(predicate);
+
+        return predicateTemplate != null && predicateTemplate.test(new AbilityActivationPredicateContext(player, this.getAbilitiesData().getRelicData().getStack(), this));
+    }
+
+    public boolean testActivationPredicates(Player player, AbilityActivationPredicateType type) {
+        var template = getTemplate();
+
+        if (template == null)
+            return false;
+
+        var context = new AbilityActivationPredicateContext(player, this.getAbilitiesData().getRelicData().getStack(), this);
+
+        for (var predicate : template.getActivation().getPredicates(type).values())
+            if (!predicate.test(context))
+                return false;
+
+        return true;
+    }
+
+    public boolean canPlayerActivate(Player player) {
+        return isActive()
+                && canPlayerUse(player)
+                && !isActivationOnCooldown()
+                && testActivationPredicates(player, AbilityActivationPredicateType.CAST);
+    }
+
+    public boolean activate(Player player, AbilityActivationStage stage) {
+        var template = getTemplate();
+
+        if (template == null || !template.getActivation().isActive())
+            return false;
+
+        var type = template.getActivation().getType();
+        var stack = this.getAbilitiesData().getRelicData().getStack();
+
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return false;
+
+        if (!canPlayerActivate(player)) {
+            if (isActivationTicking()) {
+                setActivationTicking(false);
+
+                relic.activateAbility(new AbilityActivationContext(player, stack, this, type, AbilityActivationStage.END));
+            }
+
+            return false;
+        }
+
+        switch (type) {
+            case CYCLICAL, TOGGLEABLE -> {
+                switch (stage) {
+                    case START -> setActivationTicking(true);
+                    case END -> setActivationTicking(false);
+                }
+            }
+        }
+
+        if (stage == AbilityActivationStage.START && template.getActivation().isCyclesModes())
+            cycleMode(player);
+
+        relic.activateAbility(new AbilityActivationContext(player, stack, this, type, stage));
+
+        return true;
+    }
+
+    public boolean activate(Player player) {
+        return activate(player, AbilityActivationStage.START);
     }
 
     public boolean mayUnlock() {
