@@ -9,11 +9,7 @@ import it.hurts.sskirillss.relics.client.gui.layers.*;
 import it.hurts.sskirillss.relics.client.layer.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
-import it.hurts.sskirillss.relics.client.post_effects.ChromaticAberrationPostEffect;
-import it.hurts.sskirillss.relics.client.post_effects.DistortionPostEffect;
-import it.hurts.sskirillss.relics.client.post_effects.GlitchPostEffect;
-import it.hurts.sskirillss.relics.client.post_effects.LensPostEffect;
-import it.hurts.sskirillss.relics.client.post_effects.SevenDeadlySinsPostEffect;
+import it.hurts.sskirillss.relics.client.post_effects.*;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.*;
 import it.hurts.sskirillss.relics.client.style.*;
@@ -41,6 +37,7 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+
 import java.util.List;
 
 @EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)

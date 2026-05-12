@@ -12,6 +12,7 @@ import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
 import it.hurts.sskirillss.relics.items.relics.ring.RingOfTheSevenDeadlySinsItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -55,6 +56,12 @@ public class RelicsDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_PHASE_DURATION = RelicsDataComponents.construct("midnight_mantle/duration", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN = RelicsDataComponents.construct("midnight_mantle/invisibility_cooldown", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_STARFALL_COOLDOWN = RelicsDataComponents.construct("midnight_mantle/starfall_cooldown", Codec.INT);
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GLITCHY_MANTLE_STAND_TICKS = RelicsDataComponents.construct("glitchy_mantle/stand_ticks", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> GLITCHY_MANTLE_FORCED_FALL = RelicsDataComponents.construct("glitchy_mantle/forced_fall", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> GLITCHY_MANTLE_FORCED_FALL_START_Y = RelicsDataComponents.construct("glitchy_mantle/forced_fall_start_y", Codec.DOUBLE);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GLITCHY_MANTLE_PHASE_TICKS = RelicsDataComponents.construct("glitchy_mantle/phase_ticks", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Vec3>> GLITCHY_MANTLE_LAST_SAFE_POS = RelicsDataComponents.construct("glitchy_mantle/last_safe_pos", Vec3.CODEC);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROLLER_SKATE_DURATION = RelicsDataComponents.construct("roller_skate/duration", Codec.INT);
 
