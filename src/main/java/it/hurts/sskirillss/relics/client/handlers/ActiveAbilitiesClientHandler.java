@@ -10,14 +10,17 @@ import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relic_containers.AbilityReference;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationStage;
+import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.init.RelicsRegistries;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.abilities.C2SActivateAbility;
 import it.hurts.sskirillss.relics.relic_containers.CuriosRelicStackReference;
 import it.hurts.sskirillss.relics.relic_containers.InventoryRelicStackReference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -154,8 +157,8 @@ public class ActiveAbilitiesClientHandler {
         if (keyDown && !closing)
             renderCursorMarker(guiGraphics, centerX + (int) Math.round(cursorX), centerY + (int) Math.round(cursorY));
 
-//        if (selectedIndex >= 0)
-//            renderSelectedTitle(guiGraphics, visibleReferences.get(selectedIndex), centerX, (int) Math.round(centerY + radius + 28));
+        if (selectedIndex >= 0)
+            renderSelectedTitle(guiGraphics, visibleReferences.get(selectedIndex), centerX, (int) Math.round(centerY + radius + 30));
 
         if (closing && getCloseProgress() >= 1D)
             finishClosing();
@@ -291,6 +294,7 @@ public class ActiveAbilitiesClientHandler {
             castingReference = selected;
 
             pulseCard(castingReference);
+            playAbilityCastSound();
             sendActivation(castingReference, AbilityActivationStage.START);
             wasLeftMouseDown = true;
 
@@ -303,6 +307,7 @@ public class ActiveAbilitiesClientHandler {
             castingReference = selected;
 
             pulseCard(castingReference);
+            playAbilityCastSound();
             sendActivation(castingReference, AbilityActivationStage.START);
             wasLeftMouseDown = true;
 
@@ -352,7 +357,25 @@ public class ActiveAbilitiesClientHandler {
         for (var container : RelicsRegistries.RELIC_CONTAINER_REGISTRY)
             references.addAll(container.gatherAbilityReferences().apply(player));
 
-        return references;
+        return references.stream()
+                .filter(ActiveAbilitiesClientHandler::isUnlockedAbility)
+                .toList();
+    }
+
+    private static boolean isUnlockedAbility(AbilityReference reference) {
+        var player = MC.player;
+
+        if (player == null)
+            return false;
+
+        var stack = reference.stackReference().getStack(player);
+
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return false;
+
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(reference.ability());
+
+        return abilityData != null && abilityData.isUnlocked();
     }
 
     public static void sendActivation(AbilityReference reference, AbilityActivationStage stage) {
@@ -439,9 +462,7 @@ public class ActiveAbilitiesClientHandler {
         if (abilityData == null)
             return;
 
-        var itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
-        var icon = abilityData.getTemplate().getIcon().apply(player, stack, reference.ability());
-        var abilityTexture = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/abilities/" + itemId + "/" + icon + ".png");
+        var abilityTexture = DescriptionTextures.getAbilityCardTexture(stack, abilityData.getId());
         var canUse = abilityData.canPlayerActivate(player);
         var animation = getAnimation(reference);
         var scale = animation.getScale() * openScale;
@@ -480,6 +501,10 @@ public class ActiveAbilitiesClientHandler {
 
     private static void pulseCard(AbilityReference reference) {
         getAnimation(reference).pulse();
+    }
+
+    private static void playAbilityCastSound() {
+        MC.getSoundManager().play(SimpleSoundInstance.forUI(RelicsSounds.ABILITY_CAST.get(), 1F, 1F));
     }
 
     private static CardAnimation getAnimation(AbilityReference reference) {

@@ -492,5 +492,6 @@
 
   "info.relics.researching.wrong_container": "Работа с реликвией в этом инвентаре невозможна. Перемести предмет в обычный инвентарь игрока и попробуй ещё раз.",
 
-  "key.relics.research_relic": "Исследовать реликвию под курсором"
+  "key.relics.research_relic": "Исследовать реликвию под курсором",
+  "key.relics.active_abilities_list": "Меню активных способностей"
 }
