@@ -71,6 +71,7 @@ public class ActiveAbilitiesClientHandler {
     private static final double OPEN_ANIMATION_DURATION = 0.35D;
     private static final double CLOSE_ANIMATION_DURATION = 0.35D;
     private static final double PAGE_SPIN_ANIMATION_DURATION = 0.16D;
+    private static final double CURSOR_SCROLL_TWEEN_DURATION = 0.18D;
     private static final double OPEN_SELECTION_THRESHOLD = 0.85D;
     private static final double OPEN_SPIRAL_ROTATION = Math.PI * 0.675D;
     private static final double PAGE_SPIN_ROTATION = Math.PI / 6D;
@@ -83,16 +84,19 @@ public class ActiveAbilitiesClientHandler {
     private static int page = 0;
     private static double rotation = 0D;
     private static double rotationSpeedMultiplier = 1D;
+    private static double pageSpinOffset = 0D;
     private static long lastRotationNanos = 0L;
     private static long openStartedNanos = 0L;
     private static long closeStartedNanos = 0L;
-    private static long pageSpinStartedNanos = 0L;
     private static double closeStartedProgress = 1D;
-    private static int pageSpinDirection = 1;
     private static boolean slowingRotation = false;
     private static boolean closing = false;
     private static boolean wasLeftMouseDown = false;
+    private static boolean rightMouseSelecting = false;
+    private static int rightMouseSelectedIndex = -1;
     private static Tween rotationTween = null;
+    private static Tween cursorTween = null;
+    private static Tween pageSpinTween = null;
     private static AbilityReference castingReference = null;
     private static final Map<String, CardAnimation> CARD_ANIMATIONS = new HashMap<>();
 
@@ -102,6 +106,9 @@ public class ActiveAbilitiesClientHandler {
 
         var keyDown = isAbilityListKeyDown();
 
+        if (!keyDown && shouldKeepOpenDuringMouseChord())
+            keyDown = true;
+
         if (!keyDown && !closing) {
             if (!wasOpen)
                 return;
@@ -110,8 +117,12 @@ public class ActiveAbilitiesClientHandler {
             wasOpen = false;
         }
 
-        if (keyDown && !wasOpen && !closing) {
-            open();
+        if (keyDown && !wasOpen) {
+            if (closing)
+                reopen();
+            else
+                open();
+
             wasOpen = true;
         }
 
@@ -136,10 +147,18 @@ public class ActiveAbilitiesClientHandler {
         var interfaceAlpha = getInterfaceAlpha(interfaceProgress);
         var visualRotation = getVisualRotation();
         var acceptsInput = !closing && interfaceProgress >= OPEN_SELECTION_THRESHOLD;
+    
+        if (acceptsInput)
+            updateRightMouseSelection(visibleReferences, centerX, centerY, radius, visualRotation);
+        else
+            resetRightMouseSelection();
+
         var selectedIndex = acceptsInput ? getSelectedIndex(visibleReferences, centerX, centerY, radius, visualRotation) : -1;
 
-        updateRotation(selectedIndex >= 0);
+        updateRotation(selectedIndex >= 0 || rightMouseSelecting);
         visualRotation = getVisualRotation();
+        if (acceptsInput)
+            updateRightMouseSelection(visibleReferences, centerX, centerY, radius, visualRotation);
         selectedIndex = acceptsInput ? getSelectedIndex(visibleReferences, centerX, centerY, radius, visualRotation) : -1;
         updateHoverAnimations(visibleReferences, selectedIndex);
 
@@ -168,8 +187,15 @@ public class ActiveAbilitiesClientHandler {
     public static void onClientTick(ClientTickEvent.Post event) {
         var open = MC.player != null && MC.screen == null && isAbilityListKeyDown();
 
-        if (open && !wasOpen)
-            open();
+        if (!open && shouldKeepOpenDuringMouseChord())
+            open = true;
+
+        if (open && !wasOpen) {
+            if (closing)
+                reopen();
+            else
+                open();
+        }
 
         if (!open) {
             if (wasOpen)
@@ -187,9 +213,18 @@ public class ActiveAbilitiesClientHandler {
 
     @SubscribeEvent
     public static void onMouseButton(InputEvent.MouseButton.Pre event) {
-        if (!wasOpen || event.getButton() != GLFW.GLFW_MOUSE_BUTTON_LEFT)
+        if (!wasOpen && !closing)
             return;
 
+        event.setCanceled(true);
+    }
+
+    @SubscribeEvent
+    public static void onMouseInput(InputEvent.InteractionKeyMappingTriggered event) {
+        if (!wasOpen && !closing)
+            return;
+
+        event.setSwingHand(false);
         event.setCanceled(true);
     }
 
@@ -199,6 +234,32 @@ public class ActiveAbilitiesClientHandler {
             return;
 
         var references = gatherReferences();
+
+        if (isRightMouseDown()) {
+            page = clampPage(page, references.size());
+
+            var visibleReferences = getVisibleReferences(references);
+
+            if (!visibleReferences.isEmpty()) {
+                var centerX = MC.getWindow().getGuiScaledWidth() / 2;
+                var centerY = MC.getWindow().getGuiScaledHeight() / 2;
+                var radius = getRadius(visibleReferences.size());
+                var visualRotation = getVisualRotation();
+
+                if (!rightMouseSelecting || rightMouseSelectedIndex < 0 || rightMouseSelectedIndex >= visibleReferences.size())
+                    rightMouseSelectedIndex = getNearestIndex(visibleReferences, centerX, centerY, radius, visualRotation);
+
+                rightMouseSelecting = true;
+                rightMouseSelectedIndex = Math.floorMod(rightMouseSelectedIndex + (event.getScrollDeltaY() < 0 ? 1 : -1), visibleReferences.size());
+
+                tweenCursorToIndex(rightMouseSelectedIndex, visibleReferences, centerX, centerY, radius, visualRotation);
+            }
+
+            event.setCanceled(true);
+
+            return;
+        }
+
         var nextPage = page + (event.getScrollDeltaY() < 0 ? 1 : -1);
 
         setPage(nextPage, references.size());
@@ -213,12 +274,26 @@ public class ActiveAbilitiesClientHandler {
         lastMouseY = MC.mouseHandler.ypos();
         openStartedNanos = System.nanoTime();
         closeStartedNanos = 0L;
-        pageSpinStartedNanos = 0L;
+        pageSpinOffset = 0D;
         closeStartedProgress = 1D;
         closing = false;
         wasLeftMouseDown = false;
+        resetRightMouseSelection();
+        killPageSpinTween();
         castingReference = null;
         resetAnimations();
+    }
+
+    private static void reopen() {
+        var progress = getInterfaceProgress();
+        var now = System.nanoTime();
+
+        openStartedNanos = now - (long) (OPEN_ANIMATION_DURATION * progress * 1_000_000_000D);
+        closeStartedNanos = 0L;
+        closeStartedProgress = 1D;
+        closing = false;
+        wasLeftMouseDown = false;
+        resetRightMouseSelection();
     }
 
     private static void close() {
@@ -230,12 +305,14 @@ public class ActiveAbilitiesClientHandler {
 
         closeStartedProgress = getInterfaceProgress();
         closeStartedNanos = System.nanoTime();
-        pageSpinStartedNanos = 0L;
+        pageSpinOffset = 0D;
         closing = true;
         wasLeftMouseDown = false;
+        resetRightMouseSelection();
         rotationSpeedMultiplier = 1D;
         slowingRotation = false;
         killRotationTween();
+        killPageSpinTween();
     }
 
     private static void handleCasting() {
@@ -323,6 +400,13 @@ public class ActiveAbilitiesClientHandler {
         var mouseY = MC.mouseHandler.ypos();
 
         if (isLeftMouseDown()) {
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
+
+            return;
+        }
+
+        if (isRightMouseDown()) {
             lastMouseX = mouseX;
             lastMouseY = mouseY;
 
@@ -419,8 +503,7 @@ public class ActiveAbilitiesClientHandler {
             castingReference = null;
         }
 
-        pageSpinDirection = nextPage > page ? 1 : -1;
-        pageSpinStartedNanos = System.nanoTime();
+        spinPage(nextPage > page ? 1 : -1);
         page = clampedPage;
         resetAnimations();
     }
@@ -446,8 +529,16 @@ public class ActiveAbilitiesClientHandler {
         return RelicsHotkeys.ACTIVE_ABILITIES_LIST.isDown();
     }
 
+    private static boolean shouldKeepOpenDuringMouseChord() {
+        return wasOpen && !closing && (isLeftMouseDown() || isRightMouseDown());
+    }
+
     private static boolean isLeftMouseDown() {
         return GLFW.glfwGetMouseButton(MC.getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_LEFT) == GLFW.GLFW_PRESS;
+    }
+
+    private static boolean isRightMouseDown() {
+        return GLFW.glfwGetMouseButton(MC.getWindow().getWindow(), GLFW.GLFW_MOUSE_BUTTON_RIGHT) == GLFW.GLFW_PRESS;
     }
 
     private static void renderAbility(GuiGraphics guiGraphics, AbilityReference reference, double x, double y, boolean selected, float openScale, float alpha) {
@@ -623,6 +714,100 @@ public class ActiveAbilitiesClientHandler {
         return -1;
     }
 
+    private static void updateRightMouseSelection(List<AbilityReference> references, int centerX, int centerY, double radius, double rotation) {
+        if (!isRightMouseDown()) {
+            resetRightMouseSelection();
+
+            return;
+        }
+
+        if (references.isEmpty())
+            return;
+
+        if (!rightMouseSelecting || rightMouseSelectedIndex < 0 || rightMouseSelectedIndex >= references.size()) {
+            rightMouseSelectedIndex = getNearestIndex(references, centerX, centerY, radius, rotation);
+            rightMouseSelecting = true;
+
+            tweenCursorToIndex(rightMouseSelectedIndex, references, centerX, centerY, radius, rotation);
+        }
+    }
+
+    private static void resetRightMouseSelection() {
+        rightMouseSelecting = false;
+        rightMouseSelectedIndex = -1;
+        killCursorTween();
+    }
+
+    private static int getNearestIndex(List<AbilityReference> references, int centerX, int centerY, double radius, double rotation) {
+        if (references.isEmpty())
+            return -1;
+
+        var cursorScreenX = centerX + cursorX;
+        var cursorScreenY = centerY + cursorY;
+        var nearestIndex = 0;
+        var nearestDistance = Double.MAX_VALUE;
+
+        for (int index = 0; index < references.size(); index++) {
+            var point = getPoint(index, references.size(), centerX, centerY, radius, rotation);
+            var distance = Math.pow(cursorScreenX - point.x(), 2D) + Math.pow(cursorScreenY - point.y(), 2D);
+
+            if (distance >= nearestDistance)
+                continue;
+
+            nearestDistance = distance;
+            nearestIndex = index;
+        }
+
+        return nearestIndex;
+    }
+
+    private static void snapCursorToIndex(int index, List<AbilityReference> references, int centerX, int centerY, double radius, double rotation) {
+        if (index < 0 || index >= references.size())
+            return;
+
+        var point = getPoint(index, references.size(), centerX, centerY, radius, rotation);
+
+        cursorX = point.x() - centerX;
+        cursorY = point.y() - centerY;
+    }
+
+    private static void tweenCursorToIndex(int index, List<AbilityReference> references, int centerX, int centerY, double radius, double rotation) {
+        if (index < 0 || index >= references.size())
+            return;
+
+        var point = getPoint(index, references.size(), centerX, centerY, radius, rotation);
+        var targetX = point.x() - centerX;
+        var targetY = point.y() - centerY;
+
+        killCursorTween();
+
+        cursorTween = Tween.create().setParallel(true);
+
+        cursorTween.tweenMethod(ActiveAbilitiesClientHandler::setCursorX, cursorX, targetX, CURSOR_SCROLL_TWEEN_DURATION)
+                .setEaseType(EaseType.EASE_OUT)
+                .setTransitionType(TransitionType.EXPO);
+        cursorTween.tweenMethod(ActiveAbilitiesClientHandler::setCursorY, cursorY, targetY, CURSOR_SCROLL_TWEEN_DURATION)
+                .setEaseType(EaseType.EASE_OUT)
+                .setTransitionType(TransitionType.EXPO);
+
+        cursorTween.start();
+    }
+
+    private static void killCursorTween() {
+        if (cursorTween != null)
+            cursorTween.kill();
+
+        cursorTween = null;
+    }
+
+    private static void setCursorX(double cursorX) {
+        ActiveAbilitiesClientHandler.cursorX = cursorX;
+    }
+
+    private static void setCursorY(double cursorY) {
+        ActiveAbilitiesClientHandler.cursorY = cursorY;
+    }
+
     private static Point getPoint(int index, int size, int centerX, int centerY, double radius, double rotation) {
         var angle = getAngle(index, size, rotation);
 
@@ -691,27 +876,7 @@ public class ActiveAbilitiesClientHandler {
     }
 
     private static double getVisualRotation() {
-        if (pageSpinStartedNanos == 0L)
-            return rotation;
-
-        var progress = getPageSpinProgress();
-
-        if (progress >= 1D) {
-            pageSpinStartedNanos = 0L;
-
-            return rotation;
-        }
-
-        var offset = pageSpinDirection * (1D - TransitionType.CUBIC.apply(EaseType.EASE_OUT, progress)) * PAGE_SPIN_ROTATION;
-
-        return rotation - offset;
-    }
-
-    private static double getPageSpinProgress() {
-        if (pageSpinStartedNanos == 0L)
-            return 1D;
-
-        return Math.min(1D, (System.nanoTime() - pageSpinStartedNanos) / 1_000_000_000D / PAGE_SPIN_ANIMATION_DURATION);
+        return rotation - pageSpinOffset;
     }
 
     private static void finishClosing() {
@@ -763,6 +928,32 @@ public class ActiveAbilitiesClientHandler {
 
     private static void setRotationSpeedMultiplier(double rotationSpeedMultiplier) {
         ActiveAbilitiesClientHandler.rotationSpeedMultiplier = rotationSpeedMultiplier;
+    }
+
+    private static void spinPage(int direction) {
+        killPageSpinTween();
+
+        var targetOffset = Math.clamp(pageSpinOffset + direction * PAGE_SPIN_ROTATION, -PAGE_SPIN_ROTATION * 2D, PAGE_SPIN_ROTATION * 2D);
+
+        pageSpinTween = Tween.create().setParallel(true);
+
+        pageSpinTween.tweenMethod(ActiveAbilitiesClientHandler::setPageSpinOffset, targetOffset, 0D, PAGE_SPIN_ANIMATION_DURATION)
+                .setEaseType(EaseType.EASE_OUT)
+                .setTransitionType(TransitionType.CUBIC);
+
+        pageSpinOffset = targetOffset;
+        pageSpinTween.start();
+    }
+
+    private static void killPageSpinTween() {
+        if (pageSpinTween != null)
+            pageSpinTween.kill();
+
+        pageSpinTween = null;
+    }
+
+    private static void setPageSpinOffset(double pageSpinOffset) {
+        ActiveAbilitiesClientHandler.pageSpinOffset = pageSpinOffset;
     }
 
     private static double getRadius(int cards) {
