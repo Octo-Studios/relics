@@ -22,7 +22,7 @@ public abstract class EquippableRelicLayer<T extends LivingEntity, M extends Ent
     @Override
     public void render(PoseStack poseStack, MultiBufferSource buffer, int packedLight, T livingEntity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         CuriosApi.getCuriosInventory(livingEntity).ifPresent(handler -> {
-            for (var slot : handler.findCurios(slot)) {
+            for (var slot : handler.findCurios("curio", slot)) {
                 if (!slot.slotContext().visible())
                     continue;
 
