@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
+import it.hurts.sskirillss.relics.client.post_effects.EntityGlitchMask;
 import it.hurts.sskirillss.relics.api.post_effects.PostEffect;
 import it.hurts.sskirillss.relics.api.post_effects.RenderStage;
 import it.hurts.sskirillss.relics.init.RelicsPostEffects;
@@ -32,6 +33,11 @@ public class GameRendererMixin {
 
     @Unique
     private final Map<PostEffect, PostChain> relics$postEffects = new HashMap<>();
+
+    @Inject(method = "renderLevel", at = @At("HEAD"))
+    private void relics$prepareEntityGlitchMask(DeltaTracker deltaTracker, CallbackInfo ci) {
+        EntityGlitchMask.beginFrame();
+    }
 
     @Inject(method = "render", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/pipeline/RenderTarget;bindWrite(Z)V", shift = At.Shift.BEFORE))
     private void relics$onRenderPre(DeltaTracker deltaTracker, boolean renderLevel, CallbackInfo ci) {

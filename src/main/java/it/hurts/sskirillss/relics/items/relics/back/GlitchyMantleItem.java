@@ -1,7 +1,5 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
-import com.mojang.blaze3d.shaders.FogShape;
-import it.hurts.sskirillss.relics.api.events.utility.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -18,21 +16,21 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.tags.FluidTags;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderBlockScreenEffectEvent;
-import net.neoforged.neoforge.client.event.ViewportEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
@@ -43,11 +41,24 @@ public class GlitchyMantleItem extends WearableRelicItem {
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
+                        .ability(AbilityTemplate.builder("distortion")
+                                .rankModifier(1, "disorientation")
+                                .stat(AbilityStatTemplate.builder("miss_chance")
+                                        .initialValue(0.05D, 0.1D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.35D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("misses")
+                                                .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .build())
+                                .build())
                         .ability(AbilityTemplate.builder("glitch")
-                                .rankModifier(1, "shockwave")
                                 .rankModifier(3, "projectile")
                                 .rankModifier(5, "phase")
                                 .modes("enabled", "disabled")
+                                .requiredLevel(5)
                                 .stat(AbilityStatTemplate.builder("stability_time")
                                         .initialValue(3D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 12D)
@@ -58,20 +69,15 @@ public class GlitchyMantleItem extends WearableRelicItem {
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.5D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
                                         .build())
-                                .stat(AbilityStatTemplate.builder("shockwave_radius")
-                                        .initialValue(0.15D, 0.35D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.5D)
-                                        .formatValue(value -> MathUtils.round(value, 2))
-                                        .build())
-                                .stat(AbilityStatTemplate.builder("shockwave_damage")
-                                        .initialValue(0.5D, 1.25D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 7.5D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
-                                        .build())
                                 .stat(AbilityStatTemplate.builder("projectile_damage")
                                         .initialValue(0.02D, 0.05D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.35D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
+                                        .build())
+                                .stat(AbilityStatTemplate.builder("projectile_height")
+                                        .initialValue(3D, 5D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 25D)
+                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("phase_time")
                                         .initialValue(1.5D, 3D)
@@ -84,10 +90,6 @@ public class GlitchyMantleItem extends WearableRelicItem {
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("solid_air_duration")
                                                 .formatValue(value -> MathUtils.formatTime(value.intValue()))
-                                                .build())
-                                        .metric(AbilityMetricTemplate.builder("shockwave_damage")
-                                                .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
-                                                .rankModifierVisibilityState("shockwave", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("projectile_bonus")
                                                 .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
@@ -260,6 +262,8 @@ public class GlitchyMantleItem extends WearableRelicItem {
                         entity.setDeltaMovement(Vec3.ZERO);
                     }
 
+                    level.playSound(null, BlockPos.containing(pos), SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1F, 1F);
+
                     this.setPhaseTicks(stack, 0);
                     ability.getStatisticData().getMetricData("phase_rollbacks").addValue(1);
                 }
@@ -271,6 +275,44 @@ public class GlitchyMantleItem extends WearableRelicItem {
     public static class CommonEvents {
         @SubscribeEvent
         public static void onLivingIncomingDamage(LivingIncomingDamageEvent event) {
+            if (event.getEntity() instanceof Player player && !player.level().isClientSide()) {
+                var attacker = event.getSource().getEntity() instanceof LivingEntity livingAttacker ? livingAttacker : null;
+
+                if (attacker == null && event.getSource().getDirectEntity() instanceof Projectile projectile
+                        && projectile.getOwner() instanceof LivingEntity projectileOwner) {
+                    attacker = projectileOwner;
+                }
+
+                if (attacker != null && attacker != player) {
+                    for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.GLITCHY_MANTLE.get())) {
+                        var relic = (GlitchyMantleItem) stack.getItem();
+                        var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("distortion");
+
+                        if (!ability.canPlayerUse(player))
+                            continue;
+
+                        if (player.getRandom().nextDouble() >= ability.getStatData("miss_chance").getValue())
+                            continue;
+
+                        event.setCanceled(true);
+                        ability.getStatisticData().getMetricData("misses").addValue(1);
+
+                        if (ability.getRankModifierData("disorientation").isEnabled()) {
+                            var rotation = attacker.getRandom().nextFloat() * 360F;
+
+                            attacker.setYRot(rotation);
+                            attacker.setYHeadRot(rotation);
+                            attacker.setYBodyRot(rotation);
+
+                            if (attacker instanceof Mob mob)
+                                mob.setTarget(null);
+                        }
+
+                        return;
+                    }
+                }
+            }
+
             if (!event.getContainer().getSource().is(DamageTypes.IN_WALL))
                 return;
 
@@ -292,38 +334,32 @@ public class GlitchyMantleItem extends WearableRelicItem {
         public static void onLivingFall(LivingFallEvent event) {
             var entity = event.getEntity();
 
+            var hasSafeFallMantle = false;
+
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.GLITCHY_MANTLE.get())) {
                 var relic = (GlitchyMantleItem) stack.getItem();
 
-                if (!relic.isGlitchEnabled(entity, stack) || !relic.isForcedFall(stack))
+                if (!relic.isGlitchEnabled(entity, stack))
                     continue;
+
+                if (!relic.isForcedFall(stack)) {
+                    hasSafeFallMantle = true;
+
+                    continue;
+                }
 
                 var ability = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glitch");
                 var extraMultiplier = 1D + ability.getStatData("fall_damage").getValue();
 
                 event.setDamageMultiplier((float) (event.getDamageMultiplier() * extraMultiplier));
 
-                if (ability.getRankModifierData("shockwave").isEnabled()) {
-                    var fallenBlocks = Math.max(0D, relic.getForcedFallStartY(stack) - entity.getY());
-
-                    if (fallenBlocks > 0.5D) {
-                        var totalRadius = fallenBlocks * ability.getStatData("shockwave_radius").getValue();
-                        var totalDamage = fallenBlocks * ability.getStatData("shockwave_damage").getValue();
-                        var area = new AABB(entity.blockPosition()).inflate(totalRadius, 1D, totalRadius);
-
-                        for (var target : entity.level().getEntitiesOfClass(LivingEntity.class, area)) {
-                            if (target == entity)
-                                continue;
-
-                            target.hurt(entity.damageSources().mobAttack(entity), (float) totalDamage);
-                        }
-
-                        ability.getStatisticData().getMetricData("shockwave_damage").addValue(totalDamage);
-                    }
-                }
-
                 relic.setForcedFall(stack, false);
+
+                return;
             }
+
+            if (hasSafeFallMantle)
+                event.setDamageMultiplier(0F);
         }
 
         @SubscribeEvent
@@ -348,7 +384,10 @@ public class GlitchyMantleItem extends WearableRelicItem {
                 if (!source.level().getBlockState(source.getBlockPosBelowThatAffectsMyMovement()).isAir())
                     continue;
 
-                var height = Math.max(0D, source.getY() - target.getY());
+                var height = Math.min(
+                        Math.max(0D, source.getY() - target.getY()),
+                        ability.getStatData("projectile_height").getValue()
+                );
                 var bonus = event.getNewDamage() * ability.getStatData("projectile_damage").getValue() * height;
 
                 event.setNewDamage((float) (event.getNewDamage() + bonus));
@@ -362,6 +401,9 @@ public class GlitchyMantleItem extends WearableRelicItem {
     public static class ClientEvents {
         @SubscribeEvent
         public static void onBlockScreenEffect(RenderBlockScreenEffectEvent event) {
+            if (event.getOverlayType() != RenderBlockScreenEffectEvent.OverlayType.BLOCK)
+                return;
+
             for (var stack : EntityUtils.findEquippedCurios(event.getPlayer(), RelicsItems.GLITCHY_MANTLE.get())) {
                 if (!(stack.getItem() instanceof GlitchyMantleItem relic))
                     continue;
