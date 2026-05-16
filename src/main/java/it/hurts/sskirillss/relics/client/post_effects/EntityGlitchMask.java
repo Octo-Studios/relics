@@ -3,8 +3,7 @@ package it.hurts.sskirillss.relics.client.post_effects;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -38,6 +37,7 @@ public class EntityGlitchMask {
 
         mask.setClearColor(0.0F, 0.0F, 0.0F, 0.0F);
         mask.clear(Minecraft.ON_OSX);
+
         depthCopied = false;
 
         MC.getMainRenderTarget().bindWrite(false);
@@ -46,9 +46,6 @@ public class EntityGlitchMask {
     public static TextureTarget getTarget() {
         var window = MC.getWindow();
 
-        if (window == null)
-            return null;
-
         if (target == null)
             target = new TextureTarget(window.getWidth(), window.getHeight(), true, Minecraft.ON_OSX);
 
@@ -56,7 +53,7 @@ public class EntityGlitchMask {
     }
 
     public static boolean shouldRender(LivingEntity entity) {
-        return !renderingMask && MC.player != null && entity.isAlive() && !EntityUtils.findEquippedCurio(entity, RelicsItems.GLITCHY_MANTLE.get()).isEmpty();
+        return !renderingMask && MC.player != null && entity.isAlive() && entity.hasEffect(RelicsMobEffects.GLITCH);
     }
 
     public static <T extends LivingEntity, M extends EntityModel<T>> void render(T entity, M model, List<RenderLayer<T, M>> layers, ResourceLocation texture, PoseStack poseStack, int packedLight, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
@@ -88,9 +85,11 @@ public class EntityGlitchMask {
             }
 
             buffer.endBatch();
+
             MASK_BUFFER.discard();
         } finally {
             renderingMask = false;
+
             main.bindWrite(false);
         }
     }

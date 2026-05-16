@@ -110,6 +110,12 @@ public class RelicsEntities {
                     .build("kinetic_electricity")
     );
 
+    public static final DeferredHolder<EntityType<?>, EntityType<GlitchyIllusionEntity>> GLITCHY_ILLUSION = ENTITIES.register("glitchy_illusion", () ->
+            EntityType.Builder.<GlitchyIllusionEntity>of(GlitchyIllusionEntity::new, MobCategory.MISC)
+                    .sized(0.6F, 1.8F)
+                    .build("glitchy_illusion")
+    );
+
     public static void register(IEventBus bus) {
         ENTITIES.register(bus);
     }

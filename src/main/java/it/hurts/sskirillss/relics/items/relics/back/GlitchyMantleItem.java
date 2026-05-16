@@ -6,10 +6,15 @@ import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.api.relics.VisibilityState;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
-import it.hurts.sskirillss.relics.init.RelicsDataComponents;
-import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.init.RelicsScalingModels;
+import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
+import it.hurts.sskirillss.relics.api.relics.synergies.conditions.AbilityConditionTemplate;
+import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicConditionTemplate;
+import it.hurts.sskirillss.relics.api.relics.synergies.stats.SynergyStatTemplate;
+import it.hurts.sskirillss.relics.entities.GlitchyIllusionEntity;
+import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -21,8 +26,10 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.damagesource.DamageTypes;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
@@ -44,9 +51,13 @@ public class GlitchyMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("distortion")
                                 .rankModifier(1, "disorientation")
                                 .stat(AbilityStatTemplate.builder("miss_chance")
-                                        .initialValue(0.05D, 0.1D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.35D)
+                                        .initialValue(0.1D, 0.25D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.5D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("miss")
+                                                .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
                                         .metric(AbilityMetricTemplate.builder("misses")
@@ -54,35 +65,101 @@ public class GlitchyMantleItem extends WearableRelicItem {
                                                 .build())
                                         .build())
                                 .build())
-                        .ability(AbilityTemplate.builder("glitch")
-                                .rankModifier(3, "projectile")
-                                .rankModifier(5, "phase")
+                        .ability(AbilityTemplate.builder("illusion")
+                                .rankModifier(3, "echo")
                                 .modes("enabled", "disabled")
                                 .requiredLevel(5)
+                                .stat(AbilityStatTemplate.builder("interval")
+                                        .initialValue(15D, 10D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(AbilityStatTemplate.builder("duration")
+                                        .initialValue(2.5D, 5D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(AbilityStatTemplate.builder("stun")
+                                        .initialValue(0.5D, 1D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(AbilityStatTemplate.builder("stun_radius")
+                                        .initialValue(1D, 3D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .stat(AbilityStatTemplate.builder("echo_radius")
+                                        .initialValue(0.25D, 0.5D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("creation")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("detonation")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("echo_attack")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .rankModifierVisibilityState("echo", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .build())
+                                .statistic(AbilityStatisticTemplate.builder()
+                                        .metric(AbilityMetricTemplate.builder("illusions")
+                                                .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("target_detonations")
+                                                .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("owner_detonations")
+                                                .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("damage_dealt")
+                                                .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .rankModifierVisibilityState("echo", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("stun_duration")
+                                                .formatValue(value -> MathUtils.formatTime(value.intValue()))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("echo_attacks")
+                                                .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .rankModifierVisibilityState("echo", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .build())
+                                .build())
+                        .ability(AbilityTemplate.builder("glitch")
+                                .rankModifier(5, "phase")
+                                .modes("enabled", "disabled")
+                                .requiredLevel(10)
                                 .stat(AbilityStatTemplate.builder("stability_time")
-                                        .initialValue(3D, 5D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 12D)
+                                        .initialValue(1D, 3D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("fall_damage")
-                                        .initialValue(0.1D, 0.25D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.5D)
+                                        .initialValue(2.5D, 2D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
-                                        .build())
-                                .stat(AbilityStatTemplate.builder("projectile_damage")
-                                        .initialValue(0.02D, 0.05D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.35D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
-                                        .build())
-                                .stat(AbilityStatTemplate.builder("projectile_height")
-                                        .initialValue(3D, 5D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 25D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("phase_time")
-                                        .initialValue(1.5D, 3D)
+                                        .initialValue(2.5D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .experienceSources(ExperienceSourcesTemplate.builder()
+                                        .source(ExperienceSourceTemplate.builder("air_walking")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("phasing")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
+                                                .rankModifierVisibilityState("phase", VisibilityState.OBFUSCATED)
+                                                .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
                                         .metric(AbilityMetricTemplate.builder("forced_falls")
@@ -91,10 +168,6 @@ public class GlitchyMantleItem extends WearableRelicItem {
                                         .metric(AbilityMetricTemplate.builder("solid_air_duration")
                                                 .formatValue(value -> MathUtils.formatTime(value.intValue()))
                                                 .build())
-                                        .metric(AbilityMetricTemplate.builder("projectile_bonus")
-                                                .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
-                                                .rankModifierVisibilityState("projectile", VisibilityState.OBFUSCATED)
-                                                .build())
                                         .metric(AbilityMetricTemplate.builder("phase_rollbacks")
                                                 .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .rankModifierVisibilityState("phase", VisibilityState.OBFUSCATED)
@@ -102,6 +175,23 @@ public class GlitchyMantleItem extends WearableRelicItem {
                                         .metric(AbilityMetricTemplate.builder("phase_duration")
                                                 .formatValue(value -> MathUtils.formatTime(value.intValue()))
                                                 .rankModifierVisibilityState("phase", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .build())
+                                .build())
+                        .synergy(SynergyTemplate.builder("electricity")
+                                .modes("enabled", "disabled")
+                                .stat(SynergyStatTemplate.builder("damage")
+                                        .thresholdValue(2.5D, 10D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
+                                .condition(RelicConditionTemplate.builder(RelicsItems.GLITCHY_MANTLE::get)
+                                        .container(RelicsRelicContainers.CURIOS.get())
+                                        .condition(AbilityConditionTemplate.builder("illusion")
+                                                .build())
+                                        .build())
+                                .condition(RelicConditionTemplate.builder(RelicsItems.JELLYFISH_NECKLACE::get)
+                                        .container(RelicsRelicContainers.CURIOS.get())
+                                        .condition(AbilityConditionTemplate.builder("shock")
                                                 .build())
                                         .build())
                                 .build())
@@ -157,6 +247,22 @@ public class GlitchyMantleItem extends WearableRelicItem {
         this.setPhaseTicks(stack, this.getPhaseTicks(stack) + ticks);
     }
 
+    public long getLastAirTick(ItemStack stack) {
+        return stack.getOrDefault(RelicsDataComponents.GLITCHY_MANTLE_LAST_AIR_TICK, Long.MIN_VALUE);
+    }
+
+    public void setLastAirTick(ItemStack stack, long tick) {
+        stack.set(RelicsDataComponents.GLITCHY_MANTLE_LAST_AIR_TICK, tick);
+    }
+
+    public long getLastPhaseTick(ItemStack stack) {
+        return stack.getOrDefault(RelicsDataComponents.GLITCHY_MANTLE_LAST_PHASE_TICK, Long.MIN_VALUE);
+    }
+
+    public void setLastPhaseTick(ItemStack stack, long tick) {
+        stack.set(RelicsDataComponents.GLITCHY_MANTLE_LAST_PHASE_TICK, tick);
+    }
+
     public Vec3 getLastSafePosition(ItemStack stack) {
         return stack.getOrDefault(RelicsDataComponents.GLITCHY_MANTLE_LAST_SAFE_POS, Vec3.ZERO);
     }
@@ -165,11 +271,29 @@ public class GlitchyMantleItem extends WearableRelicItem {
         stack.set(RelicsDataComponents.GLITCHY_MANTLE_LAST_SAFE_POS, pos);
     }
 
+    public int getIllusionCooldown(ItemStack stack) {
+        return stack.getOrDefault(RelicsDataComponents.GLITCHY_MANTLE_ILLUSION_COOLDOWN, 0);
+    }
+
+    public void setIllusionCooldown(ItemStack stack, int cooldown) {
+        stack.set(RelicsDataComponents.GLITCHY_MANTLE_ILLUSION_COOLDOWN, Math.max(0, cooldown));
+    }
+
+    public void addIllusionCooldown(ItemStack stack, int cooldown) {
+        this.setIllusionCooldown(stack, this.getIllusionCooldown(stack) + cooldown);
+    }
+
     private static boolean areEyesInsideCollidingBlock(LivingEntity entity) {
         var level = entity.level();
         var pos = BlockPos.containing(entity.getEyePosition());
 
         return !level.getBlockState(pos).getCollisionShape(level, pos).isEmpty();
+    }
+
+    private static boolean isMovingHorizontally(LivingEntity entity) {
+        var knownMovement = entity.getKnownMovement().multiply(1D, 0D, 1D).lengthSqr();
+
+        return knownMovement > 1.0E-4D;
     }
 
     public boolean canCollideWithAirLike(LivingEntity entity, ItemStack stack) {
@@ -201,52 +325,101 @@ public class GlitchyMantleItem extends WearableRelicItem {
         var ability = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glitch");
         var forcedFall = this.isForcedFall(stack);
         var onGround = entity.onGround();
+        var glitchEnabled = this.isGlitchEnabled(entity, stack);
 
-        if (!this.isGlitchEnabled(entity, stack)) {
+        if (!glitchEnabled) {
             this.setStandTicks(stack, 0);
             this.setForcedFall(stack, false);
             this.setPhaseTicks(stack, 0);
+        } else {
+            var stable = onGround && belowState.isAir() && !isMovingHorizontally(entity) && !entity.isShiftKeyDown();
 
-            return;
-        }
+            if (!forcedFall) {
+                if (stable) {
+                    this.addStandTicks(stack, 1);
 
-        var horizontalSpeed = entity.getDeltaMovement().horizontalDistanceSqr();
-        var stable = onGround && belowState.isAir() && horizontalSpeed < 1.0E-4D && !entity.isShiftKeyDown();
+                    if (this.getStandTicks(stack) >= (int) Math.max(1D, ability.getStatData("stability_time").getValue() * 20D)) {
+                        this.setForcedFall(stack, true);
+                        this.setForcedFallStartY(stack, entity.getY());
+                        this.setStandTicks(stack, 0);
 
-        if (!forcedFall) {
-            if (stable) {
-                this.addStandTicks(stack, 1);
-
-                if (this.getStandTicks(stack) >= (int) Math.max(1D, ability.getStatData("stability_time").getValue() * 20D)) {
-                    this.setForcedFall(stack, true);
-                    this.setForcedFallStartY(stack, entity.getY());
+                        if (!level.isClientSide())
+                            this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glitch").getStatisticData().getMetricData("forced_falls").addValue(1);
+                    }
+                } else {
                     this.setStandTicks(stack, 0);
-
-                    if (!level.isClientSide())
-                        this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glitch").getStatisticData().getMetricData("forced_falls").addValue(1);
                 }
-            } else {
-                this.setStandTicks(stack, 0);
             }
-        }
 
-        if (this.isForcedFall(stack) && onGround && !belowState.isAir() && entity.fallDistance <= 0F)
-            this.setForcedFall(stack, false);
+            if (this.isForcedFall(stack) && onGround && !belowState.isAir() && entity.fallDistance <= 0F)
+                this.setForcedFall(stack, false);
+        }
 
         if (level.isClientSide())
             return;
 
-        if (onGround && belowState.isAir() && this.canCollideWithAirLike(entity, stack))
-            ability.getStatisticData().getMetricData("solid_air_duration").addValue(1);
+        var gameTime = level.getGameTime();
 
-        if (ability.getRankModifierData("phase").isEnabled()) {
+        if (glitchEnabled && belowState.isAir() && this.canCollideWithAirLike(entity, stack) && this.getLastAirTick(stack) != gameTime) {
+            this.setLastAirTick(stack, gameTime);
+
+            ability.getStatisticData().getMetricData("solid_air_duration").addValue(1D / 20D);
+
+            if (isMovingHorizontally(entity))
+                this.getRelicData(entity, stack).getLevelingData().addExperience("glitch", "air_walking", 1D / 20D);
+        }
+
+        var illusion = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("illusion");
+
+        if (illusion.canPlayerUse(entity) && illusion.getMode().equals("enabled")) {
+            if (this.getIllusionCooldown(stack) > 0) {
+                this.addIllusionCooldown(stack, -1);
+            } else {
+                var look = entity.getLookAngle().multiply(1D, 0D, 1D);
+                var backward = look.lengthSqr() > 1.0E-6D ? look.normalize().scale(-0.95D) : Vec3.ZERO;
+                var spawnPos = entity.position().add(backward);
+                var copy = new GlitchyIllusionEntity(RelicsEntities.GLITCHY_ILLUSION.get(), level);
+
+                copy.setOwner(entity);
+                copy.setLifetime((int) Math.max(1D, illusion.getStatData("duration").getValue() * 20D));
+                copy.setStunDuration((int) Math.max(1D, illusion.getStatData("stun").getValue() * 20D));
+                copy.setStunRadius((float) Math.max(0D, illusion.getStatData("stun_radius").getValue()));
+                copy.setFlawless(this.getRelicData(entity, stack).isVisuallyFlawless());
+                copy.setPos(spawnPos.x(), spawnPos.y(), spawnPos.z());
+                copy.setYRot(entity.getYRot());
+                copy.setXRot(entity.getXRot());
+                copy.setYHeadRot(entity.getYHeadRot());
+                copy.setSnapshotXRot(entity.getXRot());
+                copy.setPose(entity.getPose());
+
+                if (level.getEntitiesOfClass(GlitchyIllusionEntity.class, copy.getBoundingBox().inflate(0.05D)).isEmpty()) {
+                    level.addFreshEntity(copy);
+
+                    this.setIllusionCooldown(stack, (int) Math.max(1D, illusion.getStatData("interval").getValue() * 20D));
+                    illusion.getStatisticData().getMetricData("illusions").addValue(1);
+                    this.getRelicData(entity, stack).getLevelingData().addExperience("illusion", "creation", 1);
+                }
+            }
+        } else {
+            this.setIllusionCooldown(stack, 0);
+        }
+
+        if (glitchEnabled && ability.getRankModifierData("phase").isEnabled()) {
             var eyesInsideBlock = areEyesInsideCollidingBlock(entity);
 
             if (!eyesInsideBlock) {
                 this.setLastSafePosition(stack, entity.position());
                 this.setPhaseTicks(stack, 0);
             } else {
-                ability.getStatisticData().getMetricData("phase_duration").addValue(1);
+                if (this.getLastPhaseTick(stack) != gameTime) {
+                    this.setLastPhaseTick(stack, gameTime);
+
+                    ability.getStatisticData().getMetricData("phase_duration").addValue(1D / 20D);
+                    this.getRelicData(entity, stack).getLevelingData().addExperience("glitch", "phasing", 1D / 20D);
+                }
+
+                entity.addEffect(new MobEffectInstance(RelicsMobEffects.GLITCH, 5, 0, false, false));
+
                 this.addPhaseTicks(stack, 1);
 
                 var limit = Math.max(1, (int) Math.round(ability.getStatData("phase_time").getValue() * 20D));
@@ -273,6 +446,8 @@ public class GlitchyMantleItem extends WearableRelicItem {
 
     @EventBusSubscriber
     public static class CommonEvents {
+        private static final ThreadLocal<Boolean> ECHOING_ATTACK = ThreadLocal.withInitial(() -> false);
+
         @SubscribeEvent
         public static void onLivingIncomingDamage(LivingIncomingDamageEvent event) {
             if (event.getEntity() instanceof Player player && !player.level().isClientSide()) {
@@ -295,17 +470,35 @@ public class GlitchyMantleItem extends WearableRelicItem {
                             continue;
 
                         event.setCanceled(true);
+
+                        player.addEffect(new MobEffectInstance(RelicsMobEffects.GLITCH, 10, 0, false, false));
+
                         ability.getStatisticData().getMetricData("misses").addValue(1);
+                        relic.getRelicData(player, stack).getLevelingData().addExperience("distortion", "miss", 1);
 
                         if (ability.getRankModifierData("disorientation").isEnabled()) {
                             var rotation = attacker.getRandom().nextFloat() * 360F;
 
+                            if (attacker instanceof ServerPlayer serverAttacker)
+                                serverAttacker.teleportTo(serverAttacker.serverLevel(), serverAttacker.getX(), serverAttacker.getY(), serverAttacker.getZ(), rotation, serverAttacker.getXRot());
+
                             attacker.setYRot(rotation);
                             attacker.setYHeadRot(rotation);
                             attacker.setYBodyRot(rotation);
+                            attacker.yRotO = rotation;
+                            attacker.yHeadRotO = rotation;
+                            attacker.yBodyRotO = rotation;
 
-                            if (attacker instanceof Mob mob)
+                            if (attacker instanceof Mob mob) {
                                 mob.setTarget(null);
+
+                                var radians = Math.toRadians(rotation);
+                                var direction = new Vec3(-Math.sin(radians), 0D, Math.cos(radians));
+                                var destination = mob.position().add(direction.scale(3D));
+
+                                mob.getNavigation().stop();
+                                mob.getNavigation().moveTo(destination.x(), destination.y(), destination.z(), 1D);
+                            }
                         }
 
                         return;
@@ -364,35 +557,52 @@ public class GlitchyMantleItem extends WearableRelicItem {
 
         @SubscribeEvent
         public static void onLivingDamage(LivingDamageEvent.Pre event) {
-            if (!(event.getSource().getDirectEntity() instanceof Projectile projectile)
-                    || !(projectile.getOwner() instanceof LivingEntity source)) {
+            if (ECHOING_ATTACK.get() || !(event.getSource().getEntity() instanceof Player source)) {
                 return;
             }
+
+            if (!event.getSource().is(DamageTypes.PLAYER_ATTACK) || event.getSource().getDirectEntity() != source)
+                return;
 
             var target = event.getEntity();
 
             for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.GLITCHY_MANTLE.get())) {
                 var relic = (GlitchyMantleItem) stack.getItem();
-                var ability = relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("glitch");
+                var ability = relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("illusion");
 
-                if (!relic.isGlitchEnabled(source, stack))
+                if (!ability.canPlayerUse(source) || !ability.getMode().equals("enabled") || !ability.getRankModifierData("echo").isEnabled())
                     continue;
 
-                if (!ability.getRankModifierData("projectile").isEnabled())
-                    continue;
+                var radius = source.getAttributeValue(Attributes.ENTITY_INTERACTION_RANGE) * ability.getStatData("echo_radius").getValue();
+                var illusions = source.level().getEntitiesOfClass(GlitchyIllusionEntity.class, target.getBoundingBox().inflate(radius), illusion -> illusion.getOwner() == source)
+                        .stream()
+                        .sorted(java.util.Comparator.comparingDouble(illusion -> illusion.distanceToSqr(target)))
+                        .toList();
 
-                if (!source.level().getBlockState(source.getBlockPosBelowThatAffectsMyMovement()).isAir())
-                    continue;
+                if (illusions.isEmpty())
+                    return;
 
-                var height = Math.min(
-                        Math.max(0D, source.getY() - target.getY()),
-                        ability.getStatData("projectile_height").getValue()
-                );
-                var bonus = event.getNewDamage() * ability.getStatData("projectile_damage").getValue() * height;
+                ECHOING_ATTACK.set(true);
 
-                event.setNewDamage((float) (event.getNewDamage() + bonus));
+                var damageDealt = 0D;
 
-                ability.getStatisticData().getMetricData("projectile_bonus").addValue(bonus);
+                try {
+                    for (var illusion : illusions) {
+                        illusion.startEchoAttack(target, source.getMainHandItem());
+                        target.invulnerableTime = 0;
+
+                        if (target.hurt(event.getSource(), event.getNewDamage()))
+                            damageDealt += event.getNewDamage();
+                    }
+                } finally {
+                    ECHOING_ATTACK.set(false);
+                }
+
+                ability.getStatisticData().getMetricData("echo_attacks").addValue(illusions.size());
+                ability.getStatisticData().getMetricData("damage_dealt").addValue(damageDealt);
+                relic.getRelicData(source, stack).getLevelingData().addExperience("illusion", "echo_attack", illusions.size());
+
+                return;
             }
         }
     }

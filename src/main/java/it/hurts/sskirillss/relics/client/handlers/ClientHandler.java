@@ -98,6 +98,7 @@ public class ClientHandler {
         RelicsRelicRenderers.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.GLITCHY_MANTLE.get(), GlitchyMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
@@ -163,6 +164,7 @@ public class ClientHandler {
         event.registerLayerDefinition(ReflectiveNecklaceModel.LAYER, ReflectiveNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(JellyfishNecklaceModel.LAYER, JellyfishNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(MidnightMantleModel.LAYER, MidnightMantleModel::constructLayerDefinition);
+        event.registerLayerDefinition(GlitchyMantleModel.LAYER, GlitchyMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(CutGlassBootModel.LAYER, CutGlassBootModel::constructLayerDefinition);
         event.registerLayerDefinition(KineticBeltModel.LAYER, KineticBeltModel::constructLayerDefinition);
         event.registerLayerDefinition(SpringyBootModel.LAYER, SpringyBootModel::constructLayerDefinition);
@@ -209,6 +211,7 @@ public class ClientHandler {
         event.registerEntityRenderer(RelicsEntities.GOLDEN_TOOTH.get(), GoldenToothRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SELF_SACRIFICE_PROJECTILE.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.KINETIC_ELECTRICITY.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.GLITCHY_ILLUSION.get(), GlitchyIllusionRenderer::new);
     }
 
     @SubscribeEvent

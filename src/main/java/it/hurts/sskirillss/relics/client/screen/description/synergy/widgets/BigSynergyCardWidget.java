@@ -27,7 +27,7 @@ import net.minecraft.world.item.ItemStack;
 import java.util.Comparator;
 import java.util.List;
 
-public class BigSynergyCardWidget extends AbstractDescriptionWidget implements IHoverableWidget {
+public class BigSynergyCardWidget extends AbstractDescriptionWidget {
     private SynergyDescriptionScreen screen;
 
     public BigSynergyCardWidget(int x, int y, SynergyDescriptionScreen screen) {
@@ -156,67 +156,67 @@ public class BigSynergyCardWidget extends AbstractDescriptionWidget implements I
         return false;
     }
 
-    @Override
-    public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        var player = minecraft.player;
-        var stack = screen.getStack();
-        var ability = screen.getSelectedSynergy();
-
-        if (!(stack.getItem() instanceof IRelicItem relic))
-            return;
-
-        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(ability);
-        var template = synergyData.getTemplate();
-
-        if (!synergyData.isUnlocked() || template == null)
-            return;
-
-        PoseStack poseStack = guiGraphics.pose();
-
-        List<FormattedCharSequence> tooltip = Lists.newArrayList();
-
-        int maxWidth = 150;
-        int renderWidth = 0;
-
-        // TODO
-        List<MutableComponent> entries = Lists.newArrayList(
-//                Component.literal("").append(Component.translatable("relics.description.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + synergyData.getLevel() + "/" + template.getInitialMaxLevel()),
-//                Component.literal("").append(Component.translatable("relics.description.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(synergyData.calculateQuality() / 2F, 1) + "/" + synergyData.getMaxQuality() / 2),
-                Component.literal(" ")
-        );
-
-        if (Screen.hasShiftDown())
-            entries.add(Component.translatable("relics.description.researching.ability.info.extra_info").withStyle(ChatFormatting.ITALIC));
-        else
-            entries.add(Component.translatable("relics.description.researching.general.extra_info"));
-
-        for (MutableComponent entry : entries) {
-            int entryWidth = (minecraft.font.width(entry) / 2);
-
-            if (entryWidth > renderWidth)
-                renderWidth = Math.min(entryWidth + 2, maxWidth);
-
-            tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
-        }
-
-        poseStack.pushPose();
-
-        poseStack.translate(0F, 0F, 400);
-
-        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, (this.getX() - renderWidth / 2) + 16, this.getY() + this.getHeight() - 2);
-
-        poseStack.scale(0.5F, 0.5F, 0.5F);
-
-        int yOff = 0;
-
-        for (FormattedCharSequence entry : tooltip) {
-            guiGraphics.drawString(minecraft.font, entry, ((this.getX() - renderWidth / 2) + 14 + 12) * 2, ((this.getY() + yOff + this.getHeight() - 2 + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
-
-            yOff += 5;
-        }
-
-        poseStack.popPose();
-    }
+//    @Override
+//    public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
+//        var player = minecraft.player;
+//        var stack = screen.getStack();
+//        var ability = screen.getSelectedSynergy();
+//
+//        if (!(stack.getItem() instanceof IRelicItem relic))
+//            return;
+//
+//        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(ability);
+//        var template = synergyData.getTemplate();
+//
+//        if (!synergyData.isUnlocked() || template == null)
+//            return;
+//
+//        PoseStack poseStack = guiGraphics.pose();
+//
+//        List<FormattedCharSequence> tooltip = Lists.newArrayList();
+//
+//        int maxWidth = 150;
+//        int renderWidth = 0;
+//
+//        // TODO
+//        List<MutableComponent> entries = Lists.newArrayList(
+////                Component.literal("").append(Component.translatable("relics.description.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + synergyData.getLevel() + "/" + template.getInitialMaxLevel()),
+////                Component.literal("").append(Component.translatable("relics.description.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(synergyData.calculateQuality() / 2F, 1) + "/" + synergyData.getMaxQuality() / 2),
+//                Component.literal(" ")
+//        );
+//
+//        if (Screen.hasShiftDown())
+//            entries.add(Component.translatable("relics.description.researching.ability.info.extra_info").withStyle(ChatFormatting.ITALIC));
+//        else
+//            entries.add(Component.translatable("relics.description.researching.general.extra_info"));
+//
+//        for (MutableComponent entry : entries) {
+//            int entryWidth = (minecraft.font.width(entry) / 2);
+//
+//            if (entryWidth > renderWidth)
+//                renderWidth = Math.min(entryWidth + 2, maxWidth);
+//
+//            tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
+//        }
+//
+//        poseStack.pushPose();
+//
+//        poseStack.translate(0F, 0F, 400);
+//
+//        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, tooltip.size() * 5, (this.getX() - renderWidth / 2) + 16, this.getY() + this.getHeight() - 2);
+//
+//        poseStack.scale(0.5F, 0.5F, 0.5F);
+//
+//        int yOff = 0;
+//
+//        for (FormattedCharSequence entry : tooltip) {
+//            guiGraphics.drawString(minecraft.font, entry, ((this.getX() - renderWidth / 2) + 14 + 12) * 2, ((this.getY() + yOff + this.getHeight() - 2 + 9) * 2), DescriptionUtils.TEXT_COLOR, false);
+//
+//            yOff += 5;
+//        }
+//
+//        poseStack.popPose();
+//    }
 
     @Override
     public void playDownSound(SoundManager handler) {

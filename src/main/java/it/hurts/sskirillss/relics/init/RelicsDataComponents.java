@@ -61,7 +61,10 @@ public class RelicsDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> GLITCHY_MANTLE_FORCED_FALL = RelicsDataComponents.construct("glitchy_mantle/forced_fall", Codec.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> GLITCHY_MANTLE_FORCED_FALL_START_Y = RelicsDataComponents.construct("glitchy_mantle/forced_fall_start_y", Codec.DOUBLE);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GLITCHY_MANTLE_PHASE_TICKS = RelicsDataComponents.construct("glitchy_mantle/phase_ticks", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> GLITCHY_MANTLE_LAST_AIR_TICK = RelicsDataComponents.construct("glitchy_mantle/last_air_tick", Codec.LONG);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> GLITCHY_MANTLE_LAST_PHASE_TICK = RelicsDataComponents.construct("glitchy_mantle/last_phase_tick", Codec.LONG);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Vec3>> GLITCHY_MANTLE_LAST_SAFE_POS = RelicsDataComponents.construct("glitchy_mantle/last_safe_pos", Vec3.CODEC);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GLITCHY_MANTLE_ILLUSION_COOLDOWN = RelicsDataComponents.construct("glitchy_mantle/illusion_cooldown", Codec.INT);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROLLER_SKATE_DURATION = RelicsDataComponents.construct("roller_skate/duration", Codec.INT);
 

@@ -2,8 +2,10 @@ package it.hurts.sskirillss.relics.client.renderer.items;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.client.models.items.GlitchyMantleModel;
 import it.hurts.sskirillss.relics.client.models.items.LeafyMantleModel;
 import it.hurts.sskirillss.relics.client.renderer.items.base.IRelicRenderer;
+import it.hurts.sskirillss.relics.items.relics.back.GlitchyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import net.minecraft.client.Minecraft;
@@ -19,18 +21,18 @@ import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.SlotContext;
 import top.theillusivec4.curios.api.client.ICurioRenderer;
 
-public class LeafyMantleRenderer implements IRelicRenderer {
-    private final LeafyMantleModel model;
+public class GlitchyMantleRenderer implements IRelicRenderer {
+    private final GlitchyMantleModel model;
 
-    public LeafyMantleRenderer() {
-        this.model = new LeafyMantleModel(Minecraft.getInstance().getEntityModels().bakeLayer(LeafyMantleModel.LAYER));
+    public GlitchyMantleRenderer() {
+        this.model = new GlitchyMantleModel(Minecraft.getInstance().getEntityModels().bakeLayer(GlitchyMantleModel.LAYER));
     }
 
     @Override
     public <E extends LivingEntity, EM extends EntityModel<E>> void render(ItemStack stack, SlotContext slotContext, PoseStack poseStack, RenderLayerParent<E, EM> parent, MultiBufferSource bufferSource, int light, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         var entity = slotContext.entity();
 
-        var relic = (LeafyMantleItem) stack.getItem();
+        var relic = (GlitchyMantleItem) stack.getItem();
 
         poseStack.pushPose();
 
@@ -39,7 +41,9 @@ public class LeafyMantleRenderer implements IRelicRenderer {
 
         ICurioRenderer.followBodyRotations(entity, this.model);
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/leafy_mantle.png")))), relic.getRelicData(entity, stack).isVisuallyFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/glitchy_mantle.png")))), relic.getRelicData(entity, stack).isVisuallyFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
+
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/glitchy_mantle_glow.png"))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
     }
