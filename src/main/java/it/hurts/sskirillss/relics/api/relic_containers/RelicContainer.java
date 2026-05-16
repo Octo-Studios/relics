@@ -39,6 +39,13 @@ public abstract class RelicContainer {
 
                     references.add(new AbilityReference(abilityData.getId(), reference));
                 }
+
+                for (var synergyData : abilitiesData.getSynergies().values()) {
+                    if (synergyData == null || !synergyData.isUnlocked() || synergyData.getTemplate().getModes().isEmpty())
+                        continue;
+
+                    references.add(new AbilityReference(synergyData.getId(), reference, AbilityReference.Type.SYNERGY));
+                }
             }
 
             return references;

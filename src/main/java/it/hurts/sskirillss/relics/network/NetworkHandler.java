@@ -12,6 +12,7 @@ import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeA
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityRankModifier;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
 import it.hurts.sskirillss.relics.network.packets.abilities.C2SActivateAbility;
+import it.hurts.sskirillss.relics.network.packets.abilities.C2SSwitchSynergyMode;
 import it.hurts.sskirillss.relics.network.packets.description.relic.C2SChangeRelicOptionFlawlessVisual;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyMode;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyRankModifier;
@@ -67,6 +68,7 @@ public class NetworkHandler {
         registrar.playToServer(C2SChangeRelicOptionFlawlessVisual.TYPE, C2SChangeRelicOptionFlawlessVisual.STREAM_CODEC, C2SChangeRelicOptionFlawlessVisual::handle);
         registrar.playToClient(S2CSyncPlayerResearch.TYPE, S2CSyncPlayerResearch.STREAM_CODEC, S2CSyncPlayerResearch::handle);
         registrar.playToServer(C2SActivateAbility.TYPE, C2SActivateAbility.STREAM_CODEC, C2SActivateAbility::handle);
+        registrar.playToServer(C2SSwitchSynergyMode.TYPE, C2SSwitchSynergyMode.STREAM_CODEC, C2SSwitchSynergyMode::handle);
 
         // === KINETIC BELT ===
         registrar.playToServer(C2SSetActive.TYPE, C2SSetActive.STREAM_CODEC, C2SSetActive::handle);

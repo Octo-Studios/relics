@@ -16,6 +16,7 @@ import it.hurts.sskirillss.relics.init.RelicsRegistries;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.abilities.C2SActivateAbility;
+import it.hurts.sskirillss.relics.network.packets.abilities.C2SSwitchSynergyMode;
 import it.hurts.sskirillss.relics.relic_containers.CuriosRelicStackReference;
 import it.hurts.sskirillss.relics.relic_containers.InventoryRelicStackReference;
 import net.minecraft.client.Minecraft;
@@ -442,11 +443,11 @@ public class ActiveAbilitiesClientHandler {
             references.addAll(container.gatherAbilityReferences().apply(player));
 
         return references.stream()
-                .filter(ActiveAbilitiesClientHandler::isUnlockedAbility)
+                .filter(ActiveAbilitiesClientHandler::isUnlockedReference)
                 .toList();
     }
 
-    private static boolean isUnlockedAbility(AbilityReference reference) {
+    private static boolean isUnlockedReference(AbilityReference reference) {
         var player = MC.player;
 
         if (player == null)
@@ -457,12 +458,25 @@ public class ActiveAbilitiesClientHandler {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return false;
 
+        if (reference.isSynergy()) {
+            var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(reference.ability());
+
+            return synergyData != null && synergyData.isUnlocked() && !synergyData.getTemplate().getModes().isEmpty();
+        }
+
         var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(reference.ability());
 
         return abilityData != null && abilityData.isUnlocked();
     }
 
     public static void sendActivation(AbilityReference reference, AbilityActivationStage stage) {
+        if (reference.isSynergy()) {
+            if (stage == AbilityActivationStage.START)
+                sendSynergyModeSwitch(reference);
+
+            return;
+        }
+
         var stackReference = reference.stackReference();
 
         if (stackReference instanceof InventoryRelicStackReference inventoryReference) {
@@ -473,6 +487,40 @@ public class ActiveAbilitiesClientHandler {
 
         if (stackReference instanceof CuriosRelicStackReference curiosReference)
             NetworkHandler.sendToServer(new C2SActivateAbility("curios", curiosReference.index(), curiosReference.identifier(), reference.ability(), stage));
+    }
+
+    private static void sendSynergyModeSwitch(AbilityReference reference) {
+        var player = MC.player;
+
+        if (player == null)
+            return;
+
+        var stackReference = reference.stackReference();
+        var stack = stackReference.getStack(player);
+
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(reference.ability());
+
+        if (synergyData == null)
+            return;
+
+        var modes = synergyData.getTemplate().getModes();
+
+        if (modes.isEmpty())
+            return;
+
+        var nextMode = modes.get(Math.floorMod(modes.indexOf(synergyData.getMode()) + 1, modes.size()));
+
+        if (stackReference instanceof InventoryRelicStackReference(int slot)) {
+            NetworkHandler.sendToServer(new C2SSwitchSynergyMode("inventory", slot, "", reference.ability(), nextMode));
+
+            return;
+        }
+
+        if (stackReference instanceof CuriosRelicStackReference(String identifier, int index))
+            NetworkHandler.sendToServer(new C2SSwitchSynergyMode("curios", index, identifier, reference.ability(), nextMode));
     }
 
     private static List<AbilityReference> getVisibleReferences(List<AbilityReference> references) {
@@ -548,6 +596,40 @@ public class ActiveAbilitiesClientHandler {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
+        if (reference.isSynergy()) {
+            var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(reference.ability());
+
+            if (synergyData == null)
+                return;
+
+            var synergyTexture = DescriptionTextures.getSynergyCardTexture(stack, synergyData.getId());
+            var canUse = synergyData.isUnlocked();
+            var animation = getAnimation(reference);
+            var scale = animation.getScale() * openScale;
+            var pose = guiGraphics.pose();
+
+            pose.pushPose();
+            pose.translate(x + CARD_WIDTH / 2D, y + CARD_HEIGHT / 2D, 0);
+            pose.mulPose(Axis.ZP.rotation(animation.clickZRotation));
+            pose.scale(scale, scale, 1F);
+            pose.translate(-CARD_WIDTH / 2D, -CARD_HEIGHT / 2D, 0);
+
+            RenderSystem.enableBlend();
+            RenderSystem.setShaderColor(1F, 1F, 1F, alpha);
+            guiGraphics.blit(synergyTexture, ICON_X, ICON_Y, 0, 0, ICON_WIDTH, ICON_HEIGHT, ICON_WIDTH, ICON_HEIGHT);
+            guiGraphics.blit(canUse ? CARD_FRAME_ACTIVE : CARD_FRAME_INACTIVE, 0, 0, 0, 0, CARD_WIDTH, CARD_HEIGHT, CARD_WIDTH, CARD_HEIGHT);
+
+            if (selected)
+                guiGraphics.blit(CARD_FRAME_OUTLINE, -1, -1, 0, 0, CARD_OUTLINE_WIDTH, CARD_OUTLINE_HEIGHT, CARD_OUTLINE_WIDTH, CARD_OUTLINE_HEIGHT);
+
+            RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+            RenderSystem.disableBlend();
+
+            pose.popPose();
+
+            return;
+        }
+
         var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(reference.ability());
 
         if (abilityData == null)
@@ -603,7 +685,7 @@ public class ActiveAbilitiesClientHandler {
     }
 
     private static String getAnimationKey(AbilityReference reference) {
-        return reference.stackReference() + ":" + reference.ability();
+        return reference.stackReference() + ":" + reference.type() + ":" + reference.ability();
     }
 
     private static void resetAnimations() {
@@ -620,6 +702,24 @@ public class ActiveAbilitiesClientHandler {
 
         var itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
         var ability = reference.ability();
+        if (reference.isSynergy()) {
+            var synergyData = relic.getRelicData(player, stack).getAbilitiesData().getSynergyData(ability);
+
+            if (synergyData == null)
+                return;
+
+            var title = Component.translatableWithFallback("relics.description." + itemId + ".synergy." + ability, ability);
+
+            title = title.copy()
+                    .append(Component.literal(" ["))
+                    .append(Component.translatable("relics.description." + itemId + ".synergy." + ability + ".mode." + synergyData.getMode()))
+                    .append(Component.literal("]"));
+
+            guiGraphics.drawString(MC.font, title, centerX - MC.font.width(title) / 2, y, 0xFFFFFF, true);
+
+            return;
+        }
+
         var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
 
         if (abilityData == null)
