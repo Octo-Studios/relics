@@ -240,7 +240,7 @@ public class PiglinMaskItem extends WearableRelicItem {
 
     @Override
     public boolean makesPiglinsNeutral(SlotContext slotContext, ItemStack stack) {
-        return true;
+        return this.getRelicData(slotContext.entity(), stack).getAbilitiesData().getAbilityData("neutrality").canPlayerUse(slotContext.entity());
     }
 
     @EventBusSubscriber
@@ -366,6 +366,9 @@ public class PiglinMaskItem extends WearableRelicItem {
 
             for (var stack : stacks) {
                 var relic = (PiglinMaskItem) stack.getItem();
+
+                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").canPlayerUse(source))
+                    continue;
 
                 var amount = MathUtils.multicast(random, relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("chance").getValue(), (int) Math.ceil(entity.getMaxHealth() / relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("health").getValue()));
 

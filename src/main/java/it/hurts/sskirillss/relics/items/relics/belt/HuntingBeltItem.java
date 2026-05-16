@@ -144,7 +144,11 @@ public class HuntingBeltItem extends WearableRelicItem {
             var totalModifier = 0D;
             var ignoreInvulnerability = false;
 
-            for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get())) {
+            for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get(), stack -> {
+                var relic = (HuntingBeltItem) stack.getItem();
+
+                return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner);
+            })) {
                 var relic = (HuntingBeltItem) stack.getItem();
 
                 totalModifier += relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatData("damage_modifier").getValue();
@@ -172,7 +176,11 @@ public class HuntingBeltItem extends WearableRelicItem {
             if (original <= 0F)
                 return;
 
-            var allActiveBelts = EntityUtils.findEquippedCurios(player, RelicsItems.HUNTING_BELT.get());
+            var allActiveBelts = EntityUtils.findEquippedCurios(player, RelicsItems.HUNTING_BELT.get(), stack -> {
+                var relic = (HuntingBeltItem) stack.getItem();
+
+                return relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(player);
+            });
             var leaderBelts = allActiveBelts.stream()
                     .filter(stack -> {
                         var relic = (HuntingBeltItem) stack.getItem();
@@ -253,7 +261,11 @@ public class HuntingBeltItem extends WearableRelicItem {
             if (damage <= 0F)
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get())) {
+            for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get(), stack -> {
+                var relic = (HuntingBeltItem) stack.getItem();
+
+                return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner);
+            })) {
                 var relic = (HuntingBeltItem) stack.getItem();
 
                 relic.getRelicData(owner, stack).getLevelingData().addExperience("pack", "pet_damage", 1);
@@ -271,7 +283,11 @@ public class HuntingBeltItem extends WearableRelicItem {
 
             if (entity instanceof OwnableEntity ownable && ownable.getOwner() instanceof LivingEntity owner
                     && !RelicsConfigs.RELICS_CONFIG.getHuntingBeltRevivalEntitiesBlacklist().contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())) {
-                var revivalBelts = EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get()).stream()
+                var revivalBelts = EntityUtils.findEquippedCurios(owner, RelicsItems.HUNTING_BELT.get(), stack -> {
+                            var relic = (HuntingBeltItem) stack.getItem();
+
+                            return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner);
+                        }).stream()
                         .filter(stack -> {
                             var relic = (HuntingBeltItem) stack.getItem();
 

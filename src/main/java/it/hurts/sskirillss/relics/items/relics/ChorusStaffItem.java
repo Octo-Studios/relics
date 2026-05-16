@@ -148,6 +148,9 @@ public class ChorusStaffItem extends RelicItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
 
+        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").canPlayerUse(player))
+            return InteractionResultHolder.pass(stack);
+
         var radius = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatData("distance").getValue();
 
         var eyePos = player.getEyePosition();

@@ -204,7 +204,7 @@ public class SpringyBootItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
                 var relic = (SpringyBootItem) stack.getItem();
 
-                if (relic.isLeaped(stack) || relic.getBounceCooldown(stack) > 0 || !entity.isShiftKeyDown())
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").canPlayerUse(entity) || relic.isLeaped(stack) || relic.getBounceCooldown(stack) > 0 || !entity.isShiftKeyDown())
                     continue;
 
                 power += relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("power").getValue();
@@ -240,7 +240,7 @@ public class SpringyBootItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
                 var relic = (SpringyBootItem) stack.getItem();
 
-                if (!relic.isLeaped(stack) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("strike").isEnabled())
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").canPlayerUse(entity) || !relic.isLeaped(stack) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("strike").isEnabled())
                     continue;
 
                 var leaps = relic.getLeaps(stack);

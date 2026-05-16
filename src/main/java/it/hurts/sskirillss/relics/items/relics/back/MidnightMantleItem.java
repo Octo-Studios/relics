@@ -341,6 +341,9 @@ public class MidnightMantleItem extends WearableRelicItem {
     }
 
     public double getModeEffectiveness(LivingEntity entity, ItemStack stack) {
+        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity))
+            return 0D;
+
         var mode = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode();
         var level = entity.getCommandSenderWorld();
 
@@ -389,42 +392,46 @@ public class MidnightMantleItem extends WearableRelicItem {
         if (this.getStarfallCooldown(stack) > 0)
             this.addStarfallCooldown(stack, -1);
 
-        var mode = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode();
+        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity)) {
+            var mode = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode();
 
-        if (!mode.isEmpty()) {
-            if (entity.tickCount % 20 == 0)
-                this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatisticData().getMetricData("duration_" + mode).addValue(1);
+            if (!mode.isEmpty()) {
+                if (entity.tickCount % 20 == 0)
+                    this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatisticData().getMetricData("duration_" + mode).addValue(1);
 
-            var totalEffectiveness = this.getModeEffectiveness(entity, stack);
+                var totalEffectiveness = this.getModeEffectiveness(entity, stack);
 
-            var attackEffectiveness = mode.equals("full_moon") ? totalEffectiveness : 0D;
-            var healEffectiveness = mode.equals("new_moon") ? totalEffectiveness : 0D;
+                var attackEffectiveness = mode.equals("full_moon") ? totalEffectiveness : 0D;
+                var healEffectiveness = mode.equals("new_moon") ? totalEffectiveness : 0D;
 
-            EntityUtils.resetAttribute(entity, Attributes.ATTACK_SPEED,
-                    (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("attack_speed").getValue() * attackEffectiveness),
-                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
-                    getPhaseAttributeId(stack, Attributes.ATTACK_SPEED, slotContext));
-            EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH,
-                    (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("max_health").getValue() * healEffectiveness),
-                    AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
-                    getPhaseAttributeId(stack, Attributes.MAX_HEALTH, slotContext));
+                EntityUtils.resetAttribute(entity, Attributes.ATTACK_SPEED,
+                        (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("attack_speed").getValue() * attackEffectiveness),
+                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
+                        getPhaseAttributeId(stack, Attributes.ATTACK_SPEED, slotContext));
+                EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH,
+                        (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("max_health").getValue() * healEffectiveness),
+                        AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
+                        getPhaseAttributeId(stack, Attributes.MAX_HEALTH, slotContext));
+            }
+
+            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled() && this.getPhaseDuration(stack) > 0)
+                this.addPhaseDuration(stack, -1);
         }
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled() && this.getPhaseDuration(stack) > 0)
-            this.addPhaseDuration(stack, -1);
+        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").canPlayerUse(entity)) {
+            var cooldown = this.getInvisibilityCooldown(stack);
 
-        var cooldown = this.getInvisibilityCooldown(stack);
+            if (cooldown > 0) {
+                if (level.getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(16)).stream().noneMatch(mob -> mob.getTarget() == entity && mob.hasLineOfSight(entity)))
+                    this.addInvisibilityCooldown(stack, -1);
+            } else if (this.canHideInTheDarkness(entity, stack)) {
+                entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
 
-        if (cooldown > 0) {
-            if (level.getEntitiesOfClass(Mob.class, entity.getBoundingBox().inflate(16)).stream().noneMatch(mob -> mob.getTarget() == entity && mob.hasLineOfSight(entity)))
-                this.addInvisibilityCooldown(stack, -1);
-        } else if (this.canHideInTheDarkness(entity, stack)) {
-            entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
+                if (entity.tickCount % 20 == 0) {
+                    this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatisticData().getMetricData("duration").addValue(1);
 
-            if (entity.tickCount % 20 == 0) {
-                this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatisticData().getMetricData("duration").addValue(1);
-
-                this.getRelicData(entity, stack).getLevelingData().addExperience("invisibility", "being_invisible", 1);
+                    this.getRelicData(entity, stack).getLevelingData().addExperience("invisibility", "being_invisible", 1);
+                }
             }
         }
     }
@@ -453,6 +460,9 @@ public class MidnightMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").canPlayerUse(entity))
+                    continue;
+
                 ServerScheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatData("cooldown").getValue() * 20)));
             }
         }
@@ -468,7 +478,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode().equals("new_moon"))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode().equals("new_moon"))
                     continue;
 
                 var heal = event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("health_regeneration").getValue() * relic.getModeEffectiveness(entity, stack);
@@ -491,7 +501,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode().equals("full_moon"))
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode().equals("full_moon"))
                     continue;
 
                 var damage = event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("attack_damage").getValue() * relic.getModeEffectiveness(entity, stack);
@@ -519,7 +529,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getRankModifierData("strike").isEnabled()
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getRankModifierData("strike").isEnabled()
                         || relic.getInvisibilityCooldown(stack) > 0 || !relic.canHideInTheDarkness(entity, stack))
                     continue;
 
@@ -579,7 +589,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled())
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled())
                     continue;
 
                 relic.setPhaseDuration(stack, (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("duration").getValue() * 20);
@@ -602,7 +612,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (random.nextDouble() > relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("star_chance").getValue())
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").canPlayerUse(entity) || random.nextDouble() > relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("star_chance").getValue())
                     continue;
 
                 var star = new ConstellationStarEntity(RelicsEntities.CONSTELLATION_STAR.get(), level);
@@ -647,7 +657,8 @@ public class MidnightMantleItem extends WearableRelicItem {
             for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
                 var relic = (MidnightMantleItem) stack.getItem();
 
-                if (relic.getStarfallCooldown(stack) > 0
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").canPlayerUse(entity)
+                        || relic.getStarfallCooldown(stack) > 0
                         || random.nextFloat() > relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("chance").getValue())
                     continue;
 
@@ -684,3 +695,4 @@ public class MidnightMantleItem extends WearableRelicItem {
         }
     }
 }
+

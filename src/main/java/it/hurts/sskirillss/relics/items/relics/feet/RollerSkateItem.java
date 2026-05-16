@@ -289,7 +289,7 @@ public class RollerSkateItem extends WearableRelicItem {
 
                 var duration = relic.getDuration(stack);
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("resistance").isEnabled() || duration <= 0)
+                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("resistance").isEnabled() || duration <= 0)
                     continue;
 
                 var modifier = (float) (original * (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("resistance").getValue() * ((float) duration / relic.getMaxDuration())));

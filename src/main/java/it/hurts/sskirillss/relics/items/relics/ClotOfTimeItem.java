@@ -104,7 +104,12 @@ public class ClotOfTimeItem extends RelicItem {
     }
 
     private int getRememberedTicks(Player player, ItemStack stack) {
-        return Math.max(1, (int) Math.round(this.getRelicData(player, stack).getAbilitiesData().getAbilityData("rewind").getStatData("time").getValue() * 20D));
+        var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("rewind");
+
+        if (!ability.canPlayerUse(player))
+            return 0;
+
+        return Math.max(1, (int) Math.round(ability.getStatData("time").getValue() * 20D));
     }
 
     private int getCooldown(ItemStack stack) {
@@ -161,7 +166,8 @@ public class ClotOfTimeItem extends RelicItem {
 
             var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("rewind");
 
-            ability.getStatisticData().getMetricData("activations").addValue(1D);
+            if (ability.canPlayerUse(player))
+                ability.getStatisticData().getMetricData("activations").addValue(1D);
         }
 
         player.startUsingItem(hand);
@@ -320,11 +326,13 @@ public class ClotOfTimeItem extends RelicItem {
 
         var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("rewind");
 
-        this.getRelicData(player, stack).getLevelingData().addExperience("rewind", "rewind", 1D / 20D);
+        if (ability.canPlayerUse(player)) {
+            this.getRelicData(player, stack).getLevelingData().addExperience("rewind", "rewind", 1D / 20D);
 
-        ability.getStatisticData().getMetricData("rewind_duration").addValue(1D / 20D);
+            ability.getStatisticData().getMetricData("rewind_duration").addValue(1D / 20D);
+        }
 
-        if (ability.getRankModifierData("health_rewind").isEnabled()) {
+        if (ability.canPlayerUse(player) && ability.getRankModifierData("health_rewind").isEnabled()) {
             var rewindHealth = Mth.lerp(t, p1.health(), p2.health());
             var currentHealth = player.getHealth();
             var targetHealth = Math.min(player.getMaxHealth(), Math.max(currentHealth, rewindHealth));
@@ -332,9 +340,10 @@ public class ClotOfTimeItem extends RelicItem {
             if (targetHealth > currentHealth) {
                 player.setHealth(targetHealth);
 
-                this.getRelicData(player, stack).getLevelingData().addExperience("rewind", "health_rewind", targetHealth - currentHealth);
-
-                ability.getStatisticData().getMetricData("health_restored").addValue(targetHealth - currentHealth);
+                if (ability.canPlayerUse(player) && ability.getRankModifierData("health_rewind").isEnabled()) {
+                    this.getRelicData(player, stack).getLevelingData().addExperience("rewind", "health_rewind", targetHealth - currentHealth);
+                    ability.getStatisticData().getMetricData("health_restored").addValue(targetHealth - currentHealth);
+                }
             }
         }
 
@@ -389,7 +398,7 @@ public class ClotOfTimeItem extends RelicItem {
 
     @Override
     public boolean isBarVisible(ItemStack stack) {
-        return stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<ClotOfTimeItem.PathPointData>of()).size() >= 2;
+        return this.getRelicData(null, stack).getAbilitiesData().getAbilityData("rewind").canPlayerUse(null) && stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<ClotOfTimeItem.PathPointData>of()).size() >= 2;
     }
 
     public record PathPointData(double x, double y, double z, float yRot, float xRot, float health, String dimension) {
@@ -452,7 +461,7 @@ public class ClotOfTimeItem extends RelicItem {
 
             var ability = relic.getRelicData(player, player.getUseItem()).getAbilitiesData().getAbilityData("rewind");
 
-            if (!ability.getRankModifierData("invulnerability").isEnabled())
+            if (!ability.canPlayerUse(player) || !ability.getRankModifierData("invulnerability").isEnabled())
                 return;
 
             event.setCanceled(true);
@@ -495,7 +504,7 @@ public class ClotOfTimeItem extends RelicItem {
                 if (usingThisStack) {
                     var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("rewind");
 
-                    if (ability.getRankModifierData("oblivion").isEnabled()) {
+                    if (ability.canPlayerUse(player) && ability.getRankModifierData("oblivion").isEnabled()) {
                         for (var mob : player.level().getEntitiesOfClass(Mob.class, player.getBoundingBox().inflate(16D))) {
                             if (mob.getTarget() == player)
                                 mob.setTarget(null);
