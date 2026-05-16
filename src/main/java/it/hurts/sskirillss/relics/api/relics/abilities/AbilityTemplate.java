@@ -204,8 +204,7 @@ public class AbilityTemplate {
         public AbilityTemplateBuilder activationPredicate(String id, AbilityActivationPredicateType type, Predicate<AbilityActivationPredicateContext> predicate) {
             var builder = AbilityActivationTemplate.builder(this.activation.getType())
                     .containers(this.activation.getContainers())
-                    .predicates(new LinkedHashMap<>(this.activation.getPredicates()))
-                    .cyclesModes(this.activation.isCyclesModes());
+                    .predicates(new LinkedHashMap<>(this.activation.getPredicates()));
 
             this.activation = builder.predicate(id, type, predicate).build();
 
@@ -216,10 +215,9 @@ public class AbilityTemplate {
             var activation = this.activation;
 
             if (!this.modes.isEmpty() && !activation.isActive())
-                activation = AbilityActivationTemplate.builder(AbilityActivationType.INSTANTANEOUS)
+                activation = AbilityActivationTemplate.builder(AbilityActivationType.CYCLE_MODE)
                         .containers(activation.getContainers())
                         .predicates(new LinkedHashMap<>(activation.getPredicates()))
-                        .cyclesModes()
                         .build();
 
             return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredRank, this.requiredPoints, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers, activation);

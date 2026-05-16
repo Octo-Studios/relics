@@ -402,7 +402,7 @@ public class AbilityData {
             }
         }
 
-        if (stage == AbilityActivationStage.START && template.getActivation().isCyclesModes())
+        if (stage == AbilityActivationStage.START && type == AbilityActivationType.CYCLE_MODE)
             cycleMode(player);
 
         relic.activateAbility(new AbilityActivationContext(player, stack, this, type, stage));

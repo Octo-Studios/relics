@@ -14,7 +14,8 @@ public enum AbilityActivationType {
     INTERRUPTIBLE(2),
     CYCLICAL(3),
     TOGGLEABLE(4),
-    CHARGEABLE(5);
+    CHARGEABLE(5),
+    CYCLE_MODE(6);
 
     public static final IntFunction<AbilityActivationType> BY_ID = ByIdMap.continuous(AbilityActivationType::getId, AbilityActivationType.values(), ByIdMap.OutOfBoundsStrategy.ZERO);
 

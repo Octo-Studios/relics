@@ -21,7 +21,6 @@ public class AbilityActivationTemplate {
     private final AbilityActivationType type;
     private final List<RelicContainer> containers;
     private final Map<String, AbilityActivationPredicateTemplate> predicates;
-    private final boolean cyclesModes;
 
     public boolean isActive() {
         return this.type != AbilityActivationType.NONE;
@@ -45,7 +44,6 @@ public class AbilityActivationTemplate {
         private AbilityActivationType type = AbilityActivationType.NONE;
         private List<RelicContainer> containers = new ArrayList<>();
         private Map<String, AbilityActivationPredicateTemplate> predicates = new LinkedHashMap<>();
-        private boolean cyclesModes = false;
 
         public AbilityActivationTemplateBuilder type(AbilityActivationType type) {
             this.type = type;
@@ -71,16 +69,6 @@ public class AbilityActivationTemplate {
             return this;
         }
 
-        public AbilityActivationTemplateBuilder cyclesModes(boolean cyclesModes) {
-            this.cyclesModes = cyclesModes;
-
-            return this;
-        }
-
-        public AbilityActivationTemplateBuilder cyclesModes() {
-            return cyclesModes(true);
-        }
-
         public AbilityActivationTemplateBuilder predicate(String id, AbilityActivationPredicateType type, Predicate<AbilityActivationPredicateContext> predicate) {
             this.predicates.put(id, new AbilityActivationPredicateTemplate(id, type, predicate));
 
@@ -88,7 +76,7 @@ public class AbilityActivationTemplate {
         }
 
         public AbilityActivationTemplate build() {
-            return new AbilityActivationTemplate(this.type, this.containers, this.predicates, this.cyclesModes);
+            return new AbilityActivationTemplate(this.type, this.containers, this.predicates);
         }
     }
 }
