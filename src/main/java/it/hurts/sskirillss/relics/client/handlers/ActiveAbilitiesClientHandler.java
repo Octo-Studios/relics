@@ -186,6 +186,30 @@ public class ActiveAbilitiesClientHandler {
 
     @SubscribeEvent
     public static void onClientTick(ClientTickEvent.Post event) {
+        if (MC.player == null) {
+            if (closing)
+                finishClosing();
+
+            wasOpen = false;
+
+            return;
+        }
+
+        if (MC.screen != null) {
+            if (wasOpen)
+                close();
+
+            if (closing)
+                finishClosing();
+
+            wasOpen = false;
+
+            return;
+        }
+
+        if (closing && getCloseProgress() >= 1D)
+            finishClosing();
+
         var open = MC.player != null && MC.screen == null && isAbilityListKeyDown();
 
         if (!open && shouldKeepOpenDuringMouseChord())
@@ -214,7 +238,7 @@ public class ActiveAbilitiesClientHandler {
 
     @SubscribeEvent
     public static void onMouseButton(InputEvent.MouseButton.Pre event) {
-        if (!wasOpen && !closing)
+        if (MC.screen != null || (!wasOpen && !closing))
             return;
 
         event.setCanceled(true);
@@ -222,7 +246,7 @@ public class ActiveAbilitiesClientHandler {
 
     @SubscribeEvent
     public static void onMouseInput(InputEvent.InteractionKeyMappingTriggered event) {
-        if (!wasOpen && !closing)
+        if (MC.screen != null || (!wasOpen && !closing))
             return;
 
         event.setSwingHand(false);
