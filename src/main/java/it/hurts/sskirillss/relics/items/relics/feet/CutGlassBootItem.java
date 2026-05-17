@@ -227,11 +227,15 @@ public class CutGlassBootItem extends WearableRelicItem {
         for (var fluid : this.getFluidEntries(entity, stack).values())
             amount += fluid.getAmount();
 
-        return Math.max(amount, (int) Math.ceil(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("capacity").getValue() * 1000));
+        var capacity = (int) MathUtils.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("capacity").getValue(), 0) * 1000;
+
+        return Math.max(amount, capacity);
     }
 
     public int getMaxFluidEntries(LivingEntity entity, ItemStack stack) {
-        return Math.max(this.getFluidEntries(entity, stack).size(), (int) Math.ceil(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("max_fluids").getValue()));
+        var maxFluids = (int) MathUtils.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("max_fluids").getValue(), 0);
+
+        return Math.max(this.getFluidEntries(entity, stack).size(), maxFluids);
     }
 
     public int getSelectedFluidIndex(LivingEntity entity, ItemStack stack) {
