@@ -122,6 +122,16 @@ public class ResearchData {
         }
     }
 
+    public void complete() {
+        var template = this.getAbilityData().getTemplate();
+
+        if (template == null)
+            return;
+
+        this.setLinks(template.getResearchTemplate().getLinks());
+        this.setResearched(true);
+    }
+
     private String getResearchKey() {
         var stack = this.getAbilityData().getAbilitiesData().getRelicData().getStack();
         var itemId = BuiltInRegistries.ITEM.getKey(stack.getItem()).toString();

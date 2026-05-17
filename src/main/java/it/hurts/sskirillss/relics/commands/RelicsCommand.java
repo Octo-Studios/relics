@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.commands;
 
 import com.mojang.brigadier.Command;
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
@@ -48,7 +49,7 @@ public class RelicsCommand {
 
                                         abilityData.setLevel(abilityTemplate.getInitialMaxLevel());
                                         abilityData.getLockData().setUnlocks(abilityData.getLockData().getMaxUnlocks());
-                                        abilityData.getResearchData().setResearched(true);
+                                        abilityData.getResearchData().complete();
 
                                         abilityTemplate.getStats().keySet().forEach(statId -> abilityData.getStatData(statId).setInitialQuality(abilityData.getStatData(statId).getMaxQuality()));
                                     });
@@ -238,6 +239,45 @@ public class RelicsCommand {
                                                             return Command.SINGLE_SUCCESS;
                                                         })
                                                 )
+                                        )
+                                )
+                        )
+                )
+                .then(Commands.literal("player")
+                        .then(Commands.literal("research")
+                                .then(Commands.argument("ability", AbilityArgument.ability())
+                                        .then(Commands.argument("researched", BoolArgumentType.bool())
+                                                .executes(ctx -> {
+                                                    var player = ctx.getSource().getPlayerOrException();
+                                                    var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
+
+                                                    if (!(stack.getItem() instanceof IRelicItem relic)) {
+                                                        ctx.getSource().sendFailure(Component.translatable("command.relics.base.not_relic"));
+
+                                                        return 0;
+                                                    }
+
+                                                    var ability = AbilityArgument.getAbility(ctx, "ability");
+                                                    var researched = BoolArgumentType.getBool(ctx, "researched");
+                                                    var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
+
+                                                    Stream.of(ability.equalsIgnoreCase("all") ? abilitiesData.getAbilityIDs().toArray(new String[0]) : new String[]{ability})
+                                                            .forEach(abilityEntry -> {
+                                                                var abilityData = abilitiesData.getAbilityData(abilityEntry);
+
+                                                                if (abilityData == null)
+                                                                    return;
+
+                                                                if (researched) {
+                                                                    abilityData.getResearchData().complete();
+                                                                } else {
+                                                                    abilityData.getResearchData().setResearched(false);
+                                                                    abilityData.getResearchData().setLinks(new HashMap<>());
+                                                                }
+                                                            });
+
+                                                    return Command.SINGLE_SUCCESS;
+                                                })
                                         )
                                 )
                         )
