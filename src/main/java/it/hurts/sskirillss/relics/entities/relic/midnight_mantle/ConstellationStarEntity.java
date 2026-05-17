@@ -353,12 +353,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         if (this.level().isClientSide())
             return false;
 
-        var owner = this.getOwner();
-        var attacker = source.getEntity();
-
-        if (owner != null && attacker != null && owner.getStringUUID().equals(attacker.getStringUUID()))
-            return false;
-
         this.playSound(SoundEvents.SHULKER_BULLET_HURT, 1F, 1F);
 
         this.discard();
