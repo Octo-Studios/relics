@@ -1,4 +1,4 @@
-package it.hurts.sskirillss.relics.client.post_effects;
+package it.hurts.sskirillss.relics.client.post_effects.misc;
 
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
@@ -23,6 +23,7 @@ public class EntityGlitchMask {
     private static TextureTarget target;
     private static boolean renderingMask;
     private static boolean depthCopied;
+    private static boolean renderedThisFrame;
 
     public static void beginFrame() {
         var mask = getTarget();
@@ -39,8 +40,13 @@ public class EntityGlitchMask {
         mask.clear(Minecraft.ON_OSX);
 
         depthCopied = false;
+        renderedThisFrame = false;
 
         MC.getMainRenderTarget().bindWrite(false);
+    }
+
+    public static boolean hasRenderedThisFrame() {
+        return renderedThisFrame;
     }
 
     public static TextureTarget getTarget() {
@@ -78,6 +84,7 @@ public class EntityGlitchMask {
             var vertexConsumer = buffer.getBuffer(model.renderType(texture));
 
             model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
+            renderedThisFrame = true;
 
             if (!entity.isSpectator()) {
                 for (var layer : layers)

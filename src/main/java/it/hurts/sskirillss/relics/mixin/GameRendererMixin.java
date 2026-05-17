@@ -1,7 +1,7 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import it.hurts.sskirillss.relics.client.post_effects.EntityGlitchMask;
+import it.hurts.sskirillss.relics.client.post_effects.misc.EntityGlitchMask;
 import it.hurts.sskirillss.relics.api.post_effects.PostEffect;
 import it.hurts.sskirillss.relics.api.post_effects.RenderStage;
 import it.hurts.sskirillss.relics.init.RelicsPostEffects;

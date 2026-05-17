@@ -4,7 +4,7 @@
   ],
   "passes": [
     {
-      "name": "relics:distortion",
+      "name": "relics:entity_glitch",
       "intarget": "minecraft:main",
       "outtarget": "swap",
       "uniforms": []

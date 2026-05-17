@@ -82,9 +82,9 @@ void main() {
     float mask = texture(MaskSampler, texCoord).a;
 
     if (mask <= 0.01) {
-        fragColor = src;
+        fragColor = vec4(src.rgb, 1.0);
         return;
     }
 
-    fragColor = vec4(mix(src.rgb, glitchColor(texCoord, mask), mask), src.a);
+    fragColor = vec4(mix(src.rgb, glitchColor(texCoord, mask), mask), 1.0);
 }

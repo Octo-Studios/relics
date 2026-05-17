@@ -151,9 +151,9 @@ public class ClientHandler {
 
         RelicsPostEffects.register(ChromaticAberrationPostEffect::new);
         RelicsPostEffects.register(SevenDeadlySinsPostEffect::new);
-        RelicsPostEffects.register(DistortionPostEffect::new);
-        RelicsPostEffects.register(LensPostEffect::new);
+        RelicsPostEffects.register(EntityGlitchPostEffect::new);
         RelicsPostEffects.register(GlitchPostEffect::new);
+        RelicsPostEffects.register(LensPostEffect::new);
 
         RelicsRelicStyles.init();
         RelicsPostEffects.init();

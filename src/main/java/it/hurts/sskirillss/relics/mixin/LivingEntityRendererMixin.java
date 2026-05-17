@@ -1,14 +1,13 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import it.hurts.sskirillss.relics.client.post_effects.EntityGlitchMask;
+import it.hurts.sskirillss.relics.client.post_effects.misc.EntityGlitchMask;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;

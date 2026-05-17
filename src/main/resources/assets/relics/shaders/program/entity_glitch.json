@@ -5,7 +5,7 @@
     "dstrgb": "1-srcalpha"
   },
   "vertex": "blit",
-  "fragment": "relics:distortion",
+  "fragment": "relics:entity_glitch",
   "attributes": [
     "Position"
   ],
