@@ -43,7 +43,7 @@ public class GlitchyMantleRenderer implements IRelicRenderer {
 
         this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/glitchy_mantle.png")))), relic.getRelicData(entity, stack).isVisuallyFlawless() ? LightTexture.FULL_BRIGHT : light, OverlayTexture.NO_OVERLAY);
 
-        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/glitchy_mantle_glow.png"))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        this.model.renderToBuffer(poseStack, bufferSource.getBuffer(RenderType.entityCutout(FlawlessUtils.getTexture(entity, stack, ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/item/model/glitchy_mantle_glow.png")))), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
     }
