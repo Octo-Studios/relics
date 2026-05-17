@@ -107,7 +107,7 @@ public class BlockStateMixin {
         if (state.isAir() || !state.getFluidState().isEmpty())
             return;
 
-        if (state.getDestroySpeed(null, pos) < 0F)
+        if (state.getDestroySpeed(level, pos) < 0F)
             return;
 
         var stack = EntityUtils.findEquippedCurio(entity, RelicsItems.GLITCHY_MANTLE.get());
