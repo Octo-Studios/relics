@@ -19,7 +19,14 @@
 
   "relics.description.relic.tooltip.abilities": "Abilities:",
 
-  "relics.description.researching.research.tip": "To unlock an ability, you need to connect the stars hidden under the fog so that the resulting constellation matches the background image. Once the constellation is matched correctly, the ability will be researched automatically.",
+  "relics.description.relic.intro.title": "Welcome to Relics!",
+  "relics.description.relic.intro.customization": "Here you can customize the relic to your liking! The interface may seem complicated, but it’s actually easy to understand:",
+  "relics.description.relic.intro.top_scroll.title": "Top Scroll",
+  "relics.description.relic.intro.top_scroll.description": "Responsible for the description of what you’re currently viewing. It has tabs attached to it for switching the description category: the description itself, statistics, settings, and more. The list of tabs also changes depending on which tab of the bottom scroll you’re currently viewing.",
+  "relics.description.relic.intro.bottom_scroll.title": "Bottom Scroll",
+  "relics.description.relic.intro.bottom_scroll.description": "Responsible for the content of the entire interface you’re currently viewing. It determines both what is shown in the top scroll and what is shown in the bottom scroll. However, in its case, the list of tabs is fixed.",
+  "relics.description.relic.intro.buttons": "Each tab has a large number of buttons. Almost all of them are labeled, so just hover over them and read the description if you don’t know what they do.",
+  "relics.description.relic.intro.good_luck": "Good luck and have fun! :)",
 
   "relics.description.researching.research.hint.description": "Hint",
   "relics.description.researching.research.hint.cost": "Cost: %1$s player experience points (%2$s relative levels) %3$s.",

@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.misc.TextJustificator;
+import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
 import net.minecraft.client.gui.GuiGraphics;

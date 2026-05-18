@@ -10,10 +10,12 @@ import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RelicIntroScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RankupRelicActionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicIntroContainerWidget;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -29,7 +31,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.registries.DeferredHolder;
 
 @OnlyIn(Dist.CLIENT)
 public class RelicDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
@@ -49,6 +50,11 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
             return;
 
         this.addRenderableWidget(new BigRelicCardWidget(x + 59, y + 43, this));
+
+        var introContainer = new RelicIntroContainerWidget(this);
+
+        this.addRenderableWidget(introContainer);
+        this.addRenderableWidget(new RelicIntroScrollbarWidget(x + 279, y + 173, introContainer));
 
         var container = subcategory.getContainerWidget(this);
 
