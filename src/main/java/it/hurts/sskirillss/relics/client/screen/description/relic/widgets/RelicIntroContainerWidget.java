@@ -25,7 +25,7 @@ public class RelicIntroContainerWidget extends AbstractDescriptionWidget impleme
     private final RelicDescriptionScreen screen;
 
     public RelicIntroContainerWidget(RelicDescriptionScreen screen) {
-        super(screen.x + 77, screen.y + 160, 196, 55);
+        super(screen.x + 77, screen.y + 160, 198, 55);
 
         this.screen = screen;
     }
