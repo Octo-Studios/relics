@@ -119,7 +119,7 @@
   "relics.description.statistic.relic.retention_time": "Relic Ownership Time",
 
   "item.relics.reflective_necklace": "Reflective Necklace",
-  "relics.description.reflective_necklace.description": "Old legends tell of a master jeweler who could trap the very fury of battle within crystals. This necklace is one of the few of his creations: the smooth facets of the stone absorb the force of a blow and store it until the wearer decides to return it to the enemy. In skilled hands, the necklace becomes not just protection but a weapon capable of turning any hostile force against its master.",
+  "relics.description.reflective_necklace.description": "The relic does not stop the blow from reaching the body - and that is its unpleasant honesty. It only takes part of the damage onto itself and hides it nearby, in pale spheres that linger beside the wearer. Once the wearer strikes back, the spheres obediently break away: one after another, until they shatter against an enemy, a wall, or something else.",
   "relics.description.reflective_necklace.ability.reflection": "Damage Condensation",
   "relics.description.reflective_necklace.ability.reflection.description": "When the relic's wearer takes damage, there is a %1$s%% chance to create an orb storing %2$s%% of the damage received. When the relic's wearer attacks, all nearby orbs within a radius of 16 blocks are sent in turn toward the attacked target. Upon colliding with any target in its path, the orb deals the stored damage to it and then disappears. The orb will also disappear if it collides with any solid block or if no target is chosen within %3$s seconds after it appears.",
   "relics.description.reflective_necklace.ability.reflection.rank_modifier.piercing": "The orb no longer disappears upon hitting the first target it encounters, and instead pierces through up to %4$s targets in its path.",
@@ -133,7 +133,7 @@
   "relics.description.reflective_necklace.ability.reflection.statistic.total_bounces": "Orb Bounces",
 
   "item.relics.jellyfish_necklace": "Jellyfish Necklace",
-  "relics.description.jellyfish_necklace.description": "Coiled around the neck like a living ornament, the jellyfish does not wither even far from its native waters. Its translucent bell gently pulses, shifting in shades of the sea, while its thin tentacles either sway lightly or contract, releasing sparks of electricity. While the wearer is submerged in water, it sustains them with life and health at the cost of its own strength. But when an enemy draws near, the tentacles flare with a blinding discharge, and an electric wave sweeps away everything in its path.",
+  "relics.description.jellyfish_necklace.description": "The relic comes alive only where there is water. In the rain or in liquid, it keeps the wearer steadier on their feet and closes their wounds. While electric arcs build up in its tentacles, it is better not to touch it: brush against it, and one of them breaks free, stinging everyone in its path.",
   "relics.description.jellyfish_necklace.ability.regeneration": "Aquatic Regeneration",
   "relics.description.jellyfish_necklace.ability.regeneration.description": "Increases the relic wearer's maximum health by %1$s% and their regeneration by %2$s%, but only while they are in liquid or in the rain.",
   "relics.description.jellyfish_necklace.ability.regeneration.rank_modifier.retention": "Upon leaving the water, the bonus to additional maximum health is replaced with absorption hearts, which are consumed as damage is taken.",
@@ -157,7 +157,7 @@
   "relics.description.jellyfish_necklace.ability.shock.statistic.hit_paralysis": "Paralysis Duration from Attacks",
 
   "item.relics.kinetic_belt": "Kinetic Belt",
-  "relics.description.kinetic_belt.description": "Once belonging to a master of aerial arts and a student of the ancient school of aeroforms, this belt is made from materials that defy the usual laws of physics. Thin plates sewn into the fabric respond not to body weight, but to movement — as if the very air obeys the wearer. Those who have mastered the art of handling this relic speak of a feeling of almost complete union with the air: every step becomes a leap, every leap — a flight, and every fall — just a push for the next takeoff.",
+  "relics.description.kinetic_belt.description": "The relic does not let the wearer truly fly, but it lets them stay in the air longer. The body loses altitude more slowly, preserves momentum better, and lands more softly.",
   "relics.description.kinetic_belt.ability.slots": "Arsenal Expansion",
   "relics.description.kinetic_belt.ability.slots.description": "Increases the maximum number of equipped charms by %1$s.",
   "relics.description.kinetic_belt.ability.gliding": "Gliding",
@@ -181,7 +181,7 @@
   "relics.description.kinetic_belt.ability.gliding.statistic.damage": "Additional Damage Dealt While Gliding",
 
   "item.relics.springy_boot": "Springy Boot",
-  "relics.description.springy_boot.description": "At the core of this boot are skillfully engineered springs that compress the force of each step and release it at the right moment, propelling the wearer away from any surface. Each landing becomes a springy bounce that does no harm to the body but, in skilled hands, can turn into a devastating shockwave.",
+  "relics.description.springy_boot.description": "With this relic, a fall rarely ends with the first touch of the ground. The surface pushes the wearer back into the air, and the movement continues from bounce to bounce until it runs out on its own.",
   "relics.description.springy_boot.ability.bounce": "Spring Dash",
   "relics.description.springy_boot.ability.bounce.description": "A crouch jump propels the relic wearer in the opposite direction of their gaze with %1$s%% force. Subsequent landings until coming to a full stop will bounce the relic wearer off horizontal surfaces, completely negating fall damage. To forcefully stop the ability's effect, simply hold the jump or crouch key before landing.",
   "relics.description.springy_boot.ability.bounce.rank_modifier.disappearance": "Using the ability grants full invisibility until the next landing.",
@@ -201,7 +201,7 @@
   "relics.description.springy_boot.ability.bounce.statistic.shockwave_stun": "Shockwave Stun Time",
 
   "item.relics.leafy_mantle": "Leafy Mantle",
-  "relics.description.leafy_mantle.description": "Woven from a thousand evergreen leaves yet as light as midday shade, this mantle wraps around the wearer’s shoulders, making them part of the forest and hiding them from prying eyes. The leaves in its fabric pulse with life-giving energy, nourishing the body, and in a moment of mortal danger, the grove itself rises in defense, deflecting any blows with its sweeping branches.",
+  "relics.description.leafy_mantle.description": "With this relic, foliage parts before the wearer: among the branches, they move freely, without obstacles, and gradually restore health. And when death comes too close, the forest takes the blows upon itself.",
   "relics.description.leafy_mantle.ability.camouflage": "Camouflage",
   "relics.description.leafy_mantle.ability.camouflage.description": "Allows free movement within tree leaves and prevents fall damage when landing on them. The relic wearer also heals for %1$s health every second while in foliage.",
   "relics.description.leafy_mantle.ability.camouflage.rank_modifier.absorption": "When the ability triggers, the relic wearer gains %2$s additional absorption health.",
@@ -221,7 +221,7 @@
   "relics.description.leafy_mantle.ability.revival.statistic.paralysis_duration": "Paralysis Time from Leaf Projectiles",
 
   "item.relics.roller_skate": "Roller Skate",
-  "relics.description.roller_skate.description": "Seemingly harmless, this roller skate is the legacy of a mad inventor who dreamed of catching the wind. One step is enough for the skate to pull you forward, picking up motion and accelerating it to the speed of the wind. In skilled hands, this swiftness can turn into a fiery dance: one sharp turn, and a scatter of deadly sparks flies across the ground, leaving a burning trail behind.",
+  "relics.description.roller_skate.description": "With this relic, ordinary running quickly stops being ordinary. The surface slides underfoot, movement becomes sharper, and on a hard drift, sparks fly from under the wheels, cutting no worse than a sword.",
   "relics.description.roller_skate.ability.skating": "Acceleration",
   "relics.description.roller_skate.ability.skating.description": "While running continuously, gradually increases the player's movement speed, reaching the maximum bonus of %1$s%% after 5 seconds. As movement speed increases, block slipperiness also increases.",
   "relics.description.roller_skate.ability.skating.rank_modifier.step_height": "Increases step height while running by %2$s blocks.",
@@ -238,7 +238,7 @@
   "relics.description.roller_skate.ability.skating.statistic.ignite_duration": "Ignite Duration from Sparks",
 
   "item.relics.midnight_mantle": "Midnight Mantle",
-  "relics.description.midnight_mantle.description": "Woven from shadows and starlight, this mantle is a relic of forgotten lunar priests who drew their power not from moonlight, but from the endlessly shifting sky. It is said its fabric changes with the phases of the Moon: sometimes cold as a silent night during the new moon, sometimes pulsing with the deep glow of the full moon. Those who dared to wear it speak of feeling as if they became part of the darkness slipping between worlds, their strength waxing and waning with the Moon. They swear that in the face of danger, the mantle responded faster than they could: shimmering stars scattering from its sleeves, and the heavens answering threats with searing bursts of light.",
+  "relics.description.midnight_mantle.description": "The relic changes with the Moon: under a full moon, the wearer strikes faster and harder, while under a new moon, they become tougher and recover from wounds more easily. In darkness, it hides them from prying eyes until light reveals their silhouette again. And if the wearer is wounded, stars flare around them, ready to form a deadly constellation.",
   "relics.description.midnight_mantle.ability.phase": "Lunar Phase",
   "relics.description.midnight_mantle.ability.phase.mode.full_moon": "Full Moon",
   "relics.description.midnight_mantle.ability.phase.mode.new_moon": "New Moon",
@@ -280,7 +280,7 @@
   "relics.description.midnight_mantle.ability.starfall.statistic.star_bounces": "Star Bounces",
 
   "item.relics.chorus_staff": "Chorus Staff",
-  "relics.description.chorus_staff.description": "A branch of the peculiar chorus, stolen from the distant End islands. After many years it still holds the power of teleportation: one swing and the body vanishes, only to reappear in another unknown place.",
+  "relics.description.chorus_staff.description": "The relic handles distance crudely and simply: one swing - and the wearer vanishes from the spot, appearing ahead faster than their own step.",
   "relics.description.chorus_staff.ability.blink": "Teleportation",
   "relics.description.chorus_staff.ability.blink.description": "When used, teleports the relic bearer forward up to %1$s blocks, consuming 1 unit from an internal buffer of %2$s units. The buffer regenerates automatically by 1 unit every %3$s seconds.",
   "relics.description.chorus_staff.ability.blink.rank_modifier.safe_fall": "Landing after teleportation does not deal fall damage.",
@@ -295,7 +295,7 @@
   "relics.description.chorus_staff.ability.blink.statistic.safe_falls": "Safe Landings after Teleportation",
 
   "item.relics.piglin_mask": "Piglin Mask",
-  "relics.description.piglin_mask.description": "A refined carving of piglin features, born of the Nether. With it, any being, no matter how alien to the Nether, can pass as one of their own among piglins.",
+  "relics.description.piglin_mask.description": "The relic echoes the features of piglins, spawn of the Nether, and even a stranger wearing it is not immediately taken for an enemy. In trades, they take gold as always, but give back more than they should. And if it comes to a fight, they rise to defend a familiar face.",
   "relics.description.piglin_mask.ability.neutrality": "Neutrality",
   "relics.description.piglin_mask.ability.neutrality.description": "Piglins no longer attack the relic bearer first.",
   "relics.description.piglin_mask.ability.neutrality.rank_modifier.legion": "Nearby piglins attack anyone who tries to harm the relic bearer or has been attacked by them.",
@@ -320,14 +320,14 @@
   "relics.description.piglin_mask.ability.looting.statistic.tripled_effect_duration": "Time spent under tripled tooth effect",
 
   "item.relics.cut_glass_boot": "Cut Glass Boot",
-  "relics.description.cut_glass_boot.description": "Crafted by a mad glassblower who sought to imprison the seas within faceted vessels, this boot is carved from multilayered crystal that remembers every drop that ever touched its walls. Over time, the glass stopped merely storing liquid and learned to command it: once the boot is filled, the surface of water, lava, poison, or anything else hardens beneath the wearer’s steps like a mirrored bridge.",
+  "relics.description.cut_glass_boot.description": "The relic does not always consider liquid an obstacle. It stores it within itself, then recognizes it underfoot and lets the wearer walk across the surface.",
   "relics.description.cut_glass_boot.ability.glass": "Glass",
   "relics.description.cut_glass_boot.ability.glass.description": "When the relic is held, it functions like a regular bucket capable of storing up to %2$s liquids with a total volume of %1$s mB. To switch the currently selected liquid, hold the relic, press Shift, and scroll the mouse wheel. When the relic is equipped, it allows movement across any liquid stored in its internal buffer. Movement speed on the liquid is halved compared to normal, but for every 1000 mB of liquid of the same type, movement speed on it increases by %3$s%%.",
   "relics.description.cut_glass_boot.ability.glass.experience_source.standing": "+1 experience point for each second spent moving across the liquid",
   "relics.description.cut_glass_boot.ability.glass.statistic.duration": "Time spent standing on liquid",
 
   "item.relics.ring_of_the_seven_deadly_sins": "Ring of the Seven Deadly Sins",
-  "relics.description.ring_of_the_seven_deadly_sins.description": "Once, this ring served as the seal on a verdict passed upon a king who fell to his own vices. Seven crystals are forged into its setting, each containing the imprint of one of the king’s deadly sins, eagerly responding to even the slightest sign of that sin within the wearer’s soul. The brighter the crystals burn, the stronger the wearer’s body and will become — but the cost grows as well: good fortune turns to loss, victories to grievous wounds, and salvation to a debt to be paid to the grave. Those who keep the ring too long say that, with time, it ceases to obey its master — and that it is the wearer’s own weaknesses that choose who will inherit the power of the sins next.",
+  "relics.description.ring_of_the_seven_deadly_sins.description": "The relic responds to the wearer's sins, but none of them serves as a gift. It eagerly empowers one who is higher, angrier, hungrier, richer, or more patient than their victim, but leaves a crack in every advantage. Once circumstances change, the same sin begins to work against the owner.",
   "relics.description.ring_of_the_seven_deadly_sins.statistic.unequip_attempts": "Attempts to remove the ring",
   "relics.description.ring_of_the_seven_deadly_sins.ability.pride": "Pride",
   "relics.description.ring_of_the_seven_deadly_sins.ability.pride.description": "Increases damage dealt by the relic bearer by %1$s%% for each block of vertical advantage above the target, but also increases damage received for each block of vertical disadvantage below the target.",
@@ -368,7 +368,7 @@
   "relics.description.ring_of_the_seven_deadly_sins.ability.lust.statistic.breeding_attempts": "Breeding attempts made",
 
   "item.relics.sphere_of_self_sacrifice": "Sphere of Self-Sacrifice",
-  "relics.description.sphere_of_self_sacrifice.description": "This sphere was forged neither from metal nor from glass - it was woven from oaths spoken softer than prayers and heavier than verdicts. Inside, beneath its clouded shell, a crimson glow rolls lazily, as if a чужое heart is searching for its owner's rhythm. They say the true bearers of this relic cease to fear death not because they are immortal, but because they have learned to bargain with inevitability itself - wagering their own blood and winning seconds that should not exist.",
+  "relics.description.sphere_of_self_sacrifice.description": "The relic takes health away just as willingly as it later returns it. The wearer opens access to their own blood, and what was lost slowly returns with interest.",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice": "Sacrifice",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.description": "On use, consumes 33% of the player's maximum health, restoring twice that amount over the next 10 seconds. Up to %1$s health restoration effects can exist simultaneously. Reusing the ability resets the duration of all active health restoration effects.",
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.rank_modifier.resistance": "Reduces incoming damage by %2$s%% for each active health restoration effect.",
@@ -385,7 +385,7 @@
   "relics.description.sphere_of_self_sacrifice.ability.sacrifice.statistic.salvation_damage_blocked": "Damage mitigated in exchange for ability activation",
 
   "item.relics.hunting_belt": "Hunting Belt",
-  "relics.description.hunting_belt.description": "This belt was worn by hunters who learned to rely not only on their own hand, but also on the fangs of their companions. Worn leather and bone charms preserve the memory of dozens of shared battles. The belt strengthens the bond between its owner and their pets, turning them into a single deadly pack.",
+  "relics.description.hunting_belt.description": "The relic does not empower the wearer directly. Instead, it gives its anger to the tamed beasts beside them, and their strikes become noticeably heavier. The more such companions join the fight, the worse it gets for the chosen target.",
   "relics.description.hunting_belt.ability.slots": "Arsenal Expansion",
   "relics.description.hunting_belt.ability.slots.description": "Increases the maximum number of equipped charms by %1$s.",
   "relics.description.hunting_belt.ability.pack": "Pack",
@@ -402,7 +402,7 @@
   "relics.description.hunting_belt.ability.pack.statistic.pet_bones": "Bones created from fallen pets",
 
   "item.relics.rider_flute": "Rider Flute",
-  "relics.description.rider_flute.description": "This simple looking flute was often carried by nomads and messengers who spent most of their lives in the saddle. Its sound is more familiar to riding animals than any reins: one signal calls them to their owner, another makes them patiently wait for their time. Over time the flute gained a strange reputation, as if it could lock the body and soul of an animal until the rider once again needs to set out on the road.",
+  "relics.description.rider_flute.description": "The relic keeps mount animals nearby, even when they are out of sight. The wearer can take a tamed mount inside, release it back out, and call it again the same way. This keeps the mount close at hand at any moment, even when there is neither a stable nor reins nearby.",
   "relics.description.rider_flute.ability.stable": "Stable",
   "relics.description.rider_flute.ability.stable.description": "Right click a tamed riding animal to place it inside the flute. Right click again to release the animal and allow it to be recalled into the flute with another right click. To completely release the animal from the flute you must right click while sneaking. The flute can store up to %1$s riding animals at the same time and you can switch between them by scrolling the mouse wheel while sneaking.",
   "relics.description.rider_flute.ability.stable.rank_modifier.regeneration": "Restores %2$s health per second to all riding animals stored inside the flute.",
@@ -421,7 +421,7 @@
   "relics.message.rider_flute.deployed_suffix": " [released]",
 
   "item.relics.clot_of_time": "Clot of Time",
-  "relics.description.clot_of_time.description": "This clot resembles a frozen drop of cosmos, within whose depths fragments of past moments slowly rotate. It is said to appear in places where time once cracked. In the hands of the relic's bearer, the clot allows them to briefly turn time back, as if erasing their own mistakes along traces that have not yet had time to fade.",
+  "relics.description.clot_of_time.description": "The relic pulls the wearer back along the path they recently took. The body returns to where it has already been, rewinding the last moments step by step.",
   "relics.description.clot_of_time.ability.rewind": "Transgression",
   "relics.description.clot_of_time.ability.rewind.description": "While holding RMB, smoothly returns the relic's bearer along the recently traveled path in time up to %1$s seconds. After the rewind ends, the ability goes on cooldown for the same amount of time the relic was used continuously without interruption.",
   "relics.description.clot_of_time.ability.rewind.rank_modifier.invulnerability": "During the rewind, the relic's bearer does not take damage.",
@@ -436,7 +436,7 @@
   "item.relics.chef_hat": "Chef's Hat",
   "item.relics.raw_meatball": "Raw Meatball",
   "item.relics.cooked_meatball": "Cooked Meatball",
-  "relics.description.chef_hat.description": "This hat once belonged to a cook whose feasts gathered not only kings, but also warriors returning from the battlefield. It was said he could do more than simply feed the hungry — he could turn the very heat of battle into food capable of restoring strength even on the brink of death. The white fabric of the hat has long absorbed the scent of smoke, spices, and blazing cauldrons, and its folds seem to hold the memory of hundreds of meals hastily prepared between clashes. Whenever the bearer of this relic defeats an enemy, the hat generously rewards them with spoils, turning fallen flesh into simple yet hearty food.",
+  "relics.description.chef_hat.description": "The relic adds food to the spoils. After a target is killed, a meatball may be left nearby, simple and filling, like a piece of raw meat. It can be eaten right away or cooked to get more benefit.",
   "relics.description.chef_hat.ability.satiety": "Meatball Harvest",
   "relics.description.chef_hat.ability.satiety.description": "Killing a target has a %1$s%% chance to drop 1 meatball, identical in properties to raw beef, which can be eaten or cooked for greater nourishment.",
   "relics.description.chef_hat.ability.satiety.rank_modifier.quick_meal": "Meatballs are consumed 3 times faster.",
@@ -451,7 +451,7 @@
   "relics.description.chef_hat.ability.satiety.statistic.health_restored": "Health restored by meatballs",
 
   "item.relics.experience_disperser": "Experience Disperser",
-  "relics.description.experience_disperser.description": "A small device within which crystalline fragments slowly rotate, capturing and refracting the very essence of accumulated experience. Their facets shimmer with a dim light, as if splitting the gained power into fine streams. Instead of allowing energy to concentrate in one place, the disperser evenly spreads it, linking all of the bearer’s relics together. With it, not a single fragment of power is wasted — it is merely shared, becoming collective.",
+  "relics.description.experience_disperser.description": "The relic does not like experience settling in one place. Once it receives its share, part of the experience spreads to the others. This way, it accumulates not in a single relic, but across all equipment at once.",
   "relics.description.experience_disperser.ability.dispersion": "Experience Dispersion",
   "relics.description.experience_disperser.ability.dispersion.description": "When any of the bearer’s relics gains experience, all equipped relics additionally receive %1$s%% of that amount.",
   "relics.description.experience_disperser.ability.dispersion.rank_modifier.same_item": "Relics of the same type gain %2$s%% more experience from the dispersion effect.",
@@ -464,7 +464,7 @@
   "relics.description.experience_disperser.ability.dispersion.statistic.converted_player_experience": "Experience Orb Experience Converted",
 
   "item.relics.glitchy_mantle": "Glitchy Mantle",
-  "relics.description.glitchy_mantle.description": "The space around the relic bearer begins to glitch, as if errors are appearing in reality itself: strikes veer off target and miss, the air beneath their feet briefly becomes solid, allowing them to walk where no path should exist, while glitchy copies appear around the bearer, resembling incorrectly loaded traces of their presence.",
+  "relics.description.glitchy_mantle.description": "With this relic, the wearer seems not to fully match what others see. Strikes sometimes pass by, confusing the attacker. Torn copies remain behind, and enemies that collide with them lose themselves for a moment. Even the void beneath the wearer's feet thickens, giving them time to take the next step despite the lack of solid ground.",
   "relics.description.glitchy_mantle.ability.distortion": "Perception Glitch",
   "relics.description.glitchy_mantle.ability.distortion.description": "Attacks against the relic bearer have a %1$s%% chance to miss.",
   "relics.description.glitchy_mantle.ability.distortion.rank_modifier.disorientation": "When an attack misses, the attacking target turns in a random direction and loses sight of the relic bearer.",
