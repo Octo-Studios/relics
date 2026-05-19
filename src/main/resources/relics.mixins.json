@@ -24,6 +24,7 @@
     "ItemInHandRendererMixin",
     "ItemRendererMixin",
     "KeyboardHandlerMixin",
+    "LevelRendererMixin",
     "LivingEntityRendererMixin",
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",
