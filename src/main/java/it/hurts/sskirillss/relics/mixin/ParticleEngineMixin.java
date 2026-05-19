@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.mixin;
 
 import com.google.common.collect.ImmutableList;
 import it.hurts.sskirillss.relics.client.particles.BasicColoredParticle;
+import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleRenderType;
 import org.spongepowered.asm.mixin.Final;
@@ -28,6 +29,7 @@ public class ParticleEngineMixin {
 
         order.add(4, BasicColoredParticle.RENDERER_NO_DEPTH);
         order.add(5, BasicColoredParticle.RENDERER_TRANSLUCENT);
+        order.add(6, GhostlyFogParticle.RENDERER);
 
         RENDER_ORDER = ImmutableList.copyOf(order);
     }

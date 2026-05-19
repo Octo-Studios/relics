@@ -525,6 +525,7 @@
   "entity.relics.thrown_relic_experience_bottle": "Thrown Relic Experience Bottle",
   "entity.relics.golden_tooth": "Golden Tooth",
   "entity.relics.kinetic_electricity": "Electrical chain",
+  "entity.relics.ghostly_fog": "Ghostly Fog",
   "entity.relics.glitchy_illusion": "Glitchy Illusion",
 
   "effect.relics.stun": "Stun",
@@ -534,6 +535,7 @@
   "effect.relics.anti_heal": "Anti-Regeneration",
   "effect.relics.bleeding": "Bleeding",
   "effect.relics.immortality": "Immortality",
+  "effect.relics.flight": "Flight",
   "effect.relics.tremor": "Tremor",
   "effect.relics.glitch": "Glitch",
 

@@ -8,6 +8,7 @@ import it.hurts.sskirillss.relics.items.PetBoneItem;
 import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
+import it.hurts.sskirillss.relics.items.relics.back.GhostlyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
 import it.hurts.sskirillss.relics.items.relics.ring.RingOfTheSevenDeadlySinsItem;
 import net.minecraft.core.component.DataComponentType;
@@ -65,6 +66,11 @@ public class RelicsDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> GLITCHY_MANTLE_LAST_PHASE_TICK = RelicsDataComponents.construct("glitchy_mantle/last_phase_tick", Codec.LONG);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Vec3>> GLITCHY_MANTLE_LAST_SAFE_POS = RelicsDataComponents.construct("glitchy_mantle/last_safe_pos", Vec3.CODEC);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GLITCHY_MANTLE_ILLUSION_COOLDOWN = RelicsDataComponents.construct("glitchy_mantle/illusion_cooldown", Codec.INT);
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Vec3>> GHOSTLY_MANTLE_LAST_FOG_POS = RelicsDataComponents.construct("ghostly_mantle/last_fog_pos", Vec3.CODEC);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Map<String, GhostlyMantleItem.GazeChargeData>>> GHOSTLY_MANTLE_GAZE_CHARGES = RelicsDataComponents.construct("ghostly_mantle/gaze_charges", Codec.unboundedMap(Codec.STRING, GhostlyMantleItem.GazeChargeData.CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GHOSTLY_MANTLE_ESCAPE_COOLDOWN = RelicsDataComponents.construct("ghostly_mantle/escape_cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Map<String, Double>>> GHOSTLY_MANTLE_REPRISAL_MARKS = RelicsDataComponents.construct("ghostly_mantle/reprisal_marks", Codec.unboundedMap(Codec.STRING, Codec.DOUBLE));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROLLER_SKATE_DURATION = RelicsDataComponents.construct("roller_skate/duration", Codec.INT);
 

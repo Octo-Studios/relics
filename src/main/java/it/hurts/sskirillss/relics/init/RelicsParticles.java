@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.init;
 
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.particles.BasicColoredParticle;
+import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.neoforged.api.distmarker.Dist;
@@ -17,6 +18,7 @@ public class RelicsParticles {
     public static final DeferredRegister<ParticleType<?>> PARTICLES = DeferredRegister.create(BuiltInRegistries.PARTICLE_TYPE, Relics.MODID);
 
     public static final DeferredHolder<ParticleType<?>, BasicColoredParticle.Type> BASIC_COLORED = PARTICLES.register("basic_colored", BasicColoredParticle.Type::new);
+    public static final DeferredHolder<ParticleType<?>, GhostlyFogParticle.Type> GHOSTLY_FOG = PARTICLES.register("ghostly_fog", GhostlyFogParticle.Type::new);
 
     public static void register(IEventBus bus) {
         PARTICLES.register(bus);
@@ -25,5 +27,6 @@ public class RelicsParticles {
     @SubscribeEvent
     public static void onParticleRegistry(RegisterParticleProvidersEvent event) {
         event.registerSpriteSet(BASIC_COLORED.get(), BasicColoredParticle.Factory::new);
+        event.registerSpriteSet(GHOSTLY_FOG.get(), GhostlyFogParticle.Factory::new);
     }
 }

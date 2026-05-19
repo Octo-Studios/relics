@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.items.relics.ChorusStaffItem;
 import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
+import it.hurts.sskirillss.relics.items.relics.back.GhostlyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.back.GlitchyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
@@ -72,6 +73,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> HUNTING_BELT = ITEMS.register("hunting_belt", HuntingBeltItem::new);
     public static final DeferredHolder<Item, RelicItem> EXPERIENCE_DISPERSER = ITEMS.register("experience_disperser", ExperienceDisperserItem::new);
     public static final DeferredHolder<Item, RelicItem> GLITCHY_MANTLE = ITEMS.register("glitchy_mantle", GlitchyMantleItem::new);
+    public static final DeferredHolder<Item, RelicItem> GHOSTLY_MANTLE = ITEMS.register("ghostly_mantle", GhostlyMantleItem::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);

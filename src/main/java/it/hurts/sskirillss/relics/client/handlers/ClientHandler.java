@@ -99,6 +99,7 @@ public class ClientHandler {
         RelicsRelicRenderers.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.GLITCHY_MANTLE.get(), GlitchyMantleRenderer::new);
+        //RelicsRelicRenderers.register(RelicsItems.GHOSTLY_MANTLE.get(), GlitchyMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
@@ -137,6 +138,7 @@ public class ClientHandler {
         RelicsRelicStyles.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleStyle::new);
         RelicsRelicStyles.register(RelicsItems.GLITCHY_MANTLE.get(), GlitchyMantleStyle::new);
+        RelicsRelicStyles.register(RelicsItems.GHOSTLY_MANTLE.get(), GlitchyMantleStyle::new);
         RelicsRelicStyles.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootStyle::new);
         RelicsRelicStyles.register(RelicsItems.HUNTING_BELT.get(), HuntingBeltStyle::new);
         RelicsRelicStyles.register(RelicsItems.CHORUS_STAFF.get(), ChorusStaffStyle::new);
@@ -212,6 +214,7 @@ public class ClientHandler {
         event.registerEntityRenderer(RelicsEntities.SELF_SACRIFICE_PROJECTILE.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.KINETIC_ELECTRICITY.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.GLITCHY_ILLUSION.get(), GlitchyIllusionRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.GHOSTLY_FOG.get(), NullRenderer::new);
     }
 
     @SubscribeEvent
