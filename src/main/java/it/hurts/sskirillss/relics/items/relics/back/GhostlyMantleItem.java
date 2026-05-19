@@ -48,6 +48,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("fog")
+                                .modes("enabled", "disabled")
                                 .rankModifier(1, "frostbite")
                                 .stat(AbilityStatTemplate.builder("duration")
                                         .initialValue(2D, 4D)
@@ -76,16 +77,20 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("fog_creation")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .source(ExperienceSourceTemplate.builder("fog_exposure")
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
                                         .metric(AbilityMetricTemplate.builder("fog_clouds")
                                                 .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("fog_exposure")
                                                 .formatValue(value -> MathUtils.formatTime(value.intValue()))
+                                                .modeVisibilityState("disabled", VisibilityState.HIDDEN)
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -245,7 +250,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
     private void tickFogTrail(LivingEntity entity, ItemStack stack) {
         var ability = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("fog");
 
-        if (!ability.canPlayerUse(entity))
+        if (!ability.canPlayerUse(entity) || ability.getMode().equals("disabled"))
             return;
 
         var current = entity.position();
