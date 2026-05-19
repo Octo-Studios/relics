@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.feet;
 
+import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -17,19 +18,26 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.WorldUtils;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import org.joml.Vector3f;
 import top.theillusivec4.curios.api.SlotContext;
 
 public class SpringyBootItem extends WearableRelicItem {
@@ -158,6 +166,42 @@ public class SpringyBootItem extends WearableRelicItem {
         this.setLeaps(stack, this.getLeaps(stack) + leaps);
     }
 
+    public static void spawnBounceFog(Level level, LivingEntity entity, double radius, int particleCount) {
+        if (level.isClientSide() || !(level instanceof ServerLevel serverLevel))
+            return;
+
+        var random = level.getRandom();
+        var center = entity.blockPosition();
+        var maxOffset = 4;
+
+        for (var i = 0; i < particleCount; i++) {
+            var angle = random.nextDouble() * Mth.TWO_PI;
+            var distance = Math.sqrt(random.nextDouble()) * radius;
+            var x = entity.getX() + Math.cos(angle) * distance;
+            var z = entity.getZ() + Math.sin(angle) * distance;
+            var groundY = WorldUtils.findSurfaceY(level, Mth.floor(x), Mth.floor(z), center.getY(), maxOffset);
+            var minAllowedY = Math.max(level.getMinBuildHeight(), center.getY() - maxOffset);
+            var maxAllowedY = Math.min(level.getMaxBuildHeight(), center.getY() + maxOffset);
+
+            if (groundY < minAllowedY || groundY > maxAllowedY)
+                continue;
+
+            var direction = new Vec3(x - entity.getX(), 0D, z - entity.getZ());
+
+            if (direction.lengthSqr() < 0.001D)
+                direction = new Vec3(random.nextDouble() - 0.5D, 0D, random.nextDouble() - 0.5D);
+
+            direction = direction.normalize();
+
+            var speed = 0.008D + random.nextDouble() * 0.012D;
+            var lifetime = 10 + random.nextInt(30);
+            var fogPosition = new Vector3f((float) x, groundY + 0.04F, (float) z);
+            var fogMotion = new Vector3f((float) (direction.x * speed), 0.08F + random.nextFloat() * 0.08F, (float) (direction.z * speed));
+
+            NetworkHandler.sendToClientsTrackingChunk(new S2CSpawnParticle(new GhostlyFogParticle.Options(lifetime), fogPosition, fogMotion), serverLevel, new ChunkPos(Mth.floor(x) >> 4, Mth.floor(z) >> 4));
+        }
+    }
+
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         super.curioTick(slotContext, stack);
@@ -224,6 +268,8 @@ public class SpringyBootItem extends WearableRelicItem {
                 var motion = lookAngle.multiply(-1F, 1F, -1F).add(0F, 0.5F, 0F).normalize().scale(power);
 
                 NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(entity.getId(), motion.toVector3f()), entity);
+
+                SpringyBootItem.spawnBounceFog(level, entity, Math.max(1.1D, power * 0.85D), 12 + Mth.ceil(power * 5D));
 
                 level.playSound(null, entity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.MASTER, 5F, 0.5F);
             }
