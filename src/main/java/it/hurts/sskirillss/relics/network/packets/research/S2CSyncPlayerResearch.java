@@ -8,11 +8,11 @@ import it.hurts.sskirillss.relics.init.RelicsAttachments;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -23,6 +23,7 @@ import java.util.Map;
 @Data
 @AllArgsConstructor
 public class S2CSyncPlayerResearch implements CustomPacketPayload {
+    private final int entityId;
     private final Map<String, ResearchComponent> research;
 
     public static final Type<S2CSyncPlayerResearch> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "sync_player_research"));
@@ -34,6 +35,7 @@ public class S2CSyncPlayerResearch implements CustomPacketPayload {
     );
 
     public static final StreamCodec<ByteBuf, S2CSyncPlayerResearch> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT, S2CSyncPlayerResearch::getEntityId,
             ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, RESEARCH_COMPONENT_CODEC), S2CSyncPlayerResearch::getResearch,
             S2CSyncPlayerResearch::new
     );
@@ -44,12 +46,18 @@ public class S2CSyncPlayerResearch implements CustomPacketPayload {
     }
 
     public void handle(IPayloadContext ctx) {
-        ctx.enqueueWork(() -> this.doSync(this.research));
+        ctx.enqueueWork(() -> this.doSync(this.entityId, this.research));
     }
 
     @OnlyIn(Dist.CLIENT)
-    private void doSync(Map<String, ResearchComponent> research) {
-        LocalPlayer player = Minecraft.getInstance().player;
+    private void doSync(int entityId, Map<String, ResearchComponent> research) {
+        var minecraft = Minecraft.getInstance();
+        var level = minecraft.level;
+        var entity = level == null ? null : level.getEntity(entityId);
+        var player = entity instanceof Player foundPlayer ? foundPlayer : null;
+
+        if (player == null && minecraft.player != null && minecraft.player.getId() == entityId)
+            player = minecraft.player;
 
         if (player == null)
             return;
