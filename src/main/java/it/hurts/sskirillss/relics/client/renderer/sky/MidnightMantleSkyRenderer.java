@@ -18,6 +18,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.levelgen.LegacyRandomSource;
 import net.minecraft.world.level.material.FogType;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
@@ -26,7 +27,7 @@ import org.joml.Matrix4f;
 import java.util.ArrayList;
 import java.util.List;
 
-@EventBusSubscriber
+@EventBusSubscriber(value = Dist.CLIENT)
 public class MidnightMantleSkyRenderer {
     private static final ResourceLocation STAR_0 = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/sky/star_0.png");
     private static final ResourceLocation STAR_1 = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/sky/star_1.png");
