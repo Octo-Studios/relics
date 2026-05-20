@@ -250,8 +250,11 @@ public class GhostlyMantleItem extends WearableRelicItem {
     private void tickFogTrail(LivingEntity entity, ItemStack stack) {
         var ability = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("fog");
 
-        if (!ability.canPlayerUse(entity) || ability.getMode().equals("disabled"))
+        if (!ability.canPlayerUse(entity) || ability.getMode().equals("disabled")) {
+            this.setLastFogPos(stack, entity.position());
+
             return;
+        }
 
         var current = entity.position();
         var last = this.getLastFogPos(stack);
