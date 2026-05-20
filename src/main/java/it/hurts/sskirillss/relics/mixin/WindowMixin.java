@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.mixin;
 
 import com.mojang.blaze3d.platform.Window;
 import it.hurts.sskirillss.relics.client.screen.base.IAutoScaledScreen;
+import it.hurts.sskirillss.relics.init.RelicsConfigs;
 import net.minecraft.client.Minecraft;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -16,7 +17,7 @@ public class WindowMixin {
         Minecraft MC = Minecraft.getInstance();
         Window window = (Window) (Object) (this);
 
-        if (!(MC.screen instanceof IAutoScaledScreen screen))
+        if (!RelicsConfigs.RELICS_CONFIG.isEnabledAutoScale() || !(MC.screen instanceof IAutoScaledScreen screen))
             return;
 
         cir.setReturnValue((double) this.relics$getAutoScale(window, screen, MC.isEnforceUnicode()));
@@ -27,7 +28,7 @@ public class WindowMixin {
         Minecraft MC = Minecraft.getInstance();
         Window window = (Window) (Object) (this);
 
-        if (!(MC.screen instanceof IAutoScaledScreen screen))
+        if (!RelicsConfigs.RELICS_CONFIG.isEnabledAutoScale() || !(MC.screen instanceof IAutoScaledScreen screen))
             return;
 
         double scale = this.relics$getAutoScale(window, screen, MC.isEnforceUnicode());
@@ -41,7 +42,7 @@ public class WindowMixin {
         Minecraft MC = Minecraft.getInstance();
         Window window = (Window) (Object) (this);
 
-        if (!(MC.screen instanceof IAutoScaledScreen screen))
+        if (!RelicsConfigs.RELICS_CONFIG.isEnabledAutoScale() || !(MC.screen instanceof IAutoScaledScreen screen))
             return;
 
         double scale = this.relics$getAutoScale(window, screen, MC.isEnforceUnicode());

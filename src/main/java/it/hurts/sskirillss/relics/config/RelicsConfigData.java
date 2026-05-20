@@ -17,6 +17,11 @@ public class RelicsConfigData implements OctoConfig {
     private boolean enabledExtendedConfigs = false;
 
     @Prop(comment = """
+        Enables automatic GUI scaling for Relics description screens. Disable this to use Minecraft's configured GUI scale instead.
+        """)
+    private boolean enabledAutoScale = true;
+
+    @Prop(comment = """
         A list of entity attributes that are ignored by the Ring of The Seven Deadly Sins' gluttony ability.
         """)
     private List<String> ringOfSDSGluttonyAttributesBlacklist = Lists.newArrayList(
