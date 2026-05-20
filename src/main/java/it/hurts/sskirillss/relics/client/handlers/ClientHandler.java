@@ -99,7 +99,7 @@ public class ClientHandler {
         RelicsRelicRenderers.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.GLITCHY_MANTLE.get(), GlitchyMantleRenderer::new);
-        //RelicsRelicRenderers.register(RelicsItems.GHOSTLY_MANTLE.get(), GlitchyMantleRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.GHOSTLY_MANTLE.get(), GhostlyMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
@@ -167,6 +167,7 @@ public class ClientHandler {
         event.registerLayerDefinition(JellyfishNecklaceModel.LAYER, JellyfishNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(MidnightMantleModel.LAYER, MidnightMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(GlitchyMantleModel.LAYER, GlitchyMantleModel::constructLayerDefinition);
+        event.registerLayerDefinition(GhostlyMantleModel.LAYER, GhostlyMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(CutGlassBootModel.LAYER, CutGlassBootModel::constructLayerDefinition);
         event.registerLayerDefinition(KineticBeltModel.LAYER, KineticBeltModel::constructLayerDefinition);
         event.registerLayerDefinition(SpringyBootModel.LAYER, SpringyBootModel::constructLayerDefinition);

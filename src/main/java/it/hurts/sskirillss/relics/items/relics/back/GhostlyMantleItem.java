@@ -51,19 +51,19 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                 .modes("enabled", "disabled")
                                 .rankModifier(1, "frostbite")
                                 .stat(AbilityStatTemplate.builder("duration")
-                                        .initialValue(2D, 4D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 12D)
+                                        .initialValue(3D, 5D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 15D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("radius")
-                                        .initialValue(0.75D, 1.25D)
+                                        .initialValue(0.5D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("air_loss")
                                         .initialValue(1D, 2D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 8D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 20, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("suffocation_damage")
                                         .initialValue(0.1D, 0.25D)
@@ -72,7 +72,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                         .build())
                                 .stat(AbilityStatTemplate.builder("tremor")
                                         .initialValue(1D, 2D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 8D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -102,23 +102,23 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                 .requiredLevel(5)
                                 .rankModifier(3, "dread")
                                 .stat(AbilityStatTemplate.builder("range")
-                                        .initialValue(8D, 12D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 32D)
+                                        .initialValue(5D, 10D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("charges")
-                                        .initialValue(2D, 3D)
+                                        .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("weakness")
-                                        .initialValue(0.03D, 0.05D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2D)
+                                        .initialValue(0.025D, 0.05D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
-                                        .initialValue(0.01D, 0.02D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
+                                        .initialValue(0.01D, 0.025D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -146,34 +146,39 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                 .requiredLevel(10)
                                 .rankModifier(5, "reprisal")
                                 .stat(AbilityStatTemplate.builder("cooldown")
-                                        .initialValue(120D, 90D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30D)
+                                        .initialValue(125D, 100D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
-                                        .initialValue(2D, 3D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 8D)
+                                        .initialValue(1D, 3D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
-                                        .initialValue(0.15D, 0.25D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1D)
+                                        .initialValue(0.5D, 1D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
-                                        .source(ExperienceSourceTemplate.builder("escape")
+                                        .source(ExperienceSourceTemplate.builder("spectral_form")
                                                 .build())
-                                        .source(ExperienceSourceTemplate.builder("reprisal")
+                                        .source(ExperienceSourceTemplate.builder("death_prevention")
+                                                .build())
+                                        .source(ExperienceSourceTemplate.builder("reprisal_damage")
                                                 .rankModifierVisibilityState("reprisal", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
-                                        .metric(AbilityMetricTemplate.builder("escapes")
+                                        .metric(AbilityMetricTemplate.builder("spectral_form_duration")
+                                                .formatValue(value -> MathUtils.formatTime(value.intValue()))
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("prevented_deaths")
                                                 .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
                                                 .build())
-                                        .metric(AbilityMetricTemplate.builder("reprisal_marks")
+                                        .metric(AbilityMetricTemplate.builder("reprisal_damage")
                                                 .rankModifierVisibilityState("reprisal", VisibilityState.OBFUSCATED)
-                                                .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -188,7 +193,6 @@ public class GhostlyMantleItem extends WearableRelicItem {
                         .step(100)
                         .build())
                 .loot(LootTemplate.builder()
-                        .entry(LootEntries.SCULK)
                         .entry(LootEntries.THE_NETHER)
                         .entry(LootEntries.NETHER_LIKE)
                         .build())
@@ -245,6 +249,15 @@ public class GhostlyMantleItem extends WearableRelicItem {
 
         if (this.getEscapeCooldown(stack) > 0)
             this.setEscapeCooldown(stack, this.getEscapeCooldown(stack) - 1);
+
+        var spectralEscape = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("spectral_escape");
+
+        if (spectralEscape.canPlayerUse(entity)
+                && entity.hasEffect(RelicsMobEffects.FLIGHT)
+                && entity.hasEffect(RelicsMobEffects.IMMORTALITY)) {
+            spectralEscape.getStatisticData().getMetricData("spectral_form_duration").addValue(1D / 20D);
+            this.getRelicData(entity, stack).getLevelingData().addExperience("spectral_escape", "spectral_form", 1D / 20D);
+        }
     }
 
     private void tickFogTrail(LivingEntity entity, ItemStack stack) {
@@ -452,8 +465,23 @@ public class GhostlyMantleItem extends WearableRelicItem {
                         if (modifier == null)
                             continue;
 
-                        event.setNewDamage((float) (event.getNewDamage() * (1D + modifier)));
+                        var original = event.getNewDamage();
+                        var modified = original * (1D + modifier);
+                        var extra = modified - original;
+
+                        event.setNewDamage((float) modified);
                         relic.setReprisalMarks(stack, marks);
+
+                        var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("spectral_escape");
+
+                        ability.getStatisticData().getMetricData("reprisal_damage").addValue(extra);
+
+                        if (extra > 0D) {
+                            var experience = player.getRandom().nextInt((int) (extra + 1D));
+
+                            if (experience > 0)
+                                relic.getRelicData(player, stack).getLevelingData().addExperience("spectral_escape", "reprisal_damage", experience);
+                        }
 
                         return;
                     }
@@ -539,17 +567,18 @@ public class GhostlyMantleItem extends WearableRelicItem {
                 player.addEffect(new MobEffectInstance(RelicsMobEffects.IMMORTALITY, duration, 0, false, false, true));
                 relic.setEscapeCooldown(stack, (int) Math.max(1D, ability.getStatData("cooldown").getValue() * 20D));
 
-                ability.getStatisticData().getMetricData("escapes").addValue(1);
-                relic.getRelicData(player, stack).getLevelingData().addExperience("spectral_escape", "escape", 1);
+                ability.getStatisticData().getMetricData("prevented_deaths").addValue(1);
+
+                var leveling = relic.getRelicData(player, stack).getLevelingData();
+                var experience = leveling.getTotalExperienceBetweenLevels(leveling.getLevel(), leveling.getLevel() + 1) * 0.05D;
+
+                relic.getRelicData(player, stack).getLevelingData().addExperience("spectral_escape", "death_prevention", experience);
 
                 if (ability.getRankModifierData("reprisal").isEnabled() && event.getSource().getEntity() instanceof LivingEntity attacker && attacker != player) {
                     var marks = relic.getReprisalMarks(stack);
 
                     marks.put(attacker.getStringUUID(), ability.getStatData("damage").getValue());
                     relic.setReprisalMarks(stack, marks);
-
-                    ability.getStatisticData().getMetricData("reprisal_marks").addValue(1);
-                    relic.getRelicData(player, stack).getLevelingData().addExperience("spectral_escape", "reprisal", 1);
                 }
 
                 return;
