@@ -76,6 +76,7 @@ public class RelicsDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SHIELD_OF_RETALIATION_PARRY_TICKS = RelicsDataComponents.construct("shield_of_retaliation/parry_ticks", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SHIELD_OF_RETALIATION_PARRY_SUCCEEDED = RelicsDataComponents.construct("shield_of_retaliation/parry_succeeded", Codec.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SHIELD_OF_RETALIATION_MISSED = RelicsDataComponents.construct("shield_of_retaliation/missed", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SHIELD_OF_RETALIATION_MISSED_TICKS = RelicsDataComponents.construct("shield_of_retaliation/missed_ticks", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SHIELD_OF_RETALIATION_RELEASE_LOCKED = RelicsDataComponents.construct("shield_of_retaliation/release_locked", Codec.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<ShieldOfRetaliationItem.CapturedProjectileData>>> SHIELD_OF_RETALIATION_CAPTURED_PROJECTILES = RelicsDataComponents.construct("shield_of_retaliation/captured_projectiles", Codec.list(ShieldOfRetaliationItem.CapturedProjectileData.CODEC));
 
