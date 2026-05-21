@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.api.relics.data;
 
-import it.hurts.sskirillss.relics.api.events.relic.GatherRelicTemplateEvent;
+import it.hurts.sskirillss.relics.api.events.relic.GatherRelicTemplateCacheKeyEvent;
+import it.hurts.sskirillss.relics.api.events.relic.ModifyRelicTemplateEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -40,16 +41,31 @@ public class RelicData {
     }
 
     public RelicTemplate getTemplate() {
-        var key = new CacheHandler.TemplateCacheKey(this.getRelic(), this.getComponent());
+        var cacheKeyEvent = this.getTemplateCacheKeyEvent();
 
-        return CacheHandler.getOrCreateTemplate(key, cacheKey -> {
-            var template = this.getRelic().getDefaultRelicTemplate();
-            var event = new GatherRelicTemplateEvent(this.getEntity(), this.getStack(), template);
+        if (!cacheKeyEvent.isCacheable())
+            return this.createTemplate();
 
-            NeoForge.EVENT_BUS.post(event);
+        var key = new CacheHandler.TemplateCacheKey(this.getRelic(), cacheKeyEvent.getEntries());
 
-            return event.getTemplate();
-        });
+        return CacheHandler.getOrCreateTemplate(key, cacheKey -> this.createTemplate());
+    }
+
+    private RelicTemplate createTemplate() {
+        var template = this.getRelic().getDefaultRelicTemplate();
+        var event = new ModifyRelicTemplateEvent(this.getEntity(), this.getStack(), template);
+
+        NeoForge.EVENT_BUS.post(event);
+
+        return event.getTemplate();
+    }
+
+    private GatherRelicTemplateCacheKeyEvent getTemplateCacheKeyEvent() {
+        var event = new GatherRelicTemplateCacheKeyEvent(this.getEntity(), this.getStack(), this.getRelic());
+
+        NeoForge.EVENT_BUS.post(event);
+
+        return event;
     }
 
     public RelicComponent getComponent() {

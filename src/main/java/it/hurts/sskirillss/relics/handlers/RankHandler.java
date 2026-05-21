@@ -1,6 +1,8 @@
 package it.hurts.sskirillss.relics.handlers;
 
-import it.hurts.sskirillss.relics.api.events.relic.GatherRelicTemplateEvent;
+import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.events.relic.GatherRelicTemplateCacheKeyEvent;
+import it.hurts.sskirillss.relics.api.events.relic.ModifyRelicTemplateEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -9,7 +11,18 @@ import net.neoforged.fml.common.EventBusSubscriber;
 @EventBusSubscriber
 public class RankHandler {
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    public static void onGatherRelicData(GatherRelicTemplateEvent event) {
+    public static void onGatherRelicTemplateCacheKey(GatherRelicTemplateCacheKeyEvent event) {
+        var entity = event.getBearer();
+        var stack = event.getStack();
+
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        event.add(Relics.MODID + ":rank", relic.getRelicData(entity, stack).getLevelingData().getRank());
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onModifyRelicTemplate(ModifyRelicTemplateEvent event) {
         var entity = event.getBearer();
         var stack = event.getStack();
 
