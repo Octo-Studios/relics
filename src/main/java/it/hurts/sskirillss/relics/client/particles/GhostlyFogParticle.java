@@ -30,6 +30,8 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nonnull;
@@ -98,27 +100,24 @@ public class GhostlyFogParticle extends TextureSheetParticle {
         var angle = this.rotation + (this.age + partialTicks) * this.spin;
         var light = this.getLightColor(partialTicks);
         var size = this.getQuadSize(partialTicks);
-        var cos = Mth.cos(angle) * size;
-        var sin = Mth.sin(angle) * size;
+        var rotation = new Quaternionf(camera.rotation());
 
-        var x1 = x - cos - sin;
-        var z1 = z - sin + cos;
-        var x2 = x - cos + sin;
-        var z2 = z - sin - cos;
-        var x3 = x + cos + sin;
-        var z3 = z + sin - cos;
-        var x4 = x + cos - sin;
-        var z4 = z + sin + cos;
+        rotation.rotateZ(angle);
 
-        this.addVertex(buffer, x1, y, z1, this.getU1(), this.getV1(), light);
-        this.addVertex(buffer, x4, y, z4, this.getU0(), this.getV1(), light);
-        this.addVertex(buffer, x3, y, z3, this.getU0(), this.getV0(), light);
-        this.addVertex(buffer, x2, y, z2, this.getU1(), this.getV0(), light);
+        var vertices = new Vector3f[]{
+                new Vector3f(-1F, -1F, 0F),
+                new Vector3f(-1F, 1F, 0F),
+                new Vector3f(1F, 1F, 0F),
+                new Vector3f(1F, -1F, 0F)
+        };
 
-        this.addVertex(buffer, x1, y, z1, this.getU1(), this.getV1(), light);
-        this.addVertex(buffer, x2, y, z2, this.getU1(), this.getV0(), light);
-        this.addVertex(buffer, x3, y, z3, this.getU0(), this.getV0(), light);
-        this.addVertex(buffer, x4, y, z4, this.getU0(), this.getV1(), light);
+        for (var vertex : vertices)
+            vertex.rotate(rotation).mul(size).add(x, y, z);
+
+        this.addVertex(buffer, vertices[0].x(), vertices[0].y(), vertices[0].z(), this.getU1(), this.getV1(), light);
+        this.addVertex(buffer, vertices[3].x(), vertices[3].y(), vertices[3].z(), this.getU0(), this.getV1(), light);
+        this.addVertex(buffer, vertices[2].x(), vertices[2].y(), vertices[2].z(), this.getU0(), this.getV0(), light);
+        this.addVertex(buffer, vertices[1].x(), vertices[1].y(), vertices[1].z(), this.getU1(), this.getV0(), light);
     }
 
     private void addVertex(VertexConsumer buffer, float x, float y, float z, float u, float v, int light) {

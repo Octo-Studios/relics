@@ -1,8 +1,8 @@
 package it.hurts.sskirillss.relics.entities;
 
+import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.items.relics.back.GhostlyMantleItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
@@ -133,7 +133,7 @@ public class GhostlyFogEntity extends Entity {
 
                 this.level().addParticle(new GhostlyFogParticle.Options(this.getLifetime() - this.tickCount - 1),
                         x,
-                        this.getY() + random.nextDouble(),
+                        this.getY() + random.nextDouble() * 2,
                         z,
                         MathUtils.randomFloat(random) * 0.01F,
                         -0.025F,
