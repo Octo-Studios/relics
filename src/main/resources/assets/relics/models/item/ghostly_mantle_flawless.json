@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "relics:item/glitchy_mantle_flawless"
+    "layer0": "relics:item/ghostly_mantle_flawless"
   }
 }

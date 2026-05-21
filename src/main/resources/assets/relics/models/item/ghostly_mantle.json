@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "relics:item/glitchy_mantle"
+    "layer0": "relics:item/ghostly_mantle"
   },
   "overrides": [
     { "predicate": { "relics:flawless": 1 }, "model": "relics:item/ghostly_mantle_flawless" }

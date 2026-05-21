@@ -137,8 +137,8 @@ public class ClientHandler {
         RelicsRelicStyles.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleStyle::new);
+        RelicsRelicStyles.register(RelicsItems.GHOSTLY_MANTLE.get(), GhostlyMantleStyle::new);
         RelicsRelicStyles.register(RelicsItems.GLITCHY_MANTLE.get(), GlitchyMantleStyle::new);
-        RelicsRelicStyles.register(RelicsItems.GHOSTLY_MANTLE.get(), GlitchyMantleStyle::new);
         RelicsRelicStyles.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootStyle::new);
         RelicsRelicStyles.register(RelicsItems.HUNTING_BELT.get(), HuntingBeltStyle::new);
         RelicsRelicStyles.register(RelicsItems.CHORUS_STAFF.get(), ChorusStaffStyle::new);

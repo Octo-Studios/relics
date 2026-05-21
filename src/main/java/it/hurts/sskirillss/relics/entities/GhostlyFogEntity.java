@@ -19,12 +19,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class GhostlyFogEntity extends Entity {
     public static final int PARTICLE_MIN_LIFETIME = 55;
     public static final int PARTICLE_RANDOM_LIFETIME_BOUND = 35;
-    public static final int PARTICLE_MAX_LIFETIME = PARTICLE_MIN_LIFETIME + PARTICLE_RANDOM_LIFETIME_BOUND - 1;
+
+    private static final Map<String, Long> LAST_EXPOSURE_TICK = new HashMap<>();
+    private static long lastExposureCleanupTick = Long.MIN_VALUE;
 
     private static final EntityDataAccessor<Integer> OWNER_ID = SynchedEntityData.defineId(GhostlyFogEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Integer> LIFETIME = SynchedEntityData.defineId(GhostlyFogEntity.class, EntityDataSerializers.INT);
@@ -147,6 +151,13 @@ public class GhostlyFogEntity extends Entity {
 
         var owner = this.getOwner();
         var radius = this.getRadius();
+        var gameTime = this.level().getGameTime();
+
+        if (lastExposureCleanupTick != gameTime && gameTime % 200L == 0L) {
+            lastExposureCleanupTick = gameTime;
+
+            LAST_EXPOSURE_TICK.values().removeIf(tick -> tick < gameTime - 200L);
+        }
 
         for (var target : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius), entity -> {
             if (entity == owner || !entity.isAlive())
@@ -169,6 +180,13 @@ public class GhostlyFogEntity extends Entity {
             if (owner == null)
                 continue;
 
+            var key = owner.getStringUUID() + ":" + target.getStringUUID();
+
+            if (LAST_EXPOSURE_TICK.getOrDefault(key, Long.MIN_VALUE) == gameTime)
+                continue;
+
+            LAST_EXPOSURE_TICK.put(key, gameTime);
+
             for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.GHOSTLY_MANTLE.get())) {
                 var relic = (GhostlyMantleItem) stack.getItem();
                 var ability = relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("fog");
@@ -176,10 +194,8 @@ public class GhostlyFogEntity extends Entity {
                 if (!ability.canPlayerUse(owner))
                     continue;
 
-                if (this.tickCount % 20 == 0) {
-                    ability.getStatisticData().getMetricData("fog_exposure").addValue(1);
-                    relic.getRelicData(owner, stack).getLevelingData().addExperience("fog", "fog_exposure", 1);
-                }
+                ability.getStatisticData().getMetricData("fog_exposure").addValue(1D / 20D);
+                relic.getRelicData(owner, stack).getLevelingData().addExperience("fog", "fog_exposure", 1D / 20D);
 
                 break;
             }

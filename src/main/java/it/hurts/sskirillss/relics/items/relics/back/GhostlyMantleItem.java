@@ -94,7 +94,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
-                                        .star(0, 4, 23).star(1, 7, 17).star(2, 13, 20).star(3, 18, 14).star(4, 12, 8)
+                                        .star(0, 14, 25).star(1, 6, 19).star(2, 15, 14).star(3, 10, 10).star(4, 15, 4)
                                         .link(0, 1).link(1, 2).link(2, 3).link(3, 4)
                                         .build())
                                 .build())
@@ -112,14 +112,14 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("weakness")
-                                        .initialValue(0.025D, 0.05D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
+                                        .initialValue(0.005D, 0.01D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.075D)
+                                        .formatValue(value -> MathUtils.round(value * 100D, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(0.01D, 0.025D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.15D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
+                                        .formatValue(value -> MathUtils.round(value * 100D, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("eye_contact")
@@ -138,8 +138,8 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
-                                        .star(0, 3, 9).star(1, 8, 7).star(2, 12, 13).star(3, 16, 7).star(4, 21, 10).star(5, 12, 23)
-                                        .link(0, 1).link(1, 2).link(2, 3).link(3, 4).link(2, 5)
+                                        .star(0, 2, 14).star(1, 7, 7).star(2, 13, 7).star(3, 19, 14).star(4, 20, 28).star(5, 1, 28).star(6, 7, 15).star(7, 14, 15)
+                                        .link(5, 0).link(0, 1).link(1, 2).link(2, 3).link(3, 4).link(3, 7).link(6, 0)
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("spectral_escape")
@@ -182,8 +182,8 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
-                                        .star(0, 11, 4).star(1, 5, 12).star(2, 17, 12).star(3, 8, 21).star(4, 14, 21)
-                                        .link(0, 1).link(0, 2).link(1, 3).link(2, 4).link(3, 4)
+                                        .star(0, 5, 23).star(1, 1, 16).star(2, 1, 7).star(3, 6, 2).star(4, 12, 5).star(5, 13, 10).star(6, 17, 14).star(7, 9, 26).star(8, 20, 29).star(9, 13, 20).star(10, 4, 9).star(11, 10, 7)
+                                        .link(8, 7).link(0, 9).link(9, 6).link(6, 5).link(5, 4).link(4, 3).link(3, 2).link(2, 1).link(4, 11).link(2, 10).link(1, 0)
                                         .build())
                                 .build())
                         .build())
@@ -333,7 +333,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
             entity.level().addFreshEntity(fog);
 
             ability.getStatisticData().getMetricData("fog_clouds").addValue(1);
-            this.getRelicData(entity, stack).getLevelingData().addExperience("fog", "fog_creation", 1D / Math.max(1, steps));
+            this.getRelicData(entity, stack).getLevelingData().addExperience("fog", "fog_creation", 0.1D / steps);
         }
 
         this.setLastFogPos(stack, last.add(direction.scale(steps * fogRadius)));
@@ -504,7 +504,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
                     continue;
 
                 var original = event.getNewDamage();
-                var reduction = Math.min(0.9D, data.charges() * ability.getStatData("weakness").getValue());
+                var reduction = data.charges() * ability.getStatData("weakness").getValue();
 
                 event.setNewDamage((float) Math.max(0D, original * (1D - reduction)));
                 ability.getStatisticData().getMetricData("damage_reduced").addValue(original - event.getNewDamage());
