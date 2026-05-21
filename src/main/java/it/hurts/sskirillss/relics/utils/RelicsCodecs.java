@@ -2,10 +2,14 @@ package it.hurts.sskirillss.relics.utils;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.datafixers.util.Unit;
-import com.mojang.serialization.*;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.Lifecycle;
+import com.mojang.serialization.MapLike;
 import com.mojang.serialization.codecs.BaseMapCodec;
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -45,7 +49,7 @@ public class RelicsCodecs {
 
         @Override
         public <T> DataResult<Map<K, V>> decode(final DynamicOps<T> ops, final MapLike<T> input) {
-            final Object2ObjectMap<K, V> read = new Object2ObjectArrayMap<>();
+            final Object2ObjectMap<K, V> read = new Object2ObjectOpenHashMap<>();
             final Stream.Builder<Pair<T, T>> failed = Stream.builder();
 
             final DataResult<Unit> result = input.entries().reduce(
