@@ -3,11 +3,8 @@ package it.hurts.sskirillss.relics.api.relics.synergies;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.api.relics.RankModifierComponent;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Singular;
+import it.hurts.sskirillss.relics.utils.RelicsCodecs;
+import lombok.*;
 
 import java.util.Map;
 
@@ -25,7 +22,7 @@ public class SynergyComponent {
     public static final Codec<SynergyComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.STRING.optionalFieldOf("mode", "").forGetter(SynergyComponent::getMode),
-                    Codec.unboundedMap(Codec.STRING, RankModifierComponent.CODEC).optionalFieldOf("rank_modifiers", Map.of()).forGetter(SynergyComponent::getRankModifiers)
+                    RelicsCodecs.unboundedMap(Codec.STRING, RankModifierComponent.CODEC).optionalFieldOf("rank_modifiers", Map.of()).forGetter(SynergyComponent::getRankModifiers)
             ).apply(instance, SynergyComponent::new)
     );
 }
