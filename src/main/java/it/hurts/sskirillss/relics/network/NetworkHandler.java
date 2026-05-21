@@ -22,6 +22,7 @@ import it.hurts.sskirillss.relics.network.packets.item.rider_flute.C2SCycleRider
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
 import it.hurts.sskirillss.relics.network.packets.item.ring_of_the_seven_deadly_sins.C2SHurtPlayer;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
+import it.hurts.sskirillss.relics.network.packets.item.shield_of_retaliation.C2SShieldOfRetaliationRelease;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.network.packets.leveling.FixLevelingPoints;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
@@ -90,6 +91,9 @@ public class NetworkHandler {
 
         // === JELLYFISH NECKLACE ===
         registrar.playToServer(C2SChainedElectricityPacket.TYPE, C2SChainedElectricityPacket.STREAM_CODEC, C2SChainedElectricityPacket::handle);
+
+        // === SHIELD OF RETALIATION ===
+        registrar.playToServer(C2SShieldOfRetaliationRelease.TYPE, C2SShieldOfRetaliationRelease.STREAM_CODEC, C2SShieldOfRetaliationRelease::handle);
 
         registrar.playToClient(ChromaticAberrationPacket.TYPE, ChromaticAberrationPacket.STREAM_CODEC, ChromaticAberrationPacket::handle);
         registrar.playToClient(ShakePacket.TYPE, ShakePacket.STREAM_CODEC, ShakePacket::handle);
