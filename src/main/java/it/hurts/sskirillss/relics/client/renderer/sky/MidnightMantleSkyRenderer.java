@@ -46,6 +46,10 @@ public class MidnightMantleSkyRenderer {
     private List<Star> starLayer4;
     private List<Star> starLayer5;
 
+    private List<Star> constellationStars;
+
+    private List<ConstellationLine> constellationLines;
+
     private float currentTintRed;
     private float currentTintGreen;
     private float currentTintBlue;
@@ -65,7 +69,11 @@ public class MidnightMantleSkyRenderer {
     }
 
     public static boolean shouldSuppressVanillaStars() {
-        return MC.player != null && MC.level != null && hasNormalSky() && INSTANCE.currentStarAlpha > 0.985F;
+        if (MC.player == null || MC.level == null || !hasNormalSky())
+            return false;
+
+        return !EntityUtils.findEquippedCurios(MC.player, RelicsItems.MIDNIGHT_MANTLE.get()).isEmpty()
+                || INSTANCE.currentStarAlpha > 0.003F;
     }
 
     private void initialise() {
@@ -134,6 +142,11 @@ public class MidnightMantleSkyRenderer {
 
             RenderSystem.setShaderTexture(0, STAR_5);
             renderStarLayer(matrices, starLayer5, renderTime, 0.009F, color.red(), color.green(), color.blue(), starAlpha * 0.42F);
+
+            renderConstellationLines(matrices, constellationLines, renderTime, color, starAlpha * 0.95F);
+
+            RenderSystem.setShaderTexture(0, STAR_5);
+            renderStarLayer(matrices, constellationStars, renderTime, 0.006F, color.secondaryRed(), color.secondaryGreen(), color.secondaryBlue(), starAlpha);
 
             matrices.popPose();
         }
@@ -261,6 +274,21 @@ public class MidnightMantleSkyRenderer {
         BufferUploader.drawWithShader(buffer.buildOrThrow());
     }
 
+    private void renderConstellationLines(PoseStack matrices, List<ConstellationLine> lines, float renderTime, StarColor color, float alpha) {
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        RenderSystem.setShader(GameRenderer::getPositionColorShader);
+        RenderSystem.disableCull();
+
+        var matrix = matrices.last().pose();
+        var buffer = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+
+        for (var line : lines)
+            addConstellationLine(buffer, matrix, line, renderTime, color, alpha);
+
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
+        RenderSystem.enableCull();
+    }
+
     private void initStars() {
         starLayer0 = makeUVStars(0.5f, 1.3f, 90, 77221);
         starLayer1 = makeUVStars(0.5f, 1.5f, 900, 41315);
@@ -268,6 +296,125 @@ public class MidnightMantleSkyRenderer {
         starLayer3 = makeUVStars(0.7f, 2.0f, 540, 61354);
         starLayer4 = makeUVStars(0.9f, 2.3f, 1240, 61355);
         starLayer5 = makeUVStars(0.9f, 2.3f, 90, 61356);
+
+        initConstellations();
+    }
+
+    private void initConstellations() {
+        constellationStars = new ArrayList<>();
+        constellationLines = new ArrayList<>();
+
+        addConstellation(11101, 0.93F, 0.29F, 0.22F, new float[][]{
+                {-0.82F, 0.12F}, {-0.38F, 0.28F}, {0.08F, 0.18F}, {0.56F, -0.08F}, {0.86F, -0.34F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}});
+
+        addConstellation(11102, 0.48F, 0.78F, -0.4F, new float[][]{
+                {-0.88F, -0.28F}, {-0.46F, 0.02F}, {-0.08F, 0.28F}, {0.28F, 0.02F}, {0.74F, -0.28F},
+                {-0.08F, 0.28F}, {-0.18F, 0.76F}, {0.28F, 0.02F}, {0.78F, 0.62F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {2, 6}, {3, 8}});
+
+        addConstellation(11103, -0.18F, 0.94F, 0.28F, new float[][]{
+                {-0.64F, 0.72F}, {-0.58F, 0.26F}, {-0.5F, -0.24F}, {-0.42F, -0.72F},
+                {0.54F, 0.7F}, {0.46F, 0.2F}, {0.36F, -0.32F}, {0.28F, -0.78F},
+                {-0.58F, 0.26F}, {0.46F, 0.2F}, {-0.5F, -0.24F}, {0.36F, -0.32F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {4, 5}, {5, 6}, {6, 7}, {8, 9}, {10, 11}});
+
+        addConstellation(11104, -0.76F, 0.55F, 0.34F, new float[][]{
+                {-0.64F, 0.48F}, {-0.12F, 0.08F}, {0.44F, 0.52F}, {-0.12F, 0.08F}, {0.08F, -0.56F}
+        }, new int[][]{{0, 1}, {1, 2}, {1, 4}});
+
+        addConstellation(11105, -0.92F, 0.12F, -0.36F, new float[][]{
+                {-0.88F, -0.58F}, {-0.42F, -0.36F}, {-0.08F, -0.02F}, {-0.24F, 0.34F},
+                {0.04F, 0.72F}, {0.44F, 0.6F}, {0.62F, 0.22F}, {0.38F, -0.1F},
+                {0.08F, -0.36F}, {0.56F, -0.52F}, {0.9F, -0.3F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 2}, {2, 8}, {8, 9}, {9, 10}});
+
+        addConstellation(11106, -0.46F, -0.54F, 0.7F, new float[][]{
+                {-0.9F, 0.44F}, {-0.48F, 0.18F}, {-0.08F, 0.34F}, {0.26F, 0.04F},
+                {0.66F, 0.26F}, {0.88F, -0.18F}, {0.44F, -0.42F}, {0.04F, -0.66F},
+                {-0.34F, -0.34F}, {-0.7F, -0.58F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 8}, {8, 1}, {8, 9}});
+
+        addConstellation(11107, 0.12F, -0.86F, 0.5F, new float[][]{
+                {-0.72F, -0.2F}, {-0.34F, 0.42F}, {0.18F, 0.64F}, {0.64F, 0.2F},
+                {0.3F, -0.42F}, {-0.24F, -0.56F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 0}});
+
+        addConstellation(11108, 0.74F, -0.48F, 0.48F, new float[][]{
+                {-0.76F, 0.46F}, {-0.42F, 0.58F}, {-0.08F, 0.4F}, {0.14F, 0.08F},
+                {0.18F, -0.28F}, {0.02F, -0.58F}, {-0.28F, -0.78F}, {-0.6F, -0.62F},
+                {0.52F, 0.26F}, {0.84F, 0.44F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {3, 8}, {8, 9}});
+
+        addConstellation(11109, 0.94F, -0.2F, -0.28F, new float[][]{
+                {-0.74F, 0.42F}, {-0.36F, 0.68F}, {0.08F, 0.5F}, {0.5F, 0.72F},
+                {0.8F, 0.36F}, {0.48F, 0.02F}, {0.08F, 0.16F}, {-0.34F, -0.08F},
+                {-0.68F, -0.48F}, {0.18F, -0.32F}, {0.48F, -0.76F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 1}, {6, 7}, {7, 8}, {6, 9}, {9, 10}});
+
+        addConstellation(11110, 0.44F, 0.36F, -0.82F, new float[][]{
+                {-0.86F, 0.18F}, {-0.46F, 0.48F}, {-0.04F, 0.36F}, {0.34F, 0.04F},
+                {0.78F, -0.12F}, {0.46F, -0.56F}, {-0.02F, -0.46F}, {-0.44F, -0.14F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 0}, {3, 6}});
+
+        addConstellation(11111, -0.22F, 0.72F, -0.66F, new float[][]{
+                {-0.92F, 0.34F}, {-0.52F, 0.08F}, {-0.12F, 0.34F}, {0.28F, 0.04F},
+                {0.68F, 0.28F}, {-0.72F, -0.38F}, {-0.26F, -0.64F}, {0.2F, -0.38F},
+                {0.68F, -0.7F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {5, 6}, {6, 7}, {7, 8}, {1, 6}, {3, 7}});
+
+        addConstellation(11112, -0.62F, -0.64F, -0.45F, new float[][]{
+                {-0.86F, 0.44F}, {-0.5F, 0.72F}, {-0.18F, 0.38F}, {-0.42F, 0.02F},
+                {-0.08F, -0.18F}, {0.32F, -0.34F}, {0.68F, -0.08F}, {0.88F, 0.34F},
+                {0.48F, 0.64F}, {0.18F, 0.22F}
+        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 8}, {8, 9}, {9, 6}});
+    }
+
+    private void addConstellation(long seed, float axisX, float axisY, float axisZ, float[][] points, int[][] connections) {
+        var random = new LegacyRandomSource(seed);
+
+        var axisLength = Mth.sqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
+
+        var normalX = axisX / axisLength;
+        var normalY = axisY / axisLength;
+        var normalZ = axisZ / axisLength;
+
+        var tangentX = normalZ;
+        var tangentY = 0F;
+        var tangentZ = -normalX;
+
+        var tangentLength = Mth.sqrt(tangentX * tangentX + tangentZ * tangentZ);
+
+        if (tangentLength < 0.001F) {
+            tangentX = 1F;
+            tangentZ = 0F;
+        } else {
+            tangentX /= tangentLength;
+            tangentZ /= tangentLength;
+        }
+
+        var bitangentX = normalY * tangentZ - normalZ * tangentY;
+        var bitangentY = normalZ * tangentX - normalX * tangentZ;
+        var bitangentZ = normalX * tangentY - normalY * tangentX;
+
+        var localStars = new ArrayList<Star>();
+
+        for (var point : points) {
+            var pointX = normalX + (tangentX * point[0] + bitangentX * point[1]) * 0.14F;
+            var pointY = normalY + (tangentY * point[0] + bitangentY * point[1]) * 0.14F;
+            var pointZ = normalZ + (tangentZ * point[0] + bitangentZ * point[1]) * 0.14F;
+
+            var pointLength = Mth.sqrt(pointX * pointX + pointY * pointY + pointZ * pointZ);
+
+            var star = new Star(pointX / pointLength * 100F, pointY / pointLength * 100F, pointZ / pointLength * 100F,
+                    1.2F + random.nextFloat() * 0.6F, random.nextFloat() * Mth.TWO_PI, random.nextFloat() * Mth.TWO_PI, 0.035F + random.nextFloat() * 0.04F);
+
+            constellationStars.add(star);
+            localStars.add(star);
+        }
+
+        for (var connection : connections)
+            constellationLines.add(new ConstellationLine(localStars.get(connection[0]), localStars.get(connection[1]), random.nextFloat() * Mth.TWO_PI));
     }
 
     private List<Star> makeUVStars(float minSize, float maxSize, int count, long seed) {
@@ -350,11 +497,60 @@ public class MidnightMantleSkyRenderer {
         }
     }
 
+    private void addConstellationLine(BufferBuilder buffer, Matrix4f matrix, ConstellationLine line, float renderTime, StarColor color, float alpha) {
+        var from = line.from();
+        var to = line.to();
+
+        var dx = to.x() - from.x();
+        var dy = to.y() - from.y();
+        var dz = to.z() - from.z();
+
+        var midX = from.x() + to.x();
+        var midY = from.y() + to.y();
+        var midZ = from.z() + to.z();
+
+        var sideX = dy * midZ - dz * midY;
+        var sideY = dz * midX - dx * midZ;
+        var sideZ = dx * midY - dy * midX;
+
+        var sideLength = Mth.sqrt(sideX * sideX + sideY * sideY + sideZ * sideZ);
+
+        if (sideLength < 0.001F)
+            return;
+
+        var widthPulse = 0.5F + 0.5F * Mth.sin(renderTime * 0.025F + line.pulseOffset());
+        var width = Mth.lerp(widthPulse, 0.1F, 0.2F);
+
+        sideX = sideX / sideLength * width;
+        sideY = sideY / sideLength * width;
+        sideZ = sideZ / sideLength * width;
+
+        var alphaPulse = 0.5F + 0.5F * Mth.sin(renderTime * 0.04F + line.pulseOffset() + 1.2F);
+        var red = Mth.clamp((color.red() + color.secondaryRed()) * 0.58F, 0F, 1F);
+        var green = Mth.clamp((color.green() + color.secondaryGreen()) * 0.58F, 0F, 1F);
+        var blue = Mth.clamp((color.blue() + color.secondaryBlue()) * 0.58F, 0F, 1F);
+        var lineAlpha = Mth.clamp(alpha * Mth.lerp(alphaPulse, 0.12F, 0.42F), 0F, 0.42F);
+
+        buffer.addVertex(matrix, from.x() + sideX, from.y() + sideY, from.z() + sideZ).setColor(red, green, blue, lineAlpha);
+        buffer.addVertex(matrix, to.x() + sideX, to.y() + sideY, to.z() + sideZ).setColor(red, green, blue, lineAlpha);
+        buffer.addVertex(matrix, to.x() - sideX, to.y() - sideY, to.z() - sideZ).setColor(red, green, blue, lineAlpha);
+        buffer.addVertex(matrix, from.x() - sideX, from.y() - sideY, from.z() - sideZ).setColor(red, green, blue, lineAlpha);
+
+        buffer.addVertex(matrix, from.x() - sideX, from.y() - sideY, from.z() - sideZ).setColor(red, green, blue, lineAlpha);
+        buffer.addVertex(matrix, to.x() - sideX, to.y() - sideY, to.z() - sideZ).setColor(red, green, blue, lineAlpha);
+        buffer.addVertex(matrix, to.x() + sideX, to.y() + sideY, to.z() + sideZ).setColor(red, green, blue, lineAlpha);
+        buffer.addVertex(matrix, from.x() + sideX, from.y() + sideY, from.z() + sideZ).setColor(red, green, blue, lineAlpha);
+    }
+
     private static float randRange(float min, float max, RandomSource random) {
         return min + random.nextFloat() * (max - min);
     }
 
     private record Star(float x, float y, float z, float size, float angle, float pulseOffset, float pulseSpeed) {
+
+    }
+
+    private record ConstellationLine(Star from, Star to, float pulseOffset) {
 
     }
 
