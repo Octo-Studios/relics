@@ -78,24 +78,24 @@
     "shield_of_retaliation_deflect": {
         "category": "players",
         "sounds": [
-            { "name": "relics:shield_of_retalliation/deflect1" },
-            { "name": "relics:shield_of_retalliation/deflect2" },
-            { "name": "relics:shield_of_retalliation/deflect3" },
-            { "name": "relics:shield_of_retalliation/deflect4" }
+            { "name": "relics:shield_of_retaliation/deflect1" },
+            { "name": "relics:shield_of_retaliation/deflect2" },
+            { "name": "relics:shield_of_retaliation/deflect3" },
+            { "name": "relics:shield_of_retaliation/deflect4" }
         ]
     },
     "shield_of_retaliation_projectile": {
         "category": "players",
         "sounds": [
-            { "name": "relics:shield_of_retalliation/projectile1" },
-            { "name": "relics:shield_of_retalliation/projectile2" },
-            { "name": "relics:shield_of_retalliation/projectile3" },
-            { "name": "relics:shield_of_retalliation/projectile4" },
-            { "name": "relics:shield_of_retalliation/projectile5" }
+            { "name": "relics:shield_of_retaliation/projectile1" },
+            { "name": "relics:shield_of_retaliation/projectile2" },
+            { "name": "relics:shield_of_retaliation/projectile3" },
+            { "name": "relics:shield_of_retaliation/projectile4" },
+            { "name": "relics:shield_of_retaliation/projectile5" }
         ]
     },
     "shield_of_retaliation_release": {
         "category": "players",
-        "sounds": [ { "name": "relics:shield_of_retalliation/release" } ]
+        "sounds": [ { "name": "relics:shield_of_retaliation/release" } ]
     }
 }
