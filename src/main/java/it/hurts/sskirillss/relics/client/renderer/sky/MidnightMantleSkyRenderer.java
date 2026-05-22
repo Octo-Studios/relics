@@ -34,6 +34,7 @@ public class MidnightMantleSkyRenderer {
     private static final ResourceLocation STAR_2 = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/sky/star_2.png");
     private static final ResourceLocation STAR_3 = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/sky/star_3.png");
     private static final ResourceLocation STAR_4 = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/sky/star_4.png");
+    private static final ResourceLocation STAR_5 = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/sky/star_5.png");
 
     private static final Minecraft MC = Minecraft.getInstance();
     private static final MidnightMantleSkyRenderer INSTANCE = new MidnightMantleSkyRenderer();
@@ -43,6 +44,7 @@ public class MidnightMantleSkyRenderer {
     private List<Star> starLayer2;
     private List<Star> starLayer3;
     private List<Star> starLayer4;
+    private List<Star> starLayer5;
 
     private float currentTintRed;
     private float currentTintGreen;

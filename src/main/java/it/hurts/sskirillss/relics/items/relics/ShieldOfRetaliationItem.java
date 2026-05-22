@@ -12,11 +12,14 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberration;
+import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberrationManager;
 import it.hurts.sskirillss.relics.dev.shake.Shake;
 import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
+import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -29,6 +32,7 @@ import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -39,8 +43,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -66,45 +72,45 @@ public class ShieldOfRetaliationItem extends RelicItem {
                                 .rankModifier(5, "guard")
                                 .initialMaxLevel(10)
                                 .stat(AbilityStatTemplate.builder("window")
-                                        .initialValue(0.5D, 0.8D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2D)
+                                        .initialValue(0.5D, 0.75D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("miss_damage")
-                                        .initialValue(0.25D, 0.15D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.05D)
+                                        .initialValue(1D, 0.75D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("miss_duration")
-                                        .initialValue(2D, 3D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 6D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
-                                        .build())
-                                .stat(AbilityStatTemplate.builder("cooldown")
-                                        .initialValue(8D, 6D)
-                                        .thresholdValue(1D, Double.MAX_VALUE)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 4D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
-                                        .build())
-                                .stat(AbilityStatTemplate.builder("projectile_damage")
-                                        .initialValue(0.25D, 0.5D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
-                                        .build())
-                                .stat(AbilityStatTemplate.builder("extension")
-                                        .initialValue(0.2D, 0.3D)
-                                        .thresholdValue(0.05D, Double.MAX_VALUE)
+                                        .initialValue(5D, 3.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
+                                .stat(AbilityStatTemplate.builder("cooldown")
+                                        .initialValue(1.5D, 1D)
+                                        .thresholdValue(0.05D, Double.MAX_VALUE)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
+                                        .formatValue(value -> MathUtils.round(value, 2))
+                                        .build())
+                                .stat(AbilityStatTemplate.builder("projectile_damage")
+                                        .initialValue(0.25D, 0.5D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
+                                        .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
+                                        .build())
+                                .stat(AbilityStatTemplate.builder("extension")
+                                        .initialValue(0.5D, 0.75D)
+                                        .thresholdValue(0.05D, Double.MAX_VALUE)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
+                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("stun_radius")
-                                        .initialValue(2D, 3D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 8D)
+                                        .initialValue(1D, 2.5D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun")
-                                        .initialValue(1D, 1.5D)
-                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
+                                        .initialValue(0.5D, 1D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -160,7 +166,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
         if (!ability.canPlayerUse(player))
             return 0;
 
-        return Math.max(1, (int) Math.round(ability.getStatData("cooldown").getValue()));
+        return Math.max(1, (int) Math.round(ability.getStatData("cooldown").getValue() * 20D));
     }
 
     private static int getActiveTicks(ItemStack stack) {
@@ -269,25 +275,14 @@ public class ShieldOfRetaliationItem extends RelicItem {
         return sourcePosition;
     }
 
-    private static boolean isProjectileInFront(Player player, Projectile projectile) {
-        var view = player.getViewVector(1F);
-        var direction = projectile.position().vectorTo(player.position()).normalize();
-        direction = new Vec3(direction.x, 0D, direction.z);
+    private static Vec3 getViewRight(Player player) {
+        var yaw = Math.toRadians(player.getYRot());
 
-        return direction.dot(view) < 0D;
-    }
-
-    private static boolean isProjectileFlyingToward(Player player, Projectile projectile) {
-        var motion = projectile.getDeltaMovement();
-
-        if (motion.lengthSqr() < 0.0001D)
-            return true;
-
-        return motion.normalize().dot(player.position().subtract(projectile.position()).normalize()) > 0D;
+        return new Vec3(-Math.cos(yaw), 0D, -Math.sin(yaw)).normalize();
     }
 
     private static boolean captureProjectile(Player player, ItemStack stack, Projectile projectile) {
-        if (projectile.isRemoved() || projectile.getOwner() == player)
+        if (projectile.isRemoved())
             return false;
 
         var captured = getCapturedProjectiles(stack);
@@ -297,13 +292,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
             return false;
 
         var look = player.getLookAngle().normalize();
-        var right = look.cross(new Vec3(0D, 1D, 0D));
-
-        if (right.lengthSqr() < 0.0001D)
-            right = new Vec3(1D, 0D, 0D);
-        else
-            right = right.normalize();
-
+        var right = getViewRight(player);
         var up = right.cross(look).normalize();
         var delta = projectile.position().subtract(player.getEyePosition());
         var forwardOffset = Mth.clamp(delta.dot(look), 0.75D, 2.25D);
@@ -340,13 +329,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
         var horizontal = Math.sqrt(look.x * look.x + look.z * look.z);
         var yRot = (float) Math.toDegrees(Math.atan2(look.x, look.z));
         var xRot = (float) Math.toDegrees(Math.atan2(look.y, horizontal));
-        var right = look.cross(new Vec3(0D, 1D, 0D));
-
-        if (right.lengthSqr() < 0.0001D)
-            right = new Vec3(1D, 0D, 0D);
-        else
-            right = right.normalize();
-
+        var right = getViewRight(player);
         var up = right.cross(look).normalize();
 
         for (int i = captured.size() - 1; i >= 0; i--) {
@@ -400,11 +383,30 @@ public class ShieldOfRetaliationItem extends RelicItem {
         var captured = getCapturedProjectiles(stack);
         var changed = positionCapturedProjectiles(player, stack, true, 1F);
 
-        var shieldCenter = player.getEyePosition().add(player.getLookAngle().normalize().scale(1.4D));
-        var shieldBox = new AABB(shieldCenter, shieldCenter).inflate(1.25D, 1.0D, 1.25D);
+        var eyePosition = player.getEyePosition();
+        var shieldCenter = eyePosition.add(player.getLookAngle().normalize().scale(1.4D));
+        var shieldBox = new AABB(eyePosition, shieldCenter).inflate(1.25D, 1.0D, 1.25D);
 
-        for (var projectile : player.level().getEntitiesOfClass(Projectile.class, shieldBox, projectile -> projectile.isAlive() && projectile.getOwner() != player)) {
-            if (!isProjectileInFront(player, projectile) || !isProjectileFlyingToward(player, projectile))
+        for (var projectile : player.level().getEntitiesOfClass(Projectile.class, shieldBox.inflate(12D), Projectile::isAlive)) {
+            var start = new Vec3(projectile.xOld, projectile.yOld, projectile.zOld);
+            var end = projectile.position();
+            var hit = shieldBox.clip(start, end);
+
+            if (!shieldBox.intersects(projectile.getBoundingBox()) && hit.isEmpty())
+                continue;
+
+            var point = hit.orElse(end);
+            var view = player.getViewVector(1F);
+            var flatView = new Vec3(view.x, 0D, view.z);
+            var direction = point.subtract(player.getEyePosition());
+            direction = new Vec3(direction.x, 0D, direction.z);
+
+            if (flatView.lengthSqr() > 0.0001D && direction.lengthSqr() > 0.0001D && direction.normalize().dot(flatView.normalize()) <= 0D)
+                continue;
+
+            var motion = projectile.getDeltaMovement();
+
+            if (motion.lengthSqr() >= 0.0001D && motion.normalize().dot(player.getEyePosition().subtract(start).normalize()) <= 0D)
                 continue;
 
             var uuid = projectile.getStringUUID();
@@ -413,13 +415,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
                 continue;
 
             var look = player.getLookAngle().normalize();
-            var right = look.cross(new Vec3(0D, 1D, 0D));
-
-            if (right.lengthSqr() < 0.0001D)
-                right = new Vec3(1D, 0D, 0D);
-            else
-                right = right.normalize();
-
+            var right = getViewRight(player);
             var up = right.cross(look).normalize();
             var delta = projectile.position().subtract(player.getEyePosition());
             var forwardOffset = Mth.clamp(delta.dot(look), 0.75D, 2.25D);
@@ -433,6 +429,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
             setSucceeded(stack, true);
             addBlockRewards(player, stack, 0D, 0);
             extendShieldWindow(stack, relic, player);
+            player.level().playSound(null, projectile.blockPosition(), RelicsSounds.SHIELD_OF_RETALIATION_PROJECTILE.get(), SoundSource.PLAYERS, 0.8F, 0.9F + player.getRandom().nextFloat() * 0.2F);
 
             ShakeManager.addForPlayer(player, (projectile.getOwner() != null ? Shake.builder(projectile.getOwner().position()) : Shake.builder(player))
                     .amplitude(0.15F)
@@ -522,6 +519,21 @@ public class ShieldOfRetaliationItem extends RelicItem {
 
         var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("retaliation");
         var look = player.getLookAngle().normalize();
+        var right = getViewRight(player);
+        var up = right.cross(look).normalize();
+        var eyePosition = player.getEyePosition();
+        var maxAimDistance = 64D;
+        var aimEnd = eyePosition.add(look.scale(maxAimDistance));
+        var blockHit = player.level().clip(new ClipContext(eyePosition, aimEnd, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+        var entityHit = EntityUtils.rayTraceEntity(player, entity -> entity instanceof LivingEntity living && living.isAlive() && !living.is(player), maxAimDistance);
+        var aimPoint = aimEnd;
+
+        if (blockHit.getType() != HitResult.Type.MISS)
+            aimPoint = blockHit.getLocation();
+
+        if (entityHit != null && eyePosition.distanceToSqr(entityHit.getLocation()) < eyePosition.distanceToSqr(aimPoint))
+            aimPoint = entityHit.getLocation();
+
         var bonus = ability.getStatData("projectile_damage").getValue();
         var released = 0;
 
@@ -533,10 +545,27 @@ public class ShieldOfRetaliationItem extends RelicItem {
 
             projectile.setOwner(player);
             projectile.setNoGravity(false);
-            var position = player.getEyePosition().add(look.scale(1.4D));
+            var position = player.getEyePosition()
+                    .add(look.scale(data.forwardOffset()))
+                    .add(right.scale(data.rightOffset()))
+                    .add(up.scale(data.upOffset()));
+            var direction = aimPoint.subtract(position);
+
+            if (direction.lengthSqr() < 0.0001D)
+                direction = look;
+            else
+                direction = direction.normalize();
+
+            var horizontal = Math.sqrt(direction.x * direction.x + direction.z * direction.z);
+            var yRot = (float) Math.toDegrees(Math.atan2(direction.x, direction.z));
+            var xRot = (float) Math.toDegrees(Math.atan2(direction.y, horizontal));
 
             projectile.setPos(position.x, position.y, position.z);
-            projectile.setDeltaMovement(look.scale(3.5F));
+            projectile.setDeltaMovement(direction.scale(3.5F));
+            projectile.setYRot(yRot);
+            projectile.setXRot(xRot);
+            projectile.yRotO = yRot;
+            projectile.xRotO = xRot;
             projectile.getPersistentData().putDouble(REFLECTED_PROJECTILE_DAMAGE_TAG, bonus);
 
             released++;
@@ -545,13 +574,24 @@ public class ShieldOfRetaliationItem extends RelicItem {
         if (released > 0)
             ability.getStatisticData().getMetricData("projectiles_reflected").addValue(released);
 
-        if (released > 0)
+        if (released > 0) {
+            player.level().playSound(null, player.blockPosition(), RelicsSounds.SHIELD_OF_RETALIATION_RELEASE.get(), SoundSource.PLAYERS, 1F, 0.95F + player.getRandom().nextFloat() * 0.1F);
+
             ShakeManager.addForPlayer(player, Shake.builder(player)
                     .amplitude(0.15F + Math.min(released * 0.05F, 0.25F))
                     .radius(Integer.MAX_VALUE)
                     .duration(10)
                     .speed(2.5F)
                     .build());
+
+            ChromaticAberrationManager.addForPlayer(player, ChromaticAberration.builder(player)
+                    .strength(0.025F + Math.min(released * 0.025F, 0.1F))
+                    .radius(Integer.MAX_VALUE)
+                    .fadeOutTime(2)
+                    .fadeInTime(2)
+                    .duration(10)
+                    .build());
+        }
 
         setCapturedProjectiles(stack, List.of());
     }
@@ -710,7 +750,10 @@ public class ShieldOfRetaliationItem extends RelicItem {
                 if (incomingProjectile != null && ability.getRankModifierData("projectile").isEnabled()) {
                     event.setCanceled(true);
                     setSucceeded(stack, true);
-                    captureProjectile(player, stack, incomingProjectile);
+
+                    if (captureProjectile(player, stack, incomingProjectile))
+                        player.level().playSound(null, incomingProjectile.blockPosition(), RelicsSounds.SHIELD_OF_RETALIATION_PROJECTILE.get(), SoundSource.PLAYERS, 0.8F, 0.9F + player.getRandom().nextFloat() * 0.2F);
+
                     extendShieldWindow(stack, relic, player);
 
                     addBlockRewards(player, stack, blockedDamage, 0);
@@ -721,6 +764,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
                 event.setCanceled(true);
 
                 setSucceeded(stack, true);
+                player.level().playSound(null, player.blockPosition(), RelicsSounds.SHIELD_OF_RETALIATION_DEFLECT.get(), SoundSource.PLAYERS, 0.9F, 0.9F + player.getRandom().nextFloat() * 0.2F);
 
                 if (incomingProjectile != null) {
                     var look = player.getLookAngle().normalize();

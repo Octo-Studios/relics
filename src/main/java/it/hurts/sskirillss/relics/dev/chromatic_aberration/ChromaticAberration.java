@@ -13,8 +13,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -156,12 +154,6 @@ public class ChromaticAberration {
             var fadeIn = fbb.readInt();
             var fadeOut = fbb.readInt();
             var strength = fbb.readFloat();
-
-            var count = fbb.readVarInt();
-            var colors = new ArrayList<Integer>(count);
-            for (var i = 0; i < count; i++) {
-                colors.add(fbb.readInt());
-            }
 
             return ChromaticAberration.builder(anchor)
                     .radius(radius)

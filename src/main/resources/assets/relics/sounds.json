@@ -74,5 +74,28 @@
     "logo_explosion": {
         "category": "master",
         "sounds": [ { "name": "relics:logo_explosion" } ]
+    },
+    "shield_of_retaliation_deflect": {
+        "category": "players",
+        "sounds": [
+            { "name": "relics:shield_of_retalliation/deflect1" },
+            { "name": "relics:shield_of_retalliation/deflect2" },
+            { "name": "relics:shield_of_retalliation/deflect3" },
+            { "name": "relics:shield_of_retalliation/deflect4" }
+        ]
+    },
+    "shield_of_retaliation_projectile": {
+        "category": "players",
+        "sounds": [
+            { "name": "relics:shield_of_retalliation/projectile1" },
+            { "name": "relics:shield_of_retalliation/projectile2" },
+            { "name": "relics:shield_of_retalliation/projectile3" },
+            { "name": "relics:shield_of_retalliation/projectile4" },
+            { "name": "relics:shield_of_retalliation/projectile5" }
+        ]
+    },
+    "shield_of_retaliation_release": {
+        "category": "players",
+        "sounds": [ { "name": "relics:shield_of_retalliation/release" } ]
     }
 }

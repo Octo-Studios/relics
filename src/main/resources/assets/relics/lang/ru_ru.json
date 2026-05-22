@@ -537,7 +537,7 @@
   "item.relics.shield_of_retaliation": "Щит возмездия",
   "relics.description.shield_of_retaliation.description": "",
   "relics.description.shield_of_retaliation.ability.retaliation": "Возмездие",
-  "relics.description.shield_of_retaliation.ability.retaliation.description": "При удержании открывает окно парирования на %1$s секунд. Первый входящий урон спереди в это окно полностью блокируется. Если носитель промахнётся по времени, следующая атака по нему в течение %3$s секунд нанесёт на %2$s% больше урона. После завершения уходит на перезарядку на %4$s тиков.",
+  "relics.description.shield_of_retaliation.ability.retaliation.description": "При удержании открывает окно парирования на %1$s секунд. Первый входящий урон спереди в это окно полностью блокируется. Если носитель промахнётся по времени, следующая атака по нему в течение %3$s секунд нанесёт на %2$s% больше урона. После завершения уходит на перезарядку на %4$s секунд.",
   "relics.description.shield_of_retaliation.ability.retaliation.rank_modifier.projectile": "Пока щит активен, влетающие в него снаряды зависают перед носителем реликвии. Получение снаряда продлевает окно на %6$s секунд. При отпускании или окончании окна все пойманные снаряды выстреливаются в направлении взгляда с увеличенным на %5$s% уроном.",
   "relics.description.shield_of_retaliation.ability.retaliation.rank_modifier.stun": "При успешном блокировании все цели в радиусе %7$s блоков оглушаются на %8$s секунд.",
   "relics.description.shield_of_retaliation.ability.retaliation.rank_modifier.guard": "Урон блокируется в течение всего времени действия окна, а не только первая входящая итерация.",
