@@ -132,6 +132,9 @@ public class MidnightMantleSkyRenderer {
             RenderSystem.setShaderTexture(0, STAR_4);
             renderStarLayer(matrices, starLayer4, renderTime, -0.011F, color.secondaryRed(), color.secondaryGreen(), color.secondaryBlue(), starAlpha * 0.42F);
 
+            RenderSystem.setShaderTexture(0, STAR_5);
+            renderStarLayer(matrices, starLayer5, renderTime, 0.009F, color.red(), color.green(), color.blue(), starAlpha * 0.42F);
+
             matrices.popPose();
         }
 
@@ -259,11 +262,12 @@ public class MidnightMantleSkyRenderer {
     }
 
     private void initStars() {
-        starLayer0 = makeUVStars(0.30f, 0.82f, 1240, 77221);
-        starLayer1 = makeUVStars(0.35f, 0.95f, 900, 41315);
-        starLayer2 = makeUVStars(0.35f, 1.05f, 760, 35151);
-        starLayer3 = makeUVStars(0.45f, 1.25f, 540, 61354);
-        starLayer4 = makeUVStars(0.55f, 1.45f, 90, 61355);
+        starLayer0 = makeUVStars(0.5f, 1.3f, 90, 77221);
+        starLayer1 = makeUVStars(0.5f, 1.5f, 900, 41315);
+        starLayer2 = makeUVStars(0.5f, 1.6f, 760, 35151);
+        starLayer3 = makeUVStars(0.7f, 2.0f, 540, 61354);
+        starLayer4 = makeUVStars(0.9f, 2.3f, 1240, 61355);
+        starLayer5 = makeUVStars(0.9f, 2.3f, 90, 61356);
     }
 
     private List<Star> makeUVStars(float minSize, float maxSize, int count, long seed) {
