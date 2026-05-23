@@ -43,6 +43,9 @@ public class GhostlyMantleItem extends WearableRelicItem {
     public static final String FOG_SUFFOCATION_DAMAGE_TAG = "relics:ghostly_mantle_fog_suffocation_damage";
     public static final String FOG_SUFFOCATION_UNTIL_TAG = "relics:ghostly_mantle_fog_suffocation_until";
 
+    private static final double FOG_GROUND_SEARCH_STEP = 0.25D;
+    private static final double MAX_FOG_GROUND_SEARCH = 3D;
+
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -286,20 +289,28 @@ public class GhostlyMantleItem extends WearableRelicItem {
 
         var direction = current.subtract(last).normalize();
         var steps = Math.min(8, (int) Math.floor(distance / fogRadius));
-        var maxJumpHeight = 0D;
-        var upwardSpeed = entity.getAttributeValue(Attributes.JUMP_STRENGTH);
+        var gravity = entity.getAttributeValue(Attributes.GRAVITY);
+        var maxGroundSearch = FOG_GROUND_SEARCH_STEP;
 
-        while (upwardSpeed > 0D) {
-            maxJumpHeight += upwardSpeed;
-            upwardSpeed = (upwardSpeed - entity.getAttributeValue(Attributes.GRAVITY)) * 0.98D;
+        if (gravity > 0.001D) {
+            var upwardSpeed = entity.getAttributeValue(Attributes.JUMP_STRENGTH);
+
+            while (upwardSpeed > 0D && maxGroundSearch < MAX_FOG_GROUND_SEARCH) {
+                maxGroundSearch += upwardSpeed;
+                upwardSpeed = (upwardSpeed - gravity) * 0.98D;
+            }
+
+            maxGroundSearch = Math.min(maxGroundSearch, MAX_FOG_GROUND_SEARCH);
         }
+
+        var spawned = false;
 
         for (var i = 1; i <= steps; i++) {
             var pos = last.add(direction.scale(i * fogRadius));
             var y = pos.y;
             var groundFound = false;
 
-            for (var j = 0D; j <= maxJumpHeight; j += 0.25D) {
+            for (var j = 0D; j <= maxGroundSearch; j += FOG_GROUND_SEARCH_STEP) {
                 var blockPos = BlockPos.containing(pos.x, pos.y + 0.2D - j, pos.z);
                 var state = entity.level().getBlockState(blockPos);
 
@@ -331,12 +342,13 @@ public class GhostlyMantleItem extends WearableRelicItem {
             fog.setPos(pos.x, y, pos.z);
 
             entity.level().addFreshEntity(fog);
+            spawned = true;
 
             ability.getStatisticData().getMetricData("fog_clouds").addValue(1);
             this.getRelicData(entity, stack).getLevelingData().addExperience("fog", "fog_creation", 0.1D / steps);
         }
 
-        this.setLastFogPos(stack, last.add(direction.scale(steps * fogRadius)));
+        this.setLastFogPos(stack, spawned ? last.add(direction.scale(steps * fogRadius)) : current);
     }
 
     private void tickGaze(LivingEntity owner, ItemStack stack) {
