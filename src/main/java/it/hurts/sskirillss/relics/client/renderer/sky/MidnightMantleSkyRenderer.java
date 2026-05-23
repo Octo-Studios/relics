@@ -4,10 +4,14 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
+import it.hurts.sskirillss.relics.items.relics.base.data.research.StarData;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.resources.ResourceLocation;
@@ -25,6 +29,9 @@ import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.joml.Matrix4f;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 @EventBusSubscriber(value = Dist.CLIENT)
@@ -39,6 +46,14 @@ public class MidnightMantleSkyRenderer {
     private static final Minecraft MC = Minecraft.getInstance();
     private static final MidnightMantleSkyRenderer INSTANCE = new MidnightMantleSkyRenderer();
 
+    private static final int CONSTELLATION_SLOT_COUNT = 10;
+    private static final int CONSTELLATION_SLOT_POOL_SIZE = 48;
+    private static final int CONSTELLATION_SLOT_POOL_STEP = 17;
+    private static final float CONSTELLATION_SLOT_GOLDEN_ANGLE = 2.3999631F;
+    private static final float CONSTELLATION_SWITCH_TICKS = 200F;
+    private static final float CONSTELLATION_FADE_TICKS = 60F;
+    private static final float CONSTELLATION_SKY_SCALE = 0.15F;
+
     private List<Star> starLayer0;
     private List<Star> starLayer1;
     private List<Star> starLayer2;
@@ -46,9 +61,7 @@ public class MidnightMantleSkyRenderer {
     private List<Star> starLayer4;
     private List<Star> starLayer5;
 
-    private List<Star> constellationStars;
-
-    private List<ConstellationLine> constellationLines;
+    private List<ResearchConstellation> researchConstellations;
 
     private float currentTintRed;
     private float currentTintGreen;
@@ -95,7 +108,7 @@ public class MidnightMantleSkyRenderer {
         matrices.mulPose(event.getModelViewMatrix());
 
         var partialTick = event.getPartialTick().getGameTimeDeltaPartialTick(false);
-        var renderTime = MC.player.tickCount + partialTick;
+        var renderTime = MC.level.getGameTime() + partialTick;
         var skyAngle = MC.level.getTimeOfDay(partialTick) * 360F;
 
         RenderSystem.depthMask(false);
@@ -143,10 +156,7 @@ public class MidnightMantleSkyRenderer {
             RenderSystem.setShaderTexture(0, STAR_5);
             renderStarLayer(matrices, starLayer5, renderTime, 0.009F, color.red(), color.green(), color.blue(), starAlpha * 0.42F);
 
-            renderConstellationLines(matrices, constellationLines, renderTime, color, starAlpha * 0.95F);
-
-            RenderSystem.setShaderTexture(0, STAR_5);
-            renderStarLayer(matrices, constellationStars, renderTime, 0.006F, color.secondaryRed(), color.secondaryGreen(), color.secondaryBlue(), starAlpha);
+            renderResearchConstellations(matrices, renderTime, color, starAlpha);
 
             matrices.popPose();
         }
@@ -289,6 +299,107 @@ public class MidnightMantleSkyRenderer {
         RenderSystem.enableCull();
     }
 
+    private void renderResearchConstellations(PoseStack matrices, float renderTime, StarColor color, float alpha) {
+        if (researchConstellations.isEmpty())
+            return;
+
+        var switchStep = (long) Math.floor(renderTime / CONSTELLATION_SWITCH_TICKS);
+        var activeSlot = (int) (switchStep % CONSTELLATION_SLOT_COUNT);
+        var round = switchStep / CONSTELLATION_SLOT_COUNT;
+        var switchProgressTicks = renderTime - switchStep * CONSTELLATION_SWITCH_TICKS;
+        var usedConstellations = new HashSet<String>();
+        var usedSlots = new HashSet<Integer>();
+        var renderEntries = new ArrayList<VisibleConstellation>();
+
+        for (var slotIndex = 0; slotIndex < CONSTELLATION_SLOT_COUNT; slotIndex++) {
+            var completedSwitches = round + (slotIndex < activeSlot ? 1L : 0L);
+            var generation = completedSwitches;
+            var constellationAlpha = alpha;
+
+            if (slotIndex == activeSlot) {
+                if (switchProgressTicks < CONSTELLATION_FADE_TICKS) {
+                    constellationAlpha = alpha * (1F - switchProgressTicks / CONSTELLATION_FADE_TICKS);
+                } else if (switchProgressTicks > CONSTELLATION_SWITCH_TICKS - CONSTELLATION_FADE_TICKS) {
+                    generation = completedSwitches + 1L;
+                    constellationAlpha = alpha * ((switchProgressTicks - (CONSTELLATION_SWITCH_TICKS - CONSTELLATION_FADE_TICKS)) / CONSTELLATION_FADE_TICKS);
+                    usedSlots.add(getConstellationSlotPoolIndex(slotIndex, completedSwitches, usedSlots));
+                } else
+                    continue;
+            }
+
+            if (constellationAlpha <= 0.003F)
+                continue;
+
+            var constellation = getResearchConstellation(slotIndex * 31L + generation, usedConstellations);
+            var slot = makeConstellationSlot(slotIndex, generation, usedSlots);
+
+            usedConstellations.add(constellation.key());
+            renderEntries.add(new VisibleConstellation(constellation, slot, constellationAlpha));
+        }
+
+        for (var entry : renderEntries)
+            renderResearchConstellation(matrices, entry.constellation(), entry.slot(), renderTime, color, entry.alpha());
+    }
+
+    private ConstellationSlot makeConstellationSlot(int slotIndex, long generation, HashSet<Integer> usedSlots) {
+        var random = new LegacyRandomSource(53791L + slotIndex * 104729L + generation * 130363L);
+        var poolIndex = getConstellationSlotPoolIndex(slotIndex, generation, usedSlots);
+
+        usedSlots.add(poolIndex);
+
+        var y = Mth.lerp((poolIndex + 0.5F) / CONSTELLATION_SLOT_POOL_SIZE, -0.85F, 0.85F);
+        var horizontal = Mth.sqrt(Math.max(0.001F, 1F - y * y));
+        var angle = poolIndex * CONSTELLATION_SLOT_GOLDEN_ANGLE;
+
+        return new ConstellationSlot(Mth.cos(angle) * horizontal, y, Mth.sin(angle) * horizontal, random.nextInt(10000));
+    }
+
+    private int getConstellationSlotPoolIndex(int slotIndex, long generation, HashSet<Integer> usedSlots) {
+        var random = new LegacyRandomSource(53791L + slotIndex * 104729L + generation * 130363L);
+        var startIndex = random.nextInt(CONSTELLATION_SLOT_POOL_SIZE);
+
+        for (var offset = 0; offset < CONSTELLATION_SLOT_POOL_SIZE; offset++) {
+            var candidateIndex = Math.floorMod(startIndex + offset * CONSTELLATION_SLOT_POOL_STEP, CONSTELLATION_SLOT_POOL_SIZE);
+
+            if (!usedSlots.contains(candidateIndex))
+                return candidateIndex;
+        }
+
+        return startIndex;
+    }
+
+    private ResearchConstellation getResearchConstellation(long index) {
+        return researchConstellations.get((int) Math.floorMod(index, researchConstellations.size()));
+    }
+
+    private ResearchConstellation getResearchConstellation(long index, HashSet<String> usedConstellations) {
+        if (usedConstellations.size() >= researchConstellations.size())
+            return getResearchConstellation(index);
+
+        for (var offset = 0; offset < researchConstellations.size(); offset++) {
+            var constellation = getResearchConstellation(index + offset);
+
+            if (!usedConstellations.contains(constellation.key()))
+                return constellation;
+        }
+
+        return getResearchConstellation(index);
+    }
+
+    private void renderResearchConstellation(PoseStack matrices, ResearchConstellation constellation, ConstellationSlot slot, float renderTime, StarColor color, float alpha) {
+        if (alpha <= 0.003F)
+            return;
+
+        var stars = new ArrayList<Star>();
+        var lines = new ArrayList<ConstellationLine>();
+
+        addResearchConstellationGeometry(constellation, slot, stars, lines);
+        renderConstellationLines(matrices, lines, renderTime, color, alpha * 0.95F);
+
+        RenderSystem.setShaderTexture(0, STAR_5);
+        renderStarLayer(matrices, stars, renderTime, 0.006F, color.secondaryRed(), color.secondaryGreen(), color.secondaryBlue(), alpha);
+    }
+
     private void initStars() {
         starLayer0 = makeUVStars(0.5f, 1.3f, 90, 77221);
         starLayer1 = makeUVStars(0.5f, 1.5f, 900, 41315);
@@ -301,88 +412,88 @@ public class MidnightMantleSkyRenderer {
     }
 
     private void initConstellations() {
-        constellationStars = new ArrayList<>();
-        constellationLines = new ArrayList<>();
-
-        addConstellation(11101, 0.93F, 0.29F, 0.22F, new float[][]{
-                {-0.82F, 0.12F}, {-0.38F, 0.28F}, {0.08F, 0.18F}, {0.56F, -0.08F}, {0.86F, -0.34F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}});
-
-        addConstellation(11102, 0.48F, 0.78F, -0.4F, new float[][]{
-                {-0.88F, -0.28F}, {-0.46F, 0.02F}, {-0.08F, 0.28F}, {0.28F, 0.02F}, {0.74F, -0.28F},
-                {-0.08F, 0.28F}, {-0.18F, 0.76F}, {0.28F, 0.02F}, {0.78F, 0.62F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {2, 6}, {3, 8}});
-
-        addConstellation(11103, -0.18F, 0.94F, 0.28F, new float[][]{
-                {-0.64F, 0.72F}, {-0.58F, 0.26F}, {-0.5F, -0.24F}, {-0.42F, -0.72F},
-                {0.54F, 0.7F}, {0.46F, 0.2F}, {0.36F, -0.32F}, {0.28F, -0.78F},
-                {-0.58F, 0.26F}, {0.46F, 0.2F}, {-0.5F, -0.24F}, {0.36F, -0.32F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {4, 5}, {5, 6}, {6, 7}, {8, 9}, {10, 11}});
-
-        addConstellation(11104, -0.76F, 0.55F, 0.34F, new float[][]{
-                {-0.64F, 0.48F}, {-0.12F, 0.08F}, {0.44F, 0.52F}, {-0.12F, 0.08F}, {0.08F, -0.56F}
-        }, new int[][]{{0, 1}, {1, 2}, {1, 4}});
-
-        addConstellation(11105, -0.92F, 0.12F, -0.36F, new float[][]{
-                {-0.88F, -0.58F}, {-0.42F, -0.36F}, {-0.08F, -0.02F}, {-0.24F, 0.34F},
-                {0.04F, 0.72F}, {0.44F, 0.6F}, {0.62F, 0.22F}, {0.38F, -0.1F},
-                {0.08F, -0.36F}, {0.56F, -0.52F}, {0.9F, -0.3F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 2}, {2, 8}, {8, 9}, {9, 10}});
-
-        addConstellation(11106, -0.46F, -0.54F, 0.7F, new float[][]{
-                {-0.9F, 0.44F}, {-0.48F, 0.18F}, {-0.08F, 0.34F}, {0.26F, 0.04F},
-                {0.66F, 0.26F}, {0.88F, -0.18F}, {0.44F, -0.42F}, {0.04F, -0.66F},
-                {-0.34F, -0.34F}, {-0.7F, -0.58F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 8}, {8, 1}, {8, 9}});
-
-        addConstellation(11107, 0.12F, -0.86F, 0.5F, new float[][]{
-                {-0.72F, -0.2F}, {-0.34F, 0.42F}, {0.18F, 0.64F}, {0.64F, 0.2F},
-                {0.3F, -0.42F}, {-0.24F, -0.56F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 0}});
-
-        addConstellation(11108, 0.74F, -0.48F, 0.48F, new float[][]{
-                {-0.76F, 0.46F}, {-0.42F, 0.58F}, {-0.08F, 0.4F}, {0.14F, 0.08F},
-                {0.18F, -0.28F}, {0.02F, -0.58F}, {-0.28F, -0.78F}, {-0.6F, -0.62F},
-                {0.52F, 0.26F}, {0.84F, 0.44F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {3, 8}, {8, 9}});
-
-        addConstellation(11109, 0.94F, -0.2F, -0.28F, new float[][]{
-                {-0.74F, 0.42F}, {-0.36F, 0.68F}, {0.08F, 0.5F}, {0.5F, 0.72F},
-                {0.8F, 0.36F}, {0.48F, 0.02F}, {0.08F, 0.16F}, {-0.34F, -0.08F},
-                {-0.68F, -0.48F}, {0.18F, -0.32F}, {0.48F, -0.76F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 1}, {6, 7}, {7, 8}, {6, 9}, {9, 10}});
-
-        addConstellation(11110, 0.44F, 0.36F, -0.82F, new float[][]{
-                {-0.86F, 0.18F}, {-0.46F, 0.48F}, {-0.04F, 0.36F}, {0.34F, 0.04F},
-                {0.78F, -0.12F}, {0.46F, -0.56F}, {-0.02F, -0.46F}, {-0.44F, -0.14F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 0}, {3, 6}});
-
-        addConstellation(11111, -0.22F, 0.72F, -0.66F, new float[][]{
-                {-0.92F, 0.34F}, {-0.52F, 0.08F}, {-0.12F, 0.34F}, {0.28F, 0.04F},
-                {0.68F, 0.28F}, {-0.72F, -0.38F}, {-0.26F, -0.64F}, {0.2F, -0.38F},
-                {0.68F, -0.7F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 4}, {5, 6}, {6, 7}, {7, 8}, {1, 6}, {3, 7}});
-
-        addConstellation(11112, -0.62F, -0.64F, -0.45F, new float[][]{
-                {-0.86F, 0.44F}, {-0.5F, 0.72F}, {-0.18F, 0.38F}, {-0.42F, 0.02F},
-                {-0.08F, -0.18F}, {0.32F, -0.34F}, {0.68F, -0.08F}, {0.88F, 0.34F},
-                {0.48F, 0.64F}, {0.18F, 0.22F}
-        }, new int[][]{{0, 1}, {1, 2}, {2, 3}, {3, 0}, {3, 4}, {4, 5}, {5, 6}, {6, 7}, {7, 8}, {8, 9}, {9, 6}});
+        researchConstellations = collectResearchConstellations();
     }
 
-    private void addConstellation(long seed, float axisX, float axisY, float axisZ, float[][] points, int[][] connections) {
-        var random = new LegacyRandomSource(seed);
+    private List<ResearchConstellation> collectResearchConstellations() {
+        var constellations = new ArrayList<ResearchConstellation>();
 
-        var axisLength = Mth.sqrt(axisX * axisX + axisY * axisY + axisZ * axisZ);
+        for (var item : BuiltInRegistries.ITEM) {
+            if (!(item instanceof IRelicItem relic))
+                continue;
 
-        var normalX = axisX / axisLength;
-        var normalY = axisY / axisLength;
-        var normalZ = axisZ / axisLength;
+            var itemKey = BuiltInRegistries.ITEM.getKey(item).toString();
 
+            for (var abilityEntry : relic.getDefaultRelicTemplate().getAbilities().getAbilities().entrySet()) {
+                var research = abilityEntry.getValue().getResearchTemplate();
+
+                if (research.getStars().size() < 3 || research.getLinks().size() < 2)
+                    continue;
+
+                var constellation = makeResearchConstellation(itemKey + "/" + abilityEntry.getKey(), research);
+
+                if (constellation != null)
+                    constellations.add(constellation);
+            }
+        }
+
+        return constellations;
+    }
+
+    private ResearchConstellation makeResearchConstellation(String key, ResearchTemplate research) {
+        var sourceStars = research.getStars().values().stream()
+                .sorted(Comparator.comparingInt(StarData::getIndex))
+                .toList();
+
+        if (sourceStars.size() < 3)
+            return null;
+
+        var minX = sourceStars.stream().mapToInt(StarData::getX).min().orElse(0);
+        var maxX = sourceStars.stream().mapToInt(StarData::getX).max().orElse(0);
+        var minY = sourceStars.stream().mapToInt(StarData::getY).min().orElse(0);
+        var maxY = sourceStars.stream().mapToInt(StarData::getY).max().orElse(0);
+        var span = Math.max(maxX - minX, maxY - minY);
+
+        if (span <= 0)
+            return null;
+
+        var centerX = (minX + maxX) * 0.5F;
+        var centerY = (minY + maxY) * 0.5F;
+        var indexMap = new HashMap<Integer, Integer>();
+        var points = new ArrayList<ConstellationPoint>();
+
+        for (var i = 0; i < sourceStars.size(); i++) {
+            var star = sourceStars.get(i);
+
+            indexMap.put(star.getIndex(), i);
+            points.add(new ConstellationPoint((star.getX() - centerX) / span * 2F, (centerY - star.getY()) / span * 2F));
+        }
+
+        var connections = new ArrayList<ConstellationConnection>();
+
+        for (var entry : research.getLinks().entries()) {
+            var from = indexMap.get(entry.getKey());
+            var to = indexMap.get(entry.getValue());
+
+            if (from != null && to != null && !from.equals(to))
+                connections.add(new ConstellationConnection(from, to));
+        }
+
+        if (connections.size() < 2)
+            return null;
+
+        return new ResearchConstellation(key, points, connections, key.hashCode());
+    }
+
+    private void addResearchConstellationGeometry(ResearchConstellation constellation, ConstellationSlot slot, List<Star> stars, List<ConstellationLine> lines) {
+        var random = new LegacyRandomSource(constellation.seed() * 31L + slot.patternOffset());
+        var axisLength = Mth.sqrt(slot.axisX() * slot.axisX() + slot.axisY() * slot.axisY() + slot.axisZ() * slot.axisZ());
+        var normalX = slot.axisX() / axisLength;
+        var normalY = slot.axisY() / axisLength;
+        var normalZ = slot.axisZ() / axisLength;
         var tangentX = normalZ;
         var tangentY = 0F;
         var tangentZ = -normalX;
-
         var tangentLength = Mth.sqrt(tangentX * tangentX + tangentZ * tangentZ);
 
         if (tangentLength < 0.001F) {
@@ -396,25 +507,20 @@ public class MidnightMantleSkyRenderer {
         var bitangentX = normalY * tangentZ - normalZ * tangentY;
         var bitangentY = normalZ * tangentX - normalX * tangentZ;
         var bitangentZ = normalX * tangentY - normalY * tangentX;
+        var firstStarIndex = stars.size();
 
-        var localStars = new ArrayList<Star>();
-
-        for (var point : points) {
-            var pointX = normalX + (tangentX * point[0] + bitangentX * point[1]) * 0.14F;
-            var pointY = normalY + (tangentY * point[0] + bitangentY * point[1]) * 0.14F;
-            var pointZ = normalZ + (tangentZ * point[0] + bitangentZ * point[1]) * 0.14F;
-
+        for (var point : constellation.points()) {
+            var pointX = normalX + (tangentX * point.x() + bitangentX * point.y()) * CONSTELLATION_SKY_SCALE;
+            var pointY = normalY + (tangentY * point.x() + bitangentY * point.y()) * CONSTELLATION_SKY_SCALE;
+            var pointZ = normalZ + (tangentZ * point.x() + bitangentZ * point.y()) * CONSTELLATION_SKY_SCALE;
             var pointLength = Mth.sqrt(pointX * pointX + pointY * pointY + pointZ * pointZ);
 
-            var star = new Star(pointX / pointLength * 100F, pointY / pointLength * 100F, pointZ / pointLength * 100F,
-                    1.2F + random.nextFloat() * 0.6F, random.nextFloat() * Mth.TWO_PI, random.nextFloat() * Mth.TWO_PI, 0.035F + random.nextFloat() * 0.04F);
-
-            constellationStars.add(star);
-            localStars.add(star);
+            stars.add(new Star(pointX / pointLength * 100F, pointY / pointLength * 100F, pointZ / pointLength * 100F,
+                    1.2F + random.nextFloat() * 0.6F, random.nextFloat() * Mth.TWO_PI, random.nextFloat() * Mth.TWO_PI, 0.035F + random.nextFloat() * 0.04F));
         }
 
-        for (var connection : connections)
-            constellationLines.add(new ConstellationLine(localStars.get(connection[0]), localStars.get(connection[1]), random.nextFloat() * Mth.TWO_PI));
+        for (var connection : constellation.connections())
+            lines.add(new ConstellationLine(stars.get(firstStarIndex + connection.from()), stars.get(firstStarIndex + connection.to()), random.nextFloat() * Mth.TWO_PI));
     }
 
     private List<Star> makeUVStars(float minSize, float maxSize, int count, long seed) {
@@ -551,6 +657,26 @@ public class MidnightMantleSkyRenderer {
     }
 
     private record ConstellationLine(Star from, Star to, float pulseOffset) {
+
+    }
+
+    private record ResearchConstellation(String key, List<ConstellationPoint> points, List<ConstellationConnection> connections, int seed) {
+
+    }
+
+    private record ConstellationPoint(float x, float y) {
+
+    }
+
+    private record ConstellationConnection(int from, int to) {
+
+    }
+
+    private record ConstellationSlot(float axisX, float axisY, float axisZ, int patternOffset) {
+
+    }
+
+    private record VisibleConstellation(ResearchConstellation constellation, ConstellationSlot slot, float alpha) {
 
     }
 
