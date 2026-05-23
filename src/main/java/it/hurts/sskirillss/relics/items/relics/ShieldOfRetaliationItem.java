@@ -43,6 +43,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileDeflection;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.ClipContext;
@@ -128,13 +129,13 @@ public class ShieldOfRetaliationItem extends RelicItem {
                                         .metric(AbilityMetricTemplate.builder("damage_blocked")
                                                 .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
-                                        .metric(AbilityMetricTemplate.builder("targets_stunned")
-                                                .formatValue(value -> String.valueOf(value.intValue()))
-                                                .rankModifierVisibilityState("stun", VisibilityState.OBFUSCATED)
-                                                .build())
                                         .metric(AbilityMetricTemplate.builder("projectiles_reflected")
                                                 .formatValue(value -> String.valueOf(value.intValue()))
                                                 .rankModifierVisibilityState("projectile", VisibilityState.OBFUSCATED)
+                                                .build())
+                                        .metric(AbilityMetricTemplate.builder("targets_stunned")
+                                                .formatValue(value -> String.valueOf(value.intValue()))
+                                                .rankModifierVisibilityState("stun", VisibilityState.OBFUSCATED)
                                                 .build())
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -808,35 +809,8 @@ public class ShieldOfRetaliationItem extends RelicItem {
                 setSucceeded(stack, true);
                 player.level().playSound(null, player.blockPosition(), RelicsSounds.SHIELD_OF_RETALIATION_DEFLECT.get(), SoundSource.PLAYERS, 0.9F, 0.9F + player.getRandom().nextFloat() * 0.2F);
 
-                if (incomingProjectile != null) {
-                    var look = player.getLookAngle().normalize();
-                    var motion = incomingProjectile.getDeltaMovement();
-                    var speed = Math.max(motion.length(), 0.4D);
-                    var reflected = motion.lengthSqr() > 0.0001D
-                            ? motion.subtract(look.scale(2D * motion.dot(look)))
-                            : look.scale(speed);
-
-                    if (reflected.lengthSqr() < 0.0001D || reflected.normalize().dot(look) <= 0D)
-                        reflected = look.scale(speed);
-                    else
-                        reflected = reflected.normalize().scale(speed);
-
-                    reflected = reflected.add(0D, 0.05D, 0D);
-
-                    var position = player.getEyePosition().add(look.scale(1.2D));
-                    var horizontal = Math.sqrt(reflected.x * reflected.x + reflected.z * reflected.z);
-                    var yRot = (float) Math.toDegrees(Math.atan2(reflected.x, reflected.z));
-                    var xRot = (float) Math.toDegrees(Math.atan2(reflected.y, horizontal));
-
-                    incomingProjectile.setNoGravity(false);
-                    incomingProjectile.setPos(position.x, position.y, position.z);
-                    incomingProjectile.setDeltaMovement(reflected);
-                    incomingProjectile.setYRot(yRot);
-                    incomingProjectile.setXRot(xRot);
-                    incomingProjectile.yRotO = yRot;
-                    incomingProjectile.xRotO = xRot;
-                    incomingProjectile.hurtMarked = true;
-                }
+                if (incomingProjectile != null)
+                    incomingProjectile.deflect(ProjectileDeflection.REVERSE, player, incomingProjectile.getOwner(), true);
 
                 ShakeManager.addForPlayer(player, (sourcePosition != null ? Shake.builder(sourcePosition) : Shake.builder(player))
                         .radius(Integer.MAX_VALUE)
@@ -874,7 +848,13 @@ public class ShieldOfRetaliationItem extends RelicItem {
                     continue;
 
                 setMissed(stack, false);
-                event.setAmount((float) (event.getAmount() * (1D + ability.getStatData("miss_damage").getValue())));
+
+                var amount = event.getAmount();
+                var multiplier = 1D + ability.getStatData("miss_damage").getValue();
+                var modified = amount * multiplier;
+
+                if (Float.isFinite(amount) && Double.isFinite(modified) && modified <= Float.MAX_VALUE)
+                    event.setAmount((float) modified);
 
                 return;
             }
