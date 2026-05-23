@@ -197,7 +197,7 @@ public class MidnightMantleSkyRenderer {
             return 0F;
 
         if (fogType == FogType.WATER)
-            return 0.18F;
+            return 0F;
 
         return 1F;
     }
