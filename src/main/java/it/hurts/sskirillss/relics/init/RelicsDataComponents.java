@@ -74,6 +74,7 @@ public class RelicsDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Map<String, Double>>> GHOSTLY_MANTLE_REPRISAL_MARKS = RelicsDataComponents.construct("ghostly_mantle/reprisal_marks", Codec.unboundedMap(Codec.STRING, Codec.DOUBLE));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SHIELD_OF_RETALIATION_PARRY_TICKS = RelicsDataComponents.construct("shield_of_retaliation/parry_ticks", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SHIELD_OF_RETALIATION_PARRY_DURATION = RelicsDataComponents.construct("shield_of_retaliation/parry_duration", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SHIELD_OF_RETALIATION_PARRY_SUCCEEDED = RelicsDataComponents.construct("shield_of_retaliation/parry_succeeded", Codec.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SHIELD_OF_RETALIATION_MISSED = RelicsDataComponents.construct("shield_of_retaliation/missed", Codec.BOOL);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SHIELD_OF_RETALIATION_MISSED_TICKS = RelicsDataComponents.construct("shield_of_retaliation/missed_ticks", Codec.INT);

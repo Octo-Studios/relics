@@ -26,12 +26,14 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.network.packets.item.shield_of_retaliation.C2SShieldOfRetaliationRelease;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -177,6 +179,14 @@ public class ShieldOfRetaliationItem extends RelicItem {
         stack.set(RelicsDataComponents.SHIELD_OF_RETALIATION_PARRY_TICKS, Math.max(0, ticks));
     }
 
+    private static int getActiveDuration(ItemStack stack) {
+        return Math.max(0, stack.getOrDefault(RelicsDataComponents.SHIELD_OF_RETALIATION_PARRY_DURATION, 0));
+    }
+
+    private static void setActiveDuration(ItemStack stack, int ticks) {
+        stack.set(RelicsDataComponents.SHIELD_OF_RETALIATION_PARRY_DURATION, Math.max(0, ticks));
+    }
+
     private static boolean hasSucceeded(ItemStack stack) {
         return stack.getOrDefault(RelicsDataComponents.SHIELD_OF_RETALIATION_PARRY_SUCCEEDED, false);
     }
@@ -246,6 +256,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
         }
 
         setActiveTicks(stack, 0);
+        setActiveDuration(stack, 0);
         setSucceeded(stack, false);
         setReleaseLocked(stack, true);
     }
@@ -264,13 +275,16 @@ public class ShieldOfRetaliationItem extends RelicItem {
     }
 
     private static Vec3 getDamageSourcePosition(LivingIncomingDamageEvent event) {
-        var sourcePosition = event.getSource().getSourcePosition();
+        Vec3 sourcePosition = null;
 
-        if (sourcePosition == null && event.getSource().getDirectEntity() != null)
-            sourcePosition = event.getSource().getDirectEntity().position();
+        if (event.getSource().getDirectEntity() != null)
+            sourcePosition = event.getSource().getDirectEntity().getBoundingBox().getCenter();
 
         if (sourcePosition == null && event.getSource().getEntity() != null)
-            sourcePosition = event.getSource().getEntity().position();
+            sourcePosition = event.getSource().getEntity().getBoundingBox().getCenter();
+
+        if (sourcePosition == null)
+            sourcePosition = event.getSource().getSourcePosition();
 
         return sourcePosition;
     }
@@ -279,6 +293,26 @@ public class ShieldOfRetaliationItem extends RelicItem {
         var yaw = Math.toRadians(player.getYRot());
 
         return new Vec3(-Math.cos(yaw), 0D, -Math.sin(yaw)).normalize();
+    }
+
+    private static void applyBlockRecoil(Player player, Vec3 sourcePosition, Vec3 incomingMotion, double blockedDamage) {
+        var recoilDirection = sourcePosition == null ? Vec3.ZERO : player.getBoundingBox().getCenter().subtract(sourcePosition);
+
+        if (recoilDirection.lengthSqr() <= 0.0001D && incomingMotion != null)
+            recoilDirection = incomingMotion;
+
+        if (recoilDirection.lengthSqr() <= 0.0001D) {
+            var look = player.getLookAngle();
+
+            recoilDirection = look.reverse();
+        }
+
+        var strength = 0.18D + Mth.clamp(Math.sqrt(Math.max(0D, blockedDamage)) * 0.13D, 0D, 1.65D);
+        var recoil = recoilDirection.lengthSqr() <= 0.0001D ? Vec3.ZERO : recoilDirection.normalize().scale(strength);
+        var motion = player.getDeltaMovement().add(recoil);
+
+        if (player instanceof ServerPlayer serverPlayer)
+            NetworkHandler.sendToClient(new S2CSetEntityMotion(player.getId(), motion.toVector3f()), serverPlayer);
     }
 
     private static boolean captureProjectile(Player player, ItemStack stack, Projectile projectile) {
@@ -423,6 +457,8 @@ public class ShieldOfRetaliationItem extends RelicItem {
             var upOffset = Mth.clamp(delta.dot(up), -0.9D, 0.9D);
 
             captured.add(new CapturedProjectileData(uuid, forwardOffset, rightOffset, upOffset));
+            applyBlockRecoil(player, projectile.getOwner() == null ? null : projectile.getOwner().position(), projectile.getDeltaMovement(), 0D);
+
             projectile.setNoGravity(true);
             projectile.setDeltaMovement(Vec3.ZERO);
 
@@ -497,7 +533,10 @@ public class ShieldOfRetaliationItem extends RelicItem {
         if (!ability.getRankModifierData("projectile").isEnabled())
             return;
 
-        setActiveTicks(stack, getActiveTicks(stack) + Math.max(1, (int) Math.round(ability.getStatData("extension").getValue() * 20D)));
+        var extension = Math.max(1, (int) Math.round(ability.getStatData("extension").getValue() * 20D));
+
+        setActiveTicks(stack, getActiveTicks(stack) + extension);
+        setActiveDuration(stack, getActiveDuration(stack) + extension);
     }
 
     private static void addShake(Player player, float amplitude, int duration) {
@@ -615,6 +654,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
 
         if (!level.isClientSide()) {
             setActiveTicks(stack, ticks);
+            setActiveDuration(stack, ticks);
             setSucceeded(stack, false);
             setMissed(stack, false);
             setReleaseLocked(stack, false);
@@ -656,6 +696,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
         }
 
         holdCapturedProjectiles(player, stack);
+        ticks = getActiveTicks(stack);
 
         if (ticks == 1) {
             finishParry(player, stack, true);
@@ -687,14 +728,14 @@ public class ShieldOfRetaliationItem extends RelicItem {
 
     @Override
     public int getBarColor(ItemStack stack) {
-        var max = Math.max(1, (int) Math.round(this.getRelicData(null, stack).getAbilitiesData().getAbilityData("retaliation").getStatData("window").getValue() * 20D));
+        var max = Math.max(1, getActiveDuration(stack));
 
         return Mth.hsvToRgb(Math.max(0F, (float) getActiveTicks(stack) / max) / 3F, 1F, 1F);
     }
 
     @Override
     public int getBarWidth(ItemStack stack) {
-        var max = Math.max(1, (int) Math.round(this.getRelicData(null, stack).getAbilitiesData().getAbilityData("retaliation").getStatData("window").getValue() * 20D));
+        var max = Math.max(1, getActiveDuration(stack));
 
         return (int) Math.ceil((13F * getActiveTicks(stack)) / max);
     }
@@ -746,6 +787,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
                 var sourcePosition = getDamageSourcePosition(event);
 
                 var blockedDamage = event.getAmount();
+                applyBlockRecoil(player, sourcePosition, incomingProjectile == null ? null : incomingProjectile.getDeltaMovement(), blockedDamage);
 
                 if (incomingProjectile != null && ability.getRankModifierData("projectile").isEnabled()) {
                     event.setCanceled(true);
@@ -810,6 +852,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
                         player.getCooldowns().addCooldown(relic, cooldown);
 
                     setActiveTicks(stack, 0);
+                    setActiveDuration(stack, 0);
                     setReleaseLocked(stack, true);
                     player.stopUsingItem();
                 }
