@@ -2,8 +2,6 @@ package it.hurts.sskirillss.relics.network.packets.item.springy_boot;
 
 import io.netty.buffer.ByteBuf;
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.dev.shake.Shake;
-import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -65,13 +63,6 @@ public class S2CBounceFromSurface implements CustomPacketPayload {
 
                 level.addParticle(ParticleTypes.CLOUD, entity.getX() + MathUtils.randomFloat(random) * 0.5F, entity.getY(), entity.getZ() + MathUtils.randomFloat(random) * 0.5F, particleMotion.x(), particleMotion.y(), particleMotion.z());
             }
-
-            ShakeManager.add(level, Shake.builder(player)
-                    .amplitude(0, 0, (float) (0.075F * speed))
-                    .duration((int) (15 * speed))
-                    .radius(Integer.MAX_VALUE)
-                    .build());
         });
     }
-
 }
