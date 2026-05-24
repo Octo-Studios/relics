@@ -8,6 +8,8 @@ import it.hurts.sskirillss.relics.api.relics.LevelingComponent;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import net.neoforged.neoforge.common.NeoForge;
 
+import java.util.HashMap;
+
 public class LevelingData {
     private final RelicData relicData;
 
@@ -90,9 +92,38 @@ public class LevelingData {
         if (!(event.getStack().getItem() instanceof IRelicItem relic))
             return false;
 
+        relic.getRelicData(event.getBearer(), event.getStack()).getLevelingData().addSourceExperience(ability, experienceSource, delta);
         relic.getRelicData(event.getBearer(), event.getStack()).getLevelingData().addExperience(delta);
 
         return true;
+    }
+
+    public double getSourceExperience(String ability, String experienceSource) {
+        return getComponent().getSourceExperience().getOrDefault(getSourceExperienceKey(ability, experienceSource), 0D);
+    }
+
+    public double getTotalSourceExperience() {
+        return getComponent().getSourceExperience().values().stream()
+                .mapToDouble(Double::doubleValue)
+                .sum();
+    }
+
+    public void addSourceExperience(String ability, String experienceSource, double amount) {
+        if (amount <= 0D)
+            return;
+
+        var key = getSourceExperienceKey(ability, experienceSource);
+        var sourceExperience = new HashMap<>(getComponent().getSourceExperience());
+
+        sourceExperience.put(key, sourceExperience.getOrDefault(key, 0D) + amount);
+
+        setComponent(getComponent().toBuilder()
+                .sourceExperience(sourceExperience)
+                .build());
+    }
+
+    private String getSourceExperienceKey(String ability, String experienceSource) {
+        return ability + "." + experienceSource;
     }
 
     public boolean addExperience(double amount) {
