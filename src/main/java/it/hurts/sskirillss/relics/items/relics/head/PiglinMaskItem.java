@@ -9,6 +9,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.GoldenToothEntity;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
@@ -22,6 +24,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -96,6 +99,9 @@ public class PiglinMaskItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("looting")
                                 .requiredLevel(5)
                                 .rankModifier(5, "frenzy")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("chance")
                                         .initialValue(0.1D, 0.15D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.75008D)
@@ -328,6 +334,9 @@ public class PiglinMaskItem extends WearableRelicItem {
                 var relic = (PiglinMaskItem) stack.getItem();
 
                 if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getRankModifierData("frenzy").isEnabled())
+                    continue;
+
+                if (!TargetingUtils.canHarm(source, event.getEntity(), stack, "looting"))
                     continue;
 
                 var stacks = relic.getStacks(stack);

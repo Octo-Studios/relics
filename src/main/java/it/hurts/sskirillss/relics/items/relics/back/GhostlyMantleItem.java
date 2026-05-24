@@ -11,6 +11,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.GhostlyFogEntity;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
@@ -20,6 +22,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Builder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -53,6 +56,9 @@ public class GhostlyMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("fog")
                                 .modes("enabled", "disabled")
                                 .rankModifier(1, "frostbite")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("duration")
                                         .initialValue(3D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 15D)
@@ -104,6 +110,9 @@ public class GhostlyMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("gaze")
                                 .requiredLevel(5)
                                 .rankModifier(3, "dread")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("range")
                                         .initialValue(5D, 10D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30D)
@@ -148,6 +157,9 @@ public class GhostlyMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("spectral_escape")
                                 .requiredLevel(10)
                                 .rankModifier(5, "reprisal")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("cooldown")
                                         .initialValue(125D, 100D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 25D)
@@ -339,6 +351,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
             fog.setAirDrain((int) Math.max(0D, MathUtils.round(ability.getStatData("air_loss").getValue(), 0)));
             fog.setSuffocationDamage((float) ability.getStatData("suffocation_damage").getValue());
             fog.setTremorTicks(ability.getRankModifierData("frostbite").isEnabled() ? (int) Math.max(1D, ability.getStatData("tremor").getValue() * 20D) : 0);
+            fog.setStack(stack);
             fog.setPos(pos.x, y, pos.z);
 
             entity.level().addFreshEntity(fog);
@@ -370,7 +383,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
         var maxCharges = Math.max(1, (int) MathUtils.round(ability.getStatData("charges").getValue(), 0));
 
         for (var target : owner.level().getEntitiesOfClass(LivingEntity.class, owner.getBoundingBox().inflate(range),
-                entity -> entity != owner && entity.isAlive() && (!(owner instanceof Player player) || !EntityUtils.isAlliedTo(player, entity)))) {
+                entity -> entity != owner && entity.isAlive() && TargetingUtils.canHarm(owner, entity, stack, "gaze"))) {
             var key = target.getStringUUID();
             var looking = isLookingAt(target, owner) && target.hasLineOfSight(owner);
             var data = charges.getOrDefault(key, GazeChargeData.EMPTY);
@@ -537,6 +550,9 @@ public class GhostlyMantleItem extends WearableRelicItem {
                 if (!ability.canPlayerUse(player) || !ability.getRankModifierData("dread").isEnabled())
                     continue;
 
+                if (!TargetingUtils.canHarm(player, event.getEntity(), stack, "gaze"))
+                    continue;
+
                 var charges = relic.getTotalCharges(stack);
 
                 if (charges <= 0)
@@ -586,7 +602,8 @@ public class GhostlyMantleItem extends WearableRelicItem {
 
                 relic.getRelicData(player, stack).getLevelingData().addExperience("spectral_escape", "death_prevention", experience);
 
-                if (ability.getRankModifierData("reprisal").isEnabled() && event.getSource().getEntity() instanceof LivingEntity attacker && attacker != player) {
+                if (ability.getRankModifierData("reprisal").isEnabled() && event.getSource().getEntity() instanceof LivingEntity attacker && attacker != player
+                        && TargetingUtils.canHarm(player, attacker, stack, "spectral_escape")) {
                     var marks = relic.getReprisalMarks(stack);
 
                     marks.put(attacker.getStringUUID(), ability.getStatData("damage").getValue());

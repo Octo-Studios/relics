@@ -12,6 +12,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberration;
 import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberrationManager;
 import it.hurts.sskirillss.relics.dev.shake.Shake;
@@ -31,6 +33,7 @@ import it.hurts.sskirillss.relics.network.packets.item.shield_of_retaliation.C2S
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -141,6 +144,9 @@ public class ShieldOfRetaliationItem extends RelicItem {
                                 .research(ResearchTemplate.builder()
                                         .star(0, 12, 4).star(1, 6, 9).star(2, 18, 9).star(3, 12, 15).star(4, 5, 22).star(5, 19, 22).star(6, 12, 28)
                                         .link(0, 1).link(0, 2).link(1, 3).link(2, 3).link(3, 4).link(3, 5).link(4, 6).link(5, 6)
+                                        .build())
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
                                         .build())
                                 .build())
                         .build())
@@ -496,15 +502,15 @@ public class ShieldOfRetaliationItem extends RelicItem {
         var stunTicks = (int) Math.round(ability.getStatData("stun").getValue() * 20D);
         var view = player.getViewVector(1F);
 
-        for (var target : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius), target -> !EntityUtils.isAlliedTo(player, target))) {
+        for (var target : player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(radius), target -> TargetingUtils.canHarm(player, target, stack, "retaliation"))) {
             var direction = target.position().subtract(player.position());
             direction = new Vec3(direction.x, 0D, direction.z);
 
             if (direction.lengthSqr() > 0.0001D && direction.normalize().dot(view) <= 0D)
                 continue;
 
-            target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, stunTicks, 0, false, false));
-            stunned++;
+            if (TargetingUtils.addHarmfulEffect(target, new MobEffectInstance(RelicsMobEffects.STUN, stunTicks, 0, false, false), player, stack, "retaliation"))
+                stunned++;
         }
 
         return stunned;

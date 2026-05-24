@@ -9,6 +9,7 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.core.registries.Registries;
@@ -122,18 +123,19 @@ public class LeavesBlockEntity extends ThrowableProjectile implements ITargetabl
     @Override
     protected void onHitEntity(EntityHitResult result) {
         if (!(result.getEntity() instanceof LivingEntity entity) || this.impactedEntities.contains(entity.getStringUUID())
-                || (!(this.getOwner() instanceof LivingEntity owner) || entity.getStringUUID().equals(owner.getStringUUID())))
+                || (!(this.getOwner() instanceof LivingEntity owner) || entity.getStringUUID().equals(owner.getStringUUID()))
+                || !TargetingUtils.canHarm(owner, entity, this.getStack(), "revival"))
             return;
 
         var level = this.level();
 
         entity.invulnerableTime = 0;
 
-        if (entity.hurt(level.damageSources().thrown(owner, this), this.getDamage())) {
+        if (TargetingUtils.hurtEnemy(entity, level.damageSources().thrown(owner, this), this.getDamage(), this.getStack(), "revival")) {
             var paralysis = this.getParalysis();
 
             if (paralysis > 0)
-                entity.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, false));
+                TargetingUtils.addHarmfulEffect(entity, new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, false), owner, this.getStack(), "revival");
 
             if (stack.getItem() instanceof LeafyMantleItem relic) {
                 relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatisticData().getMetricData("damage_dealt").addValue(this.getDamage());

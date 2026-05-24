@@ -10,6 +10,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.init.RelicsConfigs;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
@@ -23,6 +25,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.OwnableEntity;
@@ -60,6 +63,9 @@ public class HuntingBeltItem extends WearableRelicItem {
                                 .rankModifier(1, "leader")
                                 .rankModifier(3, "relentless")
                                 .rankModifier(5, "revival")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("damage_modifier")
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 3.00075D)
@@ -150,6 +156,9 @@ public class HuntingBeltItem extends WearableRelicItem {
                 return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner);
             })) {
                 var relic = (HuntingBeltItem) stack.getItem();
+
+                if (!TargetingUtils.canHarm(owner, event.getEntity(), stack, "pack"))
+                    continue;
 
                 totalModifier += relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatData("damage_modifier").getValue();
                 ignoreInvulnerability |= relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getRankModifierData("relentless").isEnabled();
@@ -267,6 +276,9 @@ public class HuntingBeltItem extends WearableRelicItem {
                 return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").canPlayerUse(owner);
             })) {
                 var relic = (HuntingBeltItem) stack.getItem();
+
+                if (!TargetingUtils.canHarm(owner, event.getEntity(), stack, "pack"))
+                    continue;
 
                 relic.getRelicData(owner, stack).getLevelingData().addExperience("pack", "pet_damage", 1);
                 relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("pack").getStatisticData().getMetricData("pet_attacks").addValue(1);

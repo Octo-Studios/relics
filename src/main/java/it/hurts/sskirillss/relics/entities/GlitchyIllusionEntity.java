@@ -9,6 +9,9 @@ import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -53,6 +56,10 @@ public class GlitchyIllusionEntity extends Entity {
 
     @Nullable
     private UUID ownerUuid;
+
+    @Getter
+    @Setter
+    private ItemStack stack = ItemStack.EMPTY;
 
     public GlitchyIllusionEntity(EntityType<? extends GlitchyIllusionEntity> type, Level level) {
         super(type, level);
@@ -313,11 +320,11 @@ public class GlitchyIllusionEntity extends Entity {
         );
 
         for (var target : this.level().getEntitiesOfClass(LivingEntity.class, segmentBox,
-                entity -> entity != owner && entity.isAlive())) {
+                entity -> entity != owner && entity.isAlive() && TargetingUtils.canHarmSynergy(owner, entity, this.getStack(), "electricity"))) {
             if (!target.getBoundingBox().inflate(0.1D).clip(start, end).isPresent() || !damagedTargets.add(target.getUUID()))
                 continue;
 
-            target.hurt(this.level().damageSources().thrown(this, owner), damage);
+            TargetingUtils.hurtEnemyBySynergy(target, this.level().damageSources().thrown(this, owner), damage, this.getStack(), "electricity");
         }
     }
 
@@ -339,8 +346,8 @@ public class GlitchyIllusionEntity extends Entity {
 
         for (var target : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius), entity -> this.canAffectTarget(entity, owner))) {
             if (target.distanceToSqr(this) <= radiusSqr) {
-                target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, this.getStunDuration(), 0, false, false));
-                target.addEffect(new MobEffectInstance(RelicsMobEffects.GLITCH, this.getStunDuration(), 0, false, false));
+                TargetingUtils.addHarmfulEffect(target, new MobEffectInstance(RelicsMobEffects.STUN, this.getStunDuration(), 0, false, false), owner, this.getStack(), "illusion");
+                TargetingUtils.addHarmfulEffect(target, new MobEffectInstance(RelicsMobEffects.GLITCH, this.getStunDuration(), 0, false, false), owner, this.getStack(), "illusion");
 
                 stunnedTargets++;
             }
@@ -374,7 +381,7 @@ public class GlitchyIllusionEntity extends Entity {
     }
 
     private boolean canAffectTarget(LivingEntity entity, @Nullable LivingEntity owner) {
-        return entity != owner && entity.isAlive();
+        return entity != owner && entity.isAlive() && TargetingUtils.canHarm(owner, entity, this.getStack(), "illusion");
     }
 
     private boolean checkOwnerProjectileHits(@Nullable LivingEntity owner) {
@@ -552,6 +559,8 @@ public class GlitchyIllusionEntity extends Entity {
 
         if (tag.hasUUID("owner"))
             this.ownerUuid = tag.getUUID("owner");
+
+        this.setStack(ItemStack.parseOptional(this.registryAccess(), tag.getCompound("stack")));
     }
 
     @Override
@@ -564,6 +573,8 @@ public class GlitchyIllusionEntity extends Entity {
 
         if (this.ownerUuid != null)
             tag.putUUID("owner", this.ownerUuid);
+
+        tag.put("stack", this.getStack().saveOptional(this.registryAccess()));
     }
 
     @Override

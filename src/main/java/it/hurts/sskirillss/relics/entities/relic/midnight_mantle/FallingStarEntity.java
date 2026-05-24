@@ -4,7 +4,7 @@ import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.dev.shake.Shake;
 import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
-import it.hurts.sskirillss.relics.entities.MidnightMantleShockwaveBlockEntity;
+import it.hurts.sskirillss.relics.entities.FallingStarShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
@@ -209,7 +209,7 @@ public class FallingStarEntity extends ThrowableProjectile {
 
                     var surfacePos = new BlockPos(entryPos.getX(), groundY, entryPos.getZ());
 
-                    var shockwave = new MidnightMantleShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
+                    var shockwave = new FallingStarShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
 
                     shockwave.setPos(surfacePos.getX() + 0.5F, surfacePos.getY(), surfacePos.getZ() + 0.5F);
                     shockwave.setBlockState(level.getBlockState(surfacePos));

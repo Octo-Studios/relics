@@ -10,6 +10,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.misc.ICreativeTabContent;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
@@ -22,6 +24,7 @@ import it.hurts.sskirillss.relics.network.packets.item.ring_of_the_seven_deadly_
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -74,6 +77,9 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("pride")
                                 .initialMaxLevel(10)
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("multiplier")
                                         .initialValue(0.025D, 0.05D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
@@ -98,6 +104,9 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                                 .build())
                         .ability(AbilityTemplate.builder("envy")
                                 .initialMaxLevel(10)
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("outgoing_damage_multiplier")
                                         .initialValue(0.005D, 0.015D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.025D)
@@ -127,6 +136,9 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                                 .build())
                         .ability(AbilityTemplate.builder("wrath")
                                 .initialMaxLevel(10)
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("window")
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
@@ -500,6 +512,12 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
 
                 for (var stack : attackerRings) {
                     var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+
+                    if (!TargetingUtils.canHarm(attacker, target, stack, "pride")) {
+                        ringBonuses.add(0D);
+                        continue;
+                    }
+
                     var perBlock = relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("pride").getStatData("multiplier").getValue();
                     var bonus = verticalDelta * perBlock;
 
@@ -626,6 +644,12 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
 
             for (var stack : rings) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+
+                if (!TargetingUtils.canHarm(attacker, event.getEntity(), stack, "wrath")) {
+                    ringModifiers.add(1D);
+                    continue;
+                }
+
                 var windowTicks = Math.max(1, (int) Math.round(relic.getRelicData(attacker, stack).getAbilitiesData().getAbilityData("wrath").getStatData("window").getValue() * 20D));
                 var state = stack.getOrDefault(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_WRATH.get(), WrathData.create(now));
                 var delta = now - state.lastHitTick();
@@ -706,6 +730,12 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
 
             for (var stack : rings) {
                 var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+
+                if (wearerIsAttacker && !TargetingUtils.canHarm(wearer, other, stack, "envy")) {
+                    modifiers.add(0D);
+                    continue;
+                }
+
                 var perPoint = Math.abs(relic.getRelicData(wearer, stack).getAbilitiesData().getAbilityData("envy").getStatData(stat).getValue());
                 var modifier = (wearerIsAttacker ? diff : -diff) * perPoint;
 

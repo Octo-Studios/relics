@@ -12,6 +12,22 @@
   "relics.description.researching.bookmarks.ability_description": "Описание способности",
   "relics.description.researching.bookmarks.ability_experience": "Источники опыта способности",
   "relics.description.researching.bookmarks.ability_statistic": "Статистика способности",
+  "relics.description.researching.bookmarks.ability_targeting": "Нацеливание способности",
+  "relics.description.researching.bookmarks.synergy_description": "Описание синергии",
+  "relics.description.researching.bookmarks.synergy_targeting": "Нацеливание синергии",
+
+  "relics.description.researching.ability.targeting.self": "Воздействует на тебя",
+  "relics.description.researching.ability.targeting.hostile_mobs": "Воздействует на враждебных мобов",
+  "relics.description.researching.ability.targeting.neutral_mobs": "Воздействует на нейтральных мобов",
+  "relics.description.researching.ability.targeting.peaceful_mobs": "Воздействует на мирных мобов",
+  "relics.description.researching.ability.targeting.tamed_creatures": "Воздействует на приручённых существ",
+  "relics.description.researching.ability.targeting.own_tamed_creatures": "Воздействует на твоих приручённых существ",
+  "relics.description.researching.ability.targeting.allied_tamed_creatures": "Воздействует на союзных приручённых существ",
+  "relics.description.researching.ability.targeting.team_players": "Воздействует на игроков твоей команды",
+  "relics.description.researching.ability.targeting.other_team_players": "Воздействует на игроков других команд",
+
+  "relics.description.researching.ability.targeting.mode.harmful": "Вредоносное",
+  "relics.description.researching.ability.targeting.mode.beneficial": "Благотворное",
 
   "relics.description.researching.bookmarks.relic": "Реликвия",
   "relics.description.researching.bookmarks.ability": "Способности",

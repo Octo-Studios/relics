@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
@@ -169,9 +170,10 @@ public class ChainedElectricityEntity extends ThrowableProjectile {
                 Math.max(start.z, end.z) + radius
         );
 
-        for (var target : level.getEntitiesOfClass(LivingEntity.class, segmentBox, entity -> entity != owner)) {
+        for (var target : level.getEntitiesOfClass(LivingEntity.class, segmentBox,
+                entity -> entity != owner && TargetingUtils.canHarmSynergy(owner, entity, this.getStack(), "electricity"))) {
             if (target.getBoundingBox().inflate(0.1D).clip(start, end).isPresent())
-                target.hurt(level.damageSources().thrown(owner instanceof LivingEntity livingOwner ? livingOwner : this, this), damage);
+                TargetingUtils.hurtEnemyBySynergy(target, level.damageSources().thrown(owner instanceof LivingEntity livingOwner ? livingOwner : this, this), damage, this.getStack(), "electricity");
         }
     }
 

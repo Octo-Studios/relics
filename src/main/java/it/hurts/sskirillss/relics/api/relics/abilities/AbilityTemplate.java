@@ -12,6 +12,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivat
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationType;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
 import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
@@ -43,6 +44,7 @@ public class AbilityTemplate {
     private final ExperienceSourcesTemplate experienceSources;
     private final Multimap<Integer, String> rankModifiers;
     private final AbilityActivationTemplate activation;
+    private final AbilityTargetingTemplate targeting;
 
     public static AbilityTemplateBuilder builder(String id) {
         return new AbilityTemplateBuilder(id);
@@ -82,6 +84,7 @@ public class AbilityTemplate {
         private ExperienceSourcesTemplate experienceSources = ExperienceSourcesTemplate.builder().build();
         private Multimap<Integer, String> rankModifiers = LinkedHashMultimap.create();
         private AbilityActivationTemplate activation = AbilityActivationTemplate.EMPTY;
+        private AbilityTargetingTemplate targeting = AbilityTargetingTemplate.EMPTY;
 
         public AbilityTemplateBuilder(String id) {
             this.id = id;
@@ -103,6 +106,7 @@ public class AbilityTemplate {
             this.modes = base.getModes();
             this.rankModifiers = base.getRankModifiers();
             this.activation = base.getActivation();
+            this.targeting = base.getTargeting();
         }
 
         public AbilityTemplateBuilder icon(Function3<Player, ItemStack, String, String> icon) {
@@ -189,6 +193,12 @@ public class AbilityTemplate {
             return this;
         }
 
+        public AbilityTemplateBuilder targeting(AbilityTargetingTemplate targeting) {
+            this.targeting = targeting;
+
+            return this;
+        }
+
         public AbilityTemplateBuilder active(AbilityActivationTemplate activation) {
             return activation(activation);
         }
@@ -220,7 +230,7 @@ public class AbilityTemplate {
                         .predicates(new LinkedHashMap<>(activation.getPredicates()))
                         .build();
 
-            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredRank, this.requiredPoints, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers, activation);
+            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredRank, this.requiredPoints, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers, activation, this.targeting);
         }
     }
 }

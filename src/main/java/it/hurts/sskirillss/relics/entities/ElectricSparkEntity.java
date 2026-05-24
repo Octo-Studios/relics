@@ -7,6 +7,7 @@ import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
@@ -95,7 +96,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
     public List<LivingEntity> locateNearestTargets() {
         return EntityUtils.gatherPotentialTargets(this, LivingEntity.class, this.getDistance())
                 .filter(entity -> (lastTarget == null || !lastTarget.getStringUUID().equals(entity.getStringUUID()))
-                        && (!(this.getOwner() instanceof Player player) || !EntityUtils.isAlliedTo(player, entity))
+                        && TargetingUtils.canHarm(this.getOwner(), entity, this.getStack(), "shock")
                         && !this.blacklistedTargets.contains(entity.getStringUUID())
                         && !this.bouncedTargets.contains(entity.getStringUUID()))
                 .collect(Collectors.toList());
@@ -172,7 +173,7 @@ public class ElectricSparkEntity extends ThrowableProjectile implements ITargeta
             var damage = this.getDamage();
             var owner = this.getOwner();
 
-            if (currentTarget.hurt(level.damageSources().thrown(this, owner), damage + (currentTarget.isInLiquid() || currentTarget.isInRain() ? damage * this.getDamageModifier() : 0F))) {
+            if (TargetingUtils.hurtEnemy(currentTarget, level.damageSources().thrown(this, owner), damage + (currentTarget.isInLiquid() || currentTarget.isInRain() ? damage * this.getDamageModifier() : 0F), this.getStack(), "shock")) {
                 this.bouncedTargets.add(currentTarget.getStringUUID());
                 this.lastTarget = currentTarget;
 

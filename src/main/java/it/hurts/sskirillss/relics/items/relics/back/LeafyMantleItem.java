@@ -10,6 +10,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.LeavesBlockEntity;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -21,6 +23,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -94,6 +97,9 @@ public class LeafyMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("revival")
                                 .requiredLevel(5)
                                 .rankModifier(1, "piercing")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("radius")
                                         .initialValue(5D, 10D)
                                         .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 24.97833D)
@@ -416,7 +422,9 @@ public class LeafyMantleItem extends WearableRelicItem {
                     if (diff > 0) {
                         var healAmount = diff;
 
-                        ServerScheduler.schedule(1, () -> entity.heal(healAmount));
+                        ServerScheduler.schedule(1, () -> {
+                            entity.heal(healAmount);
+                        });
                     }
                 }
             }

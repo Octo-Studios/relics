@@ -96,6 +96,10 @@ public class AbilityData {
         return new ResearchData(this);
     }
 
+    public AbilityTargetingData getTargetingData() {
+        return new AbilityTargetingData(this);
+    }
+
     public LockData getLockData() {
         return new LockData(this);
     }

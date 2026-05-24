@@ -11,6 +11,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.ConstellationStarEntity;
 import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.FallingStarEntity;
 import it.hurts.sskirillss.relics.init.*;
@@ -22,6 +24,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -55,6 +58,9 @@ public class MidnightMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("phase")
                                 .modes("full_moon", "new_moon")
                                 .rankModifier(1, "switch")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("attack_damage")
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.50008D)
@@ -119,6 +125,9 @@ public class MidnightMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("invisibility")
                                 .requiredLevel(5)
                                 .rankModifier(3, "strike")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("brightness")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
@@ -159,6 +168,9 @@ public class MidnightMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("constellation")
                                 .requiredLevel(10)
                                 .rankModifier(5, "stun")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("star_chance")
                                         .initialValue(0.1D, 0.2D)
                                         .thresholdValue(0D, 1D)
@@ -224,6 +236,9 @@ public class MidnightMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("starfall")
                                 .requiredLevel(15)
                                 .rankModifier(7, "bounce")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("chance")
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
@@ -504,6 +519,9 @@ public class MidnightMantleItem extends WearableRelicItem {
                 if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode().equals("full_moon"))
                     continue;
 
+                if (!TargetingUtils.canHarm(entity, event.getEntity(), stack, "phase"))
+                    continue;
+
                 var damage = event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("attack_damage").getValue() * relic.getModeEffectiveness(entity, stack);
 
                 event.setAmount((float) (event.getAmount() + damage));
@@ -531,6 +549,9 @@ public class MidnightMantleItem extends WearableRelicItem {
 
                 if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getRankModifierData("strike").isEnabled()
                         || relic.getInvisibilityCooldown(stack) > 0 || !relic.canHideInTheDarkness(entity, stack))
+                    continue;
+
+                if (!TargetingUtils.canHarm(entity, event.getEntity(), stack, "invisibility"))
                     continue;
 
                 var damage = event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatData("damage").getValue();

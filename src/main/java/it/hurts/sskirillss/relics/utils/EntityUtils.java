@@ -318,9 +318,7 @@ public class EntityUtils {
     }
 
     public static boolean isAlliedTo(@Nullable Entity source, @Nullable Entity target) {
-        return (source == null || target == null) || (source.isAlliedTo(target) || target.isAlliedTo(source)) || (target.getUUID().equals(source.getUUID()))
-                || ((target instanceof OwnableEntity ownableTarget && ownableTarget.getOwnerUUID() != null && ownableTarget.getOwnerUUID().equals(source.getUUID()))
-                || (source instanceof OwnableEntity ownableSource && ownableSource.getOwnerUUID() != null && ownableSource.getOwnerUUID().equals(target.getUUID())));
+        return source == null || target == null || TargetingUtils.areAllied(source, target);
     }
 
     public static boolean hurt(LivingEntity entity, DamageSource source, float amount) {

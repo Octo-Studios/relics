@@ -31,6 +31,8 @@ import it.hurts.sskirillss.relics.network.packets.research.PacketManageLink;
 import it.hurts.sskirillss.relics.network.packets.research.PacketResearchHint;
 import it.hurts.sskirillss.relics.network.packets.research.S2CSyncPlayerResearch;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
+import it.hurts.sskirillss.relics.network.packets.targeting.C2SChangeAbilityTargetingOption;
+import it.hurts.sskirillss.relics.network.packets.targeting.S2CSyncPlayerAbilityTargeting;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -68,6 +70,8 @@ public class NetworkHandler {
         registrar.playToServer(C2SChangeSynergyRankModifier.TYPE, C2SChangeSynergyRankModifier.STREAM_CODEC, C2SChangeSynergyRankModifier::handle);
         registrar.playToServer(C2SChangeRelicOptionFlawlessVisual.TYPE, C2SChangeRelicOptionFlawlessVisual.STREAM_CODEC, C2SChangeRelicOptionFlawlessVisual::handle);
         registrar.playToClient(S2CSyncPlayerResearch.TYPE, S2CSyncPlayerResearch.STREAM_CODEC, S2CSyncPlayerResearch::handle);
+        registrar.playToClient(S2CSyncPlayerAbilityTargeting.TYPE, S2CSyncPlayerAbilityTargeting.STREAM_CODEC, S2CSyncPlayerAbilityTargeting::handle);
+        registrar.playToServer(C2SChangeAbilityTargetingOption.TYPE, C2SChangeAbilityTargetingOption.STREAM_CODEC, C2SChangeAbilityTargetingOption::handle);
         registrar.playToServer(C2SActivateAbility.TYPE, C2SActivateAbility.STREAM_CODEC, C2SActivateAbility::handle);
         registrar.playToServer(C2SSwitchSynergyMode.TYPE, C2SSwitchSynergyMode.STREAM_CODEC, C2SSwitchSynergyMode::handle);
 

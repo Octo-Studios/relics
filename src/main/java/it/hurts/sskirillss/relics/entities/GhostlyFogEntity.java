@@ -6,6 +6,9 @@ import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.items.relics.back.GhostlyMantleItem;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -16,6 +19,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -39,6 +43,10 @@ public class GhostlyFogEntity extends Entity {
 
     @Nullable
     private UUID ownerUuid;
+
+    @Getter
+    @Setter
+    private ItemStack stack = ItemStack.EMPTY;
 
     public GhostlyFogEntity(EntityType<? extends GhostlyFogEntity> type, Level level) {
         super(type, level);
@@ -159,12 +167,8 @@ public class GhostlyFogEntity extends Entity {
             LAST_EXPOSURE_TICK.values().removeIf(tick -> tick < gameTime - 200L);
         }
 
-        for (var target : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius), entity -> {
-            if (entity == owner || !entity.isAlive())
-                return false;
-
-            return !(owner instanceof Player player) || !EntityUtils.isAlliedTo(player, entity);
-        })) {
+        for (var target : this.level().getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(radius),
+                entity -> entity != owner && entity.isAlive() && TargetingUtils.canHarm(owner, entity, this.getStack(), "fog"))) {
             target.getPersistentData().putFloat(GhostlyMantleItem.FOG_SUFFOCATION_DAMAGE_TAG, this.getSuffocationDamage());
             target.getPersistentData().putLong(GhostlyMantleItem.FOG_SUFFOCATION_UNTIL_TAG, this.level().getGameTime() + 5L);
 
@@ -172,7 +176,7 @@ public class GhostlyFogEntity extends Entity {
                 target.setAirSupply(Math.max(-20, target.getAirSupply() - this.getAirDrain()));
 
             if (this.getTremorTicks() > 0)
-                target.addEffect(new MobEffectInstance(RelicsMobEffects.TREMOR, this.getTremorTicks(), 0, false, false));
+                TargetingUtils.addHarmfulEffect(target, new MobEffectInstance(RelicsMobEffects.TREMOR, this.getTremorTicks(), 0, false, false), owner, this.getStack(), "fog");
 
             if (target.getAirSupply() <= -20 && this.tickCount % 20 == 0)
                 target.hurt(this.level().damageSources().inWall(), 1F);
@@ -222,6 +226,8 @@ public class GhostlyFogEntity extends Entity {
 
         if (tag.hasUUID("owner"))
             this.ownerUuid = tag.getUUID("owner");
+
+        this.setStack(ItemStack.parseOptional(this.registryAccess(), tag.getCompound("stack")));
     }
 
     @Override
@@ -234,6 +240,8 @@ public class GhostlyFogEntity extends Entity {
 
         if (this.ownerUuid != null)
             tag.putUUID("owner", this.ownerUuid);
+
+        tag.put("stack", this.getStack().saveOptional(this.registryAccess()));
     }
 
     @Override
