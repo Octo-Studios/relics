@@ -1,3 +1,10 @@
 {
-  "parent": "minecraft:item/shield"
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "relics:item/shield_of_retaliation"
+  },
+  "overrides": [
+    { "predicate": { "relics:flawless": 0 }, "model": "relics:item/shield_of_retaliation_non_flawless" },
+    { "predicate": { "relics:flawless": 1 }, "model": "relics:item/shield_of_retaliation_flawless" }
+  ]
 }

@@ -1,0 +1,21 @@
+{
+  "parent": "neoforge:item/default",
+  "base": {
+    "parent": "relics:item/shield_of_retaliation_3d"
+  },
+  "textures": {
+    "particle": "relics:item/shield_of_retaliation"
+  },
+  "loader": "neoforge:separate_transforms",
+  "perspectives": {
+    "ground": {
+      "parent": "relics:item/shield_of_retaliation_2d"
+    },
+    "gui": {
+      "parent": "relics:item/shield_of_retaliation_2d"
+    },
+    "fixed": {
+      "parent": "relics:item/shield_of_retaliation_2d"
+    }
+  }
+}

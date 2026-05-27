@@ -1,0 +1,7 @@
+{
+  "parent": "relics:item/shield_of_retaliation_3d",
+  "textures": {
+    "0": "relics:item/model/shield_of_retaliation_flawless",
+    "particle": "relics:item/model/shield_of_retaliation_flawless"
+  }
+}
