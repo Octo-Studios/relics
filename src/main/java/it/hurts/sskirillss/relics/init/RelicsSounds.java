@@ -35,6 +35,10 @@ public class RelicsSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> LOGO_INFLATE = SOUNDS.register("logo_inflate", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "logo_inflate")));
     public static final DeferredHolder<SoundEvent, SoundEvent> LOGO_EXPLOSION = SOUNDS.register("logo_explosion", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "logo_explosion")));
 
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_OF_RETALIATION_DEFLECT = SOUNDS.register("shield_of_retaliation_deflect", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "shield_of_retaliation_deflect")));
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_OF_RETALIATION_PROJECTILE = SOUNDS.register("shield_of_retaliation_projectile", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "shield_of_retaliation_projectile")));
+    public static final DeferredHolder<SoundEvent, SoundEvent> SHIELD_OF_RETALIATION_RELEASE = SOUNDS.register("shield_of_retaliation_release", () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "shield_of_retaliation_release")));
+
     public static void register(IEventBus bus) {
         SOUNDS.register(bus);
     }

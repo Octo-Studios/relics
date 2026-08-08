@@ -10,6 +10,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.AbilityConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicConditionTemplate;
@@ -31,6 +33,7 @@ import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -68,7 +71,7 @@ public class KineticBeltItem extends WearableRelicItem {
                                 .maxLevelRankModifier(0.1)
                                 .stat(AbilityStatTemplate.builder("amount")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 1D)
+                                        .targetValue(RelicsScalingModels.ADDITIVE.get(), 12D)
                                         .formatValue(value -> (int) (MathUtils.round(value, 0)))
                                         .build())
                                 .research(ResearchTemplate.builder()
@@ -81,21 +84,24 @@ public class KineticBeltItem extends WearableRelicItem {
                                 .rankModifier(3, "strike")
                                 .rankModifier(5, "resistance")
                                 .modes("enabled", "disabled")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("efficiency")
                                         .initialValue(0.25D, 0.35D)
                                         .thresholdValue(0D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0531D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.00048D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2571D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.49963D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("resistance")
                                         .initialValue(0.05D, 0.15D)
                                         .thresholdValue(0D, 0.75D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.75008D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -134,6 +140,9 @@ public class KineticBeltItem extends WearableRelicItem {
                                 .build())
                         .synergy(SynergyTemplate.builder("electricity")
                                 .modes("enabled", "disabled")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(SynergyStatTemplate.builder("damage")
                                         .thresholdValue(1, 5)
                                         .formatValue(value -> value)
@@ -370,6 +379,9 @@ public class KineticBeltItem extends WearableRelicItem {
 
                     if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(source) || relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
                             || !relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getRankModifierData("strike").isEnabled() || !relic.isActive(stack))
+                        continue;
+
+                    if (!TargetingUtils.canHarm(source, event.getEntity(), stack, "gliding"))
                         continue;
 
                     var additional = original * relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getStatData("damage").getValue();

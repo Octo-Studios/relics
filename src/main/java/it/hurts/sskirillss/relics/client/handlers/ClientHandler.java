@@ -9,10 +9,7 @@ import it.hurts.sskirillss.relics.client.gui.layers.*;
 import it.hurts.sskirillss.relics.client.layer.*;
 import it.hurts.sskirillss.relics.client.models.items.*;
 import it.hurts.sskirillss.relics.client.models.layers.WingsLayer;
-import it.hurts.sskirillss.relics.client.post_effects.ChromaticAberrationPostEffect;
-import it.hurts.sskirillss.relics.client.post_effects.DistortionPostEffect;
-import it.hurts.sskirillss.relics.client.post_effects.LensPostEffect;
-import it.hurts.sskirillss.relics.client.post_effects.SevenDeadlySinsPostEffect;
+import it.hurts.sskirillss.relics.client.post_effects.*;
 import it.hurts.sskirillss.relics.client.renderer.entities.*;
 import it.hurts.sskirillss.relics.client.renderer.items.*;
 import it.hurts.sskirillss.relics.client.style.*;
@@ -40,9 +37,10 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterClientTooltipComponentFactoriesEvent;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
+
 import java.util.List;
 
-@EventBusSubscriber(modid = Relics.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
 public class ClientHandler {
     @SubscribeEvent
     public static void setupClient(final FMLClientSetupEvent event) {
@@ -100,6 +98,8 @@ public class ClientHandler {
         RelicsRelicRenderers.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.GLITCHY_MANTLE.get(), GlitchyMantleRenderer::new);
+        RelicsRelicRenderers.register(RelicsItems.GHOSTLY_MANTLE.get(), GhostlyMantleRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.ROLLER_SKATE.get(), RollerSkateRenderer::new);
         RelicsRelicRenderers.register(RelicsItems.SPRINGY_BOOT.get(), SpringyBootRenderer::new);
@@ -127,16 +127,21 @@ public class ClientHandler {
         DescriptionSubcategories.registerSubcategory(SynergyDescriptionDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(AbilityExperienceDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(AbilityStatisticDescriptionSubcategory::new);
+        DescriptionSubcategories.registerSubcategory(AbilityTargetingDescriptionSubcategory::new);
+        DescriptionSubcategories.registerSubcategory(SynergyTargetingDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(RelicDescriptionDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(RelicStatisticDescriptionSubcategory::new);
         DescriptionSubcategories.registerSubcategory(RelicOptionsSubcategory::new);
 
         RelicsRelicStyles.register(RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), RingOfTheSevenDeadlySinsStyle::new);
         RelicsRelicStyles.register(RelicsItems.SPHERE_OF_SELF_SACRIFICE.get(), SphereOfSelfSacrificeStyle::new);
+        RelicsRelicStyles.register(RelicsItems.SHIELD_OF_RETALIATION.get(), ShieldOfRetaliationStyle::new);
         RelicsRelicStyles.register(RelicsItems.EXPERIENCE_DISPERSER.get(), ExperienceDisperserStyle::new);
         RelicsRelicStyles.register(RelicsItems.REFLECTIVE_NECKLACE.get(), ReflectiveNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.JELLYFISH_NECKLACE.get(), JellyfishNecklaceStyle::new);
         RelicsRelicStyles.register(RelicsItems.MIDNIGHT_MANTLE.get(), MidnightMantleStyle::new);
+        RelicsRelicStyles.register(RelicsItems.GHOSTLY_MANTLE.get(), GhostlyMantleStyle::new);
+        RelicsRelicStyles.register(RelicsItems.GLITCHY_MANTLE.get(), GlitchyMantleStyle::new);
         RelicsRelicStyles.register(RelicsItems.CUT_GLASS_BOOT.get(), CutGlassBootStyle::new);
         RelicsRelicStyles.register(RelicsItems.HUNTING_BELT.get(), HuntingBeltStyle::new);
         RelicsRelicStyles.register(RelicsItems.CHORUS_STAFF.get(), ChorusStaffStyle::new);
@@ -151,7 +156,8 @@ public class ClientHandler {
 
         RelicsPostEffects.register(ChromaticAberrationPostEffect::new);
         RelicsPostEffects.register(SevenDeadlySinsPostEffect::new);
-        RelicsPostEffects.register(DistortionPostEffect::new);
+        RelicsPostEffects.register(EntityGlitchPostEffect::new);
+        RelicsPostEffects.register(GlitchPostEffect::new);
         RelicsPostEffects.register(LensPostEffect::new);
 
         RelicsRelicStyles.init();
@@ -163,6 +169,8 @@ public class ClientHandler {
         event.registerLayerDefinition(ReflectiveNecklaceModel.LAYER, ReflectiveNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(JellyfishNecklaceModel.LAYER, JellyfishNecklaceModel::constructLayerDefinition);
         event.registerLayerDefinition(MidnightMantleModel.LAYER, MidnightMantleModel::constructLayerDefinition);
+        event.registerLayerDefinition(GlitchyMantleModel.LAYER, GlitchyMantleModel::constructLayerDefinition);
+        event.registerLayerDefinition(GhostlyMantleModel.LAYER, GhostlyMantleModel::constructLayerDefinition);
         event.registerLayerDefinition(CutGlassBootModel.LAYER, CutGlassBootModel::constructLayerDefinition);
         event.registerLayerDefinition(KineticBeltModel.LAYER, KineticBeltModel::constructLayerDefinition);
         event.registerLayerDefinition(SpringyBootModel.LAYER, SpringyBootModel::constructLayerDefinition);
@@ -209,6 +217,8 @@ public class ClientHandler {
         event.registerEntityRenderer(RelicsEntities.GOLDEN_TOOTH.get(), GoldenToothRenderer::new);
         event.registerEntityRenderer(RelicsEntities.SELF_SACRIFICE_PROJECTILE.get(), NullRenderer::new);
         event.registerEntityRenderer(RelicsEntities.KINETIC_ELECTRICITY.get(), NullRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.GLITCHY_ILLUSION.get(), GlitchyIllusionRenderer::new);
+        event.registerEntityRenderer(RelicsEntities.GHOSTLY_FOG.get(), NullRenderer::new);
     }
 
     @SubscribeEvent
@@ -220,6 +230,7 @@ public class ClientHandler {
     @SubscribeEvent
     public static void onOverlayRegistry(RegisterGuiLayersEvent event) {
         event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "info_tile"), new InfoTileLayer());
+        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "active_abilities"), new ActiveAbilitiesLayer());
         event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "leafy_ring_hide"), new LeafyMantleHideLayer());
 //        event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "phantom_boot_bridge"), new PhantomBootBridgeLayer());
         event.registerBelowAll(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "stun_effect"), new StunEffectLayer());

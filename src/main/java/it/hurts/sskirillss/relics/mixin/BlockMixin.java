@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.mixin;
 
+import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.entities.SpringyBootShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
@@ -12,15 +13,17 @@ import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.WorldUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -28,8 +31,6 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
-import java.util.Random;
-
 @Mixin(Block.class)
 public class BlockMixin {
     @Inject(method = "fallOn", at = @At("HEAD"), cancellable = true)
@@ -102,6 +103,8 @@ public class BlockMixin {
                                 level.playSound(null, livingEntity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.PLAYERS, (float) Math.clamp(0.5F + speed * 0.5F, 0.5F, 2F), (float) Math.max(0.1F, 2F - speed * 0.75F));
 
                                 NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(livingEntity.getId(), motion.multiply(1F, -1F, 1F).toVector3f()), livingEntity);
+
+                                SpringyBootItem.spawnBounceFog(level, livingEntity, Math.max(1.1D, speed * 0.85D), 12 + Mth.ceil(speed * 2.5D));
                             } else {
                                 if (relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("shockwave").isEnabled()) {
                                     var delayTicks = waveIndex * 20;
@@ -111,6 +114,7 @@ public class BlockMixin {
                                     var radius = (int) Math.min(25, Math.round((1 + relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("radius").getValue()) * verticalSpeed));
                                     var damage = (float) relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("damage").getValue();
                                     var stun = (int) relic.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("stun").getValue() * 20;
+                                    var serverLevel = (ServerLevel) level;
 
                                     relic.getRelicData(livingEntity, stack).getLevelingData().addExperience("bounce", "create_shockwave", radius);
 
@@ -131,7 +135,6 @@ public class BlockMixin {
 
                                             ServerScheduler.schedule(finalStep, () -> {
                                                 var height = 0.25F;
-                                                var localRandom = new Random();
 
                                                 poses.stream().filter(pos -> {
                                                     var dx = pos.getX() - center.getX();
@@ -167,18 +170,22 @@ public class BlockMixin {
 
                                                     level.addFreshEntity(shockwave);
 
-                                                    var angle = localRandom.nextFloat() * Math.PI * 2;
-                                                    var rad = (finalStep + 0.5F + (localRandom.nextFloat() - 0.5F) * 0.3F);
+                                                    var px = surfacePos.getX() + 0.15D + level.random.nextDouble() * 0.7D;
+                                                    var pz = surfacePos.getZ() + 0.15D + level.random.nextDouble() * 0.7D;
 
-                                                    var px = (float) (surfacePos.getX() + Math.cos(angle) * rad + 0.5F);
-                                                    var py = surfacePos.getY() + 1.5F + localRandom.nextFloat() * 0.2F;
-                                                    var pz = (float) (surfacePos.getZ() + Math.sin(angle) * rad + 0.5F);
+                                                    var direction = new Vec3(px - (center.getX() + 0.5D), 0D, pz - (center.getZ() + 0.5D));
 
-                                                    var vx = (float) Math.cos(angle) * 0.2F;
-                                                    var vy = 0.025F + localRandom.nextFloat() * 0.05F;
-                                                    var vz = (float) Math.sin(angle) * 0.2F;
+                                                    if (direction.lengthSqr() < 0.001D)
+                                                        direction = new Vec3(level.random.nextDouble() - 0.5D, 0D, level.random.nextDouble() - 0.5D);
 
-                                                    NetworkHandler.sendToClientsTrackingEntity(new S2CSpawnParticle(ParticleTypes.CLOUD, new Vector3f(px, py, pz), new Vector3f(vx, vy, vz)), shockwave);
+                                                    direction = direction.normalize();
+
+                                                    var particleSpeed = 0.008D + level.random.nextDouble() * 0.012D;
+                                                    var lifetime = 10 + level.random.nextInt(25);
+                                                    var fogPosition = new Vector3f((float) px, surfacePos.getY() + 0.04F, (float) pz);
+                                                    var fogMotion = new Vector3f((float) (direction.x * particleSpeed), height / 2F, (float) (direction.z * particleSpeed));
+
+                                                    NetworkHandler.sendToClientsTrackingChunk(new S2CSpawnParticle(new GhostlyFogParticle.Options(lifetime), fogPosition, fogMotion), serverLevel, new ChunkPos(surfacePos));
                                                 });
                                             });
                                         }

@@ -14,6 +14,7 @@
     "PiglinAiMixin",
     "PlayerMixin",
     "ScreenMixin",
+    "compat.lithium.ChunkAwareBlockCollisionSweeperMixin",
     "compat.sophisticatedbackpacks.BackpackItemMixin"
   ],
   "minVersion": "0.8",
@@ -24,6 +25,7 @@
     "ItemInHandRendererMixin",
     "ItemRendererMixin",
     "KeyboardHandlerMixin",
+    "LevelRendererMixin",
     "LivingEntityRendererMixin",
     "MouseHandlerMixin",
     "MultiPlayerGameModeMixin",

@@ -48,6 +48,6 @@ public class SimpleDescriptionScreen extends Screen implements IAutoScaledScreen
 
     @Override
     public int getAutoScale() {
-        return 4;
+        return 0;
     }
 }

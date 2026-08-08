@@ -7,11 +7,14 @@ import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
 import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
+import it.hurts.sskirillss.relics.items.relics.ShieldOfRetaliationItem;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
+import it.hurts.sskirillss.relics.items.relics.back.GhostlyMantleItem;
 import it.hurts.sskirillss.relics.items.relics.feet.CutGlassBootItem;
 import it.hurts.sskirillss.relics.items.relics.ring.RingOfTheSevenDeadlySinsItem;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -34,6 +37,7 @@ public class RelicsDataComponents {
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Map<String, CutGlassBootItem.FluidEntry>>> CUT_GLASS_BOOT_FLUIDS = RelicsDataComponents.construct("cut_glass_boot/fluids", Codec.unboundedMap(Codec.STRING, CutGlassBootItem.FluidEntry.CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> CUT_GLASS_BOOT_SELECTED_FLUID_INDEX = RelicsDataComponents.construct("cut_glass_boot/selected_fluid_index", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> CUT_GLASS_BOOT_SPEED_BLEND = RelicsDataComponents.construct("cut_glass_boot/speed_blend", Codec.FLOAT);
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<RiderFluteItem.HorseSlotData>>> RIDER_FLUTE_SLOTS = RelicsDataComponents.construct("rider_flute/slots", Codec.list(RiderFluteItem.HorseSlotData.CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> RIDER_FLUTE_SELECTED_SLOT_INDEX = RelicsDataComponents.construct("rider_flute/selected_slot_index", Codec.INT);
@@ -54,6 +58,28 @@ public class RelicsDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_PHASE_DURATION = RelicsDataComponents.construct("midnight_mantle/duration", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN = RelicsDataComponents.construct("midnight_mantle/invisibility_cooldown", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> MIDNIGHT_MANTLE_STARFALL_COOLDOWN = RelicsDataComponents.construct("midnight_mantle/starfall_cooldown", Codec.INT);
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GLITCHY_MANTLE_STAND_TICKS = RelicsDataComponents.construct("glitchy_mantle/stand_ticks", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> GLITCHY_MANTLE_FORCED_FALL = RelicsDataComponents.construct("glitchy_mantle/forced_fall", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Double>> GLITCHY_MANTLE_FORCED_FALL_START_Y = RelicsDataComponents.construct("glitchy_mantle/forced_fall_start_y", Codec.DOUBLE);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GLITCHY_MANTLE_PHASE_TICKS = RelicsDataComponents.construct("glitchy_mantle/phase_ticks", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> GLITCHY_MANTLE_LAST_AIR_TICK = RelicsDataComponents.construct("glitchy_mantle/last_air_tick", Codec.LONG);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Long>> GLITCHY_MANTLE_LAST_PHASE_TICK = RelicsDataComponents.construct("glitchy_mantle/last_phase_tick", Codec.LONG);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Vec3>> GLITCHY_MANTLE_LAST_SAFE_POS = RelicsDataComponents.construct("glitchy_mantle/last_safe_pos", Vec3.CODEC);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GLITCHY_MANTLE_ILLUSION_COOLDOWN = RelicsDataComponents.construct("glitchy_mantle/illusion_cooldown", Codec.INT);
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Vec3>> GHOSTLY_MANTLE_LAST_FOG_POS = RelicsDataComponents.construct("ghostly_mantle/last_fog_pos", Vec3.CODEC);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Map<String, GhostlyMantleItem.GazeChargeData>>> GHOSTLY_MANTLE_GAZE_CHARGES = RelicsDataComponents.construct("ghostly_mantle/gaze_charges", Codec.unboundedMap(Codec.STRING, GhostlyMantleItem.GazeChargeData.CODEC));
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> GHOSTLY_MANTLE_ESCAPE_COOLDOWN = RelicsDataComponents.construct("ghostly_mantle/escape_cooldown", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Map<String, Double>>> GHOSTLY_MANTLE_REPRISAL_MARKS = RelicsDataComponents.construct("ghostly_mantle/reprisal_marks", Codec.unboundedMap(Codec.STRING, Codec.DOUBLE));
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SHIELD_OF_RETALIATION_PARRY_TICKS = RelicsDataComponents.construct("shield_of_retaliation/parry_ticks", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SHIELD_OF_RETALIATION_PARRY_DURATION = RelicsDataComponents.construct("shield_of_retaliation/parry_duration", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SHIELD_OF_RETALIATION_PARRY_SUCCEEDED = RelicsDataComponents.construct("shield_of_retaliation/parry_succeeded", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SHIELD_OF_RETALIATION_MISSED = RelicsDataComponents.construct("shield_of_retaliation/missed", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> SHIELD_OF_RETALIATION_MISSED_TICKS = RelicsDataComponents.construct("shield_of_retaliation/missed_ticks", Codec.INT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Boolean>> SHIELD_OF_RETALIATION_RELEASE_LOCKED = RelicsDataComponents.construct("shield_of_retaliation/release_locked", Codec.BOOL);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<ShieldOfRetaliationItem.CapturedProjectileData>>> SHIELD_OF_RETALIATION_CAPTURED_PROJECTILES = RelicsDataComponents.construct("shield_of_retaliation/captured_projectiles", Codec.list(ShieldOfRetaliationItem.CapturedProjectileData.CODEC));
 
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROLLER_SKATE_DURATION = RelicsDataComponents.construct("roller_skate/duration", Codec.INT);
 

@@ -142,8 +142,28 @@ public class AbilityStatData {
 
         var threshold = template.getThresholdValue();
 
-        return MathUtils.round(Mth.clamp(template.getUpgradeModifier().getScalingModel()
-                .evaluate(this.getAbilityData().getAbilitiesData().getRelicData().getEntity(), this.getAbilityData().getAbilitiesData().getRelicData().getStack(), value, template.getUpgradeModifier().getModifier(), points), threshold.getMinValue(), threshold.getMaxValue()), 5);
+        var targetValue = template.getTargetValue();
+        var relicData = this.getAbilityData().getAbilitiesData().getRelicData();
+        var entity = relicData.getEntity();
+        var stack = relicData.getStack();
+        var baseValue = template.getInitialValue().getMaxValue();
+        var maxPoints = calculateMaxTargetPoints();
+        var modifier = targetValue.getScalingModel().calculateModifier(entity, stack, baseValue, targetValue.getTargetValue(), maxPoints);
+
+        return MathUtils.round(Mth.clamp(targetValue.getScalingModel()
+                .evaluate(entity, stack, value, modifier, points), threshold.getMinValue(), threshold.getMaxValue()), 5);
+    }
+
+    private int calculateMaxTargetPoints() {
+        var relicData = this.getAbilityData().getAbilitiesData().getRelicData();
+        var levelingData = relicData.getLevelingData();
+        var abilityTemplate = this.getAbilityData().getTemplate();
+        var maxLevel = abilityTemplate.getInitialMaxLevel();
+
+        for (var rank = levelingData.getRank(); rank < relicData.getTemplate().getLeveling().getMaxRank(); rank++)
+            maxLevel += (int) Math.ceil(maxLevel * abilityTemplate.getMaxLevelRankModifier());
+
+        return maxLevel;
     }
 
     public double getValueFromQuality(int quality) {

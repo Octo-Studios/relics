@@ -9,6 +9,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.GoldenToothEntity;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
@@ -22,6 +24,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -65,12 +68,12 @@ public class PiglinMaskItem extends WearableRelicItem {
                                 .rankModifier(3, "pocket")
                                 .stat(AbilityStatTemplate.builder("trades")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.25D)
+                                        .targetValue(RelicsScalingModels.ADDITIVE.get(), 11.75D)
                                         .formatValue(Double::intValue)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("items_count")
                                         .initialValue(1D, 4D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.4286D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 64.004D)
                                         .formatValue(Double::intValue)
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -96,29 +99,32 @@ public class PiglinMaskItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("looting")
                                 .requiredLevel(5)
                                 .rankModifier(5, "frenzy")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("chance")
                                         .initialValue(0.1D, 0.15D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.75008D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("health")
                                         .initialValue(10D, 7.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.019D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5125D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 5.5811D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 29.99998D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("attack_damage")
                                         .initialValue(0.005D, 0.01D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0571D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.02999D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("attack_speed")
                                         .initialValue(0.005D, 0.01D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1714D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.06999D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -328,6 +334,9 @@ public class PiglinMaskItem extends WearableRelicItem {
                 var relic = (PiglinMaskItem) stack.getItem();
 
                 if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getRankModifierData("frenzy").isEnabled())
+                    continue;
+
+                if (!TargetingUtils.canHarm(source, event.getEntity(), stack, "looting"))
                     continue;
 
                 var stacks = relic.getStacks(stack);

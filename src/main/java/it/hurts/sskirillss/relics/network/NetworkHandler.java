@@ -11,6 +11,8 @@ import it.hurts.sskirillss.relics.network.packets.capability.CapabilitySyncPacke
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityMode;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityRankModifier;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
+import it.hurts.sskirillss.relics.network.packets.abilities.C2SActivateAbility;
+import it.hurts.sskirillss.relics.network.packets.abilities.C2SSwitchSynergyMode;
 import it.hurts.sskirillss.relics.network.packets.description.relic.C2SChangeRelicOptionFlawlessVisual;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyMode;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyRankModifier;
@@ -20,6 +22,7 @@ import it.hurts.sskirillss.relics.network.packets.item.rider_flute.C2SCycleRider
 import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive;
 import it.hurts.sskirillss.relics.network.packets.item.ring_of_the_seven_deadly_sins.C2SHurtPlayer;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
+import it.hurts.sskirillss.relics.network.packets.item.shield_of_retaliation.C2SShieldOfRetaliationRelease;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.network.packets.leveling.FixLevelingPoints;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
@@ -28,6 +31,8 @@ import it.hurts.sskirillss.relics.network.packets.research.PacketManageLink;
 import it.hurts.sskirillss.relics.network.packets.research.PacketResearchHint;
 import it.hurts.sskirillss.relics.network.packets.research.S2CSyncPlayerResearch;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
+import it.hurts.sskirillss.relics.network.packets.targeting.C2SChangeAbilityTargetingOption;
+import it.hurts.sskirillss.relics.network.packets.targeting.S2CSyncPlayerAbilityTargeting;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -65,6 +70,10 @@ public class NetworkHandler {
         registrar.playToServer(C2SChangeSynergyRankModifier.TYPE, C2SChangeSynergyRankModifier.STREAM_CODEC, C2SChangeSynergyRankModifier::handle);
         registrar.playToServer(C2SChangeRelicOptionFlawlessVisual.TYPE, C2SChangeRelicOptionFlawlessVisual.STREAM_CODEC, C2SChangeRelicOptionFlawlessVisual::handle);
         registrar.playToClient(S2CSyncPlayerResearch.TYPE, S2CSyncPlayerResearch.STREAM_CODEC, S2CSyncPlayerResearch::handle);
+        registrar.playToClient(S2CSyncPlayerAbilityTargeting.TYPE, S2CSyncPlayerAbilityTargeting.STREAM_CODEC, S2CSyncPlayerAbilityTargeting::handle);
+        registrar.playToServer(C2SChangeAbilityTargetingOption.TYPE, C2SChangeAbilityTargetingOption.STREAM_CODEC, C2SChangeAbilityTargetingOption::handle);
+        registrar.playToServer(C2SActivateAbility.TYPE, C2SActivateAbility.STREAM_CODEC, C2SActivateAbility::handle);
+        registrar.playToServer(C2SSwitchSynergyMode.TYPE, C2SSwitchSynergyMode.STREAM_CODEC, C2SSwitchSynergyMode::handle);
 
         // === KINETIC BELT ===
         registrar.playToServer(C2SSetActive.TYPE, C2SSetActive.STREAM_CODEC, C2SSetActive::handle);
@@ -86,6 +95,9 @@ public class NetworkHandler {
 
         // === JELLYFISH NECKLACE ===
         registrar.playToServer(C2SChainedElectricityPacket.TYPE, C2SChainedElectricityPacket.STREAM_CODEC, C2SChainedElectricityPacket::handle);
+
+        // === SHIELD OF RETALIATION ===
+        registrar.playToServer(C2SShieldOfRetaliationRelease.TYPE, C2SShieldOfRetaliationRelease.STREAM_CODEC, C2SShieldOfRetaliationRelease::handle);
 
         registrar.playToClient(ChromaticAberrationPacket.TYPE, ChromaticAberrationPacket.STREAM_CODEC, ChromaticAberrationPacket::handle);
         registrar.playToClient(ShakePacket.TYPE, ShakePacket.STREAM_CODEC, ShakePacket::handle);

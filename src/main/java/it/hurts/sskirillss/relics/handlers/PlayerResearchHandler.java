@@ -30,10 +30,24 @@ public class PlayerResearchHandler {
             PlayerResearchHandler.sync(player);
     }
 
+    @SubscribeEvent
+    public static void onPlayerStartedTracking(PlayerEvent.StartTracking event) {
+        if (event.getTarget() instanceof ServerPlayer tracked && event.getEntity() instanceof ServerPlayer tracker)
+            PlayerResearchHandler.syncTo(tracked, tracker);
+    }
+
     public static void sync(ServerPlayer player) {
         var component = player.getData(RelicsAttachments.PLAYER_RESEARCH);
+        var packet = new S2CSyncPlayerResearch(player.getId(), component.getResearch());
 
-        NetworkHandler.sendToClient(new S2CSyncPlayerResearch(component.getResearch()), player);
+        NetworkHandler.sendToClient(packet, player);
+        NetworkHandler.sendToClientsTrackingEntity(packet, player);
+    }
+
+    public static void syncTo(ServerPlayer player, ServerPlayer target) {
+        var component = player.getData(RelicsAttachments.PLAYER_RESEARCH);
+
+        NetworkHandler.sendToClient(new S2CSyncPlayerResearch(player.getId(), component.getResearch()), target);
     }
 
     public static void set(ServerPlayer player, PlayerResearchComponent component) {

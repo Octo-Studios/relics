@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.client.screen.base.IScrollableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RelicIntroScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import lombok.Getter;
@@ -48,6 +49,7 @@ public abstract class DescriptionContainerWidget extends AbstractDescriptionWidg
     public ScrollbarWidget getScrollbar() {
         return this.getScreen().children().stream()
                 .filter(ScrollbarWidget.class::isInstance)
+                .filter(entry -> !(entry instanceof RelicIntroScrollbarWidget))
                 .map(ScrollbarWidget.class::cast)
                 .findFirst()
                 .orElse(null);

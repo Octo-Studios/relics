@@ -11,6 +11,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.SelfSacrificeProjectileEntity;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
@@ -24,6 +26,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -56,12 +59,12 @@ public class SphereOfSelfSacrifice extends RelicItem {
                                 .initialMaxLevel(10)
                                 .stat(AbilityStatTemplate.builder("stacks")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 2.2324D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 9.99985D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("resistance")
                                         .initialValue(0.01D, 0.025D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0286D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.05003D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -102,6 +105,9 @@ public class SphereOfSelfSacrifice extends RelicItem {
                                 .research(ResearchTemplate.builder()
                                         .star(0, 19, 9).star(1, 2, 9).star(2, 11, 27).star(3, 11, 19).star(4, 11, 12).star(5, 5, 16).star(6, 16, 16)
                                         .link(1, 5).link(5, 3).link(3, 6).link(6, 0).link(4, 3).link(3, 2)
+                                        .build())
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
                                         .build())
                                 .build())
                         .build())

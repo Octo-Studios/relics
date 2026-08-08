@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.feet;
 
+import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -9,6 +10,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
@@ -17,19 +20,27 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
+import it.hurts.sskirillss.relics.utils.WorldUtils;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
 import net.neoforged.neoforge.event.entity.living.LivingEvent;
+import org.joml.Vector3f;
 import top.theillusivec4.curios.api.SlotContext;
 
 public class SpringyBootItem extends WearableRelicItem {
@@ -43,27 +54,27 @@ public class SpringyBootItem extends WearableRelicItem {
                                 .rankModifier(5, "shockwave")
                                 .stat(AbilityStatTemplate.builder("power")
                                         .initialValue(0.5D, 0.75D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.3488D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 1.99993D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage_modifier")
                                         .initialValue(0.05D, 0.15D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0667D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.50017D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("radius")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.9534D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 10.00005D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30.0075D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2571D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 4.99925D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -114,6 +125,9 @@ public class SpringyBootItem extends WearableRelicItem {
                                         .star(0, 6, 11).star(1, 16, 13).star(2, 11, 22).star(3, 20, 23).star(4, 2, 24).star(5, 6, 29).star(6, 18, 29)
                                         .link(5, 4).link(4, 2).link(2, 3).link(3, 6).link(2, 0).link(2, 1)
                                         .build())
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .build())
                         .build())
                 .leveling(LevelingTemplate.builder()
@@ -156,6 +170,42 @@ public class SpringyBootItem extends WearableRelicItem {
 
     public void addLeaps(ItemStack stack, int leaps) {
         this.setLeaps(stack, this.getLeaps(stack) + leaps);
+    }
+
+    public static void spawnBounceFog(Level level, LivingEntity entity, double radius, int particleCount) {
+        if (level.isClientSide() || !(level instanceof ServerLevel serverLevel))
+            return;
+
+        var random = level.getRandom();
+        var center = entity.blockPosition();
+        var maxOffset = 4;
+
+        for (var i = 0; i < particleCount; i++) {
+            var angle = random.nextDouble() * Mth.TWO_PI;
+            var distance = Math.sqrt(random.nextDouble()) * radius;
+            var x = entity.getX() + Math.cos(angle) * distance;
+            var z = entity.getZ() + Math.sin(angle) * distance;
+            var groundY = WorldUtils.findSurfaceY(level, Mth.floor(x), Mth.floor(z), center.getY(), maxOffset);
+            var minAllowedY = Math.max(level.getMinBuildHeight(), center.getY() - maxOffset);
+            var maxAllowedY = Math.min(level.getMaxBuildHeight(), center.getY() + maxOffset);
+
+            if (groundY < minAllowedY || groundY > maxAllowedY)
+                continue;
+
+            var direction = new Vec3(x - entity.getX(), 0D, z - entity.getZ());
+
+            if (direction.lengthSqr() < 0.001D)
+                direction = new Vec3(random.nextDouble() - 0.5D, 0D, random.nextDouble() - 0.5D);
+
+            direction = direction.normalize();
+
+            var speed = 0.008D + random.nextDouble() * 0.012D;
+            var lifetime = 10 + random.nextInt(30);
+            var fogPosition = new Vector3f((float) x, groundY + 0.04F, (float) z);
+            var fogMotion = new Vector3f((float) (direction.x * speed), 0.08F + random.nextFloat() * 0.08F, (float) (direction.z * speed));
+
+            NetworkHandler.sendToClientsTrackingChunk(new S2CSpawnParticle(new GhostlyFogParticle.Options(lifetime), fogPosition, fogMotion), serverLevel, new ChunkPos(Mth.floor(x) >> 4, Mth.floor(z) >> 4));
+        }
     }
 
     @Override
@@ -225,6 +275,8 @@ public class SpringyBootItem extends WearableRelicItem {
 
                 NetworkHandler.sendToClientsTrackingEntityAndSelf(new S2CBounceFromSurface(entity.getId(), motion.toVector3f()), entity);
 
+                SpringyBootItem.spawnBounceFog(level, entity, Math.max(1.1D, power * 0.85D), 12 + Mth.ceil(power * 5D));
+
                 level.playSound(null, entity.blockPosition(), RelicsSounds.SPRING_BOING.get(), SoundSource.MASTER, 5F, 0.5F);
             }
         }
@@ -241,6 +293,9 @@ public class SpringyBootItem extends WearableRelicItem {
                 var relic = (SpringyBootItem) stack.getItem();
 
                 if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").canPlayerUse(entity) || !relic.isLeaped(stack) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("strike").isEnabled())
+                    continue;
+
+                if (!TargetingUtils.canHarm(entity, event.getEntity(), stack, "bounce"))
                     continue;
 
                 var leaps = relic.getLeaps(stack);

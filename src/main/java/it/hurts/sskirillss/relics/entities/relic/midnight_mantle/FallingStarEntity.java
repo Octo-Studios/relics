@@ -1,9 +1,10 @@
 package it.hurts.sskirillss.relics.entities.relic.midnight_mantle;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
+import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.dev.shake.Shake;
 import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
-import it.hurts.sskirillss.relics.entities.MidnightMantleShockwaveBlockEntity;
+import it.hurts.sskirillss.relics.entities.FallingStarShockwaveBlockEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
@@ -20,12 +21,14 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -119,7 +122,10 @@ public class FallingStarEntity extends ThrowableProjectile {
 
         if (level.isClientSide())
             return;
+
+        var serverLevel = (ServerLevel) level;
         var position = this.position();
+        var radius = Math.max(this.getRadius() - this.bounces, 1);
 
         var ringParticleCount = 250 + random.nextInt(250);
 
@@ -167,8 +173,6 @@ public class FallingStarEntity extends ThrowableProjectile {
         if (this.noPhysics || !level.getBlockState(center).blocksMotion())
             return;
 
-        var radius = Math.max(this.getRadius() - this.bounces, 1);
-
         var poses = new ArrayList<BlockPos>();
 
         for (var i = -radius; i <= radius; i++) {
@@ -205,7 +209,7 @@ public class FallingStarEntity extends ThrowableProjectile {
 
                     var surfacePos = new BlockPos(entryPos.getX(), groundY, entryPos.getZ());
 
-                    var shockwave = new MidnightMantleShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
+                    var shockwave = new FallingStarShockwaveBlockEntity(RelicsEntities.SHOCKWAVE_BLOCK.get(), level);
 
                     shockwave.setPos(surfacePos.getX() + 0.5F, surfacePos.getY(), surfacePos.getZ() + 0.5F);
                     shockwave.setBlockState(level.getBlockState(surfacePos));
@@ -218,6 +222,23 @@ public class FallingStarEntity extends ThrowableProjectile {
                     shockwave.setKnockback(0.75F);
 
                     level.addFreshEntity(shockwave);
+
+                    var px = surfacePos.getX() + 0.15D + random.nextDouble() * 0.7D;
+                    var pz = surfacePos.getZ() + 0.15D + random.nextDouble() * 0.7D;
+
+                    var direction = new Vec3(px - (center.getX() + 0.5D), 0D, pz - (center.getZ() + 0.5D));
+
+                    if (direction.lengthSqr() < 0.001D)
+                        direction = new Vec3(random.nextDouble() - 0.5D, 0D, random.nextDouble() - 0.5D);
+
+                    direction = direction.normalize();
+
+                    var speed = 0.008D + random.nextDouble() * 0.012D;
+                    var lifetime = 10 + random.nextInt(25);
+                    var fogPosition = new Vector3f((float) px, surfacePos.getY() + 0.04F, (float) pz);
+                    var fogMotion = new Vector3f((float) (direction.x * speed), height / 2F, (float) (direction.z * speed));
+
+                    NetworkHandler.sendToClientsTrackingChunk(new S2CSpawnParticle(new GhostlyFogParticle.Options(lifetime), fogPosition, fogMotion), serverLevel, new ChunkPos(surfacePos));
                 });
             });
         }

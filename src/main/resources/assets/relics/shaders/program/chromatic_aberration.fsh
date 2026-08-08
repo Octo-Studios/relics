@@ -33,5 +33,5 @@ void main() {
     float mask = smoothstep(0.0, 1.0, dist);
     vec4 result = base + fringe * mask;
 
-    fragColor = clamp(result, 0.0, 1.0);
+    fragColor = vec4(clamp(result.rgb, 0.0, 1.0), 1.0);
 }

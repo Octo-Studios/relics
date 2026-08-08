@@ -11,6 +11,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.ElectricSparkEntity;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
@@ -21,6 +23,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -53,12 +56,12 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                                 .rankModifier(3, "retention")
                                 .stat(AbilityStatTemplate.builder("max_health")
                                         .initialValue(0.1D, 0.2D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.3628D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 1.5001D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("regeneration")
                                         .initialValue(0.15D, 0.35D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.4604D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 1.99985D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -83,53 +86,53 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                                 .stat(AbilityStatTemplate.builder("cooldown")
                                         .initialValue(120D, 60D)
                                         .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), -13.9528D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 9.99988D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("rings")
                                         .initialValue(1D, 2D)
                                         .thresholdValue(0, Double.MAX_VALUE)
-                                        .upgradeModifier(RelicsScalingModels.ADDITIVE.get(), 0.2286D)
+                                        .targetValue(RelicsScalingModels.ADDITIVE.get(), 10.001D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("radius")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.RADICAL.get(), 0.7606D)
+                                        .targetValue(RelicsScalingModels.RADICAL.get(), 4.99977D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("knockback")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.0471D)
+                                        .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 2.50355D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("paralysis")
                                         .initialValue(1D, 2.5D)
-                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.0404D)
+                                        .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 9.9989D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("distance")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 4.1858D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 19.99989D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("bounces")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.2095D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 24.9975D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 4.1858D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 19.99989D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage_modifier")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.0680D)
+                                        .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 4.99993D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
                                         .initialValue(2.5D, 5D)
-                                        .upgradeModifier(RelicsScalingModels.RADICAL.get(), 4.2258D)
+                                        .targetValue(RelicsScalingModels.RADICAL.get(), 30.00017D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -174,6 +177,9 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                                 .research(ResearchTemplate.builder()
                                         .star(0, 11, 4).star(1, 4, 11).star(2, 11, 11).star(3, 18, 11).star(4, 11, 18).star(5, 6, 21).star(6, 16, 21).star(7, 5, 24).star(8, 17, 24).star(9, 4, 27).star(10, 18, 27).star(11, 8, 29).star(12, 14, 29)
                                         .link(4, 12).link(12, 11).link(11, 4).link(5, 6).link(7, 8).link(9, 10).link(0, 3).link(3, 4).link(4, 1).link(1, 0).link(0, 2).link(2, 4).link(1, 2).link(2, 3)
+                                        .build())
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
                                         .build())
                                 .build())
                         .build())
@@ -353,7 +359,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             Predicate<LivingEntity> predicate = entry -> {
                 var uuid = entry.getStringUUID();
 
-                return !uuid.equals(entity.getStringUUID()) && !affectedEntities.contains(uuid);
+                return !uuid.equals(entity.getStringUUID()) && !affectedEntities.contains(uuid) && TargetingUtils.canHarm(entity, entry, stack, "shock");
             };
 
             var collidedEntities = level.getEntitiesOfClass(LivingEntity.class, entity.getBoundingBox().inflate(0.5F), predicate);
@@ -363,7 +369,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                     var diff = target.position().add(0, target.getBbHeight() / 2D, 0).subtract(entity.position());
                     var totalKnockback = 0.5D * knockback;
 
-                    target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, true));
+                    TargetingUtils.addHarmfulEffect(target, new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, true), entity, stack, "shock");
 
                     if (!level.isClientSide())
                         this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatisticData().getMetricData("rings_paralysis").addValue(paralysis);
@@ -505,10 +511,12 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                 for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {
                     var relic = (JellyfishNecklaceItem) stack.getItem();
 
-                    if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration").canPlayerUse(entity))
+                    var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration");
+
+                    if (!abilityData.canPlayerUse(entity))
                         continue;
 
-                    var health = Math.min(entity.getMaxHealth(), event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration").getStatData("regeneration").getValue());
+                    var health = Math.min(entity.getMaxHealth(), event.getAmount() * abilityData.getStatData("regeneration").getValue());
 
                     event.setAmount((float) (event.getAmount() + health));
 

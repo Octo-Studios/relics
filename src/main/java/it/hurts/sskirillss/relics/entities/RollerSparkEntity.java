@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.items.relics.feet.RollerSkateItem;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
@@ -92,14 +93,15 @@ public class RollerSparkEntity extends ThrowableProjectile {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        if (!(result.getEntity() instanceof LivingEntity entity) || (!(this.getOwner() instanceof LivingEntity owner) || entity.getStringUUID().equals(owner.getStringUUID())))
+        if (!(result.getEntity() instanceof LivingEntity entity) || (!(this.getOwner() instanceof LivingEntity owner) || entity.getStringUUID().equals(owner.getStringUUID()))
+                || !TargetingUtils.canHarm(owner, entity, this.getStack(), "skating"))
             return;
 
         entity.invulnerableTime = 0;
 
         var damage = this.getDamage();
 
-        if (entity.hurt(this.level().damageSources().thrown(owner, this), this.getDamage())) {
+        if (TargetingUtils.hurtEnemy(entity, this.level().damageSources().thrown(owner, this), this.getDamage(), this.getStack(), "skating")) {
             var ignite = this.getIgnite();
             var toApply = (int) (ignite * 20);
             var current = entity.getRemainingFireTicks();

@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.api.relics;
 
 import it.hurts.sskirillss.relics.api.relics.data.RelicData;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationContext;
 import it.hurts.sskirillss.relics.config.data.RelicConfigData;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
@@ -28,6 +29,10 @@ public interface IRelicItem extends IRelicTemplateHolder {
 
     default RelicData getRelicData(@Nullable LivingEntity entity, ItemStack stack) {
         return new RelicData(this, entity, stack);
+    }
+
+    default void activateAbility(AbilityActivationContext context) {
+
     }
 
     // TODO: Replace with relative integration

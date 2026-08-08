@@ -43,7 +43,7 @@ public final class RelicStackingUtils {
         var template = abilityData.getTemplate();
         var statTemplate = template == null ? null : template.getStats().get(stat);
 
-        return statTemplate != null && statTemplate.getUpgradeModifier().getModifier() < 0;
+        return statTemplate != null && statTemplate.getTargetValue().getTargetValue() < statTemplate.getInitialValue().getMaxValue();
     }
 
     private static List<AbilityData> getActiveAbilityData(LivingEntity entity, ItemStack stack, String ability, Predicate<AbilityData> predicate) {

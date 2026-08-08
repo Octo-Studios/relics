@@ -4,6 +4,7 @@ import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -130,7 +131,10 @@ public class ConstellationStarEntity extends ThrowableProjectile {
 
         if (this.isStuck()) {
             if (!level.isClientSide()) {
-                if (!level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox(), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID())).isEmpty())
+                var owner = this.getOwner();
+
+                if (owner instanceof LivingEntity livingOwner && !level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox(),
+                        entity -> entity != livingOwner && TargetingUtils.canHarm(livingOwner, entity, this.getStack(), "constellation")).isEmpty())
                     this.discard();
 
                 if (this.tickCount % 5 == 0 && this.tickCount >= this.getLifetime() * 20 && random.nextInt(20) == 0)
@@ -261,15 +265,18 @@ public class ConstellationStarEntity extends ThrowableProjectile {
                 );
 
                 var crossed = false;
+                var owner = this.getOwner();
 
-                for (var entity : level.getEntitiesOfClass(LivingEntity.class, segmentBox, entity -> entity != this.getOwner())) {
+                for (var entity : level.getEntitiesOfClass(LivingEntity.class, segmentBox,
+                        entity -> owner instanceof LivingEntity livingOwner && entity != livingOwner && TargetingUtils.canHarm(livingOwner, entity, this.getStack(), "constellation"))) {
                     if (entity.getBoundingBox().clip(a, b).isPresent()) {
                         crossed = true;
 
-                        entity.addEffect(new MobEffectInstance(RelicsMobEffects.TREMOR, (int) (this.getTremor() * 20), 0));
+                        if (!level.isClientSide() && owner instanceof LivingEntity livingOwner)
+                            TargetingUtils.addHarmfulEffect(entity, new MobEffectInstance(RelicsMobEffects.TREMOR, (int) (this.getTremor() * 20), 0), livingOwner, this.getStack(), "constellation");
 
-                        if (entity.tickCount % 20 == 0 && stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner)
-                            relic.getRelicData(owner, stack).getLevelingData().addExperience("constellation", "star_tremor", 1);
+                        if (!level.isClientSide() && entity.tickCount % 20 == 0 && stack.getItem() instanceof MidnightMantleItem relic && owner instanceof LivingEntity livingOwner)
+                            relic.getRelicData(livingOwner, stack).getLevelingData().addExperience("constellation", "star_tremor", 1);
                     }
                 }
 
@@ -353,12 +360,6 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         if (this.level().isClientSide())
             return false;
 
-        var owner = this.getOwner();
-        var attacker = source.getEntity();
-
-        if (owner != null && attacker != null && owner.getStringUUID().equals(attacker.getStringUUID()))
-            return false;
-
         this.playSound(SoundEvents.SHULKER_BULLET_HURT, 1F, 1F);
 
         this.discard();
@@ -374,15 +375,17 @@ public class ConstellationStarEntity extends ThrowableProjectile {
         var random = level.getRandom();
         var position = this.position();
 
-        for (var target : level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(this.getExplosionRadius()), entity -> this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID()))) {
+        for (var target : level.getEntitiesOfClass(LivingEntity.class, this.getBoundingBox().inflate(this.getExplosionRadius()),
+                entity -> (this.getOwner() == null || !this.getOwner().getStringUUID().equals(entity.getStringUUID()))
+                        && TargetingUtils.canHarm(this.getOwner(), entity, this.getStack(), "constellation"))) {
             target.invulnerableTime = 0;
 
             var damage = this.getDamage();
 
-            if (target.hurt(this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), damage)) {
+            if (TargetingUtils.hurtEnemy(target, this.level().damageSources().thrown(this.getOwner() instanceof LivingEntity owner ? owner : this, this), damage, this.getStack(), "constellation")) {
                 var stun = this.getStun();
 
-                target.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (stun * 20), 0));
+                TargetingUtils.addHarmfulEffect(target, new MobEffectInstance(RelicsMobEffects.STUN, (int) (stun * 20), 0), this.getOwner(), this.getStack(), "constellation");
 
                 if (stack.getItem() instanceof MidnightMantleItem relic && this.getOwner() instanceof LivingEntity owner) {
                     relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("constellation").getStatisticData().getMetricData("star_damage").addValue(damage);

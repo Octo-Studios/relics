@@ -12,6 +12,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
@@ -46,29 +48,32 @@ public class RollerSkateItem extends WearableRelicItem {
                                 .rankModifier(1, "step_height")
                                 .rankModifier(3, "resistance")
                                 .rankModifier(5, "sparkling")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("speed")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.6279D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 2.50009D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("step_height")
                                         .initialValue(0.6D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0571D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.9985D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("resistance")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0857D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.99988D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(1D, 2.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.0857D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 9.99875D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("ignite")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10.001D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()

@@ -71,7 +71,7 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
             var texWidth = 16;
             var patternHeight = 21;
 
-            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/bookmarks/" + this.getId() + ".png"), poseStack)
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/bookmarks/" + this.getTextureId() + ".png"), poseStack)
                     .texOff(0, (int) (Math.floor(this.getAnimationSegments() * animationProgress) * patternHeight))
                     .patternSize(texWidth, patternHeight)
                     .anchor(SpriteAnchor.BOTTOM_CENTER)
@@ -169,11 +169,15 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
     }
 
     private int getAnimationSegments() {
-        Minecraft.getInstance().getTextureManager().getTexture(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/bookmarks/" + this.getId() + ".png")).bind();
+        Minecraft.getInstance().getTextureManager().getTexture(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/bookmarks/" + this.getTextureId() + ".png")).bind();
 
         var texHeight = GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
         var patternHeight = 21;
 
         return (texHeight / patternHeight) - 1;
+    }
+
+    private String getTextureId() {
+        return this.getId().equals("ability_targeting") || this.getId().equals("synergy_targeting") ? "options" : this.getId();
     }
 }

@@ -15,9 +15,11 @@ public class RelicsHotkeys {
     private static final String CATEGORY = "Relics";
 
     public static final KeyMapping RESEARCH_RELIC = new KeyMapping("key.relics.research_relic", GLFW_KEY_LEFT_SHIFT, CATEGORY);
+    public static final KeyMapping ACTIVE_ABILITIES_LIST = new KeyMapping("key.relics.active_abilities_list", GLFW_KEY_LEFT_ALT, CATEGORY);
 
     @SubscribeEvent
     public static void onKeybindingRegistry(RegisterKeyMappingsEvent event) {
         event.register(RESEARCH_RELIC);
+        event.register(ACTIVE_ABILITIES_LIST);
     }
 }

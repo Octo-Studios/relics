@@ -17,8 +17,10 @@ public class RelicsMobEffects {
     public static final DeferredHolder<MobEffect, MobEffect> VANISHING = EFFECTS.register("vanishing", VanishingEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> ANTI_HEAL = EFFECTS.register("anti_heal", AntiHealEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> BLEEDING = EFFECTS.register("bleeding", BleedingEffect::new);
-    public static final DeferredHolder<MobEffect, MobEffect> STUN = EFFECTS.register("stun", StunEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> GLITCH = EFFECTS.register("glitch", GlitchEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> FLIGHT = EFFECTS.register("flight", FlightEffect::new);
     public static final DeferredHolder<MobEffect, MobEffect> TREMOR = EFFECTS.register("tremor", StunEffect::new);
+    public static final DeferredHolder<MobEffect, MobEffect> STUN = EFFECTS.register("stun", StunEffect::new);
 
     public static void register(IEventBus bus) {
         EFFECTS.register(bus);

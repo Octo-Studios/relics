@@ -10,6 +10,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.LeavesBlockEntity;
 import it.hurts.sskirillss.relics.init.*;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -21,6 +23,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -58,18 +61,18 @@ public class LeafyMantleItem extends WearableRelicItem {
                                 .rankModifier(5, "disappearance")
                                 .stat(AbilityStatTemplate.builder("heal")
                                         .initialValue(0.1D, 0.25D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.6279D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 2.50009D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("absorption")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1619D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 19.9995D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("cooldown")
                                         .thresholdValue(0D, Double.MAX_VALUE)
                                         .initialValue(15D, 10D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), -0.01429D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 4.9985D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -94,24 +97,27 @@ public class LeafyMantleItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("revival")
                                 .requiredLevel(5)
                                 .rankModifier(1, "piercing")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("radius")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.0265D)
+                                        .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 24.97833D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("heal")
                                         .initialValue(0.5D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 4.99992D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(0.5D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 4.99992D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("paralysis")
                                         .initialValue(0.5D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 1.1162D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 4.99992D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
@@ -416,7 +422,9 @@ public class LeafyMantleItem extends WearableRelicItem {
                     if (diff > 0) {
                         var healAmount = diff;
 
-                        ServerScheduler.schedule(1, () -> entity.heal(healAmount));
+                        ServerScheduler.schedule(1, () -> {
+                            entity.heal(healAmount);
+                        });
                     }
                 }
             }

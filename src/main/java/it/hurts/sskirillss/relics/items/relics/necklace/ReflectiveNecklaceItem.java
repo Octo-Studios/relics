@@ -10,6 +10,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.ReflectiveOrbEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
@@ -42,35 +44,38 @@ public class ReflectiveNecklaceItem extends WearableRelicItem {
                                 .rankModifier(1, "stun")
                                 .rankModifier(3, "piercing")
                                 .rankModifier(5, "bounce")
+                                .targeting(AbilityTargetingTemplate.builder()
+                                        .selector(SelectorType.HARMFUL)
+                                        .build())
                                 .stat(AbilityStatTemplate.builder("chance")
                                         .initialValue(0.1D, 0.25D)
                                         .thresholdValue(0D, 1D)
-                                        .upgradeModifier(RelicsScalingModels.RADICAL.get(), 0.1268D)
+                                        .targetValue(RelicsScalingModels.RADICAL.get(), 1.00016D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.LOGARITHMIC.get(), 0.5581D)
+                                        .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 2.49996D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("lifetime")
                                         .initialValue(5D, 10D)
-                                        .upgradeModifier(RelicsScalingModels.EXPONENTIAL.get(), 0.05255D)
+                                        .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 60.04761D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("piercings")
                                         .initialValue(1D, 3D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1619D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 19.9995D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun")
                                         .initialValue(0.25D, 0.5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1143D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.50025D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("bounces")
                                         .initialValue(1D, 2D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.6857D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 49.999D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()

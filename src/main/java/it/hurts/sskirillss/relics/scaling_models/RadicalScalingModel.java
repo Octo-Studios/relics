@@ -9,4 +9,9 @@ public class RadicalScalingModel extends ScalingModel {
     public double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, int iterations) {
         return baseValue + Math.sqrt(iterations) * modifier;
     }
+
+    @Override
+    public double calculateModifier(LivingEntity entity, ItemStack stack, double baseValue, double targetValue, int iterations) {
+        return iterations <= 0 ? 0D : (targetValue - baseValue) / Math.sqrt(iterations);
+    }
 }

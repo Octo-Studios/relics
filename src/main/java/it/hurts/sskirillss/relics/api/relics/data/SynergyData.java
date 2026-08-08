@@ -39,6 +39,11 @@ public class SynergyData {
     public SynergyStatData getStatData(String stat) {
         return new SynergyStatData(this, stat);
     }
+
+    public SynergyTargetingData getTargetingData() {
+        return new SynergyTargetingData(this);
+    }
+
     public double getProgress() {
         var template = getTemplate();
 

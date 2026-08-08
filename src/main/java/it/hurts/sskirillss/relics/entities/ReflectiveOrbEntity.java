@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.items.relics.necklace.ReflectiveNecklaceItem;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
@@ -272,16 +273,17 @@ public class ReflectiveOrbEntity extends ThrowableProjectile {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         if (this.tickCount < ARC_DURATION || !(result.getEntity() instanceof LivingEntity entity) || this.impactedEntities.contains(entity.getStringUUID())
-                || (!(this.getOwner() instanceof LivingEntity owner) || entity.getStringUUID().equals(owner.getStringUUID())))
+                || (!(this.getOwner() instanceof LivingEntity owner) || entity.getStringUUID().equals(owner.getStringUUID()))
+                || !TargetingUtils.canHarm(owner, entity, this.getStack(), "reflection"))
             return;
 
         entity.invulnerableTime = 0;
 
-        if (entity.hurt(this.level().damageSources().thrown(owner, this), this.getDamage())) {
+        if (TargetingUtils.hurtEnemy(entity, this.level().damageSources().thrown(owner, this), this.getDamage(), this.getStack(), "reflection")) {
             var stun = this.getStun();
 
             if (stun > 0)
-                entity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, (int) (stun * 20), 0, false, false));
+                TargetingUtils.addHarmfulEffect(entity, new MobEffectInstance(RelicsMobEffects.STUN, (int) (stun * 20), 0, false, false), owner, this.getStack(), "reflection");
 
             if (stack.getItem() instanceof ReflectiveNecklaceItem relic) {
                 relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatisticData().getMetricData("total_damage").addValue(this.getDamage());

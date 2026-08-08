@@ -87,6 +87,7 @@ public record C2SChainedElectricityPacket(double x, double y, double z, float da
             electricity.setFlawless(packet.flawless);
             electricity.setPos(position);
             electricity.setOwner(player);
+            electricity.setStack(stack);
 
             if (previous != null && bestDistance <= 100D)
                 electricity.setPreviousEntity(previous);

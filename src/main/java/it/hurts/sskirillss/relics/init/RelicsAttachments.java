@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.init;
 
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.relics.PlayerAbilityTargetingComponent;
 import it.hurts.sskirillss.relics.api.relics.PlayerResearchComponent;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
@@ -14,6 +15,12 @@ public class RelicsAttachments {
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<PlayerResearchComponent>> PLAYER_RESEARCH = ATTACHMENTS.register("player_research",
             () -> AttachmentType.builder(() -> PlayerResearchComponent.EMPTY)
                     .serialize(PlayerResearchComponent.CODEC)
+                    .copyOnDeath()
+                    .build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<PlayerAbilityTargetingComponent>> PLAYER_ABILITY_TARGETING = ATTACHMENTS.register("player_ability_targeting",
+            () -> AttachmentType.builder(() -> PlayerAbilityTargetingComponent.EMPTY)
+                    .serialize(PlayerAbilityTargetingComponent.CODEC)
                     .copyOnDeath()
                     .build());
 

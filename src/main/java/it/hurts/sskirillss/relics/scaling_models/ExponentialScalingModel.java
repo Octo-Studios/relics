@@ -9,4 +9,9 @@ public class ExponentialScalingModel extends ScalingModel {
     public double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, int iterations) {
         return baseValue * Math.pow(1 + modifier, iterations);
     }
+
+    @Override
+    public double calculateModifier(LivingEntity entity, ItemStack stack, double baseValue, double targetValue, int iterations) {
+        return iterations <= 0 || baseValue == 0D || targetValue / baseValue < 0D ? 0D : Math.pow(targetValue / baseValue, 1D / iterations) - 1D;
+    }
 }

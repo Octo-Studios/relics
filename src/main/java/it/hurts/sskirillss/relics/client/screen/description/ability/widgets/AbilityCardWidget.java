@@ -94,13 +94,13 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             return;
 
         var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
-        var isEnoughLevel = abilityData.isEnoughLevel();
+        var isEnoughConditions = abilityData.isEnoughLevel() && abilityData.isEnoughRank();
         var isLockUnlocked = abilityData.getLockData().isUnlocked();
         var isAbilityResearched = abilityData.getResearchData().isResearched();
 
-        SoundManager soundManager = minecraft.getSoundManager();
+        var soundManager = minecraft.getSoundManager();
 
-        if (isEnoughLevel) {
+        if (isEnoughConditions) {
             if (isLockUnlocked) {
                 if (isAbilityResearched) {
                     if (!screen.getSelectedAbility().equals(ability)) {
@@ -299,19 +299,20 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var manager = this.minecraft.getTextureManager();
         var poseStack = guiGraphics.pose();
 
-        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(this.ability);
-        var template = abilityData.getTemplate();
+        var relicData = relic.getRelicData(player, stack);
+        var abilityData = relicData.getAbilitiesData().getAbilityData(this.ability);
+        var abilityTemplate = abilityData.getTemplate();
 
-        if (template == null)
+        if (abilityTemplate == null)
             return;
 
         var unlocks = abilityData.getLockData().getUnlocks();
 
-        var isEnoughLevel = abilityData.isEnoughLevel();
-        var isLockUnlocked = isEnoughLevel && abilityData.getLockData().isUnlocked();
+        var isEnoughConditions = abilityData.isEnoughLevel() && abilityData.isEnoughRank();
+        var isLockUnlocked = isEnoughConditions && abilityData.getLockData().isUnlocked();
         var isAbilityResearched = abilityData.getResearchData().isResearched();
 
-        var canUse = isEnoughLevel && isLockUnlocked && isAbilityResearched;
+        var canUse = isEnoughConditions && isLockUnlocked && isAbilityResearched;
 
         var canUpgrade = abilityData.mayPlayerUpgrade();
 
@@ -361,7 +362,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     .end();
 
         var level = abilityData.getLevel();
-        var maxLevel = template.getInitialMaxLevel();
+        var maxLevel = abilityTemplate.getInitialMaxLevel();
 
         drawProgressBar(guiGraphics, (-this.width / 2F) + 2, (-this.height / 2F) + 3F, (float) level / maxLevel);
 
@@ -380,22 +381,25 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                         .end();
             }
         } else {
-            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/chains_active_" + unlocks + ".png") : DescriptionTextures.ABILITY_CHAINS_INACTIVE, poseStack)
+            GUIRenderer.begin(isEnoughConditions ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/chains_active_" + unlocks + ".png") : DescriptionTextures.ABILITY_CHAINS_INACTIVE, poseStack)
                     .pos(0, 0.5F)
                     .end();
 
 
             poseStack.pushPose();
 
-            GUIRenderer.begin(isEnoughLevel ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/icons/lock_active_" + unlocks + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
+            GUIRenderer.begin(isEnoughConditions ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/icons/lock_active_" + unlocks + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
                     .pos(0, -2)
                     .end();
 
             poseStack.scale(0.5F, 0.5F, 0.5F);
 
-            var requiredLevelComponent = Component.literal(String.valueOf(relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getTemplate().getRequiredLevel())).withStyle(ChatFormatting.BOLD);
+            var currentRank = relicData.getLevelingData().getRank();
+            var rankRequirement = abilityTemplate.getRequiredRank();
 
-            guiGraphics.drawString(minecraft.font, requiredLevelComponent, (-(width / 2) + 19) * 2 - minecraft.font.width(requiredLevelComponent) / 2, (-(height / 2) + 24) * 2, isEnoughLevel ? 0xFFE278 : 0xB7AED9, true);
+            var requirementComponent = Component.literal(String.valueOf(currentRank < rankRequirement ? rankRequirement : abilityTemplate.getRequiredLevel())).withStyle(ChatFormatting.BOLD);
+
+            guiGraphics.drawString(minecraft.font, requirementComponent, (-(width / 2) + 19) * 2 - minecraft.font.width(requirementComponent) / 2, (-(height / 2) + 24) * 2, isEnoughConditions ? 0xFFE278 : 0xB7AED9, true);
 
             poseStack.popPose();
         }
@@ -662,9 +666,10 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             return;
 
         var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
-        AbilityTemplate data = abilityData.getTemplate();
 
-        if (data == null)
+        AbilityTemplate abilityTemplate = abilityData.getTemplate();
+
+        if (abilityTemplate == null)
             return;
 
         PoseStack poseStack = guiGraphics.pose();
@@ -680,13 +685,14 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         entries.add(Component.literal(" "));
 
-        int level = relic.getRelicData(player, stack).getLevelingData().getLevel();
-        int requiredLevel = data.getRequiredLevel();
-
-        if (level < requiredLevel) {
+        if (!abilityData.isEnoughRank()) {
             entries.add(Component.literal(" "));
 
-            entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.low_level", Component.literal(String.valueOf(requiredLevel)).withStyle(ChatFormatting.BOLD))));
+            entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.low_rank", Component.literal(String.valueOf(abilityTemplate.getRequiredRank())).withStyle(ChatFormatting.BOLD))));
+        } else if (!abilityData.isEnoughLevel()) {
+            entries.add(Component.literal(" "));
+
+            entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.low_level", Component.literal(String.valueOf(abilityTemplate.getRequiredLevel())).withStyle(ChatFormatting.BOLD))));
         } else {
             if (!abilityData.getLockData().isUnlocked()) {
                 entries.add(Component.literal(" "));

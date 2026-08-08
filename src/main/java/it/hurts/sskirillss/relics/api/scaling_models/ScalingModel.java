@@ -18,4 +18,44 @@ public abstract class ScalingModel {
      * @return The resulting value after applying the operation the specified number of times.
      */
     public abstract double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, int iterations);
+
+    public double calculateModifier(LivingEntity entity, ItemStack stack, double baseValue, double targetValue, int iterations) {
+        if (iterations <= 0 || baseValue == targetValue)
+            return 0D;
+
+        var direction = targetValue > baseValue ? 1D : -1D;
+        var low = direction > 0 ? 0D : -1D;
+        var high = direction > 0 ? 1D : 0D;
+
+        for (int i = 0; i < 64; i++) {
+            var value = evaluate(entity, stack, baseValue, high, iterations);
+
+            if ((direction > 0 && value >= targetValue) || (direction < 0 && value <= targetValue))
+                break;
+
+            if (direction > 0)
+                high *= 2D;
+            else
+                low = low * 2D - 1D;
+        }
+
+        for (int i = 0; i < 96; i++) {
+            var mid = (low + high) / 2D;
+            var value = evaluate(entity, stack, baseValue, mid, iterations);
+
+            if (direction > 0) {
+                if (value < targetValue)
+                    low = mid;
+                else
+                    high = mid;
+            } else {
+                if (value > targetValue)
+                    high = mid;
+                else
+                    low = mid;
+            }
+        }
+
+        return (low + high) / 2D;
+    }
 }

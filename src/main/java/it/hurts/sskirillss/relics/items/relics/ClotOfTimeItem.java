@@ -25,6 +25,7 @@ import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -65,7 +66,7 @@ public class ClotOfTimeItem extends RelicItem {
                                 .rankModifier(5, "health_rewind")
                                 .stat(AbilityStatTemplate.builder("time")
                                         .initialValue(3D, 5D)
-                                        .upgradeModifier(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1429D)
+                                        .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30.0075D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
@@ -136,10 +137,7 @@ public class ClotOfTimeItem extends RelicItem {
         var lastDimension = lastPoint.dimension().isBlank() ? currentDimension : lastPoint.dimension();
 
         return !lastDimension.equals(currentDimension)
-                || player.distanceToSqr(lastPoint.x(), lastPoint.y(), lastPoint.z()) > 1.0E-6D
-                || Math.abs(Mth.wrapDegrees(player.getYRot() - lastPoint.yRot())) > 0.1F
-                || Math.abs(player.getXRot() - lastPoint.xRot()) > 0.1F
-                || Math.abs(player.getHealth() - lastPoint.health()) > 1.0E-3F;
+                || !player.blockPosition().equals(BlockPos.containing(lastPoint.x(), lastPoint.y(), lastPoint.z()));
     }
 
     private static List<PathPointData> buildUpdatedPath(List<PathPointData> storedPath, int rememberedTicks, PathPointData newPoint) {
@@ -269,8 +267,10 @@ public class ClotOfTimeItem extends RelicItem {
                 targetY = Mth.catmullrom(t, (float) p0.y(), (float) p1.y(), (float) p2.y(), (float) p3.y());
                 targetZ = Mth.catmullrom(t, (float) p0.z(), (float) p1.z(), (float) p2.z(), (float) p3.z());
 
-                targetYRot = this.interpolateAngleCatmullrom(t, p0.yRot(), p1.yRot(), p2.yRot(), p3.yRot());
-                targetXRot = Mth.catmullrom(t, p0.xRot(), p1.xRot(), p2.xRot(), p3.xRot());
+                var targetRotation = this.interpolateLookRotationCatmullrom(t, p0, p1, p2, p3);
+
+                targetYRot = targetRotation.yRot();
+                targetXRot = targetRotation.xRot();
             }
 
             var clampedXRot = Mth.clamp(targetXRot, -90F, 90F);
@@ -415,15 +415,38 @@ public class ClotOfTimeItem extends RelicItem {
         public static PathPointData fromPlayer(Player player, String dimension) {
             return new PathPointData(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot(), player.getHealth(), dimension);
         }
+
+        public Vec3 lookVector() {
+            return Vec3.directionFromRotation(this.xRot, this.yRot);
+        }
     }
 
-    private float interpolateAngleCatmullrom(float t, float a0, float a1, float a2, float a3) {
-        var p0 = a1 + Mth.wrapDegrees(a0 - a1);
-        var p1 = a1;
-        var p2 = p1 + Mth.wrapDegrees(a2 - p1);
-        var p3 = p2 + Mth.wrapDegrees(a3 - p2);
+    private RotationData interpolateLookRotationCatmullrom(float t, PathPointData p0, PathPointData p1, PathPointData p2, PathPointData p3) {
+        var look0 = p0.lookVector();
+        var look1 = p1.lookVector();
+        var look2 = p2.lookVector();
+        var look3 = p3.lookVector();
 
-        return Mth.wrapDegrees(Mth.catmullrom(t, p0, p1, p2, p3));
+        var look = new Vec3(
+                Mth.catmullrom(t, (float) look0.x(), (float) look1.x(), (float) look2.x(), (float) look3.x()),
+                Mth.catmullrom(t, (float) look0.y(), (float) look1.y(), (float) look2.y(), (float) look3.y()),
+                Mth.catmullrom(t, (float) look0.z(), (float) look1.z(), (float) look2.z(), (float) look3.z())
+        );
+
+        if (look.lengthSqr() < 1.0E-7D)
+            look = look1;
+        else
+            look = look.normalize();
+
+        var horizontal = Math.sqrt(look.x() * look.x() + look.z() * look.z());
+        var degrees = 180F / (float) Math.PI;
+        var yRot = (float) Math.atan2(look.z(), look.x()) * degrees - 90F;
+        var xRot = (float) -Math.atan2(look.y(), horizontal) * degrees;
+
+        return new RotationData(Mth.wrapDegrees(yRot), Mth.clamp(xRot, -90F, 90F));
+    }
+
+    private record RotationData(float yRot, float xRot) {
     }
 
     @EventBusSubscriber
@@ -596,8 +619,10 @@ public class ClotOfTimeItem extends RelicItem {
                 y = Mth.catmullrom(t, (float) p0.y(), (float) p1.y(), (float) p2.y(), (float) p3.y());
                 z = Mth.catmullrom(t, (float) p0.z(), (float) p1.z(), (float) p2.z(), (float) p3.z());
 
-                targetYRot = item.interpolateAngleCatmullrom(t, p0.yRot(), p1.yRot(), p2.yRot(), p3.yRot());
-                targetXRot = Mth.catmullrom(t, p0.xRot(), p1.xRot(), p2.xRot(), p3.xRot());
+                var targetRotation = item.interpolateLookRotationCatmullrom(t, p0, p1, p2, p3);
+
+                targetYRot = targetRotation.yRot();
+                targetXRot = targetRotation.xRot();
             }
 
             var yRot = Mth.rotLerp(0.45F, player.getYRot(), targetYRot);

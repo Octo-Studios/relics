@@ -5,6 +5,7 @@ import it.hurts.sskirillss.relics.entities.misc.ITargetableEntity;
 import it.hurts.sskirillss.relics.items.relics.SphereOfSelfSacrifice;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.sync.S2CSyncEntityTargetPacket;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -73,7 +74,7 @@ public class SelfSacrificeProjectileEntity extends ThrowableProjectile implement
 
             target.invulnerableTime = 0;
 
-            target.hurt(source, damage);
+            TargetingUtils.hurtEnemy(target, source, damage, this.getStack(), "sacrifice");
 
             if (this.getStack().getItem() instanceof SphereOfSelfSacrifice relic && this.getOwner() instanceof LivingEntity owner)
                 relic.getRelicData(owner, this.getStack()).getAbilitiesData().getAbilityData("sacrifice").getStatisticData().getMetricData("blood_projectile_damage").addValue(damage);

@@ -1,7 +1,9 @@
 package it.hurts.sskirillss.relics.entities;
 
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
-import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
+import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
+import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.core.BlockPos;
@@ -11,6 +13,7 @@ import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -21,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class ShockwaveBlockEntity extends Projectile {
     private static final EntityDataAccessor<BlockState> BLOCK_STATE = SynchedEntityData.defineId(ShockwaveBlockEntity.class, EntityDataSerializers.BLOCK_STATE);
@@ -90,7 +94,8 @@ public class ShockwaveBlockEntity extends Projectile {
         if (this.tickCount >= 20)
             this.discard();
 
-        processTargets();
+        if (!this.level().isClientSide())
+            processTargets();
     }
 
     public void processTargets() {
@@ -102,17 +107,25 @@ public class ShockwaveBlockEntity extends Projectile {
         for (var entity : level.getEntitiesOfClass(Entity.class, this.getBoundingBox(), entity -> !(entity instanceof ShockwaveBlockEntity) && (owner == null || !owner.getStringUUID().equals(entity.getStringUUID())))) {
             var motion = entity.position().add(0F, 1F, 0F).subtract(center).normalize().scale(this.getKnockback());
 
-            entity.setDeltaMovement(motion);
-
             if (entity instanceof LivingEntity livingEntity) {
+                if (!(owner instanceof LivingEntity livingOwner) || !TargetingUtils.canHarm(livingOwner, livingEntity, this.getStack(), "bounce"))
+                    continue;
+
+                if (entity instanceof ServerPlayer player)
+                    NetworkHandler.sendToClient(new S2CSetEntityMotion(entity.getId(), motion.toVector3f()), player);
+                else
+                    entity.setDeltaMovement(motion);
+
                 var damage = this.getDamage();
 
-                if (livingEntity.hurt(level.damageSources().explosion(owner, this), damage)) {
+                if (TargetingUtils.hurtEnemy(livingEntity, level.damageSources().explosion(livingOwner, this), damage, this.getStack(), "bounce")) {
                     var stun = this.getStun();
 
                     if (stun > 0)
-                        livingEntity.addEffect(new MobEffectInstance(RelicsMobEffects.STUN, stun, 0, false, false));
+                        TargetingUtils.addHarmfulEffect(livingEntity, new MobEffectInstance(RelicsMobEffects.STUN, stun, 0, false, false), livingOwner, this.getStack(), "bounce");
                 }
+            } else {
+                entity.setDeltaMovement(motion);
             }
         }
     }

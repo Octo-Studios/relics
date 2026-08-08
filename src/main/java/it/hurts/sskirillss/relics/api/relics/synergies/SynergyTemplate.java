@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.AbilityConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.stats.SynergyStatTemplate;
@@ -29,6 +30,7 @@ public class SynergyTemplate {
     private final List<String> modes;
     private final Multimap<Integer, String> rankModifiers;
     private final List<RelicConditionTemplate> relicConditions;
+    private final AbilityTargetingTemplate targeting;
 
     public static SynergyTemplateBuilder builder(String id) {
         return new SynergyTemplateBuilder(id);
@@ -56,6 +58,7 @@ public class SynergyTemplate {
         private List<String> modes = new ArrayList<>();
         private Multimap<Integer, String> rankModifiers = LinkedHashMultimap.create();
         private List<RelicConditionTemplate> relicConditions = new ArrayList<>();
+        private AbilityTargetingTemplate targeting = AbilityTargetingTemplate.EMPTY;
 
         public SynergyTemplateBuilder(String id) {
             this.id = id;
@@ -69,6 +72,7 @@ public class SynergyTemplate {
             this.modes = base.getModes();
             this.rankModifiers = base.getRankModifiers();
             this.relicConditions = new ArrayList<>(base.getRelicConditions());
+            this.targeting = base.getTargeting();
         }
 
         public SynergyTemplateBuilder icon(Function3<Player, ItemStack, String, String> icon) {
@@ -113,8 +117,14 @@ public class SynergyTemplate {
             return this;
         }
 
+        public SynergyTemplateBuilder targeting(AbilityTargetingTemplate targeting) {
+            this.targeting = targeting;
+
+            return this;
+        }
+
         public SynergyTemplate build() {
-            return new SynergyTemplate(id, icon, stats, modes, rankModifiers, relicConditions);
+            return new SynergyTemplate(id, icon, stats, modes, rankModifiers, relicConditions, targeting);
         }
     }
 }
