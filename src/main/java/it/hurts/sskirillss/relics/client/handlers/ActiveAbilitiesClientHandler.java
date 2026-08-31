@@ -590,6 +590,10 @@ public class ActiveAbilitiesClientHandler {
 
     public static boolean isAbilityListKeyDown() {
         var key = RelicsHotkeys.ACTIVE_ABILITIES_LIST.getKey();
+
+        if (RelicsHotkeys.ACTIVE_ABILITIES_LIST.isUnbound())
+            return false;
+
         var window = MC.getWindow().getWindow();
 
         if (key.getType() == InputConstants.Type.MOUSE)
