@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics;
 
+import dev.ryanhcode.sable.companion.SableCompanion;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -29,6 +30,7 @@ import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Position;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -44,6 +46,7 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -159,6 +162,16 @@ public class ChorusStaffItem extends RelicItem {
         var destination = eyePos.add(lookAngle.scale(radius));
 
         var hit = level.clip(new ClipContext(eyePos, destination, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+        var projected = SableCompanion.INSTANCE.projectOutOfSubLevel(level, (Position) hit.getLocation());
+        if (!projected.equals(hit.getLocation())) {
+            var projectedBlockPos = BlockPos.containing(projected);
+            var direction = hit.getDirection();
+            if (hit.getType() == HitResult.Type.MISS) {
+                hit = BlockHitResult.miss(projected, direction, projectedBlockPos);
+            } else {
+                hit = new BlockHitResult(projected, direction, projectedBlockPos, hit.isInside());
+            }
+        }
 
         var impulse = Vec3.ZERO;
 
