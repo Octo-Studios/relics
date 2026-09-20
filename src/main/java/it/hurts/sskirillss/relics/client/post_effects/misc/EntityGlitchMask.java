@@ -17,8 +17,6 @@ import java.util.List;
 
 public class EntityGlitchMask {
     private static final Minecraft MC = Minecraft.getInstance();
-    private static final ByteBufferBuilder MASK_BUFFER = new ByteBufferBuilder(RenderType.SMALL_BUFFER_SIZE);
-    private static final MultiBufferSource.BufferSource BUFFER_SOURCE = MultiBufferSource.immediate(MASK_BUFFER);
 
     private static TextureTarget target;
     private static boolean renderingMask;
@@ -69,6 +67,8 @@ public class EntityGlitchMask {
             return;
 
         var main = MC.getMainRenderTarget();
+        var maskBuffer = new ByteBufferBuilder(RenderType.SMALL_BUFFER_SIZE);
+        var buffer = MultiBufferSource.immediate(maskBuffer);
 
         renderingMask = true;
 
@@ -80,7 +80,6 @@ public class EntityGlitchMask {
 
             mask.bindWrite(false);
 
-            var buffer = BUFFER_SOURCE;
             var vertexConsumer = buffer.getBuffer(model.renderType(texture));
 
             model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
@@ -90,11 +89,10 @@ public class EntityGlitchMask {
                 for (var layer : layers)
                     layer.render(poseStack, buffer, packedLight, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
             }
-
-            buffer.endBatch();
-
-            MASK_BUFFER.discard();
         } finally {
+            buffer.endBatch();
+            maskBuffer.discard();
+
             renderingMask = false;
 
             main.bindWrite(false);
