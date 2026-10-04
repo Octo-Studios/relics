@@ -43,6 +43,9 @@ public interface IRelicsCapability extends INBTSerializable<CompoundTag> {
 
         @Override
         public <T> LazyOptional<T> getCapability(Capability<T> cap, Direction side) {
+            if (cap != CapabilityRegistry.DATA)
+                return LazyOptional.empty();
+
             return CapabilityRegistry.DATA.orEmpty(cap, LazyOptional.of(() -> backend));
         }
 
