@@ -16,6 +16,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.MinecraftForge;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
@@ -23,6 +24,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Entity.class)
 public class EntityMixin {
+    @Unique
+    private static final int[][] RELICS_FLUID_OFFSETS = {
+        {1, 0, 1}, {1, 0, 0}, {1, -1, 0}, {1, 0, -1},
+        {0, 0, 1}, {0, 0, 0}, {0, -1, 0}, {0, 0, -1},
+        {-1, 0, 1}, {-1, 0, 0}, {-1, -1, 0}, {-1, 0, -1}
+    };
+
     @ModifyVariable(method = "move", ordinal = 1, index = 3, name = "vec32", at = @At(value = "INVOKE_ASSIGN", target = "Lnet/minecraft/world/entity/Entity;collide(Lnet/minecraft/world/phys/Vec3;)Lnet/minecraft/world/phys/Vec3;"))
     public Vec3 fluidCollision(Vec3 original) {
         if (!((Entity) (Object) this instanceof LivingEntity entity))
@@ -33,18 +41,14 @@ public class EntityMixin {
 
         Level level = entity.getCommandSenderWorld();
 
-        int[][] offsets = {
-                {1, 0, 1}, {1, 0, 0}, {1, -1, 0}, {1, 0, -1},
-                {0, 0, 1}, {0, 0, 0}, {0, -1, 0}, {0, 0, -1},
-                {-1, 0, 1}, {-1, 0, 0}, {-1, -1, 0}, {-1, 0, -1}
-        };
+        BlockPos.MutableBlockPos pos = new BlockPos.MutableBlockPos();
 
         double highestValue = original.y;
         FluidState highestFluid = null;
 
-        for (int[] offset : offsets) {
+        for (int[] offset : RELICS_FLUID_OFFSETS) {
             BlockPos sourcePos = entity.blockPosition();
-            BlockPos pos = new BlockPos(sourcePos.getX() + offset[0], sourcePos.getY() + offset[1], sourcePos.getZ() + offset[2]);
+            pos.set(sourcePos.getX() + offset[0], sourcePos.getY() + offset[1], sourcePos.getZ() + offset[2]);
 
             FluidState fluidState = level.getFluidState(pos);
 
