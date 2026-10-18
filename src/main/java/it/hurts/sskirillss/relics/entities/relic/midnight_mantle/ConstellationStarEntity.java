@@ -371,6 +371,11 @@ public class ConstellationStarEntity extends ThrowableProjectile {
     public void onRemovedFromLevel() {
         super.onRemovedFromLevel();
 
+        var reason = this.getRemovalReason();
+
+        if (reason == null || !reason.shouldDestroy())
+            return;
+
         var level = this.level();
         var random = level.getRandom();
         var position = this.position();
