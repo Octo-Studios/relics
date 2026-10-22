@@ -61,13 +61,13 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                                         .build())
                                 .statistic(AbilityStatisticTemplate.builder()
                                         .metric(AbilityMetricTemplate.builder("distributions")
-                                                .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .formatValue(value -> String.format("%.0f", MathUtils.round(value, 0)))
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("distributed_experience")
                                                 .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("player_xp_conversions")
-                                                .formatValue(value -> String.valueOf((int) MathUtils.round(value, 0)))
+                                                .formatValue(value -> String.format("%.0f", MathUtils.round(value, 0)))
                                                 .build())
                                         .metric(AbilityMetricTemplate.builder("converted_player_experience")
                                                 .formatValue(value -> String.valueOf(MathUtils.round(value, 1)))
@@ -173,7 +173,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
 
                     distributedMetric.addValue(distributed);
 
-                    var units = getWholeUnitDelta(before, distributedMetric.getValue());
+                    var units = getWholeUnitDelta(before, distributed);
 
                     if (units > 0) {
                         disperser.getRelicData(player, disperserStack).getLevelingData().addExperience("dispersion", "trigger", units);
@@ -251,7 +251,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
 
                     convertedMetric.addValue(distributed);
 
-                    var units = getWholeUnitDelta(before, convertedMetric.getValue());
+                    var units = getWholeUnitDelta(before, distributed);
 
                     if (units > 0)
                         stats.getMetricData("player_xp_conversions").addValue(units);
@@ -259,12 +259,11 @@ public class ExperienceDisperserItem extends WearableRelicItem {
             }
         }
 
-        private static int getWholeUnitDelta(double before, double after) {
+        private static double getWholeUnitDelta(double before, double delta) {
             var epsilon = 1.0E-9D;
-            var from = (int) Math.floor(before + epsilon);
-            var to = (int) Math.floor(after + epsilon);
+            var fraction = before - Math.floor(before);
 
-            return Math.max(0, to - from);
+            return Math.max(0D, Math.floor(fraction + delta + epsilon));
         }
 
         private static boolean canReceiveExperience(Player player, ItemStack stack) {
