@@ -14,7 +14,9 @@ import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.NeutralMob;
 import net.minecraft.world.entity.OwnableEntity;
 import net.minecraft.world.entity.TamableAnimal;
-import net.minecraft.world.entity.monster.Monster;
+import net.minecraft.world.entity.animal.AbstractGolem;
+import net.minecraft.world.entity.monster.Enemy;
+import net.minecraft.world.entity.npc.Npc;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 
@@ -179,7 +181,7 @@ public class TargetingUtils {
         if (isTamed(target))
             return resolveTamedOption(source, target, selectorType);
 
-        if (target instanceof Monster)
+        if (target instanceof Enemy)
             return AbilityTargetingOption.HOSTILE_MOBS;
 
         if (target instanceof NeutralMob)
@@ -190,7 +192,7 @@ public class TargetingUtils {
         if (category == MobCategory.MONSTER)
             return AbilityTargetingOption.HOSTILE_MOBS;
 
-        if (category == MobCategory.CREATURE || category == MobCategory.AMBIENT || category == MobCategory.WATER_CREATURE || category == MobCategory.WATER_AMBIENT || category == MobCategory.AXOLOTLS)
+        if (target instanceof Npc || target instanceof AbstractGolem || category == MobCategory.CREATURE || category == MobCategory.AMBIENT || category == MobCategory.WATER_CREATURE || category == MobCategory.WATER_AMBIENT || category == MobCategory.AXOLOTLS)
             return AbilityTargetingOption.PEACEFUL_MOBS;
 
         return selectorType == SelectorType.BENEFICIAL ? AbilityTargetingOption.PEACEFUL_MOBS : AbilityTargetingOption.HOSTILE_MOBS;
