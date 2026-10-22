@@ -390,7 +390,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                 var requiredTicks = Math.max(1, (int) Math.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sloth").getStatData("time").getValue() * 20D));
                 var hasImmortality = entity.hasEffect(RelicsMobEffects.IMMORTALITY);
 
-                if (stillTicks >= requiredTicks) {
+                if (stillTicks >= requiredTicks && !entity.level().isClientSide()) {
                     entity.addEffect(new MobEffectInstance(RelicsMobEffects.IMMORTALITY, 5, 0, false, false, true));
 
                     if (!hasImmortality)

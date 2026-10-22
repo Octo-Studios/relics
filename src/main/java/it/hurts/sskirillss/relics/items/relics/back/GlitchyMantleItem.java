@@ -444,7 +444,8 @@ public class GlitchyMantleItem extends WearableRelicItem {
                     this.getRelicData(entity, stack).getLevelingData().addExperience("glitch", "phasing", 1D / 20D);
                 }
 
-                entity.addEffect(new MobEffectInstance(RelicsMobEffects.GLITCH, 5, 0, false, false));
+                if (!level.isClientSide())
+                    entity.addEffect(new MobEffectInstance(RelicsMobEffects.GLITCH, 5, 0, false, false));
 
                 this.addPhaseTicks(stack, 1);
 

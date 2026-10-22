@@ -369,10 +369,11 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                     var diff = target.position().add(0, target.getBbHeight() / 2D, 0).subtract(entity.position());
                     var totalKnockback = 0.5D * knockback;
 
-                    TargetingUtils.addHarmfulEffect(target, new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, true), entity, stack, "shock");
+                    if (!level.isClientSide()) {
+                        TargetingUtils.addHarmfulEffect(target, new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, true), entity, stack, "shock");
 
-                    if (!level.isClientSide())
                         this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getStatisticData().getMetricData("rings_paralysis").addValue(paralysis);
+                    }
 
                     target.setDeltaMovement(diff.normalize().multiply(totalKnockback, totalKnockback / 2F, totalKnockback));
 

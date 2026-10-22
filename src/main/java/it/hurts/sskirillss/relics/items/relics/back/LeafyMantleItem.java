@@ -229,7 +229,7 @@ public class LeafyMantleItem extends WearableRelicItem {
             if (progress < this.getMaxProgress())
                 this.addCurrentProgress(stack, 1);
 
-            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("disappearance").isEnabled())
+            if (!level.isClientSide() && this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("disappearance").isEnabled())
                 entity.addEffect(new MobEffectInstance(RelicsMobEffects.VANISHING, 5, 0, false, false));
 
             if (entity.tickCount % 20 == 0) {
