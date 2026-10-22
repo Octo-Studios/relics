@@ -43,6 +43,15 @@ public class SimpleDescriptionScreen extends Screen implements IAutoScaledScreen
 
             if (this.screen instanceof DescriptionScreen subScreen)
                 subScreen.stack = DescriptionUtils.gatherRelicStack(player, this.slot);
+
+            if (this.stack.isEmpty()) {
+                var root = this.screen;
+
+                while (root instanceof SimpleDescriptionScreen description)
+                    root = description.screen;
+
+                Minecraft.getInstance().setScreen(root);
+            }
         }
     }
 
