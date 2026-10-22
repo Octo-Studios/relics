@@ -21,6 +21,9 @@ import java.util.UUID;
 public class BackpackItemMixin {
     @Inject(method = "inventoryTick", at = @At("TAIL"))
     public void tick(ItemStack itemStack, Level level, Entity entity, int itemSlot, boolean isSelected, CallbackInfo ci) {
+        if (level.isClientSide())
+            return;
+
         relics$tickBackpackContents(itemStack, level, entity, itemSlot, new HashSet<>(), 0);
     }
 
@@ -49,8 +52,12 @@ public class BackpackItemMixin {
             var item = stack.getItem();
 
             if (item instanceof IRelicItem) {
+                var before = stack.copy();
+
                 item.inventoryTick(stack, level, entity, itemSlot, false);
-                handler.setStackInSlot(slot, stack);
+
+                if (!ItemStack.matches(before, stack))
+                    handler.setStackInSlot(slot, stack);
             }
 
             if (item instanceof BackpackItem)
