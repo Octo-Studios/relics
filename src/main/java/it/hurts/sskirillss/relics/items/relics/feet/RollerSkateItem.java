@@ -26,6 +26,7 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
@@ -189,7 +190,7 @@ public class RollerSkateItem extends WearableRelicItem {
             EntityUtils.removeAttribute(entity, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
         }
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("sparkling").isEnabled()) {
+        if (level.isClientSide() && entity instanceof LocalPlayer && this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("sparkling").isEnabled()) {
             var motion = entity.getDeltaMovement();
 
             var xMotion = motion.x;
