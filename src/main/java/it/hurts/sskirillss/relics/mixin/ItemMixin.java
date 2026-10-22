@@ -51,27 +51,6 @@ public class ItemMixin {
             relicData.getStatisticData().getMetricData("retention_time").addValue(1);
     }
 
-    @Inject(method = "appendHoverText", at = @At("HEAD"))
-    public void appendHoverText(ItemStack stack, Item.TooltipContext context, List<Component> tooltip, TooltipFlag flag, CallbackInfo ci) {
-        relics$processTooltip(stack, context, tooltip);
-    }
-
-    @Unique
-    @OnlyIn(Dist.CLIENT)
-    private void relics$processTooltip(ItemStack stack, Item.TooltipContext context, List<Component> tooltip) {
-        Item item = stack.getItem();
-
-        if (!(item instanceof IRelicItem))
-            return;
-
-        tooltip.add(Component.literal(" "));
-
-        if (Minecraft.getInstance().screen instanceof AbstractContainerScreen<? extends AbstractContainerMenu>)
-            tooltip.add(Component.translatable("relics.description.researching.info", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName()).withStyle(ChatFormatting.GRAY));
-
-        tooltip.add(Component.literal(" "));
-    }
-
     // TODO: I think there should be less nulls :/
     @Inject(method = "verifyComponentsAfterLoad", at = @At("HEAD"))
     public void onVerifyComponentsAfterLoad(ItemStack stack, CallbackInfo ci) {
