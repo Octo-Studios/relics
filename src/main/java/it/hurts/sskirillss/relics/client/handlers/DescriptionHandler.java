@@ -9,6 +9,7 @@ import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -56,24 +57,31 @@ public class DescriptionHandler {
         if (!(MC.screen instanceof AbstractContainerScreen<? extends AbstractContainerMenu> screen))
             return;
 
-        var window = MC.getWindow();
+        var hoveredSlot = screen.getSlotUnderMouse();
 
-        var mouseX = MC.mouseHandler.xpos() * window.getGuiScaledWidth() / window.getScreenWidth();
-        var mouseY = MC.mouseHandler.ypos() * window.getGuiScaledHeight() / window.getScreenHeight();
+        if (hoveredSlot instanceof CreativeModeInventoryScreen.SlotWrapper wrapper)
+            hoveredSlot = wrapper.target;
 
-        var menu = player.containerMenu;
+        var menu = DescriptionUtils.getContainerMenu(player);
 
         var oldId = slot == null ? -1 : slot.getContainerSlot();
         var id = -1;
 
-        for (int i = 0; i < menu.slots.size(); i++) {
-            var entry = menu.slots.get(i);
+        if (hoveredSlot != null) {
+            if (screen.getMenu() == menu) {
+                slot = hoveredSlot;
+                id = hoveredSlot.index;
+            } else {
+                for (int i = 0; i < menu.slots.size(); i++) {
+                    var entry = menu.slots.get(i);
 
-            if (isHovering(screen.getGuiLeft(), screen.getGuiTop(), entry.x, entry.y, mouseX, mouseY)) {
-                slot = entry;
-                id = i;
+                    if (entry.container == hoveredSlot.container && entry.getContainerSlot() == hoveredSlot.getContainerSlot()) {
+                        slot = entry;
+                        id = i;
 
-                break;
+                        break;
+                    }
+                }
             }
         }
 
@@ -100,19 +108,12 @@ public class DescriptionHandler {
             var screenStack = DescriptionUtils.gatherRelicStack(player, id);
 
             if (!screenStack.isEmpty()) {
-                Minecraft.getInstance().setScreen(new RelicDescriptionScreen(player, player.containerMenu.containerId, id, screen));
+                Minecraft.getInstance().setScreen(new RelicDescriptionScreen(player, menu.containerId, id, screen));
 
                 ticksCount = 0;
                 ticksCountOld = 0;
             }
         }
-    }
-
-    protected static boolean isHovering(int leftPos, int topPos, int slotX, int slotY, double mouseX, double mouseY) {
-        mouseX -= leftPos;
-        mouseY -= topPos;
-
-        return mouseX >= (slotX - 1) && mouseX < (slotX + 16 + 1) && mouseY >= (slotY - 1) && mouseY < (slotY + 16 + 1);
     }
 
     @SubscribeEvent

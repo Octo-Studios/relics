@@ -6,6 +6,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -73,11 +74,17 @@ public class DescriptionUtils {
         guiGraphics.blit(TOOLTIP, x + 8, y + height + 9, width + 2, 3, 11, 4, 1, 3, texWidth, texHeight);
     }
 
+    public static AbstractContainerMenu getContainerMenu(Player player) {
+        return player.containerMenu.containerId == player.inventoryMenu.containerId ? player.inventoryMenu : player.containerMenu;
+    }
+
     public static ItemStack gatherRelicStack(Player player, int slot) {
-        if (!player.containerMenu.isValidSlotIndex(slot))
+        var menu = getContainerMenu(player);
+
+        if (!menu.isValidSlotIndex(slot))
             return ItemStack.EMPTY;
 
-        var stack = player.containerMenu.getSlot(slot).getItem();
+        var stack = menu.getSlot(slot).getItem();
 
         if (!(stack.getItem() instanceof IRelicItem))
             return ItemStack.EMPTY;
