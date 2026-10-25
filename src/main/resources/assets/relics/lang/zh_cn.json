@@ -479,7 +479,7 @@
   "relics.description.experience_disperser.ability.dispersion.statistic.player_xp_conversions": "经验球转化触发次数",
   "relics.description.experience_disperser.ability.dispersion.statistic.converted_player_experience": "转化的经验球经验",
 
-  "item.relics.glitchy_mantle": "故障斗篷",
+  "item.relics.glitchy_mantle": "故障披风",
   "relics.description.glitchy_mantle.description": "戴上这件遗物，佩戴者似乎与旁人所见的身影对不上号。攻击时有落空，令攻击者阵脚大乱。残破的复制品留在身后，撞上它们的敌人会一时迷失。就连佩戴者脚下的虚空也会变得稠密，纵使没有立足之地，也来得及迈出下一步。",
   "relics.description.glitchy_mantle.ability.distortion": "感知故障",
   "relics.description.glitchy_mantle.ability.distortion.description": "针对遗物佩戴者的攻击有 %1$s%% 的几率落空。",
@@ -520,8 +520,8 @@
   "relics.description.glitchy_mantle.synergy.electricity.enabled.description": "闪电链在遗物佩戴者的故障复制品之间延伸，对穿过它们的任何目标造成 %1$s 点伤害。",
   "relics.description.glitchy_mantle.synergy.electricity.disabled.description": "协同已禁用，不提供任何加成。",
 
-  "item.relics.ghostly_mantle": "幽灵斗篷",
-  "relics.description.ghostly_mantle.description": "遗物佩戴者身后拖着一片墓园迷雾。任何进入其中的人都会开始窒息，每一次呼吸都比上一次更困难。一旦敌人与佩戴者对视，他们的力量就开始流失。而当死亡已经举起手时，斗篷会短暂地让身体变得虚无，让佩戴者逃脱残酷的命运。",
+  "item.relics.ghostly_mantle": "幽灵披风",
+  "relics.description.ghostly_mantle.description": "遗物佩戴者身后拖着一片墓园迷雾。任何进入其中的人都会开始窒息，每一次呼吸都比上一次更困难。一旦敌人与佩戴者对视，他们的力量就开始流失。而当死亡已经举起手时，披风会短暂地让身体变得虚无，让佩戴者逃脱残酷的命运。",
   "relics.description.ghostly_mantle.ability.fog": "墓园迷雾",
   "relics.description.ghostly_mantle.ability.fog.mode.enabled": "已启用",
   "relics.description.ghostly_mantle.ability.fog.mode.disabled": "已禁用",
