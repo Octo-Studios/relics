@@ -2,25 +2,47 @@ package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.VisibilityState;
+import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.SimpleDescriptionContainerWidget;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.RerollAnimation;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerWidget {
+public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerWidget implements ITickingWidget {
+    private static final int GLOW_DURATION = 10;
+
+    private final RerollAnimation rerollAnimation = new RerollAnimation();
+
     public AbilityStatisticContainerWidget(DescriptionScreen screen) {
         super(screen);
+    }
+
+    @Override
+    public void onTick() {
+        if (!(this.getScreen() instanceof AbilityDescriptionScreen screen) || minecraft.player == null || !(screen.getStack().getItem() instanceof IRelicItem relic))
+            return;
+
+        var abilityData = relic.getRelicData(minecraft.player, screen.getStack()).getAbilitiesData().getAbilityData(screen.getSelectedAbility());
+
+        if (abilityData == null)
+            return;
+
+        rerollAnimation.observe(abilityData, screen.getSelectedAbility());
+        rerollAnimation.tick();
     }
 
     @Override
@@ -76,10 +98,14 @@ public class AbilityStatisticContainerWidget extends SimpleDescriptionContainerW
                 var lines = font.split(prefix, maxWidth);
                 metricLines.addAll(lines);
             } else {
-                var suffix = Component.literal(" ")
-                        .append(Component.literal(metric.getFormatValue()
-                                        .apply(abilityData.getStatisticData().getMetricData(metric.getId()).getValue()))
-                                .withStyle(ChatFormatting.BOLD));
+                var value = Component.literal(metric.getFormatValue()
+                                .apply(abilityData.getStatisticData().getMetricData(metric.getId()).getValue()))
+                        .withStyle(ChatFormatting.BOLD);
+
+                if (rerollAnimation.isActive())
+                    value.withColor(FastColor.ARGB32.lerp(Mth.clamp(1F - rerollAnimation.getAge() / (float) GLOW_DURATION, 0F, 1F), DescriptionUtils.TEXT_COLOR, rerollAnimation.tint()) & 0xFFFFFF);
+
+                var suffix = Component.literal(" ").append(value);
 
                 var suffixWidth = font.width(suffix);
                 var limit = Math.max(0, maxWidth - suffixWidth);

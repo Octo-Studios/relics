@@ -1,7 +1,9 @@
 package it.hurts.sskirillss.relics.client.screen.description.general.widgets.base;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
+import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -15,16 +17,26 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class AbstractPlateWidget extends AbstractDescriptionWidget implements IHoverableWidget {
+public abstract class AbstractPlateWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
+    private static final float PULSE_DECAY = 0.75F;
+    private static final float PULSE_THRESHOLD = 0.01F;
+    private static final float PULSE_SCALE = 0.08F;
+    private static final float PULSE_BRIGHTNESS = 0.9F;
+    private static final float PULSE_BLUE_BRIGHTNESS = 0.6F;
+
     @Getter
     private DescriptionScreen screen;
     @Getter
     private final String icon;
+
+    private float pulse = 0F;
+    private float pulseO = 0F;
 
     public abstract String getValue(ItemStack stack);
 
@@ -45,6 +57,15 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
 
         poseStack.translate(getX() + Math.sin((player.tickCount + pPartialTick + icon.length() * 10D) * 0.075D), getY() + Math.cos((player.tickCount + pPartialTick + icon.length() * 10D) * 0.075D) * 0.5D, 0);
 
+        var glow = Mth.lerp(pPartialTick, pulseO, pulse);
+        var scale = 1F + glow * PULSE_SCALE;
+
+        poseStack.translate(width / 2F, height / 2F, 0F);
+        poseStack.scale(scale, scale, 1F);
+        poseStack.translate(-width / 2F, -height / 2F, 0F);
+
+        RenderSystem.setShaderColor(1F + glow * PULSE_BRIGHTNESS, 1F + glow * PULSE_BRIGHTNESS, 1F + glow * PULSE_BLUE_BRIGHTNESS, 1F);
+
         GUIRenderer.begin(DescriptionTextures.PLATE_BACKGROUND, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .end();
@@ -52,6 +73,8 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
         poseStack.translate(0F, 0F, 10F);
 
         this.renderIcon(guiGraphics, 3, 3, pMouseX, pMouseY, pPartialTick);
+
+        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
         var value = Component.literal(this.getValue(screen.getStack())).withStyle(ChatFormatting.BOLD);
 
@@ -66,6 +89,16 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
                     .end();
 
         poseStack.popPose();
+    }
+
+    public void pulse(float strength) {
+        pulse = Math.min(1F, pulse + strength);
+    }
+
+    @Override
+    public void onTick() {
+        pulseO = pulse;
+        pulse = pulse < PULSE_THRESHOLD ? 0F : pulse * PULSE_DECAY;
     }
 
     public void renderIcon(GuiGraphics guiGraphics, int x, int y, int mouseX, int mouseY, float partialTick) {

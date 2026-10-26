@@ -7,10 +7,12 @@ import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
+import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.LevelUpEffect;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -32,17 +34,47 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHoverableWidget {
+public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     public static final List<ResourceLocation> BACKGROUNDS = Stream.of("blue", "cyan", "green", "light_blue", "orange", "magenta", "purple", "red", "yellow")
             .map(color -> ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/backgrounds/" + color + ".png"))
             .toList();
 
+    private static final int PARTICLES = 60;
+    private static final int PARTICLES_PER_RANK = 20;
+    private static final int MAX_PARTICLES = 200;
+    private static final float FLASH_STRENGTH = 0.9F;
+
     private RelicDescriptionScreen screen;
+
+    private final LevelUpEffect levelUpEffect = new LevelUpEffect();
+
+    private int lastRank = -1;
 
     public BigRelicCardWidget(int x, int y, RelicDescriptionScreen screen) {
         super(x, y, 50, 87);
 
         this.screen = screen;
+    }
+
+    @Override
+    public void onTick() {
+        if (minecraft.player == null || !(screen.getStack().getItem() instanceof IRelicItem relic))
+            return;
+
+        var random = minecraft.player.getRandom();
+        var rank = relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getRank();
+
+        if (lastRank >= 0 && rank > lastRank) {
+            var tint = getTextureColor(pickClosestBackground(screen.getStack(), BACKGROUNDS));
+
+            levelUpEffect.start(screen, random, getX(), getY(), width, height, tint, Math.min(PARTICLES + rank * PARTICLES_PER_RANK, MAX_PARTICLES));
+
+            screen.getRankupEffect().start();
+        }
+
+        lastRank = rank;
+
+        levelUpEffect.tick();
     }
 
     @Override
@@ -63,7 +95,7 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.translate(0, 0, -100);
 
-        var color = (float) (1.05F + (Math.sin(player.tickCount * 0.25F) * 0.1F));
+        var color = (float) (1.05F + (Math.sin(player.tickCount * 0.25F) * 0.1F)) + levelUpEffect.flash(pPartialTick) * FLASH_STRENGTH;
 
         RenderSystem.setShaderColor(color, color, color, 1F);
 

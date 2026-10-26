@@ -12,6 +12,8 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.ProgressBarEffect;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.ProgressPath;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -29,8 +31,12 @@ import java.util.List;
 
 public class RelicExperienceWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
     private static final int FILLER_WIDTH = 125;
+    private static final int FILLER_HEIGHT = 11;
+    private static final int ANIMATION_DURATION = 20;
+    private static final float FLASH_STRENGTH = 0.6F;
 
     private final DescriptionScreen screen;
+    private final ProgressBarEffect progressEffect = new ProgressBarEffect(ProgressPath.horizontalBar(FILLER_WIDTH, FILLER_HEIGHT), ANIMATION_DURATION);
 
     public RelicExperienceWidget(int x, int y, DescriptionScreen screen) {
         super(x, y, 139, 15);
@@ -49,7 +55,7 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
 
         poseStack.pushPose();
 
-        var color = (float) (1.025F + (Math.sin(player.tickCount * 0.5F) * 0.05F));
+        var color = (float) (1.025F + (Math.sin(player.tickCount * 0.5F) * 0.05F)) + progressEffect.flash(pPartialTick) * FLASH_STRENGTH;
 
         GUIRenderer.begin(DescriptionTextures.RELIC_EXPERIENCE_BACKGROUND, poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
@@ -59,11 +65,11 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
         RenderSystem.enableBlend();
 
         GUIRenderer.begin(DescriptionTextures.RELIC_EXPERIENCE_FILLER, poseStack)
-                .patternSize(calculateFillerWidth(relic), 11)
+                .patternSize(calculateAnimatedFillerWidth(relic, pPartialTick), FILLER_HEIGHT)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(getX() + 3, getY() + 2)
                 .color(color, color, color, 1F)
-                .texSize(FILLER_WIDTH, 11)
+                .texSize(FILLER_WIDTH, FILLER_HEIGHT)
                 .end();
 
         RenderSystem.disableBlend();
@@ -91,6 +97,9 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
             return;
 
         var random = player.getRandom();
+
+        progressEffect.update(calculateFillerWidth(relic) / (float) FILLER_WIDTH);
+        progressEffect.tick(screen, random, getX() + 3, getY() + 2, 1F, 1F);
 
         int fillerWidth = this.calculateFillerWidth(relic);
 
@@ -178,6 +187,10 @@ public class RelicExperienceWidget extends AbstractDescriptionWidget implements 
         var level = relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getLevel();
 
         return (float) (relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getExperience() / (relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getTotalExperienceBetweenLevels(level, level + 1) / 100D));
+    }
+
+    private int calculateAnimatedFillerWidth(IRelicItem relic, float partialTick) {
+        return (int) Math.ceil(progressEffect.progressOr(calculateFillerWidth(relic) / (float) FILLER_WIDTH, partialTick) * FILLER_WIDTH);
     }
 
     private int calculateFillerWidth(IRelicItem relic) {

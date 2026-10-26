@@ -11,7 +11,6 @@ import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec2;
 
 public class AbilityResearchWidget extends AbstractDescriptionWidget {
     @Getter
@@ -35,6 +34,14 @@ public class AbilityResearchWidget extends AbstractDescriptionWidget {
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         var poseStack = guiGraphics.pose();
 
+        poseStack.pushPose();
+
+        screen.children().stream()
+                .filter(BigAbilityCardWidget.class::isInstance)
+                .map(BigAbilityCardWidget.class::cast)
+                .findFirst()
+                .ifPresent(card -> card.applyPunch(poseStack, partialTick));
+
         GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/research.png"), poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
                 .pos(this.getX(), this.getY())
@@ -45,6 +52,8 @@ public class AbilityResearchWidget extends AbstractDescriptionWidget {
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(this.getX() - 1, this.getY() - 1)
                     .end();
+
+        poseStack.popPose();
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
     }

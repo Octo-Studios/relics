@@ -23,7 +23,12 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionText
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.research.AbilityResearchScreen;
 import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.LevelUpEffect;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.ProgressBarEffect;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.ProgressPath;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.RerollAnimation;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.UIParticles;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
 import it.hurts.sskirillss.relics.utils.ClientScheduler;
@@ -53,9 +58,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AbilityCardWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
+    private static final int STAR_X = 9;
+    private static final int STAR_Y = 43;
+    private static final int STAR_STEP = 5;
+    private static final float STAR_CENTER_X = 2F;
+    private static final float STAR_CENTER_Y = 1F;
+    private static final int STAR_SPARKS = 3;
+    private static final float PROGRESS_FLASH = 1.2F;
+
     private final AbilityDescriptionScreen screen;
     @Getter
     private final String ability;
+
+    private final RerollAnimation rerollAnimation = new RerollAnimation();
+    private final ProgressBarEffect progressBarEffect = new ProgressBarEffect(ProgressPath.cardFrame()).animateDecrease(true);
 
     @Getter
     @Setter
@@ -364,7 +380,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var level = abilityData.getLevel();
         var maxLevel = abilityTemplate.getInitialMaxLevel();
 
-        drawProgressBar(guiGraphics, (-this.width / 2F) + 2, (-this.height / 2F) + 3F, (float) level / maxLevel);
+        drawProgressBar(guiGraphics, (-this.width / 2F) + 2, (-this.height / 2F) + 3F, progressBarEffect.progressOr(maxLevel > 0 ? (float) level / maxLevel : 0F, partialTick), 1F + (progressBarEffect.isRising() ? progressBarEffect.flash(partialTick) * PROGRESS_FLASH : 0F));
 
         if (isHovered())
             GUIRenderer.begin(DescriptionTextures.ABILITY_SMALL_CARD_FRAME_SELECTION, poseStack)
@@ -425,18 +441,25 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 boolean isAliquot = quality % 2 == 1;
 
                 for (int i = 0; i < Math.floor(quality / 2D); i++) {
+                    var brightness = starBrightness(i, 2, partialTick);
+
                     GUIRenderer.begin(DescriptionTextures.SMALL_STAR_ACTIVE, poseStack)
-                            .pos(-(width / 2F) + xOff + 9, -(height / 2F) + 43)
+                            .pos(-(width / 2F) + xOff + STAR_X, -(height / 2F) + STAR_Y)
+                            .color(brightness, brightness, brightness, 1F)
                             .end();
 
-                    xOff += 5;
+                    xOff += STAR_STEP;
                 }
 
-                if (isAliquot)
+                if (isAliquot) {
+                    var brightness = starBrightness(quality / 2, 1, partialTick);
+
                     GUIRenderer.begin(DescriptionTextures.SMALL_STAR_ACTIVE, poseStack)
-                            .pos(-(width / 2F) + xOff + 8, -(height / 2F) + 43)
+                            .pos(-(width / 2F) + xOff + STAR_X - 1, -(height / 2F) + STAR_Y)
                             .patternSize(1, 2)
+                            .color(brightness, brightness, brightness, 1F)
                             .end();
+                }
             }
         }
 
@@ -458,6 +481,10 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
     }
 
     public static void drawProgressBar(GuiGraphics gui, float x, float y, float progress) {
+        drawProgressBar(gui, x, y, progress, 1F);
+    }
+
+    public static void drawProgressBar(GuiGraphics gui, float x, float y, float progress, float brightness) {
         var textureWidth = 38;
         var textureHeight = 51;
 
@@ -497,6 +524,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var renderer = GUIRenderer
                 .begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_filler.png"), gui.pose())
                 .texSize(textureWidth, textureHeight)
+                .color(brightness, brightness, brightness, 1F)
                 .anchor(SpriteAnchor.TOP_LEFT);
 
         var drawLen = 0;
@@ -613,6 +641,8 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
     @Override
     public void onTick() {
+        updateEffects();
+
         var hovered = this.isHovered();
 
         var overshoot = 1.075F;
@@ -650,6 +680,42 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             hoverTween.start();
         }
+    }
+
+    private float starBrightness(int index, int state, float partialTick) {
+        return 1F + (state > BigAbilityCardWidget.getStarState(rerollAnimation.getOldQuality(), index) ? rerollAnimation.starFlash(partialTick) : 0F);
+    }
+
+    private void updateEffects() {
+        var player = minecraft.player;
+        var stack = screen.getStack();
+
+        if (player == null || !(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+
+        if (abilityData == null || abilityData.getTemplate() == null)
+            return;
+
+        var maxLevel = abilityData.getTemplate().getInitialMaxLevel();
+
+        var random = player.getRandom();
+
+        var scaleX = getHoverXSqueeze() * getClickXSqueeze();
+        var scaleY = getHoverYSqueeze() * getClickYSqueeze();
+
+        progressBarEffect.update(maxLevel > 0 ? (float) abilityData.getLevel() / maxLevel : 0F);
+        progressBarEffect.tick(screen, random, getX() + width / 2F + (-width / 2F + 2F) * scaleX, getY() + height / 2F + (-height / 2F + 3F) * scaleY, scaleX, scaleY);
+
+        if (rerollAnimation.observe(abilityData, ability)) {
+            for (var i = 0; i < BigAbilityCardWidget.STAR_COUNT; i++) {
+                if (BigAbilityCardWidget.getStarState(rerollAnimation.getNewQuality(), i) != BigAbilityCardWidget.getStarState(rerollAnimation.getOldQuality(), i))
+                    LevelUpEffect.burstAt(screen, random, getX() + STAR_X + i * STAR_STEP + STAR_CENTER_X, getY() + STAR_Y + STAR_CENTER_Y, UIParticles.GOLD, STAR_SPARKS);
+            }
+        }
+
+        rerollAnimation.tick();
     }
 
     @Override

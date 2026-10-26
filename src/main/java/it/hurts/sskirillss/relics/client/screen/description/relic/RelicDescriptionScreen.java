@@ -16,6 +16,7 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtil
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RankupRelicActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicIntroContainerWidget;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.RankupEffect;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
@@ -38,8 +39,18 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
     @Setter
     private DescriptionSubcategory subcategory = DescriptionSubcategories.getSubcategory("relic_description");
 
+    @Getter
+    private final RankupEffect rankupEffect = new RankupEffect();
+
     public RelicDescriptionScreen(Player player, int container, int slot, Screen screen) {
         super(player, container, slot, screen);
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        rankupEffect.tick();
     }
 
     @Override
@@ -91,6 +102,12 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
 
     @Override
     public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        var poseStack = guiGraphics.pose();
+
+        poseStack.pushPose();
+
+        poseStack.translate(rankupEffect.shakeX(pPartialTick), rankupEffect.shakeY(pPartialTick), 0F);
+
         super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
 
         for (GuiEventListener listener : this.children()) {
@@ -101,6 +118,8 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
                 widget.onHovered(guiGraphics, pMouseX, pMouseY);
             }
         }
+
+        poseStack.popPose();
     }
 
     @Override
