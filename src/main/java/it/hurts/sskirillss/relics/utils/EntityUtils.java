@@ -243,19 +243,25 @@ public class EntityUtils {
     }
 
     public static long getTotalExperienceForLevel(int level) {
-        long result = 0;
+        if (level <= 0)
+            return 0;
 
-        for (int i = 0; i < level; i++)
-            result += getExperienceForLevel(i);
+        if (level <= 15)
+            return (long) level * level + 6L * level;
 
-        return result;
+        if (level <= 30) {
+            long offset = level - 15;
+
+            return 315 + 37 * offset + (5 * offset * (offset - 1)) / 2;
+        }
+
+        long offset = level - 30;
+
+        return 1395 + 112 * offset + (9 * offset * (offset - 1)) / 2;
     }
 
     public static long getPlayerTotalExperience(Player player) {
-        long totalExperience = 0;
-
-        for (int level = 0; level < player.experienceLevel; level++)
-            totalExperience += getExperienceForLevel(level);
+        var totalExperience = getTotalExperienceForLevel(player.experienceLevel);
 
         totalExperience += Math.round(player.experienceProgress * getExperienceForLevel(player.experienceLevel));
 
