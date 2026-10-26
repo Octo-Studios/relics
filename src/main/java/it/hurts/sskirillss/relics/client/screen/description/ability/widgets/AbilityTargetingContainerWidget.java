@@ -10,6 +10,8 @@ import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescr
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.ToggleSwitch;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.ToggleSwitchAnimator;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.targeting.C2SChangeAbilityTargetingOption;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
@@ -28,8 +30,6 @@ import java.util.List;
 import java.util.Locale;
 
 public class AbilityTargetingContainerWidget extends DescriptionContainerWidget {
-    private static final ResourceLocation SWITCH_ON = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/rank_modifier_switch_on.png");
-    private static final ResourceLocation SWITCH_OFF = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/rank_modifier_switch_off.png");
     private static final ResourceLocation SWITCH_OUTLINE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/rank_modifier_switch_outline.png");
 
     private static final int TOGGLE_X = 5;
@@ -40,6 +40,8 @@ public class AbilityTargetingContainerWidget extends DescriptionContainerWidget 
     private static final int HEADER_STEP = 9;
     private static final int LABEL_X_OFFSET = 12;
     private static final int LABEL_Y_OFFSET = 2;
+
+    private final ToggleSwitchAnimator switches = new ToggleSwitchAnimator();
 
     public AbilityTargetingContainerWidget(DescriptionScreen screen) {
         super(screen);
@@ -85,10 +87,7 @@ public class AbilityTargetingContainerWidget extends DescriptionContainerWidget 
             poseStack.pushPose();
             poseStack.translate(x, y, 100);
 
-            GUIRenderer.begin(data.getTargetingData().getOption(option, row.mode()) ? SWITCH_ON : SWITCH_OFF, poseStack)
-                    .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(1, 1)
-                    .end();
+            ToggleSwitch.render(poseStack, switches.amount(option + ":" + row.mode(), data.getTargetingData().getOption(option, row.mode())));
 
             if (this.isToggleHovered(mouseX, mouseY, row, yOffset))
                 GUIRenderer.begin(SWITCH_OUTLINE, poseStack)

@@ -9,6 +9,8 @@ import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.Abilit
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.description.synergy.SynergyDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.synergy.widgets.SynergyDescriptionContainerWidget;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.ToggleSwitch;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.ToggleSwitchAnimator;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityRankModifier;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyRankModifier;
@@ -26,14 +28,14 @@ public class RankModifierToggleWidget extends AbstractDescriptionWidget {
     private static final double LINE_STEP = 5D;
     private static final int X_OFFSET = 5;
     private static final int Y_OFFSET = -2;
-    private static final ResourceLocation SWITCH_ON = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/rank_modifier_switch_on.png");
-    private static final ResourceLocation SWITCH_OFF = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/rank_modifier_switch_off.png");
+
     private static final ResourceLocation SWITCH_OUTLINE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/rank_modifier_switch_outline.png");
 
     private final DescriptionContainerWidget container;
     private final String rankModifier;
     private final int fallbackLineIndex;
     private final boolean synergy;
+    private final ToggleSwitchAnimator switches = new ToggleSwitchAnimator();
     private double renderX;
     private double renderY;
     private boolean positionVisible;
@@ -61,10 +63,7 @@ public class RankModifierToggleWidget extends AbstractDescriptionWidget {
         poseStack.pushPose();
         poseStack.translate(this.renderX, this.renderY, 100);
 
-        GUIRenderer.begin(this.isRankModifierEnabled() ? SWITCH_ON : SWITCH_OFF, poseStack)
-                .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(1, 1)
-                .end();
+        ToggleSwitch.render(poseStack, this.switches.amount(this.rankModifier, this.isRankModifierEnabled()));
 
         if (this.isHovered())
             GUIRenderer.begin(SWITCH_OUTLINE, poseStack)
