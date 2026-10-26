@@ -7,16 +7,36 @@ import it.hurts.sskirillss.relics.api.events.utility.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 import org.lwjgl.opengl.GL11;
 
+import java.awt.Color;
+
 @EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
 public class TooltipBorderHandler {
+    public static final int PATTERN_WIDTH = 160;
+    public static final int PATTERN_HEIGHT = 64;
+    public static final int CORNER_WIDTH = 32;
+    public static final int CORNER_HEIGHT = 32;
+    public static final int CORNER_MARGIN = 3;
+    public static final int MIDDLE_WIDTH = 96;
+    public static final int MIDDLE_HEIGHT = CORNER_HEIGHT;
+
+    private static final long GLINT_PERIOD = 2800L;
+    private static final float GLINT_ACTIVE = 0.4F;
+    private static final float GLINT_WIDTH = 6F;
+    private static final float GLINT_STRENGTH = 0.9F;
+    private static final float BREATH_SATURATION = 0.4F;
+    private static final float BREATH_BRIGHTNESS = 0.12F;
+    private static final float BREATH_SPEED = 2F;
+
     @SubscribeEvent
     public static void onTooltipDisplay(TooltipDisplayEvent event) {
         var player = Minecraft.getInstance().player;
@@ -62,14 +82,7 @@ public class TooltipBorderHandler {
         var x = event.getX();
         var y = event.getY();
 
-        var patternWidth = 160;
-        var patternHeight = 64;
-
-        var cornerWidth = 32;
-        var cornerHeight = 32;
-
-        var middleWidth = 96;
-        var middleHeight = cornerHeight;
+        TooltipParticles.render(graphics, stack, frameTexture, x, y, width, height);
 
         poseStack.pushPose();
 
@@ -81,25 +94,30 @@ public class TooltipBorderHandler {
 
         int frame = animation.getFrameByTime(player.tickCount).getKey();
 
-        int offset = patternHeight * frame;
+        int offset = PATTERN_HEIGHT * frame;
 
-        graphics.blit(frameTexture, x - cornerWidth / 2 - 3, y - cornerHeight / 2 - 3, 0, offset, cornerWidth, cornerHeight, texWidth, texHeight);
-        graphics.blit(frameTexture, x + width - cornerWidth / 2 + 3, y - cornerHeight / 2 - 3, patternWidth - cornerWidth, offset, cornerWidth, cornerHeight, texWidth, texHeight);
+        graphics.blit(frameTexture, x - CORNER_WIDTH / 2 - CORNER_MARGIN, y - CORNER_HEIGHT / 2 - CORNER_MARGIN, 0, offset, CORNER_WIDTH, CORNER_HEIGHT, texWidth, texHeight);
+        graphics.blit(frameTexture, x + width - CORNER_WIDTH / 2 + CORNER_MARGIN, y - CORNER_HEIGHT / 2 - CORNER_MARGIN, PATTERN_WIDTH - CORNER_WIDTH, offset, CORNER_WIDTH, CORNER_HEIGHT, texWidth, texHeight);
 
-        graphics.blit(frameTexture, x - cornerWidth / 2 - 3, y + height - cornerHeight / 2 + 3, 0, (patternHeight - cornerHeight) + offset, cornerWidth, cornerHeight, texWidth, texHeight);
-        graphics.blit(frameTexture, x + width - cornerWidth / 2 + 3, y + height - cornerHeight / 2 + 3, patternWidth - cornerWidth, (patternHeight - cornerHeight) + offset, cornerWidth, cornerHeight, texWidth, texHeight);
+        graphics.blit(frameTexture, x - CORNER_WIDTH / 2 - CORNER_MARGIN, y + height - CORNER_HEIGHT / 2 + CORNER_MARGIN, 0, (PATTERN_HEIGHT - CORNER_HEIGHT) + offset, CORNER_WIDTH, CORNER_HEIGHT, texWidth, texHeight);
+        graphics.blit(frameTexture, x + width - CORNER_WIDTH / 2 + CORNER_MARGIN, y + height - CORNER_HEIGHT / 2 + CORNER_MARGIN, PATTERN_WIDTH - CORNER_WIDTH, (PATTERN_HEIGHT - CORNER_HEIGHT) + offset, CORNER_WIDTH, CORNER_HEIGHT, texWidth, texHeight);
 
-        graphics.blit(frameTexture, x + (width - middleWidth) / 2, y - middleHeight + 1, cornerWidth, offset, middleWidth, middleHeight, texWidth, texHeight);
-        graphics.blit(frameTexture, x + (width - middleWidth) / 2, y + height - 1, cornerWidth, middleHeight + offset, middleWidth, middleHeight, texWidth, texHeight);
+        graphics.blit(frameTexture, x + (width - MIDDLE_WIDTH) / 2, y - MIDDLE_HEIGHT + 1, CORNER_WIDTH, offset, MIDDLE_WIDTH, MIDDLE_HEIGHT, texWidth, texHeight);
+        graphics.blit(frameTexture, x + (width - MIDDLE_WIDTH) / 2, y + height - 1, CORNER_WIDTH, MIDDLE_HEIGHT + offset, MIDDLE_WIDTH, MIDDLE_HEIGHT, texWidth, texHeight);
 
         RenderSystem.setShaderTexture(0, starTexture);
 
         var xOff = 0;
 
-        for (int i = 1; i < relic.getRelicData(player, stack).calculateQuality() + 1; i++) {
+        var quality = relic.getRelicData(player, stack).calculateQuality();
+        var glintCenter = -GLINT_WIDTH + (Util.getMillis() % GLINT_PERIOD) / (float) GLINT_PERIOD / GLINT_ACTIVE * (quality * 3F + 2F * GLINT_WIDTH);
+
+        for (int i = 1; i < quality + 1; i++) {
             var isAliquot = i % 2 == 1;
 
-            var color = (float) (1F + Math.sin(player.tickCount * i * 0.05F) * 0.1F);
+            var glint = Mth.clamp(1F - Math.abs(xOff + (isAliquot ? 1.5F : 1F) - glintCenter) / GLINT_WIDTH, 0F, 1F) * GLINT_STRENGTH;
+
+            var color = (float) (1F + Math.sin(player.tickCount * i * 0.05F) * 0.1F) + glint;
 
             RenderSystem.setShaderColor(color, color, color, 1F);
 
@@ -113,6 +131,15 @@ public class TooltipBorderHandler {
         RenderSystem.disableBlend();
 
         poseStack.popPose();
+    }
+
+    private static int breathe(int argb, float breath) {
+        var hsb = Color.RGBtoHSB((argb >> 16) & 0xFF, (argb >> 8) & 0xFF, argb & 0xFF, null);
+
+        var saturation = Mth.clamp(hsb[1] * Mth.lerp(breath, 1F - BREATH_SATURATION, 1F + BREATH_SATURATION), 0F, 1F);
+        var brightness = Mth.clamp(hsb[2] * Mth.lerp(breath, 1F - BREATH_BRIGHTNESS, 1F + BREATH_BRIGHTNESS), 0F, 1F);
+
+        return (argb & 0xFF000000) | (Color.HSBtoRGB(hsb[0], saturation, brightness) & 0xFFFFFF);
     }
 
     @SubscribeEvent
@@ -137,6 +164,11 @@ public class TooltipBorderHandler {
             event.setBorderStart(topBorder.getARGB());
         if (bottomBorder != null)
             event.setBorderEnd(bottomBorder.getARGB());
+
+        var breath = (Mth.sin(Util.getMillis() / 1000F * BREATH_SPEED) + 1F) / 2F;
+
+        event.setBorderStart(breathe(event.getBorderStart(), breath));
+        event.setBorderEnd(breathe(event.getBorderEnd(), breath));
 
         var topBackground = style.getTopTooltipBackgroundColor(player, stack);
         var bottomBackground = style.getBottomTooltipBackgroundColor(player, stack);
