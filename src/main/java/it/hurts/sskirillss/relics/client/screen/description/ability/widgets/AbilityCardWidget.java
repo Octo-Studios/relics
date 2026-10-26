@@ -135,7 +135,8 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                             if (!(entry instanceof AbilityCardWidget card) || !card.ability.equals(ability))
                                 continue;
                         }
-                    }
+                    } else if (abilityData.mayPlayerUpgrade() && screen.getUpgradeButton() != null)
+                        screen.getUpgradeButton().shake();
                 } else
                     minecraft.setScreen(new AbilityResearchScreen(minecraft.player, screen.container, screen.slot, screen, ability));
             } else {
