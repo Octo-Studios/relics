@@ -287,6 +287,13 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         }
 
         arrivals.removeIf(arrival -> arrival.ticks <= 0);
+
+        if (arrivals.isEmpty() && pointsCounter != null) {
+            floatingTexts.release(pointsCounter);
+
+            pointsCounter = null;
+            pointsGained = 0;
+        }
     }
 
     private void onReset(RandomSource random, int requiredPoints, int oldLevel, int newLevel) {
@@ -348,7 +355,13 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             batch.add(arrival);
         }
 
-        batch.stream().max(Comparator.comparingInt(entry -> entry.ticks)).ifPresent(entry -> entry.last = true);
+        var last = batch.get(0);
+
+        for (var entry : batch)
+            if (entry.ticks >= last.ticks)
+                last = entry;
+
+        last.last = true;
 
         arrivals.addAll(batch);
     }
