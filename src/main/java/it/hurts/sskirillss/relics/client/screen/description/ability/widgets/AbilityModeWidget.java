@@ -54,6 +54,8 @@ public class AbilityModeWidget extends AbstractDescriptionWidget {
 
         var newMode = modes.get(newIndex);
 
+        screen.getModeSlide().press(step);
+
         NetworkHandler.sendToServer(new C2SChangeAbilityMode(screen.getContainer(), screen.getSlot(), screen.getSelectedAbility(), newMode));
 
         screen.rebuildWidgets();
@@ -63,17 +65,19 @@ public class AbilityModeWidget extends AbstractDescriptionWidget {
     public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         var poseStack = guiGraphics.pose();
 
+        var nudge = screen.getModeSlide().nudge(step, pPartialTick);
+
         poseStack.pushPose();
 
         GUIRenderer.begin(step > 0 ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_right.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_left.png"), poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
-                .pos(this.getX(), this.getY())
+                .pos(this.getX() + nudge, this.getY())
                 .end();
 
         if (this.isHovered())
             GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_arrow_selection.png"), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
-                    .pos(this.getX() - 1, this.getY() - 1)
+                    .pos(this.getX() - 1 + nudge, this.getY() - 1)
                     .end();
 
         poseStack.popPose();

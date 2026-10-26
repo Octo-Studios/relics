@@ -17,6 +17,7 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.Scro
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.AbilityDescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
+import it.hurts.sskirillss.relics.client.screen.utils.SelectionSlide;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -53,6 +54,9 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
     private DescriptionSubcategory subcategory = DescriptionSubcategories.getSubcategory("ability_description");
 
     @Getter
+    private final SelectionSlide modeSlide = new SelectionSlide();
+
+    @Getter
     private UpgradeAbilityActionWidget upgradeButton;
     @Getter
     private RerollAbilityActionWidget rerollButton;
@@ -73,6 +77,13 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
             this.setPage(abilities.indexOf(getSelectedAbility()) / 4);
         }
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+
+        modeSlide.tick();
     }
 
     @Override

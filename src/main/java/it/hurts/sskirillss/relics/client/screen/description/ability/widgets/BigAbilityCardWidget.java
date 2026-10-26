@@ -109,6 +109,13 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
     private static final float FLASH_STRENGTH = 0.9F;
 
+    private static final int MODE_DOT_WIDTH = 4;
+    private static final int MODE_FIELD_WIDTH = 30;
+    private static final int MODE_DOT_X = 11;
+    private static final int MODE_DOT_Y = 15;
+    private static final int MODE_SPARKS = 6;
+    private static final float MODE_FLASH_STRENGTH = 0.8F;
+
     private AbilityDescriptionScreen screen;
 
     private final LevelUpEffect levelUpEffect = new LevelUpEffect();
@@ -157,6 +164,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         var random = minecraft.player.getRandom();
 
         updateLevel(random, stack, ability, abilityData);
+        updateMode(random, ability, abilityData);
         updateArrivals(random);
 
         levelUpEffect.tick();
@@ -239,6 +247,19 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             levelCounter = null;
             levelDelta = 0;
         }
+    }
+
+    private void updateMode(RandomSource random, String ability, AbilityData abilityData) {
+        var template = abilityData.getTemplate();
+
+        if (template == null || template.getModes().isEmpty() || !abilityData.isUnlocked())
+            return;
+
+        var modes = template.getModes();
+        var index = modes.indexOf(abilityData.getMode());
+
+        if (index >= 0 && screen.getModeSlide().update(ability, index))
+            LevelUpEffect.burstAt(screen, random, getModeDotX(modes.size(), index) + MODE_DOT_WIDTH / 2F, getY() + MODE_DOT_Y + MODE_DOT_WIDTH / 2F, STAR_TINT, MODE_SPARKS);
     }
 
     private void updateArrivals(RandomSource random) {
@@ -366,6 +387,12 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             floatingTexts.add(String.format(Locale.ROOT, "%+.1f", delta / 2F).replace(".0", ""), tint, getX() + width / 2F + (random.nextFloat() - 0.5F) * REROLL_TEXT_SPREAD, getY() + REROLL_TEXT_OFFSET_Y, -1F);
     }
 
+    private float getModeDotX(int amount, float index) {
+        var margin = (MODE_FIELD_WIDTH - amount * MODE_DOT_WIDTH) / (amount + 1);
+
+        return getX() + MODE_DOT_X + margin * (index + 1) + MODE_DOT_WIDTH * index;
+    }
+
     private int displayedLevel(String ability, int actual, float partialTick) {
         if (levelRollback >= rollbackDuration)
             return ability.equals(lastAbility) && lastLevel >= 0 && lastLevel != actual ? lastLevel : actual;
@@ -433,30 +460,23 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
                     .pos(this.getX() + 8, this.getY() + 11)
                     .end();
 
-            var dotWidth = 4;
-            var fieldWidth = 30;
-
             var amount = modes.size();
+            var slide = screen.getModeSlide();
 
-            if (amount > 0) {
-                var totalWidth = amount * dotWidth;
-                var margin = (fieldWidth - totalWidth) / (amount + 1);
+            for (int index = 0; index < amount; index++) {
+                var brightness = 1F + (index == modes.indexOf(abilityData.getMode()) ? slide.flash(pPartialTick) * MODE_FLASH_STRENGTH : 0F);
 
-                for (int index = 0; index < amount; index++) {
-                    var x = this.getX() + 11 + margin * (index + 1) + dotWidth * index;
-
-                    GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_point.png"), poseStack)
-                            .anchor(SpriteAnchor.TOP_LEFT)
-                            .pos(x, this.getY() + 15)
-                            .end();
-
-                    if (index == modes.indexOf(abilityData.getMode()))
-                        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_selection.png"), poseStack)
-                                .anchor(SpriteAnchor.TOP_LEFT)
-                                .pos(x - 1, this.getY() + 14)
-                                .end();
-                }
+                GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_point.png"), poseStack)
+                        .anchor(SpriteAnchor.TOP_LEFT)
+                        .color(brightness, brightness, brightness, 1F)
+                        .pos(getModeDotX(amount, index), this.getY() + MODE_DOT_Y)
+                        .end();
             }
+
+            GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/ability_mode_selection.png"), poseStack)
+                    .anchor(SpriteAnchor.TOP_LEFT)
+                    .pos(getModeDotX(amount, slide.position(pPartialTick)) - 1, this.getY() + MODE_DOT_Y - 1)
+                    .end();
         }
 
         if (isUnlocked && hasStats) {
