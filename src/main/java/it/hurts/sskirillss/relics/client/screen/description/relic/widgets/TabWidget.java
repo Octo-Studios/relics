@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
 import it.hurts.sskirillss.relics.client.screen.base.ITabbedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.BookmarkTransition;
 
 public class TabWidget extends BookmarkWidget {
     private DescriptionCategory category;
@@ -18,6 +19,9 @@ public class TabWidget extends BookmarkWidget {
         if (this.isLocked())
             return;
 
+        if (this.minecraft.screen instanceof ITabbedDescriptionScreen screen)
+            BookmarkTransition.mark(this.getKey(), BookmarkTransition.tabKey(screen.getCategory().getId()));
+
         this.minecraft.setScreen(this.category.getScreen(this.getScreen()));
     }
 
@@ -29,5 +33,10 @@ public class TabWidget extends BookmarkWidget {
     @Override
     public String getId() {
         return this.category.getId();
+    }
+
+    @Override
+    public String getKey() {
+        return BookmarkTransition.tabKey(this.getId());
     }
 }

@@ -13,6 +13,7 @@ import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScre
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.BookmarkTransition;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -26,11 +27,16 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
 
 public abstract class BookmarkWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
+    private static final int TRANSITION_DURATION = 8;
+    private static final float TRANSITION_DISTANCE = 10F;
+    private static final float OVERSHOOT = 1.70158F;
+
     @Getter
     private DescriptionScreen screen;
 
@@ -42,6 +48,10 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
     public Tween hoverTween;
     private boolean hasHovered = false;
 
+    private BookmarkTransition.Phase phase = BookmarkTransition.Phase.NONE;
+    private boolean transitionChecked = false;
+    private int transitionTicks = TRANSITION_DURATION;
+
     public BookmarkWidget(int x, int y, DescriptionScreen screen) {
         super(x, y, 16, 20);
 
@@ -50,16 +60,20 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
 
     public abstract String getId();
 
+    public abstract String getKey();
+
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         var poseStack = guiGraphics.pose();
         var player = this.minecraft.player;
 
+        checkTransition();
+
         GUIScissors.begin(this.getX() - 1, this.getY() - 3, this.getWidth() + 2, this.getHeight() + 3);
 
         poseStack.pushPose();
 
-        poseStack.translate(getX() + (this.getWidth() / 2F), getY() + this.getHeight() + 1 - this.slideProgress, 0);
+        poseStack.translate(getX() + (this.getWidth() / 2F), getY() + this.getHeight() + 1 - this.slideProgress + getTransitionOffset(pPartialTick), 0);
 
         if (this.isLocked()) {
             poseStack.translate(0, 10, 0);
@@ -138,6 +152,11 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
 
     @Override
     public void onTick() {
+        checkTransition();
+
+        if (transitionTicks < TRANSITION_DURATION)
+            transitionTicks++;
+
         var hovered = this.isHovered();
         var animationDuration = (this.getAnimationSegments() * 0.5F) / 20F;
 
@@ -166,6 +185,27 @@ public abstract class BookmarkWidget extends AbstractDescriptionWidget implement
 
             hoverTween.start();
         }
+    }
+
+    private void checkTransition() {
+        if (transitionChecked)
+            return;
+
+        transitionChecked = true;
+        phase = BookmarkTransition.consume(getKey());
+
+        if (phase != BookmarkTransition.Phase.NONE)
+            transitionTicks = 0;
+    }
+
+    private float getTransitionOffset(float partialTick) {
+        if (transitionTicks >= TRANSITION_DURATION)
+            return 0F;
+
+        var time = Mth.clamp((transitionTicks + partialTick) / TRANSITION_DURATION, 0F, 1F) - 1F;
+        var eased = 1F + (OVERSHOOT + 1F) * time * time * time + OVERSHOOT * time * time;
+
+        return (phase == BookmarkTransition.Phase.ENTER ? -TRANSITION_DISTANCE : TRANSITION_DISTANCE) * (1F - eased);
     }
 
     private int getAnimationSegments() {

@@ -3,8 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
 import it.hurts.sskirillss.relics.client.screen.base.IPagedDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
-
-import java.util.Locale;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.BookmarkTransition;
 
 public class PageWidget extends BookmarkWidget {
     private DescriptionSubcategory subcategory;
@@ -20,6 +19,8 @@ public class PageWidget extends BookmarkWidget {
         if (this.isLocked() || !(this.getScreen() instanceof IPagedDescriptionScreen screen))
             return;
 
+        BookmarkTransition.mark(this.getKey(), BookmarkTransition.pageKey(screen.getSubcategory().getId()));
+
         screen.setSubcategory(this.subcategory);
 
         this.getScreen().rebuildWidgets();
@@ -33,5 +34,10 @@ public class PageWidget extends BookmarkWidget {
     @Override
     public String getId() {
         return this.subcategory.getId();
+    }
+
+    @Override
+    public String getKey() {
+        return BookmarkTransition.pageKey(this.getId());
     }
 }
