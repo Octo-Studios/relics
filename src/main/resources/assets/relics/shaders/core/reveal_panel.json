@@ -20,6 +20,7 @@
     { "name": "color", "type": "float", "count": 4, "values": [ 1.0, 1.0, 1.0 , 1.0] },
     { "name": "time", "type": "float", "count": 1, "values": [ 1.0 ] },
     { "name": "pixelCount", "type": "float", "count": 1, "values": [ 60.0 ] },
+    { "name": "pointCount", "type": "int", "count": 1, "values": [ 1 ] },
     {
       "name": "positions",
       "type": "float",

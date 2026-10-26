@@ -9,6 +9,7 @@ uniform float greenRadius;
 uniform vec2 size;
 uniform float time;
 uniform float pixelCount;
+uniform int pointCount;
 uniform vec3 col1;
 uniform vec3 col2;
 
@@ -131,29 +132,27 @@ void main(){
     float mod;
     float noisePixelSpread = 5;
 
-    for (int i = 0; i < POINT_COUNT;i += 2){
-        float x = positions[i];
-        float y = positions[i + 1];
-        vec2 v = vec2(x,y);
-
-
-        v = floor(normalizeCoords(v) * pixelCount);
-        vec2 b = ptc - v;
-
+    for (int i = 0; i < pointCount * 2; i += 2){
         float rad = revealRadiuses[i / 2];
         float nSpread = noiseSpreads[i / 2];
 
+        vec2 v = floor(normalizeCoords(vec2(positions[i], positions[i + 1])) * pixelCount);
+        vec2 b = ptc - v;
+
+        float bLength = length(b);
+
+        if ((bLength - nSpread * 1.75 - 0.5) / rad >= dist)
+            continue;
 
         float additionalLength = 0;
-        if (length(b) > 0){
-            vec2 bn = normalize(b);
+        if (bLength > 0){
+            vec2 bn = b / bLength;
             vec2 b1 = bn * rad;
             additionalLength = perlinNoise3d(b1.x + 0.143223,b1.y + 0.143223,time + 0.22343 * i,10) * nSpread;
             additionalLength = round(additionalLength);
         }
 
-
-        float l = (length(b) + additionalLength) / rad;
+        float l = (bLength + additionalLength) / rad;
         if (l < dist){
             noisePixelSpread = nSpread;
             revealRadius = rad;

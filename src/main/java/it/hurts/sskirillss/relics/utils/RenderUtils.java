@@ -3,7 +3,6 @@ package it.hurts.sskirillss.relics.utils;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
-import it.hurts.sskirillss.relics.init.RelicsCoreShaders;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -16,12 +15,9 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import org.apache.commons.lang3.tuple.Pair;
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
-
-import java.util.List;
 
 public class RenderUtils {
-    public static float getPartialTick(boolean ignorePause){
+    public static float getPartialTick(boolean ignorePause) {
         var tracker = Minecraft.getInstance().getTimer();
 
         if (ignorePause && tracker instanceof DeltaTracker.Timer timer)
@@ -40,73 +36,6 @@ public class RenderUtils {
 
         ScreenUtils.drawCenteredString(guiGraphics, font, text, x, y, textColor, false);
     }
-
-    public static void renderRevealingPanel(PoseStack matrices, float x, float y, float sizeX, float sizeY, List<Vector2f> points, List<Float> revealRadiuses, List<Float> noiseSpreads, float time) {
-        RenderSystem.enableBlend();
-
-        float[] arr = new float[256];
-        float[] radiuses = new float[128];
-        float[] noiseSpreadsArr = new float[128];
-
-        for (int i = 0; i < arr.length; i += 2) {
-
-            float lmx;
-            float lmy;
-
-            if (i / 2 < points.size()) {
-                Vector2f v = points.get(i / 2);
-                lmx = (v.x - x) / sizeX;
-                lmy = (v.y - y) / sizeY;
-
-                radiuses[i / 2] = revealRadiuses.get(i / 2);
-                noiseSpreadsArr[i / 2] = noiseSpreads.get(i / 2);
-
-
-            } else {
-                radiuses[i / 2] = 0.0001f;
-                noiseSpreadsArr[i / 2] = 0.000001f;
-                lmx = -100;
-                lmy = -100;
-            }
-            arr[i] = lmx;
-            arr[i + 1] = lmy;
-        }
-
-
-        Matrix4f mat = matrices.last().pose();
-
-
-        RenderSystem.setShader(() -> RelicsCoreShaders.REVEAL_SHADER);
-        RelicsCoreShaders.REVEAL_SHADER.safeGetUniform("revealRadiuses").set(radiuses);
-        RelicsCoreShaders.REVEAL_SHADER.safeGetUniform("noiseSpreads").set(noiseSpreadsArr);
-        RelicsCoreShaders.REVEAL_SHADER.safeGetUniform("positions").set(arr);
-        RelicsCoreShaders.REVEAL_SHADER.safeGetUniform("pixelCount").set(110F);
-
-
-        RelicsCoreShaders.REVEAL_SHADER.safeGetUniform("greenRadius").set(0.035f);
-        RelicsCoreShaders.REVEAL_SHADER.safeGetUniform("size").set(sizeX, sizeY);
-        RelicsCoreShaders.REVEAL_SHADER.safeGetUniform("time").set(time);
-        RelicsCoreShaders.REVEAL_SHADER.safeGetUniform("col1").set(0F, 0F, 1F);
-        RelicsCoreShaders.REVEAL_SHADER.safeGetUniform("col2").set(1F, 0F, 0F);
-
-
-        BufferBuilder builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-
-        builder.addVertex(mat, x, y, 0).setUv(0, 0);
-        builder.addVertex(mat, x + sizeX, y, 0).setUv(1, 0);
-        builder.addVertex(mat, x + sizeX, y + sizeY, 0).setUv(1, 1);
-        builder.addVertex(mat, x, y + sizeY, 0).setUv(0, 1);
-        builder.addVertex(mat, x, y + sizeY, 0).setUv(0, 1);
-        builder.addVertex(mat, x + sizeX, y + sizeY, 0).setUv(1, 1);
-        builder.addVertex(mat, x + sizeX, y, 0).setUv(1, 0);
-        builder.addVertex(mat, x, y, 0).setUv(0, 0);
-
-
-        BufferUploader.drawWithShader(builder.buildOrThrow());
-
-        RenderSystem.disableBlend();
-    }
-
 
     public static void renderAnimatedTextureFromCenter(PoseStack matrix, float centerX, float centerY, float texWidth, float texHeight, float patternWidth, float patternHeight, float scale, AnimationData animation) {
         ClientLevel level = Minecraft.getInstance().level;

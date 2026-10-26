@@ -3,8 +3,14 @@ package it.hurts.sskirillss.relics.client.screen.description.research;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.BufferUploader;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.Tesselator;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
@@ -20,22 +26,24 @@ import it.hurts.sskirillss.relics.client.screen.description.research.particles.R
 import it.hurts.sskirillss.relics.client.screen.description.research.widgets.HintWidget;
 import it.hurts.sskirillss.relics.client.screen.description.research.widgets.StarWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
+import it.hurts.sskirillss.relics.init.RelicsCoreShaders;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.StarData;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.research.PacketManageLink;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -47,8 +55,10 @@ import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.apache.commons.lang3.tuple.Pair;
+import org.joml.Matrix4f;
 import org.joml.Vector2f;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -63,6 +73,10 @@ public class AbilityResearchScreen extends DescriptionScreen {
 
     @Nullable
     public StarData selectedStar;
+
+    private static final int REVEAL_MAX_POINTS = 128;
+
+    private static TextureTarget revealTarget;
 
     private List<BurnPoint> points = new ArrayList<>();
     private List<StarWidget> stars = new ArrayList<>();
@@ -359,16 +373,17 @@ public class AbilityResearchScreen extends DescriptionScreen {
             addLivingPoint(pMouseX, pMouseY, 3, 0.1F);
 
             for (BurnPoint point : points) {
-                boolean shouldRender = point.getLifeTime() > 0;
+                if (point.getLifeTime() <= 0)
+                    continue;
 
-                positions.add(new Vector2f(shouldRender ? point.getX() : -100, shouldRender ? point.getY() : -100));
+                positions.add(new Vector2f(point.getX(), point.getY()));
                 scales.add(Mth.lerp(pPartialTick, point.getScaleO(), point.getScale()));
                 noises.add(point.getScale() * 75);
             }
 
             poseStack.translate(0, 0, 5000);
 
-            RenderUtils.renderRevealingPanel(poseStack, x + 67, y + 54, 110, 155, positions, scales, noises, (player.tickCount + pPartialTick) / 50F);
+            renderRevealingPanel(poseStack, x + 67, y + 54, 110, 155, positions, scales, noises, (player.tickCount + pPartialTick) / 50F);
 
             GUIRenderer.begin(DescriptionTextures.RESEARCH_BACKGROUND, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
@@ -422,6 +437,112 @@ public class AbilityResearchScreen extends DescriptionScreen {
 
             poseStack.popPose();
         }
+    }
+
+    private void renderRevealingPanel(PoseStack matrices, float x, float y, float sizeX, float sizeY, List<Vector2f> points, List<Float> revealRadiuses, List<Float> noiseSpreads, float time) {
+        var shader = RelicsCoreShaders.REVEAL_SHADER;
+
+        if (shader == null)
+            return;
+
+        var width = Mth.ceil(sizeX);
+        var height = Mth.ceil(sizeY);
+
+        var count = Math.min(REVEAL_MAX_POINTS, points.size());
+
+        var positions = new float[REVEAL_MAX_POINTS * 2];
+        var radiuses = new float[REVEAL_MAX_POINTS];
+        var noiseSpreadsArr = new float[REVEAL_MAX_POINTS];
+
+        for (var i = 0; i < count; i++) {
+            var point = points.get(i);
+
+            positions[i * 2] = (point.x - x) / sizeX;
+            positions[i * 2 + 1] = (point.y - y) / sizeY;
+
+            radiuses[i] = Math.max(revealRadiuses.get(i), 0.0001F);
+            noiseSpreadsArr[i] = noiseSpreads.get(i);
+        }
+
+        if (revealTarget == null) {
+            revealTarget = new TextureTarget(width, height, false, Minecraft.ON_OSX);
+
+            revealTarget.setFilterMode(GL11.GL_NEAREST);
+        } else if (revealTarget.width != width || revealTarget.height != height)
+            revealTarget.resize(width, height, Minecraft.ON_OSX);
+
+        var projection = new Matrix4f(RenderSystem.getProjectionMatrix());
+        var sorting = RenderSystem.getVertexSorting();
+        var modelView = RenderSystem.getModelViewStack();
+
+        revealTarget.setClearColor(0F, 0F, 0F, 0F);
+        revealTarget.clear(Minecraft.ON_OSX);
+        revealTarget.bindWrite(true);
+
+        RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0F, width, height, 0F, 1000F, 21000F), VertexSorting.ORTHOGRAPHIC_Z);
+
+        modelView.pushMatrix();
+        modelView.translation(0F, 0F, -11000F);
+
+        RenderSystem.applyModelViewMatrix();
+
+        RenderSystem.disableBlend();
+
+        RenderSystem.setShader(() -> shader);
+
+        shader.safeGetUniform("revealRadiuses").set(radiuses);
+        shader.safeGetUniform("noiseSpreads").set(noiseSpreadsArr);
+        shader.safeGetUniform("positions").set(positions);
+        shader.safeGetUniform("pointCount").set(count);
+        shader.safeGetUniform("pixelCount").set(110F);
+        shader.safeGetUniform("greenRadius").set(0.035F);
+        shader.safeGetUniform("size").set(sizeX, sizeY);
+        shader.safeGetUniform("time").set(time);
+        shader.safeGetUniform("col1").set(0F, 0F, 1F);
+        shader.safeGetUniform("col2").set(1F, 0F, 0F);
+
+        var builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+
+        builder.addVertex(0F, 0F, 0F).setUv(0F, 0F);
+        builder.addVertex(width, 0F, 0F).setUv(1F, 0F);
+        builder.addVertex(width, height, 0F).setUv(1F, 1F);
+        builder.addVertex(0F, height, 0F).setUv(0F, 1F);
+        builder.addVertex(0F, height, 0F).setUv(0F, 1F);
+        builder.addVertex(width, height, 0F).setUv(1F, 1F);
+        builder.addVertex(width, 0F, 0F).setUv(1F, 0F);
+        builder.addVertex(0F, 0F, 0F).setUv(0F, 0F);
+
+        BufferUploader.drawWithShader(builder.buildOrThrow());
+
+        modelView.popMatrix();
+
+        RenderSystem.applyModelViewMatrix();
+        RenderSystem.setProjectionMatrix(projection, sorting);
+
+        Minecraft.getInstance().getMainRenderTarget().bindWrite(true);
+
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderTexture(0, revealTarget.getColorTextureId());
+
+        var mat = matrices.last().pose();
+
+        builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+
+        builder.addVertex(mat, x, y, 0).setUv(0, 1);
+        builder.addVertex(mat, x + sizeX, y, 0).setUv(1, 1);
+        builder.addVertex(mat, x + sizeX, y + sizeY, 0).setUv(1, 0);
+        builder.addVertex(mat, x, y + sizeY, 0).setUv(0, 0);
+        builder.addVertex(mat, x, y + sizeY, 0).setUv(0, 0);
+        builder.addVertex(mat, x + sizeX, y + sizeY, 0).setUv(1, 0);
+        builder.addVertex(mat, x + sizeX, y, 0).setUv(1, 1);
+        builder.addVertex(mat, x, y, 0).setUv(0, 1);
+
+        BufferUploader.drawWithShader(builder.buildOrThrow());
+
+        RenderSystem.disableBlend();
     }
 
     public Vec2 getScaledPos(Vec2 pos) {
