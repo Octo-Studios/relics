@@ -22,13 +22,16 @@ public class ContainerSlotClickEvent extends PlayerContainerEvent implements ICa
     private final ClickType type;
     @Getter
     private final ClickAction action;
+    @Getter
+    private final int button;
 
-    public ContainerSlotClickEvent(Player player, AbstractContainerMenu container, Slot slot, ClickType type, ClickAction action, ItemStack heldStack, ItemStack slotStack) {
+    public ContainerSlotClickEvent(Player player, AbstractContainerMenu container, Slot slot, ClickType type, ClickAction action, int button, ItemStack heldStack, ItemStack slotStack) {
         super(player, container);
 
         this.slot = slot;
         this.type = type;
         this.action = action;
+        this.button = button;
         this.heldStack = heldStack;
         this.slotStack = slotStack;
     }

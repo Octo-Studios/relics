@@ -6,7 +6,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.items.AstralSatchelItem;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3f;
 
@@ -18,6 +17,7 @@ public class AstralFX {
     private static final List<Particle> MOTES = new ArrayList<>();
 
     private static final int MOTE_COUNT = 150;
+    private static final double MAX_SPEED = 0.03D;
 
     private static double lastRadius;
 
@@ -91,11 +91,19 @@ public class AstralFX {
 
             particle.previous = particle.position;
             particle.velocity = particle.velocity.scale(0.97D).add(randomVelocity(0.0018D)).add(swirl);
+
+            if (particle.velocity.length() > MAX_SPEED)
+                particle.velocity = particle.velocity.normalize().scale(MAX_SPEED);
+
             particle.position = particle.position.add(particle.velocity);
 
-            if (particle.position.length() > radius - 0.5D) {
-                particle.position = particle.position.scale(-0.88D);
-                particle.previous = particle.position;
+            var limit = radius - 0.5D;
+
+            if (particle.position.length() > limit) {
+                var normal = particle.position.normalize();
+
+                particle.position = normal.scale(limit);
+                particle.velocity = particle.velocity.subtract(normal.scale(2D * Math.max(0D, particle.velocity.dot(normal)))).scale(0.5D);
             }
         }
     }

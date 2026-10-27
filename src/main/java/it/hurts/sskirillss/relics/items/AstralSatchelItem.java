@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.items;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.api.events.utility.ContainerSlotClickEvent;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -31,13 +32,18 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
+import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
@@ -119,6 +125,13 @@ public class AstralSatchelItem extends RelicItem {
 
     public static ItemStack find(Player player) {
         var inventory = player.getInventory();
+        var slot = getState(player).slot;
+
+        if (slot >= 0) {
+            var stack = inventory.getItem(slot);
+
+            return stack.getItem() instanceof AstralSatchelItem ? stack : ItemStack.EMPTY;
+        }
 
         for (var i = 0; i < inventory.getContainerSize(); i++) {
             var stack = inventory.getItem(i);
@@ -130,10 +143,24 @@ public class AstralSatchelItem extends RelicItem {
         return ItemStack.EMPTY;
     }
 
-    public static boolean canUse(Player player) {
-        var stack = find(player);
-
+    public static boolean canUse(Player player, ItemStack stack) {
         return stack.getItem() instanceof AstralSatchelItem relic && relic.getAbility(player, stack).canPlayerUse(player);
+    }
+
+    public static int getSlot(Player player, InteractionHand hand) {
+        return hand == InteractionHand.MAIN_HAND ? player.getInventory().selected : Inventory.SLOT_OFFHAND;
+    }
+
+    public static void setSlot(Player player, int slot) {
+        getState(player).slot = slot;
+    }
+
+    public static boolean isLocked(Player player, int slot) {
+        return slot >= 0 && getState(player).slot == slot;
+    }
+
+    public static boolean isLocked(Player player, Slot slot) {
+        return slot.container == player.getInventory() && isLocked(player, slot.getContainerSlot());
     }
 
     public static double getRadius(Player player) {
@@ -151,20 +178,30 @@ public class AstralSatchelItem extends RelicItem {
     }
 
     public static void setActive(Player player, boolean active) {
+        setActive(player, active, -1);
+    }
+
+    public static void setActive(Player player, boolean active, int slot) {
         var state = getState(player);
 
         state.aimed = null;
 
         if (!active) {
             state.active = false;
+            state.slot = -1;
 
             return;
         }
 
-        var satchel = find(player);
-
-        if (!canUse(player))
+        if (slot < 0 || slot >= player.getInventory().getContainerSize())
             return;
+
+        var satchel = player.getInventory().getItem(slot);
+
+        if (!canUse(player, satchel))
+            return;
+
+        state.slot = slot;
 
         var radius = getRadius(player);
 
@@ -292,7 +329,7 @@ public class AstralSatchelItem extends RelicItem {
     public static boolean deposit(Player player, ItemStack stack) {
         var satchel = find(player);
 
-        if (!(satchel.getItem() instanceof AstralSatchelItem relic) || stack.isEmpty() || stack.getItem() instanceof AstralSatchelItem)
+        if (!(satchel.getItem() instanceof AstralSatchelItem relic) || stack.isEmpty())
             return false;
 
         var entries = new ArrayList<>(getEntries(satchel));
@@ -444,6 +481,7 @@ public class AstralSatchelItem extends RelicItem {
         private boolean active;
         private Vec3 camera = Vec3.ZERO;
         private UUID aimed;
+        private int slot = -1;
     }
 
     public record Entry(UUID id, ItemStack stack, Vec3 position, int amount) {
@@ -487,10 +525,57 @@ public class AstralSatchelItem extends RelicItem {
             if (deposit(player, stack))
                 return;
 
+            if (stack.getItem() instanceof AstralSatchelItem) {
+                var slot = getState(player).slot;
+
+                if (slot >= 0 && player.getInventory().getItem(slot).isEmpty()) {
+                    player.getInventory().setItem(slot, stack.copy());
+
+                    return;
+                }
+            }
+
             player.getInventory().placeItemBackInInventory(stack.copy());
 
-            if (!(stack.getItem() instanceof AstralSatchelItem))
-                player.displayClientMessage(Component.translatable("relics.message.astral_satchel.full"), true);
+            player.displayClientMessage(Component.translatable("relics.message.astral_satchel.full"), true);
+        }
+
+        @SubscribeEvent
+        public static void onSlotClick(ContainerSlotClickEvent event) {
+            var player = event.getEntity();
+
+            if (isLocked(player, event.getSlot()) || event.getType() == ClickType.SWAP && isLocked(player, event.getButton()))
+                event.setCanceled(true);
+        }
+
+        @SubscribeEvent
+        public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
+            if (isActive(event.getEntity()))
+                event.setCanceled(true);
+        }
+
+        @SubscribeEvent
+        public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+            if (isActive(event.getEntity()))
+                event.setCanceled(true);
+        }
+
+        @SubscribeEvent
+        public static void onEntityInteract(PlayerInteractEvent.EntityInteract event) {
+            if (isActive(event.getEntity()))
+                event.setCanceled(true);
+        }
+
+        @SubscribeEvent
+        public static void onEntityInteractSpecific(PlayerInteractEvent.EntityInteractSpecific event) {
+            if (isActive(event.getEntity()))
+                event.setCanceled(true);
+        }
+
+        @SubscribeEvent
+        public static void onAttackEntity(AttackEntityEvent event) {
+            if (isActive(event.getEntity()))
+                event.setCanceled(true);
         }
 
         @SubscribeEvent
@@ -537,10 +622,10 @@ public class AstralSatchelItem extends RelicItem {
     public static class ClientEvents {
         @SubscribeEvent
         public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-            if (!event.getLevel().isClientSide() || !(event.getItemStack().getItem() instanceof AstralSatchelItem) || !canUse(event.getEntity()))
+            if (!event.getLevel().isClientSide() || !canUse(event.getEntity(), event.getItemStack()))
                 return;
 
-            AstralSpace.enter();
+            AstralSpace.enter(getSlot(event.getEntity(), event.getHand()));
         }
     }
 }

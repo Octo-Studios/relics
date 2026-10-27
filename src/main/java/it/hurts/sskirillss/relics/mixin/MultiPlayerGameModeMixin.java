@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.mixin;
 
 import it.hurts.sskirillss.relics.api.events.utility.ContainerSlotClickEvent;
+import it.hurts.sskirillss.relics.items.AstralSatchelItem;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.ClickAction;
@@ -19,21 +20,24 @@ public class MultiPlayerGameModeMixin {
         if (index < 0)
             return;
 
-        if (clickType != ClickType.PICKUP && clickType != ClickType.QUICK_MOVE && clickType != ClickType.SWAP)
-            return;
-
         var menu = player.containerMenu;
 
-        if (containerId != menu.containerId)
-            return;
-
-        if (index >= menu.slots.size())
+        if (containerId != menu.containerId || index >= menu.slots.size())
             return;
 
         var slot = menu.slots.get(index);
 
+        if (clickType == ClickType.THROW && AstralSatchelItem.isLocked(player, slot)) {
+            ci.cancel();
+
+            return;
+        }
+
+        if (clickType != ClickType.PICKUP && clickType != ClickType.QUICK_MOVE && clickType != ClickType.SWAP)
+            return;
+
         if (!(slot instanceof ResultSlot) && slot.allowModification(player) && menu.canTakeItemForPickAll(menu.getCarried(), slot) && slot.isActive()) {
-            var event = new ContainerSlotClickEvent(player, menu, slot, clickType, button == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY, menu.getCarried(), slot.getItem());
+            var event = new ContainerSlotClickEvent(player, menu, slot, clickType, button == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY, button, menu.getCarried(), slot.getItem());
 
             NeoForge.EVENT_BUS.post(event);
 

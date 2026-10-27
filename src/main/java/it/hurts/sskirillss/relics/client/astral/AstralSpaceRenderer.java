@@ -13,6 +13,7 @@ import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.items.AstralSatchelItem;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LightTexture;
@@ -22,6 +23,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 import org.lwjgl.opengl.GL11;
@@ -292,8 +294,6 @@ public class AstralSpaceRenderer {
 
         VISUALS.keySet().retainAll(ids);
 
-        AstralSpace.clearCounts();
-
         Lighting.setupFor3DItems();
 
         for (var i = 0; i < entries.size(); i++) {
@@ -311,7 +311,7 @@ public class AstralSpaceRenderer {
             var distance = (float) toCamera.length();
 
             if (distance > 0.001F)
-                position = position.add(toCamera.scale(0.35D * visual.hover / distance));
+                position = position.add(toCamera.scale(Math.min(0.35F * visual.hover, distance) / distance));
 
             if (i == aimed)
                 labelPosition = position;
@@ -319,7 +319,7 @@ public class AstralSpaceRenderer {
             var fog = Mth.lerp(visual.hover, Mth.clamp(1.15F - distance / (radius * 1.6F), 0F, 1F), 1F);
             var model = itemRenderer.getModel(entry.stack(), MC.level, null, 0);
             var groundScale = Math.max(model.getTransforms().ground.scale.x(), 0.1F);
-            var scale = ITEM_SIZE / groundScale * (1F + 0.2F * visual.hover) * birth * AstralMotion.getPulse(id) * Mth.clamp((distance - 0.4F) / 1.4F, 0.05F, 1F);
+            var scale = ITEM_SIZE / groundScale * (1F + 0.2F * visual.hover) * birth * AstralMotion.getPulse(id);
 
             RenderSystem.setShaderColor(Mth.lerp(fog, 0.55F, 1F), Mth.lerp(fog, 0.5F, 1F), Mth.lerp(fog, 0.85F, 1F), 1F);
 
@@ -343,20 +343,35 @@ public class AstralSpaceRenderer {
                 pose.popPose();
             }
 
+            if (entry.amount() > 1) {
+                var text = AstralTooltip.format(entry.amount());
+                var anchor = position.add(cornerRight).subtract(cornerUp);
+                var textScale = 0.035F * birth;
+
+                pose.pushPose();
+                pose.translate(anchor.x, anchor.y, anchor.z);
+                pose.mulPose(new Quaternionf().setFromNormalized(view).conjugate());
+                pose.scale(textScale, -textScale, textScale);
+
+                var textX = -MC.font.width(text);
+                var textY = -MC.font.lineHeight + 1;
+
+                MC.font.drawInBatch(text, textX + 1, textY + 1, 0xFF3F3F3F, false, pose.last().pose(), bufferSource, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
+
+                bufferSource.endBatch();
+
+                MC.font.drawInBatch(text, textX, textY, 0xFFFFFFFF, false, pose.last().pose(), bufferSource, Font.DisplayMode.SEE_THROUGH, 0, LightTexture.FULL_BRIGHT);
+
+                pose.popPose();
+            }
+
             bufferSource.endBatch();
 
             var center = project(position, camera, viewProjection);
             var corner = project(position.add(cornerRight).subtract(cornerUp), camera, viewProjection);
 
-            if (center != null && corner != null) {
-                var halfWidth = Math.abs(corner[0] - center[0]);
-
-                if (i == aimed)
-                    labelRadius = halfWidth;
-
-                if (entry.amount() > 1)
-                    AstralSpace.addCount(new AstralSpace.CountLabel(entry.amount(), corner[0], corner[1], Mth.clamp(halfWidth * 0.09F, 0.75F, 3F)));
-            }
+            if (i == aimed && center != null && corner != null)
+                labelRadius = Math.abs(corner[0] - center[0]);
 
             if (buffered)
                 AstralSceneBuffer.bind();
@@ -392,6 +407,8 @@ public class AstralSpaceRenderer {
 
             if (point != null)
                 AstralSpace.setLabel(entries.get(aimed).stack(), point[0], point[1], labelRadius, VISUALS.get(entries.get(aimed).id()).hover);
+            else
+                AstralSpace.fadeLabel(delta * 7F);
         } else {
             AstralSpace.fadeLabel(delta * 7F);
         }

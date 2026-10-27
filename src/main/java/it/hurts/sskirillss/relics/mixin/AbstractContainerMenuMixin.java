@@ -36,7 +36,7 @@ public class AbstractContainerMenuMixin {
         );
 
         if (shouldProcess) {
-            var event = new ContainerSlotClickEvent(player, menu, slot, clickType, action == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY, menu.getCarried(), slot.getItem());
+            var event = new ContainerSlotClickEvent(player, menu, slot, clickType, action == 0 ? ClickAction.PRIMARY : ClickAction.SECONDARY, action, menu.getCarried(), slot.getItem());
 
             NeoForge.EVENT_BUS.post(event);
 

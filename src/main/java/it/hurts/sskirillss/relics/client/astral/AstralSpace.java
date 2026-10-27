@@ -24,7 +24,6 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -36,7 +35,6 @@ public class AstralSpace {
 
     private static final Minecraft MC = Minecraft.getInstance();
     private static final long CLOCK_START = System.nanoTime();
-    private static final List<CountLabel> COUNTS = new ArrayList<>();
 
     private static Phase phase = Phase.NONE;
     private static boolean scene;
@@ -67,9 +65,6 @@ public class AstralSpace {
         NONE, ENTER, EXIT
     }
 
-    public record CountLabel(int amount, float x, float y, float scale) {
-    }
-
     public static boolean isRendering() {
         return scene && phase == Phase.NONE;
     }
@@ -90,11 +85,13 @@ public class AstralSpace {
         return scene || phase != Phase.NONE;
     }
 
-    public static void enter() {
+    public static void enter(int slot) {
         var player = MC.player;
 
         if (player == null || isEngaged())
             return;
+
+        AstralSatchelItem.setSlot(player, slot);
 
         beginScene();
 
@@ -104,7 +101,7 @@ public class AstralSpace {
 
         echo();
 
-        NetworkHandler.sendToServer(new C2SSetAstralSatchelActive(true));
+        NetworkHandler.sendToServer(new C2SSetAstralSatchelActive(true, slot));
     }
 
     public static void exit() {
@@ -117,12 +114,12 @@ public class AstralSpace {
 
         echo();
 
-        NetworkHandler.sendToServer(new C2SSetAstralSatchelActive(false));
+        NetworkHandler.sendToServer(new C2SSetAstralSatchelActive(false, -1));
     }
 
     private static void hardExit() {
         if (MC.player != null && isEngaged() && !released)
-            NetworkHandler.sendToServer(new C2SSetAstralSatchelActive(false));
+            NetworkHandler.sendToServer(new C2SSetAstralSatchelActive(false, -1));
 
         endScene();
 
@@ -166,6 +163,9 @@ public class AstralSpace {
 
     private static void endScene() {
         scene = false;
+
+        if (MC.player != null)
+            AstralSatchelItem.setSlot(MC.player, -1);
 
         AstralMotion.reset();
         AstralFX.reset();
@@ -220,18 +220,6 @@ public class AstralSpace {
         labelX = x;
         labelY = y;
         labelStrength = strength;
-    }
-
-    public static List<CountLabel> getCounts() {
-        return COUNTS;
-    }
-
-    public static void clearCounts() {
-        COUNTS.clear();
-    }
-
-    public static void addCount(CountLabel label) {
-        COUNTS.add(label);
     }
 
     public static void fadeLabel(float amount) {
@@ -410,36 +398,35 @@ public class AstralSpace {
             if (!AstralSpace.isLocked() || MC.player == null)
                 return;
 
-            event.setSwingHand(false);
+            if (AstralSpace.isActive() && event.isUseItem()) {
+                var entries = AstralSpace.getEntries();
+                var aimed = AstralSpace.pick(entries, 1F);
+                var holdsSatchel = MC.player.getItemInHand(event.getHand()).getItem() instanceof AstralSatchelItem;
+
+                if (aimed < 0 && !holdsSatchel)
+                    return;
+
+                event.setSwingHand(false);
+                event.setCanceled(true);
+
+                if (aimed >= 0) {
+                    AstralSpace.markUse();
+
+                    NetworkHandler.sendToServer(new C2SWithdrawAstralSatchelItem(entries.get(aimed).id()));
+                } else if (AstralSpace.canExit() && AstralSatchelItem.isLocked(MC.player, AstralSatchelItem.getSlot(MC.player, event.getHand()))) {
+                    AstralSpace.exit();
+                }
+
+                return;
+            }
+
+            var pushing = AstralSpace.isActive() && event.isAttack();
+
+            event.setSwingHand(pushing);
             event.setCanceled(true);
 
-            if (!AstralSpace.isActive())
-                return;
-
-            if (event.isAttack()) {
+            if (pushing)
                 AstralSpace.push();
-
-                return;
-            }
-
-            if (!event.isUseItem())
-                return;
-
-            var entries = AstralSpace.getEntries();
-            var aimed = AstralSpace.pick(entries, 1F);
-
-            if (aimed >= 0) {
-                AstralSpace.markUse();
-
-                NetworkHandler.sendToServer(new C2SWithdrawAstralSatchelItem(entries.get(aimed).id()));
-
-                return;
-            }
-
-            var holdsSatchel = MC.player.getMainHandItem().getItem() instanceof AstralSatchelItem || MC.player.getOffhandItem().getItem() instanceof AstralSatchelItem;
-
-            if (holdsSatchel && AstralSpace.canExit())
-                AstralSpace.exit();
         }
 
         @SubscribeEvent
