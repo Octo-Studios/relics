@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
+import it.hurts.sskirillss.relics.items.AstralSatchelItem;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
 import it.hurts.sskirillss.relics.items.relics.ClotOfTimeItem;
 import it.hurts.sskirillss.relics.items.relics.RiderFluteItem;
@@ -102,6 +103,8 @@ public class RelicsDataComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> RING_OF_THE_SEVEN_DEADLY_SINS_HURT_TIMER = RelicsDataComponents.construct("ring_of_the_seven_deadly_sins/hurt_timer", Codec.INT);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<SphereOfSelfSacrifice.HealingStack>>> SPHERE_OF_SELF_SACRIFICE_STACKS = RelicsDataComponents.construct("sphere_of_self_sacrifice/stacks", Codec.list(SphereOfSelfSacrifice.HealingStack.CODEC));
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<PetBoneItem.PetBoneData>> PET_BONE_DATA = RelicsDataComponents.construct("pet_bone/data", PetBoneItem.PetBoneData.CODEC);
+
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<List<AstralSatchelItem.Entry>>> ASTRAL_SATCHEL_ENTRIES = RelicsDataComponents.construct("astral_satchel/entries", Codec.list(AstralSatchelItem.Entry.CODEC));
 
     public static <T> DeferredHolder<DataComponentType<?>, DataComponentType<T>> construct(String name, Codec<T> codec) {
         return DATA_COMPONENTS.register(name, () -> DataComponentType.<T>builder()

@@ -1,6 +1,7 @@
 package it.hurts.sskirillss.relics.init;
 
 import it.hurts.sskirillss.relics.Relics;
+import it.hurts.sskirillss.relics.items.AstralSatchelItem;
 import it.hurts.sskirillss.relics.items.GoldenToothItem;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
 import it.hurts.sskirillss.relics.items.CookedMeatballItem;
@@ -76,6 +77,7 @@ public class RelicsItems {
     public static final DeferredHolder<Item, RelicItem> GLITCHY_MANTLE = ITEMS.register("glitchy_mantle", GlitchyMantleItem::new);
     public static final DeferredHolder<Item, RelicItem> GHOSTLY_MANTLE = ITEMS.register("ghostly_mantle", GhostlyMantleItem::new);
     public static final DeferredHolder<Item, RelicItem> SHIELD_OF_RETALIATION = ITEMS.register("shield_of_retaliation", ShieldOfRetaliationItem::new);
+    public static final DeferredHolder<Item, Item> ASTRAL_SATCHEL = ITEMS.register("astral_satchel", AstralSatchelItem::new);
 
     public static void register(IEventBus bus) {
         ITEMS.register(bus);

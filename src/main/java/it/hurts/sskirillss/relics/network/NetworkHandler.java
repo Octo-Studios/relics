@@ -16,6 +16,9 @@ import it.hurts.sskirillss.relics.network.packets.abilities.C2SSwitchSynergyMode
 import it.hurts.sskirillss.relics.network.packets.description.relic.C2SChangeRelicOptionFlawlessVisual;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyMode;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyRankModifier;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSetAstralSatchelActive;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSyncAstralSatchelCamera;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SWithdrawAstralSatchelItem;
 import it.hurts.sskirillss.relics.network.packets.item.cut_glass_boot.C2SCycleFluid;
 import it.hurts.sskirillss.relics.network.packets.item.jellyfish_necklace.C2SChainedElectricityPacket;
 import it.hurts.sskirillss.relics.network.packets.item.rider_flute.C2SCycleRiderFluteSlot;
@@ -98,6 +101,11 @@ public class NetworkHandler {
 
         // === SHIELD OF RETALIATION ===
         registrar.playToServer(C2SShieldOfRetaliationRelease.TYPE, C2SShieldOfRetaliationRelease.STREAM_CODEC, C2SShieldOfRetaliationRelease::handle);
+
+        // === ASTRAL SATCHEL ===
+        registrar.playToServer(C2SSetAstralSatchelActive.TYPE, C2SSetAstralSatchelActive.STREAM_CODEC, C2SSetAstralSatchelActive::handle);
+        registrar.playToServer(C2SWithdrawAstralSatchelItem.TYPE, C2SWithdrawAstralSatchelItem.STREAM_CODEC, C2SWithdrawAstralSatchelItem::handle);
+        registrar.playToServer(C2SSyncAstralSatchelCamera.TYPE, C2SSyncAstralSatchelCamera.STREAM_CODEC, C2SSyncAstralSatchelCamera::handle);
 
         registrar.playToClient(ChromaticAberrationPacket.TYPE, ChromaticAberrationPacket.STREAM_CODEC, ChromaticAberrationPacket::handle);
         registrar.playToClient(ShakePacket.TYPE, ShakePacket.STREAM_CODEC, ShakePacket::handle);
