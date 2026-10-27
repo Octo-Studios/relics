@@ -4,6 +4,7 @@ import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractPlateWidget;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.FloatingTexts;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
@@ -16,6 +17,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RankPlateWidget extends AbstractPlateWidget {
+    private static final int TEXT_COLOR = 0xFF55FFFF;
+    private static final float TEXT_X = 10F;
+    private static final float TEXT_Y = 8F;
+    private static final float RANK_PULSE = 0.8F;
+
+    private final FloatingTexts floatingTexts = new FloatingTexts();
+
+    private int lastRank = -1;
+
     public RankPlateWidget(int x, int y, DescriptionScreen screen) {
         super(x, y, screen, "rank");
     }
@@ -31,6 +41,18 @@ public class RankPlateWidget extends AbstractPlateWidget {
         var relic = (IRelicItem) stack.getItem();
 
         var poseStack = guiGraphics.pose();
+
+        var scale = getPulseScale(pPartialTick);
+
+        poseStack.pushPose();
+
+        poseStack.translate(width / 2F, height / 2F, 0F);
+        poseStack.scale(1F / scale, 1F / scale, 1F);
+        poseStack.translate(-width / 2F - getWobbleX(pPartialTick), -height / 2F - getWobbleY(pPartialTick), 0D);
+
+        floatingTexts.render(guiGraphics, minecraft.font, pPartialTick);
+
+        poseStack.popPose();
 
         var time = player.tickCount + pPartialTick;
 
@@ -60,6 +82,28 @@ public class RankPlateWidget extends AbstractPlateWidget {
         }
 
         poseStack.popPose();
+    }
+
+    @Override
+    public void onTick() {
+        super.onTick();
+
+        floatingTexts.tick();
+
+        var stack = getScreen().getStack();
+
+        if (minecraft.player == null || !(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var rank = relic.getRelicData(minecraft.player, stack).getLevelingData().getRank();
+
+        if (lastRank >= 0 && rank > lastRank) {
+            pulse(RANK_PULSE);
+
+            floatingTexts.add("+" + (rank - lastRank), TEXT_COLOR, TEXT_X, TEXT_Y, -1F);
+        }
+
+        lastRank = rank;
     }
 
     @Override

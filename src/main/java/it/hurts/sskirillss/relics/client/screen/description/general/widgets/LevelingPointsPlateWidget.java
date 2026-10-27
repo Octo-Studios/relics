@@ -3,8 +3,13 @@ package it.hurts.sskirillss.relics.client.screen.description.general.widgets;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractPlateWidget;
-import it.hurts.sskirillss.relics.utils.RenderUtils;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.AnimatedValue;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.DeltaCounter;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.FloatingTexts;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.RerollAnimation;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.UIParticles;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -19,14 +24,16 @@ public class LevelingPointsPlateWidget extends AbstractPlateWidget {
     private static final int MIN_DURATION = 6;
     private static final int MAX_DURATION = 40;
     private static final float DURATION_PER_POINT = 1.5F;
+    private static final float COUNTER_X = 10F;
+    private static final float COUNTER_Y = 8F;
+    private static final float SPEND_PULSE = 0.6F;
 
-    private boolean initialized = false;
-    private boolean animating = false;
+    private final FloatingTexts floatingTexts = new FloatingTexts();
+    private final DeltaCounter counter = new DeltaCounter(floatingTexts);
+    private final AnimatedValue points = new AnimatedValue();
+
     private int actual = 0;
     private int target = 0;
-    private float from = 0F;
-    private int ticks = 0;
-    private int duration = 1;
     private int settle = 0;
     private int hidden = 0;
     private int hiddenTicks = 0;
@@ -45,29 +52,49 @@ public class LevelingPointsPlateWidget extends AbstractPlateWidget {
     }
 
     @Override
+    public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        var poseStack = guiGraphics.pose();
+
+        var scale = getPulseScale(partialTick);
+
+        poseStack.pushPose();
+
+        poseStack.translate(width / 2F, height / 2F, 0F);
+        poseStack.scale(1F / scale, 1F / scale, 1F);
+        poseStack.translate(-width / 2F - getWobbleX(partialTick), -height / 2F - getWobbleY(partialTick), 0D);
+
+        floatingTexts.render(guiGraphics, minecraft.font, partialTick);
+
+        poseStack.popPose();
+    }
+
+    @Override
     public void onTick() {
         super.onTick();
+
+        floatingTexts.tick();
 
         var stack = getScreen().getStack();
 
         if (minecraft.player == null || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var points = relic.getRelicData(minecraft.player, stack).getLevelingData().getPoints();
+        var current = relic.getRelicData(minecraft.player, stack).getLevelingData().getPoints();
 
-        if (!initialized) {
-            initialized = true;
-            actual = points;
-            target = points;
+        if (!points.isInitialized()) {
+            actual = current;
+            target = current;
+
+            points.snap(current);
 
             return;
         }
 
-        if (points != actual) {
-            if (points < actual)
+        if (current != actual) {
+            if (current < actual)
                 hidden = 0;
 
-            actual = points;
+            actual = current;
             settle = 1;
         }
 
@@ -80,25 +107,16 @@ public class LevelingPointsPlateWidget extends AbstractPlateWidget {
             var desired = Math.max(0, actual - hidden);
 
             if (desired != target) {
-                from = displayedPoints(0F);
+                if (desired < target)
+                    pulse(SPEND_PULSE);
+
                 target = desired;
-                ticks = 0;
-                duration = Mth.clamp(Math.round(Math.abs(desired - from) * DURATION_PER_POINT), MIN_DURATION, MAX_DURATION);
-                animating = true;
+
+                points.set(desired, Mth.clamp(Math.round(Math.abs(desired - points.getValue()) * DURATION_PER_POINT), MIN_DURATION, MAX_DURATION));
             }
         }
 
-        if (animating && ++ticks >= duration)
-            animating = false;
-    }
-
-    private int displayedPoints(float partialTick) {
-        if (!animating)
-            return target;
-
-        var t = Mth.clamp((ticks + partialTick) / duration, 0F, 1F);
-
-        return Math.round(Mth.lerp(1F - (1F - t) * (1F - t), from, target));
+        counter.update(points.getInt(target), points.isMoving(), UIParticles.GOLD, RerollAnimation.TINT_DOWN, COUNTER_X, COUNTER_Y);
     }
 
     @Override
@@ -127,6 +145,6 @@ public class LevelingPointsPlateWidget extends AbstractPlateWidget {
         if (!(stack.getItem() instanceof IRelicItem relic))
             return "";
 
-        return String.valueOf(initialized ? displayedPoints(RenderUtils.getPartialTick(false)) : relic.getRelicData(minecraft.player, stack).getLevelingData().getPoints());
+        return String.valueOf(points.getInt(relic.getRelicData(minecraft.player, stack).getLevelingData().getPoints()));
     }
 }

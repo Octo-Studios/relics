@@ -4,6 +4,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public class FloatingTexts {
         private int age = 0;
         private int life = 0;
         private float pop = 0F;
+        private float popO = 0F;
         private boolean hold = false;
     }
 
@@ -74,6 +76,7 @@ public class FloatingTexts {
     public void tick() {
         for (var entry : entries) {
             entry.life++;
+            entry.popO = entry.pop;
             entry.pop *= POP_DECAY;
 
             if (entry.hold && entry.life > HOLD_TIMEOUT)
@@ -90,18 +93,18 @@ public class FloatingTexts {
         var poseStack = guiGraphics.pose();
 
         for (var entry : entries) {
-            var progress = Math.min((entry.age + partialTick) / DURATION, 1F);
+            var progress = entry.hold ? 0F : Math.min((entry.age + partialTick) / DURATION, 1F);
             var alpha = Math.max((int) (255 * (1F - progress * progress)), MIN_ALPHA);
-            var scale = SCALE * (1F + entry.pop * POP_SCALE);
+            var scale = SCALE * (1F + Mth.lerp(partialTick, entry.popO, entry.pop) * POP_SCALE);
 
             var component = Component.literal(entry.text).withStyle(ChatFormatting.BOLD);
 
             poseStack.pushPose();
 
-            poseStack.translate(entry.x - font.width(component) * SCALE / 2F, entry.y + entry.direction * progress * RISE, Z_LEVEL);
+            poseStack.translate(entry.x, entry.y + font.lineHeight * SCALE / 2F + entry.direction * progress * RISE, Z_LEVEL);
             poseStack.scale(scale, scale, 1F);
 
-            guiGraphics.drawString(font, component, 0, 0, (alpha << 24) | (entry.color & 0xFFFFFF), true);
+            guiGraphics.drawString(font, component.getVisualOrderText(), -font.width(component) / 2F, -font.lineHeight / 2F, (alpha << 24) | (entry.color & 0xFFFFFF), true);
 
             poseStack.popPose();
         }

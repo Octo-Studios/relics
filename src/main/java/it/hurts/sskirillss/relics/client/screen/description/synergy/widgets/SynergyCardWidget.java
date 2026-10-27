@@ -17,6 +17,7 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionText
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.synergy.SynergyDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.ClickAnimation;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -43,15 +44,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
     @Getter
     private final String synergy;
 
-    @Getter
-    @Setter
-    private float clickXSqueeze = 1F;
-    @Getter
-    @Setter
-    private float clickYSqueeze = 1F;
-    @Getter
-    @Setter
-    private float clickZRotation = 0F;
+    private final ClickAnimation clickAnimation = new ClickAnimation();
 
     public Tween hoverTween;
     private boolean hasHovered = false;
@@ -103,53 +96,7 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
                 }
             }
         } else {
-            var overshootFactor = 0.035F;
-            var overshoot = 1F + overshootFactor;
-
-            var tween = Tween.create().setParallel(true);
-
-            tween.tweenMethod(this::setClickYSqueeze, this.getClickYSqueeze(), overshoot, 0.08D)
-                    .setEaseType(EaseType.EASE_OUT)
-                    .setTransitionType(TransitionType.QUAD);
-            tween.tweenMethod(this::setClickXSqueeze, this.getClickXSqueeze(), overshoot, 0.08D)
-                    .setEaseType(EaseType.EASE_OUT)
-                    .setTransitionType(TransitionType.QUAD);
-
-            tween.tweenMethod(this::setClickYSqueeze, overshoot, 1F, 0.12D)
-                    .setDelay(0.04D)
-                    .setEaseType(EaseType.EASE_IN)
-                    .setTransitionType(TransitionType.QUAD);
-            tween.tweenMethod(this::setClickXSqueeze, overshoot, 1F, 0.12D)
-                    .setDelay(0.04D)
-                    .setEaseType(EaseType.EASE_IN)
-                    .setTransitionType(TransitionType.QUAD);
-
-            var initialRotation = this.getClickZRotation();
-            var rotationBase = 0.025F;
-            var amplitude = random.nextBoolean() ? rotationBase : -rotationBase;
-            var decay = 0.75F;
-            var segmentDuration = 0.25D;
-            var delay = 0D;
-            var lastTarget = initialRotation;
-
-            for (var i = 0; i < 10; i++) {
-                var nextTarget = (i % 2 == 0 ? amplitude : -amplitude);
-
-                tween.tweenMethod(this::setClickZRotation, lastTarget, nextTarget, segmentDuration)
-                        .setDelay(delay)
-                        .setEaseType(i == 0 ? EaseType.EASE_OUT : EaseType.EASE_IN_OUT)
-                        .setTransitionType(TransitionType.QUAD);
-
-                lastTarget = nextTarget;
-                delay += segmentDuration;
-                amplitude *= decay;
-            }
-
-            tween.tweenMethod(this::setClickZRotation, lastTarget, 0f, segmentDuration)
-                    .setDelay(delay)
-                    .setEaseType(EaseType.EASE_IN);
-
-            tween.start();
+            clickAnimation.play(1.035F, 0.025F, 10, 0.25D);
 
             soundManager.play(SimpleSoundInstance.forUI(SoundEvents.CHAIN_BREAK, 1F));
         }
@@ -184,9 +131,9 @@ public class SynergyCardWidget extends AbstractDescriptionWidget implements IHov
         poseStack.translate((this.getX() + (this.width / 2F)), (this.getY() + (this.height / 2F)), 0);
 
         poseStack.scale(this.getHoverXSqueeze(), this.getHoverYSqueeze(), 1F);
-        poseStack.scale(this.getClickXSqueeze(), this.getClickYSqueeze(), 1F);
+        poseStack.scale(clickAnimation.getScale(), clickAnimation.getScale(), 1F);
 
-        poseStack.mulPose(Axis.ZP.rotation(this.getClickZRotation()));
+        poseStack.mulPose(Axis.ZP.rotation(clickAnimation.getRotation()));
 
         var color = (float) (1.05F + (Math.sin((player.tickCount + (synergy.length() * 10)) * 0.2F) * 0.1F));
 

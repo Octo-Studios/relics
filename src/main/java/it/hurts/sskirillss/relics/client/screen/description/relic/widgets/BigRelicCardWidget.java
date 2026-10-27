@@ -12,7 +12,11 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.AnimatedValue;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.DeltaCounter;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.FloatingTexts;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.LevelUpEffect;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.RerollAnimation;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -26,6 +30,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.FormattedCharSequence;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.client.model.data.ModelData;
 
@@ -42,13 +47,22 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
     private static final int PARTICLES = 60;
     private static final int PARTICLES_PER_RANK = 20;
     private static final int MAX_PARTICLES = 200;
+    private static final int MIN_ROLLBACK_DURATION = 8;
+    private static final int MAX_ROLLBACK_DURATION = 30;
+    private static final float ROLLBACK_PER_LEVEL = 0.75F;
+    private static final float COUNTER_OFFSET_Y = 8F;
     private static final float FLASH_STRENGTH = 0.9F;
 
     private RelicDescriptionScreen screen;
 
     private final LevelUpEffect levelUpEffect = new LevelUpEffect();
+    private final FloatingTexts floatingTexts = new FloatingTexts();
+
+    private final AnimatedValue shownLevel = new AnimatedValue();
+    private final DeltaCounter levelCounter = new DeltaCounter(floatingTexts);
 
     private int lastRank = -1;
+    private int lastLevel = -1;
 
     public BigRelicCardWidget(int x, int y, RelicDescriptionScreen screen) {
         super(x, y, 50, 87);
@@ -74,7 +88,20 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         lastRank = rank;
 
+        var level = relic.getRelicData(minecraft.player, screen.getStack()).getLevelingData().getLevel();
+
+        if (lastLevel < 0 || level > lastLevel) {
+            shownLevel.snap(level);
+            levelCounter.reset();
+        } else if (level < lastLevel)
+            shownLevel.set(level, Mth.clamp(Math.round((shownLevel.getValue() - level) * ROLLBACK_PER_LEVEL), MIN_ROLLBACK_DURATION, MAX_ROLLBACK_DURATION));
+
+        lastLevel = level;
+
+        levelCounter.update(shownLevel.getInt(level), shownLevel.isMoving(), RerollAnimation.TINT_DOWN, RerollAnimation.TINT_DOWN, getX() + width / 2F, getY() + COUNTER_OFFSET_Y);
+
         levelUpEffect.tick();
+        floatingTexts.tick();
     }
 
     @Override
@@ -178,11 +205,13 @@ public class BigRelicCardWidget extends AbstractDescriptionWidget implements IHo
 
         poseStack.scale(0.75F, 0.75F, 1F);
 
-        MutableComponent levelComponent = Component.literal(String.valueOf(relic.getRelicData(player, stack).getLevelingData().getLevel())).withStyle(ChatFormatting.BOLD);
+        MutableComponent levelComponent = Component.literal(String.valueOf(shownLevel.getInt(relic.getRelicData(player, stack).getLevelingData().getLevel()))).withStyle(ChatFormatting.BOLD);
 
         guiGraphics.drawString(minecraft.font, levelComponent, (int) (((getX() + 26.5F) * 1.33F) - (minecraft.font.width(levelComponent) / 2F)), (int) ((getY() + 4.5F) * 1.33F), 0xFFE278, false);
 
         poseStack.popPose();
+
+        floatingTexts.render(guiGraphics, minecraft.font, pPartialTick);
 
         if (isHovered() && relic.getRelicData(player, stack).getAbilitiesData().hasUnlockedUpgradeableAbility())
             GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_outline.png"), poseStack)

@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class AbstractPlateWidget extends AbstractDescriptionWidget implements IHoverableWidget, ITickingWidget {
+    private static final double WOBBLE_SPEED = 0.075D;
+    private static final double WOBBLE_PHASE = 10D;
+    private static final double WOBBLE_Y_SCALE = 0.5D;
     private static final float PULSE_DECAY = 0.75F;
     private static final float PULSE_THRESHOLD = 0.01F;
     private static final float PULSE_SCALE = 0.08F;
@@ -55,10 +58,10 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
 
         poseStack.pushPose();
 
-        poseStack.translate(getX() + Math.sin((player.tickCount + pPartialTick + icon.length() * 10D) * 0.075D), getY() + Math.cos((player.tickCount + pPartialTick + icon.length() * 10D) * 0.075D) * 0.5D, 0);
+        poseStack.translate(getX() + getWobbleX(pPartialTick), getY() + getWobbleY(pPartialTick), 0);
 
         var glow = Mth.lerp(pPartialTick, pulseO, pulse);
-        var scale = 1F + glow * PULSE_SCALE;
+        var scale = getPulseScale(pPartialTick);
 
         poseStack.translate(width / 2F, height / 2F, 0F);
         poseStack.scale(scale, scale, 1F);
@@ -89,6 +92,18 @@ public abstract class AbstractPlateWidget extends AbstractDescriptionWidget impl
                     .end();
 
         poseStack.popPose();
+    }
+
+    public float getPulseScale(float partialTick) {
+        return 1F + Mth.lerp(partialTick, pulseO, pulse) * PULSE_SCALE;
+    }
+
+    public double getWobbleX(float partialTick) {
+        return Math.sin((minecraft.player.tickCount + partialTick + icon.length() * WOBBLE_PHASE) * WOBBLE_SPEED);
+    }
+
+    public double getWobbleY(float partialTick) {
+        return Math.cos((minecraft.player.tickCount + partialTick + icon.length() * WOBBLE_PHASE) * WOBBLE_SPEED) * WOBBLE_Y_SCALE;
     }
 
     public void pulse(float strength) {
