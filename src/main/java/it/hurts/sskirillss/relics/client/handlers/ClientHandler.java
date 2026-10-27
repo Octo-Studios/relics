@@ -153,6 +153,7 @@ public class ClientHandler {
         RelicsRelicStyles.register(RelicsItems.PIGLIN_MASK.get(), PiglinMaskStyle::new);
         RelicsRelicStyles.register(RelicsItems.RIDER_FLUTE.get(), RiderFluteStyle::new);
         RelicsRelicStyles.register(RelicsItems.CHEF_HAT.get(), ChefHatStyle::new);
+        RelicsRelicStyles.register(RelicsItems.ASTRAL_SATCHEL.get(), AstralSatchelStyle::new);
 
         RelicsPostEffects.register(ChromaticAberrationPostEffect::new);
         RelicsPostEffects.register(SevenDeadlySinsPostEffect::new);

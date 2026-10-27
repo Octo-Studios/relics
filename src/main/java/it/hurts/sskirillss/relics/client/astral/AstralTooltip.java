@@ -7,11 +7,48 @@ import net.minecraft.client.gui.screens.Screen;
 public class AstralTooltip {
     private static final Minecraft MC = Minecraft.getInstance();
 
+    private static String format(int amount) {
+        if (amount >= 1_000_000_000)
+            return String.format("%.1fB", amount / 1.0E9D);
+
+        if (amount >= 1_000_000)
+            return String.format("%.1fM", amount / 1.0E6D);
+
+        if (amount >= 10_000)
+            return String.format("%.0fK", amount / 1.0E3D);
+
+        if (amount >= 1_000)
+            return String.format("%.1fK", amount / 1.0E3D);
+
+        return String.valueOf(amount);
+    }
+
+    private static void renderCounts(GuiGraphics graphics) {
+        if (!AstralSpace.isRendering() || MC.player == null || MC.screen != null || MC.options.hideGui)
+            return;
+
+        var pose = graphics.pose();
+
+        for (var label : AstralSpace.getCounts()) {
+            var text = format(label.amount());
+
+            pose.pushPose();
+            pose.translate(label.x(), label.y(), 300F);
+            pose.scale(label.scale(), label.scale(), 1F);
+
+            graphics.drawString(MC.font, text, -MC.font.width(text), -MC.font.lineHeight + 1, 0xFFFFFFFF, true);
+
+            pose.popPose();
+        }
+    }
+
     public static void render(GuiGraphics graphics) {
+        renderCounts(graphics);
+
         var strength = AstralSpace.getLabelStrength();
         var stack = AstralSpace.getLabelStack();
 
-        if (!AstralSpace.isActive() || MC.player == null || MC.options.hideGui || stack.isEmpty() || strength <= 0.02F)
+        if (!AstralSpace.isActive() || MC.player == null || MC.screen != null || MC.options.hideGui || stack.isEmpty() || strength <= 0.02F)
             return;
 
         var ease = strength * strength * (3F - 2F * strength);
@@ -19,14 +56,15 @@ public class AstralTooltip {
         var x = AstralSpace.getLabelX();
         var y = AstralSpace.getLabelY();
         var width = Screen.getTooltipFromItem(MC, stack).stream().mapToInt(MC.font::width).max().orElse(0);
-        var right = x + (12 + width) * scale < graphics.guiWidth() - 4;
+        var gap = AstralSpace.getLabelRadius() / scale + 6F;
+        var right = x + (gap + 12 + width) * scale < graphics.guiWidth() - 4;
         var pose = graphics.pose();
 
         pose.pushPose();
         pose.translate(x, y, 0F);
         pose.scale(scale, scale, 1F);
 
-        graphics.renderTooltip(MC.font, stack, right ? 0 : -24 - width, 0);
+        graphics.renderTooltip(MC.font, stack, right ? (int) gap : (int) -(gap + 24 + width), 0);
 
         pose.popPose();
     }

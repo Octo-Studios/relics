@@ -5,7 +5,9 @@ import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberration;
 import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberrationManager;
 import it.hurts.sskirillss.relics.items.AstralSatchelItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SPushAstralSatchelItem;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSetAstralSatchelActive;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSetAstralSatchelAim;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSyncAstralSatchelCamera;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SWithdrawAstralSatchelItem;
 import lombok.Getter;
@@ -23,23 +25,18 @@ import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.UUID;
 
 public class AstralSpace {
-    public static final float HIT_RADIUS = 0.75F;
-    public static final float BIRTH_DURATION = 0.6F;
-    public static final float FLY_DURATION = 0.5F;
-    public static final float WAVE_DURATION = 2.4F;
+    public static final float HIT_RADIUS = 0.65F;
     public static final float TRANSITION_DURATION = 1.6F;
 
     private static final Minecraft MC = Minecraft.getInstance();
     private static final long CLOCK_START = System.nanoTime();
-    private static final Map<Vec3, Long> BIRTHS = new HashMap<>();
-    private static final Map<Vec3, Vec3> BIRTH_STARTS = new HashMap<>();
-    private static final List<Wave> WAVES = new ArrayList<>();
-    private static final List<Flyer> FLYERS = new ArrayList<>();
+    private static final List<CountLabel> COUNTS = new ArrayList<>();
 
     private static Phase phase = Phase.NONE;
     private static boolean scene;
@@ -51,10 +48,14 @@ public class AstralSpace {
     private static Vec3 velocity = Vec3.ZERO;
     private static Vec3 previousVelocity = Vec3.ZERO;
     private static Vec3 sentCamera = Vec3.ZERO;
-    private static List<AstralSatchelItem.Entry> lastEntries = List.of();
+    private static UUID sentAim;
 
     @Getter
+    private static double radius = AstralSatchelItem.DEFAULT_RADIUS;
+    @Getter
     private static ItemStack labelStack = ItemStack.EMPTY;
+    @Getter
+    private static float labelRadius;
     @Getter
     private static float labelX;
     @Getter
@@ -66,10 +67,7 @@ public class AstralSpace {
         NONE, ENTER, EXIT
     }
 
-    public record Wave(Vec3 origin, long born, int color) {
-    }
-
-    public record Flyer(ItemStack stack, Vec3 start, long born) {
+    public record CountLabel(int amount, float x, float y, float scale) {
     }
 
     public static boolean isRendering() {
@@ -152,34 +150,24 @@ public class AstralSpace {
     private static void beginScene() {
         scene = true;
         released = false;
+        radius = AstralSatchelItem.getRadius(MC.player);
         camera = Vec3.ZERO;
         previousCamera = Vec3.ZERO;
         velocity = Vec3.ZERO;
         previousVelocity = Vec3.ZERO;
         sentCamera = Vec3.ZERO;
-        lastEntries = List.of();
+        sentAim = null;
         labelStack = ItemStack.EMPTY;
         labelStrength = 0F;
 
-        BIRTHS.clear();
-        BIRTH_STARTS.clear();
-        WAVES.clear();
-        FLYERS.clear();
-
-        for (var entry : getEntries())
-            BIRTHS.put(entry.position(), -1L);
-
+        AstralMotion.begin(getEntries());
         AstralFX.init();
     }
 
     private static void endScene() {
         scene = false;
 
-        BIRTHS.clear();
-        BIRTH_STARTS.clear();
-        WAVES.clear();
-        FLYERS.clear();
-
+        AstralMotion.reset();
         AstralFX.reset();
         AstralSceneBuffer.release();
     }
@@ -226,19 +214,24 @@ public class AstralSpace {
         return previousCamera.lerp(camera, partialTick);
     }
 
-    public static List<Wave> getWaves() {
-        return WAVES;
-    }
-
-    public static List<Flyer> getFlyers() {
-        return FLYERS;
-    }
-
-    public static void setLabel(ItemStack stack, float x, float y, float strength) {
+    public static void setLabel(ItemStack stack, float x, float y, float radius, float strength) {
         labelStack = stack;
+        labelRadius = radius;
         labelX = x;
         labelY = y;
         labelStrength = strength;
+    }
+
+    public static List<CountLabel> getCounts() {
+        return COUNTS;
+    }
+
+    public static void clearCounts() {
+        COUNTS.clear();
+    }
+
+    public static void addCount(CountLabel label) {
+        COUNTS.add(label);
     }
 
     public static void fadeLabel(float amount) {
@@ -262,6 +255,8 @@ public class AstralSpace {
 
             return;
         }
+
+        radius = AstralSatchelItem.getRadius(player);
 
         var elapsed = (System.nanoTime() - phaseStart) / 1.0E9F;
 
@@ -312,100 +307,47 @@ public class AstralSpace {
         if (wish.lengthSqr() > 1.0E-6D)
             velocity = velocity.add(wish.normalize().scale(speed));
 
-        camera = AstralSatchelItem.clamp(camera.add(velocity));
+        camera = AstralSatchelItem.clamp(camera.add(velocity), radius);
 
         var entries = getEntries();
-        var now = System.nanoTime();
 
-        BIRTHS.keySet().removeIf(position -> entries.stream().noneMatch(entry -> entry.position().equals(position)));
-        BIRTH_STARTS.keySet().removeIf(position -> !BIRTHS.containsKey(position));
-
-        for (var entry : entries) {
-            if (BIRTHS.putIfAbsent(entry.position(), now) == null) {
-                var tint = AstralFX.getTint(entry.stack());
-
-                BIRTH_STARTS.put(entry.position(), getCamera(1F).add(look.scale(0.8D)).add(0D, -0.45D, 0D));
-
-                WAVES.add(new Wave(entry.position(), now, tint));
-            }
-        }
-
-        for (var previous : lastEntries) {
-            if (entries.stream().noneMatch(entry -> entry.position().equals(previous.position()))) {
-                var tint = AstralFX.getTint(previous.stack());
-
-                WAVES.add(new Wave(previous.position(), now, tint));
-                FLYERS.add(new Flyer(previous.stack(), previous.position(), now));
-            }
-        }
-
-        WAVES.removeIf(wave -> (now - wave.born()) / 1.0E9F > WAVE_DURATION);
-        FLYERS.removeIf(flyer -> (now - flyer.born()) / 1.0E9F > FLY_DURATION);
-
-        lastEntries = entries;
-
+        AstralMotion.tick(entries);
         AstralFX.tick();
 
-        if (phase != Phase.EXIT && MC.player.tickCount % 2 == 0 && !camera.equals(sentCamera)) {
+        if (phase == Phase.EXIT)
+            return;
+
+        if (player.tickCount % 2 == 0 && !camera.equals(sentCamera)) {
             sentCamera = camera;
 
             NetworkHandler.sendToServer(new C2SSyncAstralSatchelCamera(camera.toVector3f()));
         }
+
+        var aimed = pick(entries, 1F);
+        var aimedId = aimed < 0 ? null : entries.get(aimed).id();
+
+        if (!Objects.equals(aimedId, sentAim)) {
+            sentAim = aimedId;
+
+            NetworkHandler.sendToServer(new C2SSetAstralSatchelAim(Optional.ofNullable(aimedId)));
+        }
     }
 
-    public static float getBirth(AstralSatchelItem.Entry entry) {
-        var born = BIRTHS.get(entry.position());
-
-        if (born == null || born < 0L)
-            return 1F;
-
-        var progress = Mth.clamp((System.nanoTime() - born) / 1.0E9F / BIRTH_DURATION, 0F, 1F);
-
-        return 1F - (1F - progress) * (1F - progress) * (1F - progress);
-    }
-
-    public static Vec3 getPosition(AstralSatchelItem.Entry entry, float partialTick) {
-        var position = entry.position();
-        var phase = (float) (position.x * 12.9898D + position.y * 78.233D + position.z * 37.719D);
-        var time = getTime();
-        var drift = new Vec3(
-                Mth.sin(time * 0.7F + phase) * 0.25D,
-                Mth.sin(time * 0.9F + phase * 1.3F) * 0.2D,
-                Mth.cos(time * 0.6F + phase * 0.7F) * 0.25D
-        );
-
-        var settled = position.add(drift);
-        var birth = getBirth(entry);
-
-        if (birth >= 1F)
-            return settled;
-
-        var start = BIRTH_STARTS.get(position);
-
-        if (start == null)
-            start = getCamera(partialTick).add(MC.player.getViewVector(1F).scale(1.2D));
-
-        return start.lerp(settled, birth).add(0D, Math.sin(Math.PI * birth) * 0.55D, 0D);
-    }
-
-    public static float getFlyerProgress(Flyer flyer) {
-        var progress = Mth.clamp((System.nanoTime() - flyer.born()) / 1.0E9F / FLY_DURATION, 0F, 1F);
-
-        return progress * progress * (3F - 2F * progress);
-    }
-
-    public static Vec3 getFlyerPosition(Flyer flyer, float partialTick) {
+    private static void push() {
         var player = MC.player;
+        var entries = getEntries();
+        var aimed = pick(entries, 1F);
 
-        if (player == null)
-            return flyer.start();
+        if (player == null || aimed < 0)
+            return;
 
-        var t = getFlyerProgress(flyer);
-        var target = getCamera(partialTick).add(player.getViewVector(1F).scale(0.7D)).add(0D, -0.55D, 0D);
-        var control = flyer.start().lerp(target, 0.5D).add(0D, 1.2D, 0D);
-        var inverse = 1D - t;
+        var entry = entries.get(aimed);
 
-        return flyer.start().scale(inverse * inverse).add(control.scale(2D * inverse * t)).add(target.scale((double) t * t));
+        AstralMotion.pulse(entry.id(), AstralMotion.PULSE_SHRINK);
+
+        markUse();
+
+        NetworkHandler.sendToServer(new C2SPushAstralSatchelItem(entry.id(), player.getViewVector(1F).toVector3f()));
     }
 
     public static int pick(List<AstralSatchelItem.Entry> entries, float partialTick) {
@@ -416,14 +358,15 @@ public class AstralSpace {
 
         var origin = getCamera(partialTick);
         var look = player.getViewVector(1F);
+        var reach = player.entityInteractionRange() * AstralSatchelItem.REACH_MULTIPLIER;
         var best = -1;
         var bestDistance = Double.MAX_VALUE;
 
         for (var i = 0; i < entries.size(); i++) {
-            var offset = getPosition(entries.get(i), partialTick).subtract(origin);
+            var offset = AstralMotion.getPosition(entries.get(i), partialTick).subtract(origin);
             var along = offset.dot(look);
 
-            if (along <= 0.2D || along > AstralSatchelItem.RADIUS * 2D)
+            if (along <= 0.2D || along > reach)
                 continue;
 
             var miss = offset.subtract(look.scale(along)).length();
@@ -470,15 +413,25 @@ public class AstralSpace {
             event.setSwingHand(false);
             event.setCanceled(true);
 
-            if (!event.isUseItem() || !AstralSpace.isActive())
+            if (!AstralSpace.isActive())
                 return;
 
-            var aimed = AstralSpace.pick(AstralSpace.getEntries(), 1F);
+            if (event.isAttack()) {
+                AstralSpace.push();
+
+                return;
+            }
+
+            if (!event.isUseItem())
+                return;
+
+            var entries = AstralSpace.getEntries();
+            var aimed = AstralSpace.pick(entries, 1F);
 
             if (aimed >= 0) {
                 AstralSpace.markUse();
 
-                NetworkHandler.sendToServer(new C2SWithdrawAstralSatchelItem(aimed));
+                NetworkHandler.sendToServer(new C2SWithdrawAstralSatchelItem(entries.get(aimed).id()));
 
                 return;
             }

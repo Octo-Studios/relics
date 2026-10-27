@@ -19,6 +19,8 @@ public class AstralFX {
 
     private static final int MOTE_COUNT = 150;
 
+    private static double lastRadius;
+
     private static class Particle {
         Vec3 position;
         Vec3 previous;
@@ -31,10 +33,27 @@ public class AstralFX {
     public static void init() {
         MOTES.clear();
 
-        for (var i = 0; i < MOTE_COUNT; i++) {
+        lastRadius = AstralSpace.getRadius();
+
+        populate();
+    }
+
+    private static int getTargetCount() {
+        var ratio = AstralSpace.getRadius() / AstralSatchelItem.DEFAULT_RADIUS;
+
+        return Math.max((int) (MOTE_COUNT * ratio * ratio), MOTE_COUNT);
+    }
+
+    private static void populate() {
+        var target = getTargetCount();
+
+        while (MOTES.size() > target)
+            MOTES.removeLast();
+
+        while (MOTES.size() < target) {
             var particle = new Particle();
 
-            particle.position = randomInSphere(AstralSatchelItem.RADIUS - 1D);
+            particle.position = randomInSphere(AstralSpace.getRadius() - 1D);
             particle.previous = particle.position;
             particle.velocity = randomVelocity(0.01D);
             particle.size = 0.12F + RANDOM.nextFloat() * 0.2F;
@@ -49,14 +68,23 @@ public class AstralFX {
         MOTES.clear();
     }
 
-    public static int getTint(ItemStack stack) {
-        var color = stack.getRarity().color().getColor();
-
-        return AstralSprites.mix(color == null ? 0xFFFFFF : color, 0x6A5CFF, 0.55F);
-    }
-
     public static void tick() {
-        var radius = AstralSatchelItem.RADIUS;
+        var radius = AstralSpace.getRadius();
+
+        if (radius != lastRadius) {
+            if (lastRadius > 0D) {
+                var factor = Math.max(radius - 1D, 1D) / Math.max(lastRadius - 1D, 1D);
+
+                for (var particle : MOTES) {
+                    particle.position = particle.position.scale(factor);
+                    particle.previous = particle.position;
+                }
+            }
+
+            lastRadius = radius;
+
+            populate();
+        }
 
         for (var particle : MOTES) {
             var swirl = new Vec3(-particle.position.z, 0D, particle.position.x).scale(0.00008D);
@@ -78,6 +106,7 @@ public class AstralFX {
 
         var matrix = pose.last().pose();
         var sparks = AstralSprites.begin(AstralSprites.SPARK);
+        var scale = (float) Math.sqrt(Math.max(1D, AstralSpace.getRadius() / AstralSatchelItem.DEFAULT_RADIUS));
 
         RenderSystem.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
 
@@ -85,7 +114,7 @@ public class AstralFX {
             var position = particle.previous.lerp(particle.position, partialTick);
             var alpha = (int) (200F * (0.45F + 0.55F * Mth.sin(time * 1.6F + particle.phase)));
 
-            AstralSprites.quad(sparks, matrix, position.x, position.y, position.z, right, up, particle.size, 0F, particle.color, alpha);
+            AstralSprites.quad(sparks, matrix, position.x, position.y, position.z, right, up, particle.size * scale, 0F, particle.color, alpha);
         }
 
         AstralSprites.end(sparks);

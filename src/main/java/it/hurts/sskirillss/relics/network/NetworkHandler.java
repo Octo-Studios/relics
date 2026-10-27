@@ -16,6 +16,10 @@ import it.hurts.sskirillss.relics.network.packets.abilities.C2SSwitchSynergyMode
 import it.hurts.sskirillss.relics.network.packets.description.relic.C2SChangeRelicOptionFlawlessVisual;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyMode;
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyRankModifier;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SMergeAstralSatchelItems;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SPushAstralSatchelItem;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSetAstralSatchelAim;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.S2CAstralSatchelMotion;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSetAstralSatchelActive;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSyncAstralSatchelCamera;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SWithdrawAstralSatchelItem;
@@ -106,6 +110,10 @@ public class NetworkHandler {
         registrar.playToServer(C2SSetAstralSatchelActive.TYPE, C2SSetAstralSatchelActive.STREAM_CODEC, C2SSetAstralSatchelActive::handle);
         registrar.playToServer(C2SWithdrawAstralSatchelItem.TYPE, C2SWithdrawAstralSatchelItem.STREAM_CODEC, C2SWithdrawAstralSatchelItem::handle);
         registrar.playToServer(C2SSyncAstralSatchelCamera.TYPE, C2SSyncAstralSatchelCamera.STREAM_CODEC, C2SSyncAstralSatchelCamera::handle);
+        registrar.playToServer(C2SPushAstralSatchelItem.TYPE, C2SPushAstralSatchelItem.STREAM_CODEC, C2SPushAstralSatchelItem::handle);
+        registrar.playToServer(C2SMergeAstralSatchelItems.TYPE, C2SMergeAstralSatchelItems.STREAM_CODEC, C2SMergeAstralSatchelItems::handle);
+        registrar.playToServer(C2SSetAstralSatchelAim.TYPE, C2SSetAstralSatchelAim.STREAM_CODEC, C2SSetAstralSatchelAim::handle);
+        registrar.playToClient(S2CAstralSatchelMotion.TYPE, S2CAstralSatchelMotion.STREAM_CODEC, S2CAstralSatchelMotion::handle);
 
         registrar.playToClient(ChromaticAberrationPacket.TYPE, ChromaticAberrationPacket.STREAM_CODEC, ChromaticAberrationPacket::handle);
         registrar.playToClient(ShakePacket.TYPE, ShakePacket.STREAM_CODEC, ShakePacket::handle);

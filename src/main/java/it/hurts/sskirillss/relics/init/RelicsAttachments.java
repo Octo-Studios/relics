@@ -3,6 +3,7 @@ package it.hurts.sskirillss.relics.init;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.PlayerAbilityTargetingComponent;
 import it.hurts.sskirillss.relics.api.relics.PlayerResearchComponent;
+import it.hurts.sskirillss.relics.items.AstralSatchelItem;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -23,6 +24,9 @@ public class RelicsAttachments {
                     .serialize(PlayerAbilityTargetingComponent.CODEC)
                     .copyOnDeath()
                     .build());
+
+    public static final DeferredHolder<AttachmentType<?>, AttachmentType<AstralSatchelItem.State>> ASTRAL_SATCHEL_STATE = ATTACHMENTS.register("astral_satchel_state",
+            () -> AttachmentType.builder(AstralSatchelItem.State::new).build());
 
     public static void register(IEventBus bus) {
         ATTACHMENTS.register(bus);
