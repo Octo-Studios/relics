@@ -6,6 +6,7 @@ import it.hurts.sskirillss.relics.items.AstralSatchelItem;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
@@ -17,11 +18,13 @@ import java.util.UUID;
 @AllArgsConstructor
 public class C2SWithdrawAstralSatchelItem implements CustomPacketPayload {
     private final UUID id;
+    private final int amount;
 
     public static final Type<C2SWithdrawAstralSatchelItem> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "astral_satchel/withdraw"));
 
     public static final StreamCodec<ByteBuf, C2SWithdrawAstralSatchelItem> STREAM_CODEC = StreamCodec.composite(
             UUIDUtil.STREAM_CODEC, C2SWithdrawAstralSatchelItem::getId,
+            ByteBufCodecs.VAR_INT, C2SWithdrawAstralSatchelItem::getAmount,
             C2SWithdrawAstralSatchelItem::new
     );
 
@@ -31,6 +34,6 @@ public class C2SWithdrawAstralSatchelItem implements CustomPacketPayload {
     }
 
     public void handle(IPayloadContext ctx) {
-        ctx.enqueueWork(() -> AstralSatchelItem.withdraw(ctx.player(), this.getId()));
+        ctx.enqueueWork(() -> AstralSatchelItem.withdraw(ctx.player(), this.getId(), this.getAmount()));
     }
 }

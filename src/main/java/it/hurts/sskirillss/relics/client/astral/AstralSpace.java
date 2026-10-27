@@ -12,6 +12,7 @@ import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSyncAst
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SWithdrawAstralSatchelItem;
 import lombok.Getter;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
@@ -32,6 +33,8 @@ import java.util.UUID;
 public class AstralSpace {
     public static final float HIT_RADIUS = 0.65F;
     public static final float TRANSITION_DURATION = 1.6F;
+    public static final int WITHDRAW_ALL = -1;
+    public static final int WITHDRAW_STACK = 0;
 
     private static final Minecraft MC = Minecraft.getInstance();
     private static final long CLOCK_START = System.nanoTime();
@@ -170,6 +173,10 @@ public class AstralSpace {
         AstralMotion.reset();
         AstralFX.reset();
         AstralSceneBuffer.release();
+    }
+
+    public static int getWithdrawAmount() {
+        return Screen.hasShiftDown() ? WITHDRAW_ALL : WITHDRAW_STACK;
     }
 
     public static void markUse() {
@@ -412,7 +419,7 @@ public class AstralSpace {
                 if (aimed >= 0) {
                     AstralSpace.markUse();
 
-                    NetworkHandler.sendToServer(new C2SWithdrawAstralSatchelItem(entries.get(aimed).id()));
+                    NetworkHandler.sendToServer(new C2SWithdrawAstralSatchelItem(entries.get(aimed).id(), AstralSpace.getWithdrawAmount()));
                 } else if (AstralSpace.canExit() && AstralSatchelItem.isLocked(MC.player, AstralSatchelItem.getSlot(MC.player, event.getHand()))) {
                     AstralSpace.exit();
                 }

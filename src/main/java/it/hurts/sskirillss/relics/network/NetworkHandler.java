@@ -18,6 +18,8 @@ import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeS
 import it.hurts.sskirillss.relics.network.packets.description.synergy.C2SChangeSynergyRankModifier;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SMergeAstralSatchelItems;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SPushAstralSatchelItem;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SQuickStoreAstralSatchelDrop;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SQuickStoreAstralSatchelSlot;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSetAstralSatchelAim;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.S2CAstralSatchelMotion;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SSetAstralSatchelActive;
@@ -113,6 +115,8 @@ public class NetworkHandler {
         registrar.playToServer(C2SPushAstralSatchelItem.TYPE, C2SPushAstralSatchelItem.STREAM_CODEC, C2SPushAstralSatchelItem::handle);
         registrar.playToServer(C2SMergeAstralSatchelItems.TYPE, C2SMergeAstralSatchelItems.STREAM_CODEC, C2SMergeAstralSatchelItems::handle);
         registrar.playToServer(C2SSetAstralSatchelAim.TYPE, C2SSetAstralSatchelAim.STREAM_CODEC, C2SSetAstralSatchelAim::handle);
+        registrar.playToServer(C2SQuickStoreAstralSatchelSlot.TYPE, C2SQuickStoreAstralSatchelSlot.STREAM_CODEC, C2SQuickStoreAstralSatchelSlot::handle);
+        registrar.playToServer(C2SQuickStoreAstralSatchelDrop.TYPE, C2SQuickStoreAstralSatchelDrop.STREAM_CODEC, C2SQuickStoreAstralSatchelDrop::handle);
         registrar.playToClient(S2CAstralSatchelMotion.TYPE, S2CAstralSatchelMotion.STREAM_CODEC, S2CAstralSatchelMotion::handle);
 
         registrar.playToClient(ChromaticAberrationPacket.TYPE, ChromaticAberrationPacket.STREAM_CODEC, ChromaticAberrationPacket::handle);

@@ -23,8 +23,12 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SQuickStoreAstralSatchelDrop;
+import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SQuickStoreAstralSatchelSlot;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.S2CAstralSatchelMotion;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -33,11 +37,16 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -67,6 +76,7 @@ public class AstralSatchelItem extends RelicItem {
     public static final double PUSH_DISTANCE = 7D;
     public static final double PUSH_RESTITUTION = 0.6D;
     public static final int PUSH_BOUNCES = 3;
+    public static final double DROP_PICK_RADIUS = 0.3D;
 
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
@@ -74,6 +84,7 @@ public class AstralSatchelItem extends RelicItem {
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("subspace")
                                 .initialMaxLevel(10)
+                                .rankModifier(1, "quick_storage")
                                 .rankModifier(3, "immortality")
                                 .rankModifier(5, "infinite_stacks")
                                 .stat(AbilityStatTemplate.builder("radius")
@@ -242,8 +253,10 @@ public class AstralSatchelItem extends RelicItem {
     }
 
     public static int getStackLimit(Player player, ItemStack stack) {
-        var satchel = find(player);
+        return getStackLimit(player, find(player), stack);
+    }
 
+    public static int getStackLimit(Player player, ItemStack satchel, ItemStack stack) {
         if (satchel.getItem() instanceof AstralSatchelItem relic && relic.isRankModifierEnabled(player, satchel, "infinite_stacks"))
             return MAX_AMOUNT;
 
@@ -366,20 +379,125 @@ public class AstralSatchelItem extends RelicItem {
         if (thrown != null)
             sendMotion(player, thrown.id(), path, true);
 
-        var ability = relic.getAbility(player, satchel);
-
-        if (ability.canPlayerUse(player)) {
-            relic.getRelicData(player, satchel).getLevelingData().addExperience("subspace", "storing", stack.getCount());
-
-            ability.getStatisticData().getMetricData("stored_items").addValue(stack.getCount());
-        }
-
-        player.level().playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.6F, 1.4F);
+        reward(player, satchel, relic, stack.getCount());
 
         return true;
     }
 
-    public static void withdraw(Player player, UUID id) {
+    private static void reward(Player player, ItemStack satchel, AstralSatchelItem relic, int count) {
+        var ability = relic.getAbility(player, satchel);
+
+        if (ability.canPlayerUse(player)) {
+            relic.getRelicData(player, satchel).getLevelingData().addExperience("subspace", "storing", count);
+
+            ability.getStatisticData().getMetricData("stored_items").addValue(count);
+        }
+
+        player.level().playSound(null, player.blockPosition(), SoundEvents.AMETHYST_BLOCK_CHIME, SoundSource.PLAYERS, 0.6F, 1.4F);
+    }
+
+    public static boolean canQuickStore(Player player, ItemStack satchel) {
+        return satchel.getItem() instanceof AstralSatchelItem relic && relic.isRankModifierEnabled(player, satchel, "quick_storage");
+    }
+
+    public static boolean quickStore(Player player, ItemStack satchel, ItemStack stack) {
+        if (stack.isEmpty() || stack == satchel || !canQuickStore(player, satchel))
+            return false;
+
+        var relic = (AstralSatchelItem) satchel.getItem();
+        var entries = new ArrayList<>(getEntries(satchel));
+        var limit = getStackLimit(player, satchel, stack);
+        var radius = relic.getRadius(player, satchel);
+        var random = player.getRandom();
+        var remaining = stack.getCount();
+
+        for (var i = 0; i < entries.size() && remaining > 0; i++) {
+            var entry = entries.get(i);
+            var transfer = Math.min(remaining, limit - entry.amount());
+
+            if (transfer <= 0 || !ItemStack.isSameItemSameComponents(entry.stack(), stack))
+                continue;
+
+            entries.set(i, entry.withAmount(entry.amount() + transfer));
+
+            remaining -= transfer;
+        }
+
+        while (remaining > 0 && entries.size() < MAX_ENTRIES) {
+            var amount = Math.min(remaining, limit);
+            var position = clamp(new Vec3(random.nextGaussian(), random.nextGaussian(), random.nextGaussian()).scale(radius * 0.3D), radius);
+
+            entries.add(Entry.create(stack, position, amount));
+
+            remaining -= amount;
+        }
+
+        var moved = stack.getCount() - remaining;
+
+        if (moved <= 0) {
+            player.displayClientMessage(Component.translatable("relics.message.astral_satchel.full"), true);
+
+            return false;
+        }
+
+        stack.shrink(moved);
+
+        setEntries(satchel, entries);
+
+        reward(player, satchel, relic, moved);
+
+        return true;
+    }
+
+    public static boolean quickClick(Player player, AbstractContainerMenu menu, Slot slot, ClickAction action, boolean apply) {
+        var carried = menu.getCarried();
+        var stored = slot.getItem();
+        var satchel = ItemStack.EMPTY;
+        var source = ItemStack.EMPTY;
+
+        if (action == ClickAction.SECONDARY && carried.getItem() instanceof AstralSatchelItem && !stored.isEmpty()) {
+            satchel = carried;
+            source = stored;
+        } else if (action == ClickAction.PRIMARY && stored.getItem() instanceof AstralSatchelItem && !carried.isEmpty()) {
+            satchel = stored;
+            source = carried;
+        }
+
+        if (source == satchel || isLocked(player, slot) || !canQuickStore(player, satchel))
+            return false;
+
+        if (apply) {
+            quickStore(player, satchel, source);
+
+            slot.setChanged();
+            menu.broadcastChanges();
+        }
+
+        return true;
+    }
+
+    public static void quickStoreDrop(Player player, int id, InteractionHand hand) {
+        var satchel = player.getItemInHand(hand);
+
+        if (isActive(player) || !canQuickStore(player, satchel) || !(player.level().getEntity(id) instanceof ItemEntity drop) || !drop.isAlive())
+            return;
+
+        var reach = player.entityInteractionRange() + 2D;
+
+        if (drop.distanceToSqr(player.getEyePosition()) > reach * reach)
+            return;
+
+        var stack = drop.getItem();
+
+        quickStore(player, satchel, stack);
+
+        if (stack.isEmpty())
+            drop.discard();
+        else
+            drop.setItem(stack);
+    }
+
+    public static void withdraw(Player player, UUID id, int amount) {
         var satchel = find(player);
 
         if (!isActive(player) || !(satchel.getItem() instanceof AstralSatchelItem relic))
@@ -392,12 +510,21 @@ public class AstralSatchelItem extends RelicItem {
             return;
 
         var entry = entries.get(index);
-        var stack = entry.stack().copyWithCount(Math.min(entry.amount(), entry.stack().getMaxStackSize()));
-        var requested = stack.getCount();
+        var limit = entry.stack().getMaxStackSize();
+        var wanted = amount < 0 ? entry.amount() : Math.min(entry.amount(), amount == 0 ? limit : amount);
+        var withdrawn = 0;
 
-        player.getInventory().add(stack);
+        while (withdrawn < wanted) {
+            var chunk = entry.stack().copyWithCount(Math.min(wanted - withdrawn, limit));
+            var size = chunk.getCount();
 
-        var withdrawn = requested - stack.getCount();
+            player.getInventory().add(chunk);
+
+            withdrawn += size - chunk.getCount();
+
+            if (!chunk.isEmpty())
+                break;
+        }
 
         if (withdrawn <= 0)
             return;
@@ -544,8 +671,16 @@ public class AstralSatchelItem extends RelicItem {
         public static void onSlotClick(ContainerSlotClickEvent event) {
             var player = event.getEntity();
 
-            if (isLocked(player, event.getSlot()) || event.getType() == ClickType.SWAP && isLocked(player, event.getButton()))
+            if (isLocked(player, event.getSlot()) || event.getType() == ClickType.SWAP && isLocked(player, event.getButton())) {
                 event.setCanceled(true);
+
+                return;
+            }
+
+            if (player.level().isClientSide() || event.getType() != ClickType.PICKUP || !quickClick(player, event.getContainer(), event.getSlot(), event.getAction(), true))
+                return;
+
+            event.setCanceled(true);
         }
 
         @SubscribeEvent
@@ -621,11 +756,74 @@ public class AstralSatchelItem extends RelicItem {
     @EventBusSubscriber(modid = Relics.MODID, value = Dist.CLIENT)
     public static class ClientEvents {
         @SubscribeEvent
-        public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
-            if (!event.getLevel().isClientSide() || !canUse(event.getEntity(), event.getItemStack()))
+        public static void onSlotClick(ContainerSlotClickEvent event) {
+            var player = event.getEntity();
+            var menu = event.getContainer();
+            var slot = event.getSlot();
+
+            if (event.getType() != ClickType.PICKUP || !quickClick(player, menu, slot, event.getAction(), false))
                 return;
 
-            AstralSpace.enter(getSlot(event.getEntity(), event.getHand()));
+            event.setCanceled(true);
+
+            if (Minecraft.getInstance().screen instanceof CreativeModeInventoryScreen) {
+                quickClick(player, menu, slot, event.getAction(), true);
+
+                Minecraft.getInstance().gameMode.handleCreativeModeItemAdd(slot.getItem(), slot.index);
+            } else {
+                NetworkHandler.sendToServer(new C2SQuickStoreAstralSatchelSlot(menu.slots.indexOf(slot), event.getAction() == ClickAction.SECONDARY));
+            }
+        }
+
+        private static ItemEntity findDrop(Player player) {
+            var reach = player.entityInteractionRange();
+            var start = player.getEyePosition();
+            var end = start.add(player.getViewVector(1F).scale(reach));
+            var block = player.level().clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, player));
+            var limit = block.getType() == HitResult.Type.MISS ? reach * reach : block.getLocation().distanceToSqr(start);
+
+            ItemEntity result = null;
+
+            var nearest = limit;
+
+            for (var drop : player.level().getEntitiesOfClass(ItemEntity.class, player.getBoundingBox().expandTowards(end.subtract(start)).inflate(1D))) {
+                var hit = drop.getBoundingBox().inflate(DROP_PICK_RADIUS).clip(start, end);
+
+                if (hit.isEmpty())
+                    continue;
+
+                var distance = hit.get().distanceToSqr(start);
+
+                if (distance > nearest)
+                    continue;
+
+                nearest = distance;
+                result = drop;
+            }
+
+            return result;
+        }
+
+        @SubscribeEvent
+        public static void onRightClickItem(PlayerInteractEvent.RightClickItem event) {
+            var player = event.getEntity();
+
+            if (!event.getLevel().isClientSide() || !canUse(player, event.getItemStack()) || AstralSpace.isEngaged())
+                return;
+
+            if (canQuickStore(player, event.getItemStack())) {
+                var drop = findDrop(player);
+
+                if (drop != null) {
+                    NetworkHandler.sendToServer(new C2SQuickStoreAstralSatchelDrop(drop.getId(), event.getHand() == InteractionHand.OFF_HAND));
+
+                    player.swing(event.getHand());
+
+                    return;
+                }
+            }
+
+            AstralSpace.enter(getSlot(player, event.getHand()));
         }
     }
 }
