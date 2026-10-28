@@ -7,6 +7,7 @@ import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescripti
 import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.packets.leveling.PacketRelicTweak;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -56,6 +57,12 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
         var maxLevel = relic.getRelicData(player, stack).calculateMaxLevel();
         var isMaxLevel = level >= maxLevel;
 
+        var levelingData = relic.getRelicData(player, stack).getLevelingData();
+
+        var currentExperience = EntityUtils.getPlayerTotalExperience(player);
+        var requiredExperience = levelingData.getRankupPlayerExperienceCost();
+        var hasExperience = requiredExperience <= currentExperience;
+
         var key = RelicsHotkeys.RESEARCH_RELIC.getKey().getValue();
 
         var hasShiftDown = key != GLFW.GLFW_KEY_UNKNOWN && InputConstants.isKeyDown(minecraft.getWindow().getWindow(), key);
@@ -78,12 +85,11 @@ public class RankupRelicActionWidget extends AbstractRelicActionWidget {
                     .append(Component.translatable("relics.description.relic.rankup.cost.entry_1", maxLevel)
                             .withColor(isMaxLevel ? DescriptionUtils.POSITIVE_COLOR(true) : DescriptionUtils.NEGATIVE_COLOR(true))));
 
-            if (isMaxLevel) {
-                description.add(newLine);
+            var relativeLevelCost = hasExperience ? EntityUtils.calculateExperienceLevelLoss(player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience);
 
-                description.add(Component.translatable("relics.description.relic.rankup.warning", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName().getString())
-                        .withColor(hasShiftDown ? DescriptionUtils.NEUTRAL_COLOR(true) : DescriptionUtils.NEGATIVE_COLOR(true)));
-            }
+            description.add(Component.literal("   ● ")
+                    .append(Component.translatable("relics.description.relic.rankup.cost.entry_2", hasShiftDown ? requiredExperience + "+" : requiredExperience, hasShiftDown ? relativeLevelCost + "+" : relativeLevelCost)
+                            .withColor(hasExperience ? DescriptionUtils.POSITIVE_COLOR(true) : DescriptionUtils.NEGATIVE_COLOR(true))));
         } else
             description.add(Component.empty()
                     .append(Component.translatable("relics.description.relic.rankup.max_rank", maxLevel)

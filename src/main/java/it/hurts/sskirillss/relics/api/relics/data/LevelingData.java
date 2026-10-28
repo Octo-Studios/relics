@@ -6,6 +6,8 @@ import it.hurts.sskirillss.relics.api.events.relic.leveling.RelicLevelingPointsC
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.LevelingComponent;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
+import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.HashMap;
@@ -273,7 +275,13 @@ public class LevelingData {
         for (int i = 0; i < level; i++)
             total += operation.evaluate(this.getRelicData().getEntity(), this.getRelicData().getStack(), template.getInitialCost(), template.getStep(), i);
 
-        return (int) Math.floor(total);
+        return (int) Math.floor(total * getRankExperienceMultiplier());
+    }
+
+    public double getRankExperienceMultiplier() {
+        var template = this.getRelicData().getTemplate().getLeveling();
+
+        return Math.max(0D, template.getRankScalingModel().evaluate(this.getRelicData().getEntity(), this.getRelicData().getStack(), 1D, template.getRankStep(), getRank()));
     }
 
     public int getLevelFromExperience(int experience) {
@@ -300,22 +308,30 @@ public class LevelingData {
         return current != getLevel();
     }
 
-    public boolean mayPlayerRankup() {
+    public int getRankupPlayerExperienceCost() {
+        return (int) Math.round(this.getRelicData().getTemplate().getLeveling().getRankupCost() * (getRank() + 1));
+    }
+
+    public boolean mayRankup() {
         var levelingTemplate = this.getRelicData().getTemplate().getLeveling();
 
-        return getLevel() == this.getRelicData().calculateMaxLevel() && getRank() < levelingTemplate.getMaxRank();
+        return getLevel() >= this.getRelicData().calculateMaxLevel() && getRank() < levelingTemplate.getMaxRank();
+    }
+
+    public boolean mayPlayerRankup() {
+        if (!(this.getRelicData().getEntity() instanceof Player player))
+            return false;
+
+        return mayRankup() && EntityUtils.getPlayerTotalExperience(player) >= getRankupPlayerExperienceCost();
     }
 
     public boolean rankup() {
-        if (!mayPlayerRankup())
+        if (!(this.getRelicData().getEntity() instanceof Player player) || !mayPlayerRankup())
             return false;
 
-        addRank(1);
-        setLevel(0);
-        setPoints(0);
+        player.giveExperiencePoints(-getRankupPlayerExperienceCost());
 
-        for (var ability : this.getRelicData().getTemplate().getAbilities().getAbilities().values())
-            this.getRelicData().getAbilitiesData().getAbilityData(ability.getId()).setLevel(0);
+        addRank(1);
 
         return true;
     }

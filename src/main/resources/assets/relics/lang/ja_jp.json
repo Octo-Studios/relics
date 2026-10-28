@@ -106,9 +106,9 @@
 
   "relics.description.relic.rankup.title": "レリックをレベルアップ",
   "relics.description.relic.rankup.cost.entry_1": "%1$sレリックのレベル",
-  "relics.description.relic.rankup.warning": "この操作はレリックの状態に重大な影響を及ぼします。起こりうる結果を理解した上で実行する場合は、［%1$s］を長押しして確定してください！",
+  "relics.description.relic.rankup.cost.entry_2": "%1$s経験値ポイント（%2$s相対レベル）",
   "relics.description.relic.rankup.max_rank": "このレリックはすでに最大ランクに達しているため、これ以上強化できません！",
-  "relics.description.relic.rankup.description": "蓄積されたレリックのレベル、アビリティのレベル、および未使用のアップグレードポイントをすべてリセットします。引き換えにレリックのランクが上昇し、レベル上限の解放や特定のアビリティの性質変化が起こります。",
+  "relics.description.relic.rankup.description": "レリックのランクが上昇し、レベル上限の解放や特定のアビリティの性質変化が起こります。",
 
   "relics.description.ability.levelup.title": "アビリティをレベルアップ",
   "relics.description.ability.levelup.cost.entry_1": "%1$s経験値ポイント（%2$s相対レベル）",

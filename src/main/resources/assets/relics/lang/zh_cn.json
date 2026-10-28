@@ -106,9 +106,9 @@
 
   "relics.description.relic.rankup.title": "遗物晋升",
   "relics.description.relic.rankup.cost.entry_1": "%1$s 遗物等级",
-  "relics.description.relic.rankup.warning": "此操作会显著影响遗物状态。使用前请按住 [%1$s] 以确认你理解可能的后果！",
+  "relics.description.relic.rankup.cost.entry_2": "%1$s 经验值（%2$s 相对等级）",
   "relics.description.relic.rankup.max_rank": "遗物已达到最高品阶，无法继续提升！",
-  "relics.description.relic.rankup.description": "重置所有累积的遗物和能力等级，以及所有未使用的能力升级点数。作为回报，提高遗物的品阶，从而提高其最高等级并改变某些能力的行为。",
+  "relics.description.relic.rankup.description": "提高遗物的品阶，从而提高其最高等级并改变某些能力的行为。",
 
   "relics.description.ability.levelup.title": "能力升级",
   "relics.description.ability.levelup.cost.entry_1": "%1$s 经验值（%2$s 相对等级）",

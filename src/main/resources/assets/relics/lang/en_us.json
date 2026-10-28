@@ -106,9 +106,9 @@
 
   "relics.description.relic.rankup.title": "Relic Rank Up",
   "relics.description.relic.rankup.cost.entry_1": "%1$s relic levels",
-  "relics.description.relic.rankup.warning": "This action significantly affects the relic's state. Hold [%1$s] before using to confirm that you understand the possible consequences!",
+  "relics.description.relic.rankup.cost.entry_2": "%1$s experience points (%2$s relative levels)",
   "relics.description.relic.rankup.max_rank": "The relic has already reached its maximum rank and can no longer be increased!",
-  "relics.description.relic.rankup.description": "Resets all accumulated relic and ability levels, as well as any unspent ability upgrade points. In return, increases the relic's rank, which raises its maximum level and alters the behavior of certain abilities.",
+  "relics.description.relic.rankup.description": "Increases the relic's rank, which raises its maximum level and alters the behavior of certain abilities.",
 
   "relics.description.ability.levelup.title": "Ability Level Up",
   "relics.description.ability.levelup.cost.entry_1": "%1$s experience points (%2$s relative levels)",

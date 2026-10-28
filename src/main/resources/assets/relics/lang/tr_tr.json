@@ -80,9 +80,9 @@
 
   "relics.description.relic.rankup.title": "Kalıntı Sıralamasını Yükselt",
   "relics.description.relic.rankup.cost.entry_1": "%1$s kalıntı seviyeleri",
-  "relics.description.relic.rankup.warning": "Bu işlem, kutsal emanetin durumunu önemli ölçüde etkileyecektir. Olası sonuçları anladığınızı onaylamak için kullanmadan önce [%1$s] tuşuna basılı tutun!",
+  "relics.description.relic.rankup.cost.entry_2": "%1$s deneyim puanları (%2$s göreceli seviyeler)",
   "relics.description.relic.rankup.max_rank": "Bu kalıntı zaten en yüksek seviyeye ulaştı ve daha fazla yükseltilemez!",
-  "relics.description.relic.rankup.description": "Birikmiş tüm kalıntı ve yetenek seviyelerini, ayrıca harcanmamış yetenek yükseltme puanlarını sıfırlar. Buna karşılık, kalıntının rütbesini yükselterek maksimum seviyesini artırır ve belirli yeteneklerin davranışını değiştirir.",
+  "relics.description.relic.rankup.description": "Kalıntının rütbesini yükselterek maksimum seviyesini artırır ve belirli yeteneklerin davranışını değiştirir.",
 
   "relics.description.ability.levelup.title": "Yetenek Seviyesi Yükseltme",
   "relics.description.ability.levelup.cost.entry_1": "%1$s deneyim puanları (%2$s göreceli seviyeler)",

@@ -106,9 +106,9 @@
 
   "relics.description.relic.rankup.title": "Aumento de Grau da Relíquia",
   "relics.description.relic.rankup.cost.entry_1": "%1$s níveis de relíquia",
-  "relics.description.relic.rankup.warning": "Esta ação afeta significativamente o estado da relíquia. Segure [%1$s] antes de usar para confirmar que você entende as possíveis consequências!",
+  "relics.description.relic.rankup.cost.entry_2": "%1$s pontos de experiência (%2$s níveis relativos)",
   "relics.description.relic.rankup.max_rank": "A relíquia já atingiu seu grau máximo e não pode mais ser melhorada!",
-  "relics.description.relic.rankup.description": "Zera todos os níveis acumulados da relíquia e das habilidades, bem como quaisquer pontos de melhoria de habilidade não gastos. Em troca, o grau da relíquia é melhorado, o que eleva seu nível máximo e altera o comportamento de certas habilidades.",
+  "relics.description.relic.rankup.description": "Melhora o grau da relíquia, o que eleva seu nível máximo e altera o comportamento de certas habilidades.",
 
   "relics.description.ability.levelup.title": "Aumento de Nível de Habilidade",
   "relics.description.ability.levelup.cost.entry_1": "%1$s pontos de experiência (%2$s níveis relativos)",

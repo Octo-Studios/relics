@@ -75,9 +75,9 @@
 
   "relics.description.relic.rankup.title": "Підвищення рангу реліквії",
   "relics.description.relic.rankup.cost.entry_1": "%1$s рівнів реліквій",
-  "relics.description.relic.rankup.warning": "Ця дія значно впливає на стан реліквії. Утримуйте [%1$s] перед використанням, щоб підтвердити, що ви розумієте можливі наслідки!",
+  "relics.description.relic.rankup.cost.entry_2": "%1$s очок досвіду (%2$s відносних рівнів)",
   "relics.description.relic.rankup.max_rank": "Реліквія вже досягла свого максимального рангу і більше не може бути збільшена!",
-  "relics.description.relic.rankup.description": "Скидає всі накопичені реліквії та рівні здібностей, а також будь-які невитрачені очки покращення здібностей. Натомість підвищує ранг реліквії, що підвищує її максимальний рівень і змінює поведінку певних здібностей.",
+  "relics.description.relic.rankup.description": "Підвищує ранг реліквії, що підвищує її максимальний рівень і змінює поведінку певних здібностей.",
 
   "relics.description.ability.levelup.title": "Підвищення рівня здібности",
   "relics.description.ability.levelup.cost.entry_1": "%1$s очок досвіду (%2$s відносних рівнів)",
