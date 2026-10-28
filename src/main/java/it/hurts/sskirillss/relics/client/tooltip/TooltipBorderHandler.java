@@ -9,6 +9,7 @@ import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
@@ -65,7 +66,17 @@ public class TooltipBorderHandler {
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
         RenderSystem.setShaderTexture(0, frameTexture);
 
-        Minecraft.getInstance().getTextureManager().getTexture(frameTexture).bind();
+        var textureManager = Minecraft.getInstance().getTextureManager();
+        var texture = textureManager.getTexture(frameTexture);
+
+        // GeckoLib doing some weird stuff
+        if (texture instanceof SimpleTexture && texture.getClass() != SimpleTexture.class) {
+            textureManager.register(frameTexture, new SimpleTexture(frameTexture));
+
+            texture = textureManager.getTexture(frameTexture);
+        }
+
+        texture.bind();
 
         int texWidth = GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_WIDTH);
         int texHeight = GlStateManager._getTexLevelParameter(GL11.GL_TEXTURE_2D, 0, GL11.GL_TEXTURE_HEIGHT);
