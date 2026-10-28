@@ -33,6 +33,8 @@ import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -348,21 +350,18 @@ public class KineticBeltItem extends WearableRelicItem {
 
     @EventBusSubscriber
     public static class CommonEvents {
+        private static RelicStacks getGlidingStacks(LivingEntity entity) {
+            return RelicStackingUtils.stacks(entity, RelicsItems.KINETIC_BELT.get(), "gliding", RelicStacks.modeIsNot("disabled"));
+        }
+
         @SubscribeEvent
         public static void onLivingFall(LivingFallEvent event) {
             var entity = event.getEntity();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
-                var relic = (KineticBeltItem) stack.getItem();
+            if (getGlidingStacks(entity).withRank("momentum").filter(entry -> ((KineticBeltItem) entry.relic()).isActive(entry.stack())).isEmpty())
+                return;
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
-                        || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getRankModifierData("momentum").isEnabled() || !relic.isActive(stack))
-                    continue;
-
-                event.setDistance(0);
-
-                break;
-            }
+            event.setDistance(0);
         }
 
         @SubscribeEvent
@@ -374,21 +373,17 @@ public class KineticBeltItem extends WearableRelicItem {
             if (event.getSource().getDirectEntity() instanceof Projectile projectile && projectile.getOwner() instanceof LivingEntity source) {
                 double strikeTotal = 0D;
 
-                for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.KINETIC_BELT.get())) {
-                    var relic = (KineticBeltItem) stack.getItem();
-
-                    if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(source) || relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
-                            || !relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getRankModifierData("strike").isEnabled() || !relic.isActive(stack))
+                for (var entry : getGlidingStacks(source).withRank("strike")) {
+                    if (!((KineticBeltItem) entry.relic()).isActive(entry.stack()))
                         continue;
 
-                    if (!TargetingUtils.canHarm(source, event.getEntity(), stack, "gliding"))
+                    if (!TargetingUtils.canHarm(source, event.getEntity(), entry.stack(), "gliding"))
                         continue;
 
-                    var additional = original * relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getStatData("damage").getValue();
+                    var additional = original * entry.stat("damage");
 
-                    relic.getRelicData(source, stack).getLevelingData().addExperience("gliding", "strike", additional);
-
-                    relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("gliding").getStatisticData().getMetricData("damage").addValue(additional);
+                    entry.addExperience("strike", additional);
+                    entry.addMetric("damage", additional);
 
                     strikeTotal += additional;
                 }
@@ -398,18 +393,14 @@ public class KineticBeltItem extends WearableRelicItem {
 
             double resistanceTotal = 0D;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
-                var relic = (KineticBeltItem) stack.getItem();
-
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")
-                        || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getRankModifierData("resistance").isEnabled() || !relic.isActive(stack))
+            for (var entry : getGlidingStacks(entity).withRank("resistance")) {
+                if (!((KineticBeltItem) entry.relic()).isActive(entry.stack()))
                     continue;
 
-                var additional = original * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("resistance").getValue();
+                var additional = original * entry.stat("resistance");
 
-                relic.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "resistance", additional);
-
-                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatisticData().getMetricData("resistance").addValue(additional);
+                entry.addExperience("resistance", additional);
+                entry.addMetric("resistance", additional);
 
                 resistanceTotal += additional;
             }

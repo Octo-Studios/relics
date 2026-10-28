@@ -20,6 +20,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
@@ -516,14 +517,11 @@ public class GhostlyMantleItem extends WearableRelicItem {
             if (!(target instanceof Player player) || !(source instanceof LivingEntity attacker) || source == target)
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.GHOSTLY_MANTLE.get())) {
-                var relic = (GhostlyMantleItem) stack.getItem();
-                var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("gaze");
+            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.GHOSTLY_MANTLE.get(), "gaze")) {
+                var relic = (GhostlyMantleItem) entry.relic();
+                var ability = entry.ability();
 
-                if (!ability.canPlayerUse(player))
-                    continue;
-
-                var data = relic.getGazeCharges(stack).get(attacker.getStringUUID());
+                var data = relic.getGazeCharges(entry.stack()).get(attacker.getStringUUID());
 
                 if (data == null || data.charges() <= 0)
                     continue;
@@ -543,12 +541,10 @@ public class GhostlyMantleItem extends WearableRelicItem {
             if (!(event.getSource().getEntity() instanceof Player player))
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.GHOSTLY_MANTLE.get())) {
-                var relic = (GhostlyMantleItem) stack.getItem();
-                var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("gaze");
-
-                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("dread").isEnabled())
-                    continue;
+            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.GHOSTLY_MANTLE.get(), "gaze").withRank("dread")) {
+                var stack = entry.stack();
+                var relic = (GhostlyMantleItem) entry.relic();
+                var ability = entry.ability();
 
                 if (!TargetingUtils.canHarm(player, event.getEntity(), stack, "gaze"))
                     continue;
@@ -577,11 +573,12 @@ public class GhostlyMantleItem extends WearableRelicItem {
             if (!(target instanceof Player player))
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.GHOSTLY_MANTLE.get())) {
-                var relic = (GhostlyMantleItem) stack.getItem();
-                var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("spectral_escape");
+            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.GHOSTLY_MANTLE.get(), "spectral_escape")) {
+                var stack = entry.stack();
+                var relic = (GhostlyMantleItem) entry.relic();
+                var ability = entry.ability();
 
-                if (!ability.canPlayerUse(player) || relic.getEscapeCooldown(stack) > 0)
+                if (relic.getEscapeCooldown(stack) > 0)
                     continue;
 
                 event.setCanceled(true);

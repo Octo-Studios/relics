@@ -17,7 +17,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.DamageTypeTags;
@@ -94,17 +95,7 @@ public class ChefHatItem extends WearableRelicItem {
         if (entity == null)
             return 1D;
 
-        var count = 0;
-
-        for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CHEF_HAT.get())) {
-            if (!(stack.getItem() instanceof ChefHatItem relic))
-                continue;
-
-            var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("satiety");
-
-            if (abilityData.canPlayerUse(entity) && abilityData.getRankModifierData("quick_meal").isEnabled())
-                count++;
-        }
+        var count = RelicStackingUtils.stacks(entity, RelicsItems.CHEF_HAT.get(), "satiety").count("quick_meal");
 
         return count <= 0 ? 1D : 3D * count;
     }
@@ -114,26 +105,17 @@ public class ChefHatItem extends WearableRelicItem {
             return;
 
         double maxHealing = 0D;
-        ChefHatItem healingRelic = null;
-        ItemStack healingStack = ItemStack.EMPTY;
+        RelicStacks.Entry healingEntry = null;
         var consumedMetric = cooked ? "cooked_meatballs_eaten" : "raw_meatballs_eaten";
 
-        for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CHEF_HAT.get())) {
-            if (!(stack.getItem() instanceof ChefHatItem relic))
+        for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.CHEF_HAT.get(), "satiety")) {
+            entry.addExperience("consume", 1);
+            entry.addMetric(consumedMetric, 1);
+
+            if (!entry.rank("meatball_healing"))
                 continue;
 
-            var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("satiety");
-
-            if (!abilityData.canPlayerUse(entity))
-                continue;
-
-            relic.getRelicData(entity, stack).getLevelingData().addExperience("satiety", "consume", 1);
-            abilityData.getStatisticData().getMetricData(consumedMetric).addValue(1);
-
-            if (!abilityData.getRankModifierData("meatball_healing").isEnabled())
-                continue;
-
-            var healing = abilityData.getStatData("healing").getValue();
+            var healing = entry.stat("healing");
 
             if (cooked)
                 healing *= 2D;
@@ -142,14 +124,12 @@ public class ChefHatItem extends WearableRelicItem {
                 continue;
 
             maxHealing = healing;
-            healingRelic = relic;
-            healingStack = stack;
+            healingEntry = entry;
         }
 
-        if (maxHealing <= 0D || healingStack.isEmpty())
+        if (maxHealing <= 0D || healingEntry == null)
             return;
 
-        var abilityData = healingRelic.getRelicData(entity, healingStack).getAbilitiesData().getAbilityData("satiety");
         var before = entity.getHealth();
 
         entity.heal((float) maxHealing);
@@ -159,8 +139,8 @@ public class ChefHatItem extends WearableRelicItem {
         if (restored <= 0F)
             return;
 
-        healingRelic.getRelicData(entity, healingStack).getLevelingData().addExperience("satiety", "healing", restored);
-        abilityData.getStatisticData().getMetricData("health_restored").addValue(restored);
+        healingEntry.addExperience("healing", restored);
+        healingEntry.addMetric("health_restored", restored);
     }
 
     @EventBusSubscriber
@@ -185,14 +165,8 @@ public class ChefHatItem extends WearableRelicItem {
                     || event.getSource().is(DamageTypeTags.IS_FIRE)
                     || cookedByFireAspect;
 
-            for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.CHEF_HAT.get())) {
-                var relic = (ChefHatItem) stack.getItem();
-                var abilityData = relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("satiety");
-
-                if (!abilityData.canPlayerUse(source))
-                    continue;
-
-                var chance = abilityData.getStatData("chance").getValue();
+            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.CHEF_HAT.get(), "satiety")) {
+                var chance = entry.stat("chance");
 
                 if (chance <= 0D)
                     continue;
@@ -200,15 +174,15 @@ public class ChefHatItem extends WearableRelicItem {
                 if (random.nextDouble() > chance)
                     continue;
 
-                var cookedDrop = abilityData.getRankModifierData("cooked_meatball").isEnabled() || cookedByFire;
+                var cookedDrop = entry.rank("cooked_meatball") || cookedByFire;
                 var item = cookedDrop
                         ? RelicsItems.COOKED_MEATBALL.get()
                         : RelicsItems.RAW_MEATBALL.get();
 
                 target.spawnAtLocation(new ItemStack(item, 1));
 
-                relic.getRelicData(source, stack).getLevelingData().addExperience("satiety", "drop", 1);
-                abilityData.getStatisticData().getMetricData("meatballs_dropped").addValue(1);
+                entry.addExperience("drop", 1);
+                entry.addMetric("meatballs_dropped", 1);
             }
         }
     }

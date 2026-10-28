@@ -18,7 +18,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -113,18 +113,14 @@ public class ExperienceDisperserItem extends WearableRelicItem {
 
             var sourceAtMaxLevel = sourceRelicData != null && sourceRelicData.isMaxLevel();
 
-            for (var disperserStack : EntityUtils.findEquippedCurios(player, RelicsItems.EXPERIENCE_DISPERSER.get())) {
-                var disperser = (ExperienceDisperserItem) disperserStack.getItem();
-                var ability = disperser.getRelicData(player, disperserStack).getAbilitiesData().getAbilityData("dispersion");
+            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.EXPERIENCE_DISPERSER.get(), "dispersion")) {
+                var ability = entry.ability();
 
-                if (!ability.canPlayerUse(player))
+                if (sourceAtMaxLevel && !entry.rank("max_level"))
                     continue;
 
-                if (sourceAtMaxLevel && !ability.getRankModifierData("max_level").isEnabled())
-                    continue;
-
-                var ratio = ability.getStatData("distribution_ratio").getValue();
-                var sameItemBonus = ability.getStatData("same_item_bonus").getValue();
+                var ratio = entry.stat("distribution_ratio");
+                var sameItemBonus = entry.stat("same_item_bonus");
 
                 if (ratio <= 0D)
                     continue;
@@ -154,7 +150,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                 for (var relicStack : targets) {
                     var transfer = event.getDelta() * ratio;
 
-                    if (ability.getRankModifierData("same_item").isEnabled() && relicStack.getItem() == event.getStack().getItem())
+                    if (entry.rank("same_item") && relicStack.getItem() == event.getStack().getItem())
                         transfer *= 1D + sameItemBonus;
 
                     if (transfer <= 0D || !(relicStack.getItem() instanceof IRelicItem relic))
@@ -176,7 +172,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                     var units = getWholeUnitDelta(before, distributed);
 
                     if (units > 0) {
-                        disperser.getRelicData(player, disperserStack).getLevelingData().addExperience("dispersion", "trigger", units);
+                        entry.addExperience("trigger", units);
 
                         stats.getMetricData("distributions").addValue(units);
                     }
@@ -200,14 +196,9 @@ public class ExperienceDisperserItem extends WearableRelicItem {
             if (relics.isEmpty())
                 return;
 
-            for (var disperserStack : EntityUtils.findEquippedCurios(player, RelicsItems.EXPERIENCE_DISPERSER.get())) {
-                var disperser = (ExperienceDisperserItem) disperserStack.getItem();
-                var ability = disperser.getRelicData(player, disperserStack).getAbilitiesData().getAbilityData("dispersion");
-
-                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("player_xp").isEnabled())
-                    continue;
-
-                var ratio = ability.getStatData("player_xp_ratio").getValue();
+            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.EXPERIENCE_DISPERSER.get(), "dispersion").withRank("player_xp")) {
+                var ability = entry.ability();
+                var ratio = entry.stat("player_xp_ratio");
                 var targets = new ArrayList<ItemStack>();
 
                 for (var relicStack : relics) {

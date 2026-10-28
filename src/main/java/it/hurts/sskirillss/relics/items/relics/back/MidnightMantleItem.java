@@ -21,6 +21,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
@@ -472,11 +473,9 @@ public class MidnightMantleItem extends WearableRelicItem {
             if (entity.getCommandSenderWorld().isClientSide())
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
-                var relic = (MidnightMantleItem) stack.getItem();
-
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").canPlayerUse(entity))
-                    continue;
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "invisibility")) {
+                var stack = entry.stack();
+                var relic = (MidnightMantleItem) entry.relic();
 
                 ServerScheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatData("cooldown").getValue() * 20)));
             }
@@ -490,20 +489,16 @@ public class MidnightMantleItem extends WearableRelicItem {
             if (!level.isClientSide() && level.getServer() != null && !level.getServer().isSameThread())
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
-                var relic = (MidnightMantleItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "phase", data -> data.getMode().equals("new_moon"))) {
+                var relic = (MidnightMantleItem) entry.relic();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode().equals("new_moon"))
-                    continue;
-
-                var heal = event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("health_regeneration").getValue() * relic.getModeEffectiveness(entity, stack);
+                var heal = event.getAmount() * entry.stat("health_regeneration") * relic.getModeEffectiveness(entity, entry.stack());
 
                 event.setAmount((float) (event.getAmount() + heal));
 
                 if (!entity.level().isClientSide()) {
-                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatisticData().getMetricData("health_regeneration").addValue(heal);
-
-                    relic.getRelicData(entity, stack).getLevelingData().addExperience("phase", "health_regeneration", heal);
+                    entry.addMetric("health_regeneration", heal);
+                    entry.addExperience("health_regeneration", heal);
                 }
             }
         }
@@ -513,27 +508,24 @@ public class MidnightMantleItem extends WearableRelicItem {
             if (!(event.getSource().getEntity() instanceof LivingEntity entity))
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
-                var relic = (MidnightMantleItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "phase", data -> data.getMode().equals("full_moon"))) {
+                var relic = (MidnightMantleItem) entry.relic();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode().equals("full_moon"))
+                if (!TargetingUtils.canHarm(entity, event.getEntity(), entry.stack(), "phase"))
                     continue;
 
-                if (!TargetingUtils.canHarm(entity, event.getEntity(), stack, "phase"))
-                    continue;
-
-                var damage = event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("attack_damage").getValue() * relic.getModeEffectiveness(entity, stack);
+                var damage = event.getAmount() * entry.stat("attack_damage") * relic.getModeEffectiveness(entity, entry.stack());
 
                 event.setAmount((float) (event.getAmount() + damage));
 
                 if (!entity.level().isClientSide()) {
-                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatisticData().getMetricData("additional_damage").addValue(damage);
+                    entry.addMetric("additional_damage", damage);
 
                     if (damage > 0) {
                         var experience = entity.getRandom().nextInt((int) (damage + 1));
 
                         if (experience > 0)
-                            relic.getRelicData(entity, stack).getLevelingData().addExperience("phase", "damage_dealing", experience);
+                            entry.addExperience("damage_dealing", experience);
                     }
                 }
             }
@@ -544,27 +536,26 @@ public class MidnightMantleItem extends WearableRelicItem {
             if (!(event.getSource().getEntity() instanceof LivingEntity entity))
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
-                var relic = (MidnightMantleItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "invisibility").withRank("strike")) {
+                var stack = entry.stack();
+                var relic = (MidnightMantleItem) entry.relic();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getRankModifierData("strike").isEnabled()
-                        || relic.getInvisibilityCooldown(stack) > 0 || !relic.canHideInTheDarkness(entity, stack))
+                if (relic.getInvisibilityCooldown(stack) > 0 || !relic.canHideInTheDarkness(entity, stack))
                     continue;
 
                 if (!TargetingUtils.canHarm(entity, event.getEntity(), stack, "invisibility"))
                     continue;
 
-                var damage = event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatData("damage").getValue();
+                var damage = event.getAmount() * entry.stat("damage");
 
                 event.setAmount((float) (event.getAmount() + damage));
 
                 if (!entity.level().isClientSide()) {
-                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatisticData().getMetricData("additional_damage").addValue(damage);
-
-                    relic.getRelicData(entity, stack).getLevelingData().addExperience("invisibility", "damage_dealing", 1);
+                    entry.addMetric("additional_damage", damage);
+                    entry.addExperience("damage_dealing", 1);
                 }
 
-                relic.setInvisibilityCooldown(stack, (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").getStatData("cooldown").getValue());
+                relic.setInvisibilityCooldown(stack, (int) entry.stat("cooldown"));
             }
         }
 
@@ -607,14 +598,8 @@ public class MidnightMantleItem extends WearableRelicItem {
         public static void onAbilityModeSwitch(AbilityModeSwitchEvent event) {
             var entity = event.getBearer();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
-                var relic = (MidnightMantleItem) stack.getItem();
-
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled())
-                    continue;
-
-                relic.setPhaseDuration(stack, (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("duration").getValue() * 20);
-            }
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "phase").withRank("switch"))
+                ((MidnightMantleItem) entry.relic()).setPhaseDuration(entry.stack(), (int) entry.stat("duration") * 20);
         }
 
         @SubscribeEvent
@@ -630,34 +615,34 @@ public class MidnightMantleItem extends WearableRelicItem {
             var level = entity.level();
             var random = level.getRandom();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
-                var relic = (MidnightMantleItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "constellation")) {
+                var stack = entry.stack();
+                var relic = (MidnightMantleItem) entry.relic();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").canPlayerUse(entity) || random.nextDouble() > relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("star_chance").getValue())
+                if (random.nextDouble() > entry.stat("star_chance"))
                     continue;
 
                 var star = new ConstellationStarEntity(RelicsEntities.CONSTELLATION_STAR.get(), level);
 
                 star.setDeltaMovement(MathUtils.randomFloat(random) * 0.5F, 0.1F + random.nextFloat() * 0.1F, MathUtils.randomFloat(random) * 0.5F);
-                star.setConstellationRadius((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("constellation_radius").getValue());
-                star.setExplosionRadius((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("explosion_radius").getValue());
-                star.setDamage((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("explosion_damage").getValue());
-                star.setTremor((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("tremor_duration").getValue());
-                star.setLifetime((int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("star_lifetime").getValue());
+                star.setConstellationRadius((float) entry.stat("constellation_radius"));
+                star.setExplosionRadius((float) entry.stat("explosion_radius"));
+                star.setDamage((float) entry.stat("explosion_damage"));
+                star.setTremor((float) entry.stat("tremor_duration"));
+                star.setLifetime((int) entry.stat("star_lifetime"));
                 star.setFlawless(relic.getRelicData(entity, stack).isVisuallyFlawless());
                 star.setPos(entity.getEyePosition());
                 star.setOwner(entity);
                 star.setStack(stack);
 
-                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getRankModifierData("stun").isEnabled())
-                    star.setStun((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatData("stun_duration").getValue());
+                if (entry.rank("stun"))
+                    star.setStun((float) entry.stat("stun_duration"));
 
                 level.addFreshEntity(star);
 
                 if (!level.isClientSide()) {
-                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("constellation").getStatisticData().getMetricData("total_stars").addValue(1);
-
-                    relic.getRelicData(entity, stack).getLevelingData().addExperience("constellation", "star_creation", 1);
+                    entry.addMetric("total_stars", 1);
+                    entry.addExperience("star_creation", 1);
                 }
             }
         }
@@ -675,12 +660,11 @@ public class MidnightMantleItem extends WearableRelicItem {
             var level = entity.level();
             var random = level.getRandom();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.MIDNIGHT_MANTLE.get())) {
-                var relic = (MidnightMantleItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "starfall")) {
+                var stack = entry.stack();
+                var relic = (MidnightMantleItem) entry.relic();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").canPlayerUse(entity)
-                        || relic.getStarfallCooldown(stack) > 0
-                        || random.nextFloat() > relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("chance").getValue())
+                if (relic.getStarfallCooldown(stack) > 0 || random.nextFloat() > entry.stat("chance"))
                     continue;
 
                 var pos = new Vec3(target.getX() + MathUtils.randomFloat(random) * 10, target.getY() + 25 + random.nextInt(25), target.getZ() + MathUtils.randomFloat(random) * 10);
@@ -692,25 +676,24 @@ public class MidnightMantleItem extends WearableRelicItem {
 
                 var star = new FallingStarEntity(RelicsEntities.FALLING_STAR.get(), level);
 
-                star.setDamage((float) (event.getAmount() * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("damage").getValue()));
-                star.setRadius((int) Math.round(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("radius").getValue()));
-                star.setStun((int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("stun").getValue() * 20));
+                star.setDamage((float) (event.getAmount() * entry.stat("damage")));
+                star.setRadius((int) Math.round(entry.stat("radius")));
+                star.setStun((int) (entry.stat("stun") * 20));
                 star.setFlawless(relic.getRelicData(entity, stack).isVisuallyFlawless());
                 star.setDeltaMovement(motion);
                 star.setOwner(entity);
                 star.setStack(stack);
                 star.setPos(pos);
 
-                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getRankModifierData("bounce").isEnabled())
-                    star.setBounceChance((float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatData("bounce_chance").getValue());
+                if (entry.rank("bounce"))
+                    star.setBounceChance((float) entry.stat("bounce_chance"));
 
                 level.addFreshEntity(star);
                 relic.setStarfallCooldown(stack, 20);
 
                 if (!level.isClientSide()) {
-                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("starfall").getStatisticData().getMetricData("total_stars").addValue(1);
-
-                    relic.getRelicData(entity, stack).getLevelingData().addExperience("starfall", "star_creation", 1);
+                    entry.addMetric("total_stars", 1);
+                    entry.addExperience("star_creation", 1);
                 }
             }
         }

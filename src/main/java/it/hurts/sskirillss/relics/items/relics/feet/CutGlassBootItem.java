@@ -22,6 +22,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.cut_glass_boot.C2SCycleFluid;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -675,13 +676,8 @@ public class CutGlassBootItem extends WearableRelicItem {
             if (entity.isShiftKeyDown())
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.CUT_GLASS_BOOT.get())) {
-                var relic = (CutGlassBootItem) stack.getItem();
-
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(entity))
-                    continue;
-
-                var fluids = relic.getFluidEntries(entity, stack);
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.CUT_GLASS_BOOT.get(), "glass")) {
+                var fluids = ((CutGlassBootItem) entry.relic()).getFluidEntries(entity, entry.stack());
 
                 if (!fluids.containsKey(event.getFluid().getFluidType().toString()))
                     continue;

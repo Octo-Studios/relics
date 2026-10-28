@@ -22,6 +22,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
@@ -486,11 +487,12 @@ public class GlitchyMantleItem extends WearableRelicItem {
                 }
 
                 if (attacker != null && attacker != player) {
-                    for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.GLITCHY_MANTLE.get())) {
-                        var relic = (GlitchyMantleItem) stack.getItem();
-                        var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("distortion");
+                    for (var entry : RelicStackingUtils.stacks(player, RelicsItems.GLITCHY_MANTLE.get(), "distortion")) {
+                        var stack = entry.stack();
+                        var relic = (GlitchyMantleItem) entry.relic();
+                        var ability = entry.ability();
 
-                        if (!ability.canPlayerUse(player) || !TargetingUtils.canHarm(player, attacker, stack, "distortion"))
+                        if (!TargetingUtils.canHarm(player, attacker, stack, "distortion"))
                             continue;
 
                         if (player.getRandom().nextDouble() >= ability.getStatData("miss_chance").getValue())
@@ -593,12 +595,10 @@ public class GlitchyMantleItem extends WearableRelicItem {
 
             var target = event.getEntity();
 
-            for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.GLITCHY_MANTLE.get())) {
-                var relic = (GlitchyMantleItem) stack.getItem();
-                var ability = relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("illusion");
-
-                if (!ability.canPlayerUse(source) || !ability.getMode().equals("enabled") || !ability.getRankModifierData("echo").isEnabled())
-                    continue;
+            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.GLITCHY_MANTLE.get(), "illusion", data -> data.getMode().equals("enabled")).withRank("echo")) {
+                var stack = entry.stack();
+                var relic = (GlitchyMantleItem) entry.relic();
+                var ability = entry.ability();
 
                 var radius = source.getAttributeValue(Attributes.ENTITY_INTERACTION_RANGE) * ability.getStatData("echo_radius").getValue();
                 var illusions = source.level().getEntitiesOfClass(GlitchyIllusionEntity.class, target.getBoundingBox().inflate(radius), illusion -> illusion.getOwner() == source)

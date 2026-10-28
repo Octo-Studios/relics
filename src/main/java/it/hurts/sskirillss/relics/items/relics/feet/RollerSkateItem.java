@@ -24,6 +24,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.client.player.LocalPlayer;
@@ -290,19 +291,18 @@ public class RollerSkateItem extends WearableRelicItem {
             var original = event.getOriginalDamage();
             double resistedTotal = 0D;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.ROLLER_SKATE.get())) {
-                var relic = (RollerSkateItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.ROLLER_SKATE.get(), "skating").withRank("resistance")) {
+                var relic = (RollerSkateItem) entry.relic();
 
-                var duration = relic.getDuration(stack);
+                var duration = relic.getDuration(entry.stack());
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("resistance").isEnabled() || duration <= 0)
+                if (duration <= 0)
                     continue;
 
-                var modifier = (float) (original * (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("resistance").getValue() * ((float) duration / relic.getMaxDuration())));
+                var modifier = (float) (original * (entry.stat("resistance") * ((float) duration / relic.getMaxDuration())));
 
-                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatisticData().getMetricData("damage_resisted").addValue(modifier);
-
-                relic.getRelicData(entity, stack).getLevelingData().addExperience("skating", "resisting_damage", modifier);
+                entry.addMetric("damage_resisted", modifier);
+                entry.addExperience("resisting_damage", modifier);
 
                 resistedTotal += modifier;
             }

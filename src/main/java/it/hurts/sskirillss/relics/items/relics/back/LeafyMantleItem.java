@@ -20,6 +20,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
@@ -283,14 +284,14 @@ public class LeafyMantleItem extends WearableRelicItem {
 
             var total = 0F;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
-                var relic = (LeafyMantleItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").withRank("absorption")) {
+                var stack = entry.stack();
+                var relic = (LeafyMantleItem) entry.relic();
 
                 if (!relic.isHiding(stack) || relic.getCurrentProgress(stack) < relic.getMaxProgress())
                     continue;
 
-                if (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) && relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("absorption").isEnabled())
-                    total += (float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatData("absorption").getValue();
+                total += (float) entry.stat("absorption");
             }
 
             var current = entity.getAbsorptionAmount();
@@ -312,16 +313,11 @@ public class LeafyMantleItem extends WearableRelicItem {
             var entity = event.getEntity();
             var level = entity.level();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
-                var relic = (LeafyMantleItem) stack.getItem();
+            if (!level.getBlockState(entity.getBlockPosBelowThatAffectsMyMovement()).is(BlockTags.LEAVES))
+                return;
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) || !level.getBlockState(entity.getBlockPosBelowThatAffectsMyMovement()).is(BlockTags.LEAVES))
-                    continue;
-
+            if (!RelicStackingUtils.stacks(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").isEmpty())
                 event.setCanceled(true);
-
-                break;
-            }
         }
 
         @SubscribeEvent
@@ -434,11 +430,9 @@ public class LeafyMantleItem extends WearableRelicItem {
             if (entity.getCommandSenderWorld().isClientSide())
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
-                var relic = (LeafyMantleItem) stack.getItem();
-
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").canPlayerUse(entity) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("disappearance").isEnabled())
-                    continue;
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").withRank("disappearance")) {
+                var stack = entry.stack();
+                var relic = (LeafyMantleItem) entry.relic();
 
                 ServerScheduler.schedule(1, () -> relic.setInvisibilityCooldown(stack, (int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatData("cooldown").getValue() * 20)));
             }

@@ -10,6 +10,14 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public final class RelicStackingUtils {
+    public static RelicStacks stacks(LivingEntity entity, Item item, String ability) {
+        return RelicStacks.of(entity, item, ability);
+    }
+
+    public static RelicStacks stacks(LivingEntity entity, Item item, String ability, Predicate<AbilityData> predicate) {
+        return RelicStacks.of(entity, item, ability, predicate);
+    }
+
     public static List<ItemStack> findActiveStacks(LivingEntity entity, Item item, Predicate<ItemStack> predicate) {
         return EntityUtils.findEquippedCurios(entity, item).stream()
                 .filter(predicate)

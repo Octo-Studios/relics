@@ -1,6 +1,5 @@
 package it.hurts.sskirillss.relics.items.relics.feet;
 
-import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -12,8 +11,8 @@ import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
+import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.init.*;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -22,8 +21,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import it.hurts.sskirillss.relics.utils.WorldUtils;
 import net.minecraft.server.level.ServerLevel;
@@ -251,15 +250,16 @@ public class SpringyBootItem extends WearableRelicItem {
 
             var power = 0D;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
-                var relic = (SpringyBootItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.SPRINGY_BOOT.get(), "bounce")) {
+                var stack = entry.stack();
+                var relic = (SpringyBootItem) entry.relic();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").canPlayerUse(entity) || relic.isLeaped(stack) || relic.getBounceCooldown(stack) > 0 || !entity.isShiftKeyDown())
+                if (relic.isLeaped(stack) || relic.getBounceCooldown(stack) > 0 || !entity.isShiftKeyDown())
                     continue;
 
-                power += relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("power").getValue();
+                power += entry.stat("power");
 
-                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatisticData().getMetricData("primary_bounces").addValue(1);
+                entry.addMetric("primary_bounces", 1);
 
                 relic.setLeaped(stack, true);
                 relic.addBounceCooldown(stack, 5);
@@ -289,10 +289,11 @@ public class SpringyBootItem extends WearableRelicItem {
             var totalModifier = 0D;
             var totalLeaps = 0;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.SPRINGY_BOOT.get())) {
-                var relic = (SpringyBootItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.SPRINGY_BOOT.get(), "bounce").withRank("strike")) {
+                var stack = entry.stack();
+                var relic = (SpringyBootItem) entry.relic();
 
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").canPlayerUse(entity) || !relic.isLeaped(stack) || !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getRankModifierData("strike").isEnabled())
+                if (!relic.isLeaped(stack))
                     continue;
 
                 if (!TargetingUtils.canHarm(entity, event.getEntity(), stack, "bounce"))
@@ -303,15 +304,14 @@ public class SpringyBootItem extends WearableRelicItem {
                 if (totalLeaps < leaps)
                     totalLeaps = leaps;
 
-                var modifier = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatData("damage_modifier").getValue();
+                var modifier = entry.stat("damage_modifier");
 
                 totalModifier += modifier;
 
                 var damage = event.getNewDamage() * leaps * modifier;
 
-                relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("bounce").getStatisticData().getMetricData("additional_damage").addValue(damage);
-
-                relic.getRelicData(entity, stack).getLevelingData().addExperience("bounce", "strike", damage);
+                entry.addMetric("additional_damage", damage);
+                entry.addExperience("strike", damage);
             }
 
             var damage = event.getNewDamage() * totalLeaps * totalModifier;

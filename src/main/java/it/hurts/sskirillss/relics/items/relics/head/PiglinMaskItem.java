@@ -16,7 +16,6 @@ import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -24,6 +23,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -260,18 +260,13 @@ public class PiglinMaskItem extends WearableRelicItem {
 
             var level = source.level();
 
-            for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.PIGLIN_MASK.get())) {
-                var relic = (PiglinMaskItem) stack.getItem();
-
-                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("neutrality").getRankModifierData("legion").isEnabled())
-                    continue;
-
+            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.PIGLIN_MASK.get(), "neutrality").withRank("legion")) {
                 for (var piglin : level.getEntitiesOfClass(Mob.class, source.getBoundingBox().inflate(32), mob -> mob instanceof Piglin || mob instanceof ZombifiedPiglin)) {
                     if (piglin.getTarget() != null || !piglin.hasLineOfSight(target) || piglin.isBaby())
                         continue;
 
-                    relic.getRelicData(source, stack).getLevelingData().addExperience("neutrality", "target", 1);
-                    relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("neutrality").getStatisticData().getMetricData("target").addValue(1);
+                    entry.addExperience("target", 1);
+                    entry.addMetric("target", 1);
 
                     piglin.getBrain().setMemory(MemoryModuleType.ANGRY_AT, target.getUUID());
 
@@ -290,18 +285,13 @@ public class PiglinMaskItem extends WearableRelicItem {
 
             var level = source.level();
 
-            for (var stack : EntityUtils.findEquippedCurios(target, RelicsItems.PIGLIN_MASK.get())) {
-                var relic = (PiglinMaskItem) stack.getItem();
-
-                if (!relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("neutrality").getRankModifierData("legion").isEnabled())
-                    continue;
-
+            for (var entry : RelicStackingUtils.stacks(target, RelicsItems.PIGLIN_MASK.get(), "neutrality").withRank("legion")) {
                 for (var piglin : level.getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate(32), mob -> mob instanceof Piglin || mob instanceof ZombifiedPiglin)) {
                     if (piglin.getTarget() != null || !piglin.hasLineOfSight(source) || piglin.isBaby())
                         continue;
 
-                    relic.getRelicData(target, stack).getLevelingData().addExperience("neutrality", "target", 1);
-                    relic.getRelicData(target, stack).getAbilitiesData().getAbilityData("neutrality").getStatisticData().getMetricData("target").addValue(1);
+                    entry.addExperience("target", 1);
+                    entry.addMetric("target", 1);
 
                     piglin.getBrain().setMemory(MemoryModuleType.ANGRY_AT, source.getUUID());
 
@@ -321,29 +311,20 @@ public class PiglinMaskItem extends WearableRelicItem {
             if (originalDamage <= 0F)
                 return;
 
-            var uniqueStacks = new java.util.ArrayList<ItemStack>();
-
-            for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.PIGLIN_MASK.get())) {
-                if (uniqueStacks.stream().noneMatch(existing -> existing == stack))
-                    uniqueStacks.add(stack);
-            }
-
             var totalModifier = 0D;
 
-            for (var stack : uniqueStacks) {
-                var relic = (PiglinMaskItem) stack.getItem();
-
-                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getRankModifierData("frenzy").isEnabled())
-                    continue;
+            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.PIGLIN_MASK.get(), "looting").withRank("frenzy")) {
+                var stack = entry.stack();
+                var relic = (PiglinMaskItem) entry.relic();
 
                 if (!TargetingUtils.canHarm(source, event.getEntity(), stack, "looting"))
                     continue;
 
                 var stacks = relic.getStacks(stack);
                 var multiplier = stacks >= PiglinMaskItem.getMaxStacks() ? 3 : 1;
-                var modifier = originalDamage * relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("attack_damage").getValue() * stacks * multiplier;
+                var modifier = originalDamage * entry.stat("attack_damage") * stacks * multiplier;
 
-                relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatisticData().getMetricData("additional_damage").addValue(modifier);
+                entry.addMetric("additional_damage", modifier);
 
                 totalModifier += modifier;
             }
@@ -364,25 +345,13 @@ public class PiglinMaskItem extends WearableRelicItem {
                 return;
 
             var random = level.getRandom();
-            var stacks = new java.util.ArrayList<ItemStack>();
-
-            for (var stack : EntityUtils.findEquippedCurios(source, RelicsItems.PIGLIN_MASK.get())) {
-                if (stacks.stream().noneMatch(existing -> existing == stack))
-                    stacks.add(stack);
-            }
-
             var totalAmount = 0;
 
-            for (var stack : stacks) {
-                var relic = (PiglinMaskItem) stack.getItem();
+            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.PIGLIN_MASK.get(), "looting")) {
+                var amount = MathUtils.multicast(random, entry.stat("chance"), (int) Math.ceil(entity.getMaxHealth() / entry.stat("health")));
 
-                if (!relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").canPlayerUse(source))
-                    continue;
-
-                var amount = MathUtils.multicast(random, relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("chance").getValue(), (int) Math.ceil(entity.getMaxHealth() / relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatData("health").getValue()));
-
-                relic.getRelicData(source, stack).getAbilitiesData().getAbilityData("looting").getStatisticData().getMetricData("teeth_dropped").addValue(amount);
-                relic.getRelicData(source, stack).getLevelingData().addExperience("looting", "drop", amount);
+                entry.addMetric("teeth_dropped", amount);
+                entry.addExperience("drop", amount);
                 totalAmount += amount;
             }
 

@@ -22,8 +22,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -128,21 +128,21 @@ public class ReflectiveNecklaceItem extends WearableRelicItem {
             var random = level.getRandom();
 
             if (damage >= 1) {
-                for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.REFLECTIVE_NECKLACE.get())) {
-                    var relic = (ReflectiveNecklaceItem) stack.getItem();
+                for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.REFLECTIVE_NECKLACE.get(), "reflection")) {
+                    var stack = entry.stack();
 
-                    if (level.getRandom().nextDouble() > relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("chance").getValue())
+                    if (level.getRandom().nextDouble() > entry.stat("chance"))
                         continue;
 
-                    var orbDamage = Math.clamp((float) (damage * relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("damage").getValue()), Float.MIN_VALUE, Float.MAX_VALUE);
+                    var orbDamage = Math.clamp((float) (damage * entry.stat("damage")), Float.MIN_VALUE, Float.MAX_VALUE);
 
                     var orb = new ReflectiveOrbEntity(RelicsEntities.REFLECTIVE_ORB.get(), level);
 
-                    orb.setPiercings(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getRankModifierData("piercing").isEnabled() ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("piercings").getValue() : 0);
-                    orb.setBounces(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getRankModifierData("bounce").isEnabled() ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("bounces").getValue() : 0);
-                    orb.setStun(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getRankModifierData("stun").isEnabled() ? (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("stun").getValue() : 0);
-                    orb.setLifetime((int) (relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatData("lifetime").getValue() * 20));
-                    orb.setFlawless(relic.getRelicData(entity, stack).isVisuallyFlawless());
+                    orb.setPiercings(entry.rank("piercing") ? (int) entry.stat("piercings") : 0);
+                    orb.setBounces(entry.rank("bounce") ? (int) entry.stat("bounces") : 0);
+                    orb.setStun(entry.rank("stun") ? (int) entry.stat("stun") : 0);
+                    orb.setLifetime((int) (entry.stat("lifetime") * 20));
+                    orb.setFlawless(entry.relicData().isVisuallyFlawless());
                     orb.setPos(entity.getEyePosition());
                     orb.setDamage(orbDamage);
                     orb.setOwner(entity);
@@ -155,18 +155,16 @@ public class ReflectiveNecklaceItem extends WearableRelicItem {
 
                     level.addFreshEntity(orb);
 
-                    relic.getRelicData(entity, stack).getLevelingData().addExperience("reflection", "construct", orbDamage * 0.1D);
+                    entry.addExperience("construct", orbDamage * 0.1D);
 
-                    relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("reflection").getStatisticData().getMetricData("total_orbs").addValue(1);
+                    entry.addMetric("total_orbs", 1);
                 }
             }
 
             if (!(event.getSource().getEntity() instanceof LivingEntity livingSource))
                 return;
 
-            var stack = EntityUtils.findEquippedCurio(livingSource, RelicsItems.REFLECTIVE_NECKLACE.get());
-
-            if (!stack.isEmpty()) {
+            if (!RelicStackingUtils.stacks(livingSource, RelicsItems.REFLECTIVE_NECKLACE.get(), "reflection").isEmpty()) {
                 var step = 0;
 
                 for (var orb : level.getEntitiesOfClass(ReflectiveOrbEntity.class, livingSource.getBoundingBox().inflate(ORB_SEARCH_RADIUS)).stream()
