@@ -564,6 +564,18 @@
   "relics.description.shield_of_retaliation.ability.retaliation.statistic.targets_stunned": "Оглушено целей",
   "relics.description.shield_of_retaliation.ability.retaliation.statistic.projectiles_reflected": "Отражено снарядов",
 
+  "item.relics.astral_satchel": "Астральная сумка",
+  "relics.description.astral_satchel.description": "Реликвия открывает проход в отдельное астральное подпространство, где предметы не подчиняются привычным законам мира. Всё, что владелец отправляет туда, не занимает места в инвентаре и парит среди звёзд, пока не будет призвано обратно.",
+  "relics.description.astral_satchel.ability.subspace": "Подпространство",
+  "relics.description.astral_satchel.ability.subspace.description": "При нажатии ПКМ с реликвией в руке владелец переносится в астральное подпространство радиусом %1$s блоков, внутри которого можно свободно перемещаться. Любой предмет, выброшенный в этом состоянии, остаётся парить в подпространстве вместо того, чтобы упасть на землю. Чтобы забрать предмет обратно, нужно навести на него взгляд и нажать ПКМ, а чтобы вернуться в мир, нужно нажать ПКМ, не целясь ни в какой предмет. Нажатие ЛКМ по предмету толкает его вперёд, и он некоторое время скользит по инерции. Предмет, выброшенный при взгляде на такой же предмет, добавляется к нему, а в остальных случаях остаётся лежать отдельно. Одинаковые предметы, оказавшиеся рядом, сами сближаются и сливаются. Подпространство вмещает до 64 разных предметов. Тело владельца остаётся в реальном мире и ничем не защищено. Если радиус подпространства уменьшится, предметы, оказавшиеся за его границей, будут прижаты к новой границе.",
+  "relics.description.astral_satchel.ability.subspace.rank_modifier.quick_storage": "Предметы можно отправлять в подпространство, не входя в него: нажми ПКМ реликвией по предмету в инвентаре, ЛКМ предметом по реликвии в инвентаре или ПКМ реликвией в руке по выброшенному предмету в мире.",
+  "relics.description.astral_satchel.ability.subspace.rank_modifier.immortality": "Пока владелец находится в астральном подпространстве, он получает эффект «Бессмертие».",
+  "relics.description.astral_satchel.ability.subspace.rank_modifier.infinite_stacks": "Одинаковые предметы сливаются в кучи неограниченного размера.",
+  "relics.description.astral_satchel.ability.subspace.experience_source.storing": "+1 единица опыта за каждый предмет, отправленный в подпространство",
+  "relics.description.astral_satchel.ability.subspace.statistic.stored_items": "Предметов отправлено в подпространство",
+  "relics.description.astral_satchel.ability.subspace.statistic.withdrawn_items": "Предметов забрано из подпространства",
+  "relics.message.astral_satchel.full": "Подпространство переполнено",
+
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
   "item.relics.golden_tooth": "Золотой зуб",
   "item.relics.pet_bone": "Кость питомца",
