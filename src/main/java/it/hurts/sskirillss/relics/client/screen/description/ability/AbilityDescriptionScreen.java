@@ -68,9 +68,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
         if (stack.getItem() instanceof IRelicItem relic) {
             var relicData = relic.getRelicData(player, stack);
-            var abilities = relicData.getTemplate().getAbilities().getAbilities().keySet().stream()
-                    .filter(entry -> relicData.getAbilitiesData().getAbilityData(entry).isEnabled())
-                    .toList();
+            var abilities = relicData.getTemplate().getAbilities().getAbilities().keySet().stream().toList();
 
             if (this.selectedAbility == null)
                 this.setSelectedAbility(abilities.getFirst());
@@ -103,9 +101,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         if (abilityData.getTemplate() == null)
             return;
 
-        var abilities = relicData.getTemplate().getAbilities().getAbilities().keySet().stream()
-                .filter(entry -> relicData.getAbilitiesData().getAbilityData(entry).isEnabled())
-                .toList();
+        var abilities = relicData.getTemplate().getAbilities().getAbilities().keySet().stream().toList();
 
         var maxEntries = 4;
 
@@ -161,6 +157,9 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         if (container instanceof AbilityDescriptionContainerWidget abilityContainer)
             for (var entry : abilityContainer.getRankModifierToggleEntries())
                 this.addRenderableWidget(new RankModifierToggleWidget(abilityContainer, entry.rankModifier(), entry.lineIndex(), false));
+
+        if (abilityData.isUnlocked())
+            this.addRenderableWidget(new AbilityToggleWidget(x + AbilityToggleWidget.TOGGLE_X, y + AbilityToggleWidget.TOGGLE_Y, this));
 
         this.initModeButtons();
     }
@@ -237,7 +236,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         } else
             title.withStyle(ChatFormatting.BOLD);
 
-        guiGraphics.drawString(minecraft.font, title.withStyle(ChatFormatting.BOLD), (int) ((x + 114) * 1.33F), (int) ((y + 62) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
+        guiGraphics.drawString(minecraft.font, title.withStyle(ChatFormatting.BOLD), (int) ((x + AbilityToggleWidget.TITLE_X + (abilityData.isUnlocked() ? AbilityToggleWidget.TITLE_OFFSET : 0)) * 1.33F), (int) ((y + 62) * 1.33F), DescriptionUtils.TEXT_COLOR, false);
 
         poseStack.popPose();
 

@@ -262,15 +262,23 @@ public class AbilityData {
     }
 
     public boolean isEnabled() {
-        return true;
+        var component = getComponent();
+
+        return component == null || component.isEnabled();
+    }
+
+    public void setEnabled(boolean enabled) {
+        setComponent(getComponent().toBuilder()
+                .enabled(enabled)
+                .build());
     }
 
     public boolean isUnlocked() {
-        return isEnabled() && isEnoughLevel() && getLockData().isUnlocked() && getResearchData().isResearched();
+        return isEnoughLevel() && getLockData().isUnlocked() && getResearchData().isResearched();
     }
 
     public boolean canPlayerUse(LivingEntity entity) {
-        return isUnlocked();
+        return isUnlocked() && isEnabled();
     }
 
     public boolean isActive() {
@@ -323,7 +331,7 @@ public class AbilityData {
     }
 
     public boolean isActivationTicking() {
-        return isUnlocked() && getActivationComponent().isTicking();
+        return isUnlocked() && isEnabled() && getActivationComponent().isTicking();
     }
 
     public void setActivationTicking(boolean ticking) {

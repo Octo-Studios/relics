@@ -16,7 +16,11 @@ public class ToggleSwitch {
     private static final float KNOT_TRAVEL = 3F;
 
     public static void render(PoseStack poseStack, float amount) {
-        var eased = amount * amount * (3F - 2F * amount);
+        render(poseStack, amount, amount);
+    }
+
+    public static void render(PoseStack poseStack, float position, float amount) {
+        var eased = position * position * (3F - 2F * position);
 
         RenderSystem.enableBlend();
 

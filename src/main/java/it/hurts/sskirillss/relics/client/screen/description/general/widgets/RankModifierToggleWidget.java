@@ -63,9 +63,13 @@ public class RankModifierToggleWidget extends AbstractDescriptionWidget {
         poseStack.pushPose();
         poseStack.translate(this.renderX, this.renderY, 100);
 
-        ToggleSwitch.render(poseStack, this.switches.amount(this.rankModifier, this.isRankModifierEnabled()));
+        var locked = this.isLocked();
 
-        if (this.isHovered())
+        var amount = this.switches.amount(this.rankModifier, this.isRankModifierEnabled());
+
+        ToggleSwitch.render(poseStack, amount, locked ? 0F : amount);
+
+        if (!locked && this.isHovered())
             GUIRenderer.begin(SWITCH_OUTLINE, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .end();
@@ -78,8 +82,22 @@ public class RankModifierToggleWidget extends AbstractDescriptionWidget {
     }
 
     @Override
+    public boolean isLocked() {
+        if (this.synergy || !(this.container.getScreen() instanceof AbilityDescriptionScreen screen))
+            return false;
+
+        var player = minecraft.player;
+        var stack = screen.getStack();
+
+        if (player == null || stack == null || !(stack.getItem() instanceof IRelicItem relic))
+            return false;
+
+        return !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(screen.getSelectedAbility()).isEnabled();
+    }
+
+    @Override
     public void onPress() {
-        if (!this.isVisible())
+        if (!this.isVisible() || this.isLocked())
             return;
 
         var enabled = !this.isRankModifierEnabled();

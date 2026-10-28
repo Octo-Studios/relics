@@ -9,6 +9,7 @@ import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.capability.CapabilitySyncPacket;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityMode;
+import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityEnabled;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SChangeAbilityRankModifier;
 import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
 import it.hurts.sskirillss.relics.network.packets.abilities.C2SActivateAbility;
@@ -76,6 +77,7 @@ public class NetworkHandler {
         registrar.playToServer(C2SChangeAbilityMode.TYPE, C2SChangeAbilityMode.STREAM_CODEC, C2SChangeAbilityMode::handle);
         registrar.playToServer(C2SChangeSynergyMode.TYPE, C2SChangeSynergyMode.STREAM_CODEC, C2SChangeSynergyMode::handle);
         registrar.playToServer(C2SChangeAbilityRankModifier.TYPE, C2SChangeAbilityRankModifier.STREAM_CODEC, C2SChangeAbilityRankModifier::handle);
+        registrar.playToServer(C2SChangeAbilityEnabled.TYPE, C2SChangeAbilityEnabled.STREAM_CODEC, C2SChangeAbilityEnabled::handle);
         registrar.playToServer(C2SChangeSynergyRankModifier.TYPE, C2SChangeSynergyRankModifier.STREAM_CODEC, C2SChangeSynergyRankModifier::handle);
         registrar.playToServer(C2SChangeRelicOptionFlawlessVisual.TYPE, C2SChangeRelicOptionFlawlessVisual.STREAM_CODEC, C2SChangeRelicOptionFlawlessVisual::handle);
         registrar.playToClient(S2CSyncPlayerResearch.TYPE, S2CSyncPlayerResearch.STREAM_CODEC, S2CSyncPlayerResearch::handle);

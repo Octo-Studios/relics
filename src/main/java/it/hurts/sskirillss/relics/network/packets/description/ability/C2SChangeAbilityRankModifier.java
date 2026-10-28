@@ -64,6 +64,9 @@ public class C2SChangeAbilityRankModifier implements CustomPacketPayload, IRelic
                 return;
             }
 
+            if (!abilityData.isEnabled())
+                return;
+
             abilityData.getRankModifierData(this.getRankModifier()).setEnabled(this.isEnabled());
 
             try {

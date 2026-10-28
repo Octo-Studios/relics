@@ -16,6 +16,7 @@ import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRel
 import it.hurts.sskirillss.relics.client.screen.utils.misc.AnimatedValue;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.DeltaCounter;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.FloatingTexts;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.GrayscaleTextures;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.LevelUpEffect;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.RerollAnimation;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.UIParticles;
@@ -288,7 +289,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         var color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F)) + (levelUpEffect.flash(pPartialTick) + rerollEffect.flash(pPartialTick)) * FLASH_STRENGTH;
 
         if (isUnlocked)
-            GUIRenderer.begin(DescriptionTextures.getAbilityCardTexture(stack, ability), poseStack)
+            GUIRenderer.begin(abilityData.isEnabled() ? DescriptionTextures.getAbilityCardTexture(stack, ability) : GrayscaleTextures.get(DescriptionTextures.getAbilityCardTexture(stack, ability)), poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .color(color, color, color, 1F)
                     .pos(this.getX() + 8, this.getY() + 20)

@@ -23,6 +23,7 @@ import java.util.stream.IntStream;
 public class AbilityDescriptionContainerWidget extends DescriptionContainerWidget {
     private static final int VERTICAL_PADDING = 1;
     private static final String RANK_MODIFIER_CONDITION_INDENT = "    ";
+    private static final Style DISABLED_STYLE = Style.EMPTY.withStrikethrough(true);
 
     public AbilityDescriptionContainerWidget(DescriptionScreen screen) {
         super(screen);
@@ -109,6 +110,9 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
             if (wantsReroll)
                 result = result.withStyle(ChatFormatting.OBFUSCATED);
 
+            if (abilityData.isUnlocked() && !abilityData.isEnabled())
+                result = result.withStyle(DISABLED_STYLE);
+
             return result;
         }).toList();
 
@@ -143,6 +147,10 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         if (!abilityData.isUnlocked())
             for (var line : rawLines)
                 line.setRawLine(ScreenUtils.randomizeAllCharacters(line.getRawLine(), this.hashCode()).withStyle(Style.EMPTY.withFont(ScreenUtils.ILLAGER_ALT_FONT).withColor(DescriptionUtils.NEGATIVE_COLOR(true))));
+        else if (!abilityData.isEnabled())
+            for (var line : rawLines)
+                if (line.isJustify())
+                    line.setRawLine(line.getRawLine().withStyle(DISABLED_STYLE));
 
         return new DescriptionData(rawLines, dynamicComponents);
     }

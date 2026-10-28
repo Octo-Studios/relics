@@ -167,9 +167,7 @@ public class AbilityPageScrollbarWidget extends AbstractDescriptionWidget implem
             return 0;
 
         var relicData = relic.getRelicData(player, stack);
-        var abilities = relicData.getTemplate().getAbilities().getAbilities().keySet().stream()
-                .filter(entry -> relicData.getAbilitiesData().getAbilityData(entry).isEnabled())
-                .toList();
+        var abilities = relicData.getTemplate().getAbilities().getAbilities().keySet().stream().toList();
 
         var maxEntries = 4;
         var size = abilities.size();

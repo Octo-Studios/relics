@@ -24,6 +24,7 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtil
 import it.hurts.sskirillss.relics.client.screen.description.research.AbilityResearchScreen;
 import it.hurts.sskirillss.relics.client.screen.particle.PixelUIParticle;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.ClickAnimation;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.GrayscaleTextures;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.LevelUpEffect;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.ProgressBarEffect;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.ProgressPath;
@@ -252,7 +253,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         var color = (float) ((canUpgrade ? 0.75F : 1.05F) + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
 
         if (isLockUnlocked)
-            GUIRenderer.begin(DescriptionTextures.getAbilityCardTexture(stack, ability), poseStack)
+            GUIRenderer.begin(abilityData.isEnabled() ? DescriptionTextures.getAbilityCardTexture(stack, ability) : GrayscaleTextures.get(DescriptionTextures.getAbilityCardTexture(stack, ability)), poseStack)
                     .color(color, color, color, 1F)
                     .texSize(22, 31)
                     .pos(0, -2)

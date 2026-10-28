@@ -29,8 +29,9 @@ public class AbilityComponent {
     private final Map<String, RankModifierComponent> rankModifiers;
     private final AbilityActivationComponent activation;
     private final int points;
+    private final boolean enabled;
 
-    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), LockComponent.EMPTY, AbilityStatisticComponent.EMPTY, "", Map.of(), AbilityActivationComponent.EMPTY, 0);
+    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), LockComponent.EMPTY, AbilityStatisticComponent.EMPTY, "", Map.of(), AbilityActivationComponent.EMPTY, 0, true);
 
     public static final Codec<AbilityComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
@@ -40,7 +41,8 @@ public class AbilityComponent {
                     Codec.STRING.optionalFieldOf("mode", "").forGetter(AbilityComponent::getMode),
                     Codec.unboundedMap(Codec.STRING, RankModifierComponent.CODEC).optionalFieldOf("rank_modifiers", Map.of()).forGetter(AbilityComponent::getRankModifiers),
                     AbilityActivationComponent.CODEC.optionalFieldOf("activation", AbilityActivationComponent.EMPTY).forGetter(AbilityComponent::getActivation),
-                    Codec.INT.fieldOf("points").forGetter(AbilityComponent::getPoints)
+                    Codec.INT.fieldOf("points").forGetter(AbilityComponent::getPoints),
+                    Codec.BOOL.optionalFieldOf("enabled", true).forGetter(AbilityComponent::isEnabled)
             ).apply(instance, AbilityComponent::new)
     );
 }
