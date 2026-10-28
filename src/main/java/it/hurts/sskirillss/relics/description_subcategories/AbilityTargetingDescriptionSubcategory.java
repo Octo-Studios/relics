@@ -32,6 +32,6 @@ public class AbilityTargetingDescriptionSubcategory extends DescriptionSubcatego
         var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(screen.getSelectedAbility());
         var template = abilityData.getTemplate();
 
-        return template != null && abilityData.canPlayerUse(entity) && template.getTargeting().isActive();
+        return template != null && abilityData.isUnlocked() && template.getTargeting().isActive();
     }
 }

@@ -35,6 +35,6 @@ public class AbilityStatisticDescriptionSubcategory extends DescriptionSubcatego
         var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData(ability);
         var template = abilityData.getTemplate();
 
-        return template != null && abilityData.canPlayerUse(entity) && !template.getStatistic().getMetrics().isEmpty();
+        return template != null && abilityData.isUnlocked() && !template.getStatistic().getMetrics().isEmpty();
     }
 }
