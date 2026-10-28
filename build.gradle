@@ -76,6 +76,18 @@ repositories {
             includeGroup "curse.maven"
         }
     }
+    exclusiveContent {
+        forRepository {
+            maven {
+                url = "https://maven.ryanhcode.dev/releases"
+                name = "RyanHCode Maven"
+            }
+        }
+        filter {
+            includeGroup("dev.ryanhcode.sable")
+            includeGroup("dev.ryanhcode.sable-companion")
+        }
+    }
 }
 
 dependencies {
@@ -91,6 +103,13 @@ dependencies {
     implementation("curse.maven:sophisticated-backpacks-422301:7916628")
     implementation("curse.maven:sophisticated-core-618298:7916600")
     implementation("curse.maven:spark-361579:6225208")
+
+    jarJar(implementation("dev.ryanhcode.sable-companion:sable-companion-common-${project.minecraft_version}:[${project.sable_companion_version},)")) {
+        version {
+            prefer project.sable_companion_version
+        }
+    }
+    
     implementation("curse.maven:lithium-360438:7740400")
     implementation("curse.maven:ftb-teams-forge-404468:7878281")
     implementation("curse.maven:ftb-library-forge-404465:7746959")
