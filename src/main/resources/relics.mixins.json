@@ -15,7 +15,8 @@
     "PlayerMixin",
     "ScreenMixin",
     "compat.lithium.ChunkAwareBlockCollisionSweeperMixin",
-    "compat.sophisticatedbackpacks.BackpackItemMixin"
+    "compat.sophisticatedbackpacks.BackpackItemMixin",
+    "compat.sophisticatedcore.StorageContainerMenuBaseMixin"
   ],
   "minVersion": "0.8",
   "client": [
