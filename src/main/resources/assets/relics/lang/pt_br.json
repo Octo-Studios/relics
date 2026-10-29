@@ -60,7 +60,7 @@
   "relics.description.researching.general.relic_progress.extra_info": "Mostra o quão perto a relíquia está do seu potencial máximo. Determinado pela qualidade e nível da relíquia e habilidades.",
 
   "relics.description.researching.general.relic_rank.title": "Grau da Relíquia:",
-  "relics.description.researching.general.relic_rank.extra_info": "Obtido aumentando manualmente o grau da relíquia, o que zera todo o progresso ds melhorias, mas aumenta seu nível máximo.",
+  "relics.description.researching.general.relic_rank.extra_info": "Obtido aumentando manualmente o grau da relíquia, o que aumenta seu nível máximo.",
 
   "relics.description.researching.relic.card.low_level": "Para desbloquear esta habilidade, você deve aumentar o nível da relíquia para %1$s!",
   "relics.description.researching.relic.card.unresearched": "Para usar esta habilidade, você deve concluir a pesquisa!",

@@ -60,7 +60,7 @@
   "relics.description.researching.general.relic_progress.extra_info": "レリックが最大潜在能力にどれほど近づいているかを示します。レリックとアビリティそれぞれの品質およびレベルによって決定されます。",
 
   "relics.description.researching.general.relic_rank.title": "レリックのランク：",
-  "relics.description.researching.general.relic_rank.extra_info": "手動でランクアップを行うことで上昇します。すべての強化進捗はリセットされますが、レベル上限が引き上げられます。",
+  "relics.description.researching.general.relic_rank.extra_info": "手動でランクアップを行うことで上昇します。レベル上限が引き上げられます。",
 
   "relics.description.researching.relic.card.low_level": "このアビリティを解放するには、レリックのレベルを%1$sまで上げる必要があります！",
   "relics.description.researching.relic.card.low_rank": "解放するには、レリックのランクを%1$sまで上げる必要があります！",

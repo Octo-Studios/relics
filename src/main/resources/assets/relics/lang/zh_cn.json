@@ -60,7 +60,7 @@
   "relics.description.researching.general.relic_progress.extra_info": "显示遗物与其最大潜能的接近程度。由遗物和能力的基础品质与等级决定。",
 
   "relics.description.researching.general.relic_rank.title": "遗物品阶：",
-  "relics.description.researching.general.relic_rank.extra_info": "通过手动提升遗物品阶获得，此举会重置所有升级进度，但会提高其最高等级。",
+  "relics.description.researching.general.relic_rank.extra_info": "通过手动提升遗物品阶获得，此举会提高其最高等级。",
 
   "relics.description.researching.relic.card.low_level": "要解锁此能力，你必须将遗物等级提升至 %1$s！",
   "relics.description.researching.relic.card.low_rank": "要解锁此能力，你必须将遗物品阶提升至 %1$s！",

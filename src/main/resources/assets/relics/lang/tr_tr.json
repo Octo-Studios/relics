@@ -41,7 +41,7 @@
   "relics.description.researching.general.relic_progress.extra_info": "Bu, kutsal emanetin maksimum potansiyeline ne kadar yakın olduğunu gösterir. Kutsal emanetin kalitesi, seviyesi ve yetenekleri tarafından belirlenir.",
 
   "relics.description.researching.general.relic_rank.title": "Kalıntı Sırası:",
-  "relics.description.researching.general.relic_rank.extra_info": "Bu işlem, kalıntının seviyesini manuel olarak artırarak gerçekleştirilir; bu işlem tüm yükseltme ilerlemesini sıfırlar ancak maksimum seviyesini yükseltir.",
+  "relics.description.researching.general.relic_rank.extra_info": "Bu işlem, kalıntının rütbesini manuel olarak artırarak gerçekleştirilir; maksimum seviyesini yükseltir.",
 
   "relics.description.researching.relic.card.low_level": "Bu yeteneğin kilidini açmak için, kalıntı seviyesini yükseltmeniz gerekir %1$s!",
   "relics.description.researching.relic.card.unresearched": "Bu yeteneği kullanabilmek için araştırmayı tamamlamanız gerekiyor!",
