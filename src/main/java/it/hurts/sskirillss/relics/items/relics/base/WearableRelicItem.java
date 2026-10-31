@@ -2,11 +2,10 @@ package it.hurts.sskirillss.relics.items.relics.base;
 
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
-import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicAttributeModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
+import it.hurts.sskirillss.relics.utils.EntityUtils;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,7 +40,7 @@ public class WearableRelicItem extends RelicItem implements ICurioItem {
         if (attributes != null)
             attributes.getAttributes().forEach(attribute ->
                     modifiers.put(attribute.getAttribute(), new AttributeModifier(
-                            ResourceLocation.fromNamespaceAndPath(Relics.MODID, BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.getAttribute().value()).getPath() + "_" + slotContext.identifier() + "_" + slotContext.index()),
+                            EntityUtils.getAttributeId(slotContext, stack, attribute.getAttribute().value()),
                             attribute.getMultiplier(), attribute.getOperation())));
 
         if (slots != null)

@@ -140,8 +140,17 @@ public class EntityUtils {
         return entity == null ? null : new EntityHitResult(entity, vector3d);
     }
 
-    public static ResourceLocation getAttributeId(ItemStack stack, Attribute attribute) {
-        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath() + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute).getPath());
+    public static ResourceLocation getAttributeId(SlotContext slotContext, ItemStack stack, Attribute attribute) {
+        return ResourceLocation.fromNamespaceAndPath(Relics.MODID, BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
+                + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute).getPath()
+                + "_" + slotContext.identifier()
+                + "_" + slotContext.index());
+    }
+
+    public static ResourceLocation getAttributeId(SlotContext slotContext, ItemStack stack, Attribute attribute, String tag) {
+        var id = getAttributeId(slotContext, stack, attribute);
+
+        return id.withSuffix("_" + tag);
     }
 
     public static boolean hasAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, ResourceLocation id) {
@@ -150,8 +159,8 @@ public class EntityUtils {
         return instance != null && instance.hasModifier(id);
     }
 
-    public static boolean hasAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder) {
-        return hasAttribute(entity, attributeHolder,  getAttributeId(stack, attributeHolder.value()));
+    public static boolean hasAttribute(SlotContext slotContext, ItemStack stack, Holder<Attribute> attributeHolder) {
+        return hasAttribute(slotContext.entity(), attributeHolder, getAttributeId(slotContext, stack, attributeHolder.value()));
     }
 
     public static void applyAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation, ResourceLocation id) {
@@ -163,8 +172,8 @@ public class EntityUtils {
         instance.addTransientModifier(new AttributeModifier(id, value, operation));
     }
 
-    public static void applyAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
-        applyAttribute(entity, attributeHolder, value, operation, getAttributeId(stack, attributeHolder.value()));
+    public static void applyAttribute(SlotContext slotContext, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
+        applyAttribute(slotContext.entity(), attributeHolder, value, operation, getAttributeId(slotContext, stack, attributeHolder.value()));
     }
 
     public static void removeAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, net.minecraft.world.entity.ai.attributes.AttributeModifier.Operation operation, ResourceLocation id) {
@@ -176,21 +185,27 @@ public class EntityUtils {
         instance.removeModifier(new AttributeModifier(id, instance.getValue(), operation));
     }
 
-    public static void removeAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, AttributeModifier.Operation operation) {
-        removeAttribute(entity, attributeHolder, operation, getAttributeId(stack, attributeHolder.value()));
+    public static void removeAttribute(SlotContext slotContext, ItemStack stack, Holder<Attribute> attributeHolder, AttributeModifier.Operation operation) {
+        removeAttribute(slotContext.entity(), attributeHolder, operation, getAttributeId(slotContext, stack, attributeHolder.value()));
     }
 
     public static void resetAttribute(LivingEntity entity, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation, ResourceLocation id) {
         var attribute = entity.getAttribute(attributeHolder);
 
-        if (attribute == null || attribute.getValue() != value) {
-            EntityUtils.removeAttribute(entity, attributeHolder, operation, id);
-            EntityUtils.applyAttribute(entity, attributeHolder, value, operation, id);
-        }
+        if (attribute == null)
+            return;
+
+        var existing = attribute.getModifier(id);
+
+        if (existing != null && existing.amount() == value && existing.operation() == operation)
+            return;
+
+        EntityUtils.removeAttribute(entity, attributeHolder, operation, id);
+        EntityUtils.applyAttribute(entity, attributeHolder, value, operation, id);
     }
 
-    public static void resetAttribute(LivingEntity entity, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
-        resetAttribute(entity, attributeHolder, value, operation, getAttributeId(stack, attributeHolder.value()));
+    public static void resetAttribute(SlotContext slotContext, ItemStack stack, Holder<Attribute> attributeHolder, float value, AttributeModifier.Operation operation) {
+        resetAttribute(slotContext.entity(), attributeHolder, value, operation, getAttributeId(slotContext, stack, attributeHolder.value()));
     }
 
     public static ItemStack findEquippedCurio(Entity entity, Item item) {

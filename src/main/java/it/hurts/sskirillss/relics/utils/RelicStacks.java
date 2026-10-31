@@ -124,9 +124,25 @@ public final class RelicStacks implements Iterable<RelicStacks.Entry> {
         return entries.stream().mapToDouble(mapper).min().orElse(0D);
     }
 
+    public Best best(ToDoubleFunction<Entry> mapper) {
+        Best best = null;
+
+        for (var entry : entries) {
+            var value = mapper.applyAsDouble(entry);
+
+            if (value > 0D && (best == null || value > best.value()))
+                best = new Best(entry, value);
+        }
+
+        return best;
+    }
+
     @Override
     public Iterator<Entry> iterator() {
         return entries.iterator();
+    }
+
+    public record Best(Entry entry, double value) {
     }
 
     public record Entry(LivingEntity entity, ItemStack stack, IRelicItem relic, AbilityData ability) {

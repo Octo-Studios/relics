@@ -1,6 +1,5 @@
 package it.hurts.sskirillss.relics.items.relics.back;
 
-import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.relic.abilities.ability.AbilityModeSwitchEvent;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
@@ -26,9 +25,6 @@ import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -310,15 +306,6 @@ public class MidnightMantleItem extends WearableRelicItem {
                 .build();
     }
 
-    private static ResourceLocation getPhaseAttributeId(ItemStack stack, Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, SlotContext slotContext) {
-        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
-                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
-                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.value()).getPath()
-                        + "_" + slotContext.identifier()
-                        + "_" + slotContext.index()
-                        + "_phase");
-    }
-
 
     public int getInvisibilityCooldown(ItemStack stack) {
         return stack.getOrDefault(RelicsDataComponents.MIDNIGHT_MANTLE_INVISIBILITY_COOLDOWN.get(), 0);
@@ -423,11 +410,11 @@ public class MidnightMantleItem extends WearableRelicItem {
                 EntityUtils.resetAttribute(entity, Attributes.ATTACK_SPEED,
                         (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("attack_speed").getValue() * attackEffectiveness),
                         AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
-                        getPhaseAttributeId(stack, Attributes.ATTACK_SPEED, slotContext));
+                        EntityUtils.getAttributeId(slotContext, stack, Attributes.ATTACK_SPEED.value(), "phase"));
                 EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH,
                         (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("max_health").getValue() * healEffectiveness),
                         AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
-                        getPhaseAttributeId(stack, Attributes.MAX_HEALTH, slotContext));
+                        EntityUtils.getAttributeId(slotContext, stack, Attributes.MAX_HEALTH.value(), "phase"));
             }
 
             if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled() && this.getPhaseDuration(stack) > 0)
@@ -462,9 +449,9 @@ public class MidnightMantleItem extends WearableRelicItem {
         var entity = slotContext.entity();
 
         EntityUtils.removeAttribute(entity, Attributes.ATTACK_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
-                getPhaseAttributeId(stack, Attributes.ATTACK_SPEED, slotContext));
+                EntityUtils.getAttributeId(slotContext, stack, Attributes.ATTACK_SPEED.value(), "phase"));
         EntityUtils.removeAttribute(entity, Attributes.MAX_HEALTH, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
-                getPhaseAttributeId(stack, Attributes.MAX_HEALTH, slotContext));
+                EntityUtils.getAttributeId(slotContext, stack, Attributes.MAX_HEALTH.value(), "phase"));
     }
 
     @EventBusSubscriber

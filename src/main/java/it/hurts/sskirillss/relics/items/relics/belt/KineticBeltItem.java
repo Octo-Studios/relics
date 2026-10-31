@@ -1,6 +1,5 @@
 package it.hurts.sskirillss.relics.items.relics.belt;
 
-import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
@@ -37,8 +36,6 @@ import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -54,15 +51,6 @@ import top.theillusivec4.curios.api.SlotContext;
 import java.awt.*;
 
 public class KineticBeltItem extends WearableRelicItem {
-    private static ResourceLocation getGravityAttributeId(ItemStack stack, SlotContext slotContext) {
-        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
-                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
-                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(Attributes.GRAVITY.value()).getPath()
-                        + "_" + slotContext.identifier()
-                        + "_" + slotContext.index()
-                        + "_gliding");
-    }
-
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -225,7 +213,7 @@ public class KineticBeltItem extends WearableRelicItem {
 
         var entity = slotContext.entity();
         var level = entity.level();
-        var gravityAttributeId = getGravityAttributeId(stack, slotContext);
+        var gravityAttributeId = EntityUtils.getAttributeId(slotContext, stack, Attributes.GRAVITY.value(), "gliding");
 
         if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")) {
             EntityUtils.removeAttribute(entity, Attributes.GRAVITY, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);

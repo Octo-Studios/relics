@@ -26,10 +26,7 @@ import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
-import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.AgeableMob;
 import net.minecraft.world.entity.Entity;
@@ -63,15 +60,6 @@ import top.theillusivec4.curios.common.inventory.CurioSlot;
 import java.util.ArrayList;
 
 public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements ICreativeTabContent {
-    private static ResourceLocation getGluttonyAttributeId(ItemStack stack, Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, SlotContext slotContext) {
-        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
-                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
-                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.value()).getPath()
-                        + "_" + slotContext.identifier()
-                        + "_" + slotContext.index()
-                        + "_gluttony");
-    }
-
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -369,7 +357,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                     if (blacklist.contains(attribute.getRegisteredName()))
                         continue;
 
-                    EntityUtils.resetAttribute(entity, attribute, (float) modifier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, getGluttonyAttributeId(stack, attribute, slotContext));
+                    EntityUtils.resetAttribute(entity, attribute, (float) modifier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, EntityUtils.getAttributeId(slotContext, stack, attribute.value(), "gluttony"));
                 }
             }
         }
@@ -449,7 +437,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
         var entity = slotContext.entity();
 
         for (var instance : entity.getAttributes().attributes.values())
-            EntityUtils.removeAttribute(entity, instance.getAttribute(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, getGluttonyAttributeId(stack, instance.getAttribute(), slotContext));
+            EntityUtils.removeAttribute(entity, instance.getAttribute(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, EntityUtils.getAttributeId(slotContext, stack, instance.getAttribute().value(), "gluttony"));
     }
 
     @Override

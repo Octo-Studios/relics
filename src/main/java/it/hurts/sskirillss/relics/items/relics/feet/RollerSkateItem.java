@@ -28,8 +28,6 @@ import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -128,15 +126,6 @@ public class RollerSkateItem extends WearableRelicItem {
                 .build();
     }
 
-    private static ResourceLocation getAttributeId(ItemStack stack, net.minecraft.core.Holder<net.minecraft.world.entity.ai.attributes.Attribute> attribute, SlotContext slotContext) {
-        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
-                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
-                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(attribute.value()).getPath()
-                        + "_" + slotContext.identifier()
-                        + "_" + slotContext.index()
-                        + "_skating");
-    }
-
     public int getDuration(ItemStack stack) {
         return stack.getOrDefault(RelicsDataComponents.ROLLER_SKATE_DURATION, 0);
     }
@@ -160,8 +149,8 @@ public class RollerSkateItem extends WearableRelicItem {
 
         var level = entity.level();
         var random = level.getRandom();
-        var movementSpeedAttributeId = getAttributeId(stack, Attributes.MOVEMENT_SPEED, slotContext);
-        var stepHeightAttributeId = getAttributeId(stack, Attributes.STEP_HEIGHT, slotContext);
+        var movementSpeedAttributeId = EntityUtils.getAttributeId(slotContext, stack, Attributes.MOVEMENT_SPEED.value(), "skating");
+        var stepHeightAttributeId = EntityUtils.getAttributeId(slotContext, stack, Attributes.STEP_HEIGHT.value(), "skating");
 
         var duration = this.getDuration(stack);
 
@@ -244,8 +233,8 @@ public class RollerSkateItem extends WearableRelicItem {
 
         LivingEntity entity = slotContext.entity();
 
-        EntityUtils.removeAttribute(entity, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, getAttributeId(stack, Attributes.MOVEMENT_SPEED, slotContext));
-        EntityUtils.removeAttribute(entity, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE, getAttributeId(stack, Attributes.STEP_HEIGHT, slotContext));
+        EntityUtils.removeAttribute(entity, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, EntityUtils.getAttributeId(slotContext, stack, Attributes.MOVEMENT_SPEED.value(), "skating"));
+        EntityUtils.removeAttribute(entity, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE, EntityUtils.getAttributeId(slotContext, stack, Attributes.STEP_HEIGHT.value(), "skating"));
     }
 
     @EventBusSubscriber(modid = Relics.MODID)

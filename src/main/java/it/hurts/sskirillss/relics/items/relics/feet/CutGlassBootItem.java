@@ -119,22 +119,13 @@ public class CutGlassBootItem extends WearableRelicItem {
                 .build();
     }
 
-    private static ResourceLocation getMovementSpeedAttributeId(ItemStack stack, SlotContext slotContext) {
-        return ResourceLocation.fromNamespaceAndPath(Relics.MODID,
-                BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath()
-                        + "_" + BuiltInRegistries.ATTRIBUTE.getKey(Attributes.MOVEMENT_SPEED.value()).getPath()
-                        + "_" + slotContext.identifier()
-                        + "_" + slotContext.index()
-                        + "_glass");
-    }
-
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         super.curioTick(slotContext, stack);
 
         var entity = slotContext.entity();
         var level = entity.level();
-        var movementSpeedAttributeId = getMovementSpeedAttributeId(stack, slotContext);
+        var movementSpeedAttributeId = EntityUtils.getAttributeId(slotContext, stack, Attributes.MOVEMENT_SPEED.value(), "glass");
 
         if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(entity)) {
             this.setSpeedBlend(stack, 0F);
@@ -211,7 +202,7 @@ public class CutGlassBootItem extends WearableRelicItem {
         if (stack.getItem() == newStack.getItem())
             return;
 
-        EntityUtils.removeAttribute(slotContext.entity(), Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, getMovementSpeedAttributeId(stack, slotContext));
+        EntityUtils.removeAttribute(slotContext.entity(), Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, EntityUtils.getAttributeId(slotContext, stack, Attributes.MOVEMENT_SPEED.value(), "glass"));
     }
 
     @Override

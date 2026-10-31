@@ -230,7 +230,7 @@ public class PiglinMaskItem extends WearableRelicItem {
 
             var modifier = stacks >= PiglinMaskItem.getMaxStacks() ? 3 : 1;
 
-            EntityUtils.resetAttribute(entity, stack, Attributes.ATTACK_SPEED, (float) (stacks * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("looting").getStatData("attack_speed").getValue() * modifier), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.resetAttribute(slotContext, stack, Attributes.ATTACK_SPEED, (float) (stacks * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("looting").getStatData("attack_speed").getValue() * modifier), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         }
     }
 
@@ -239,9 +239,7 @@ public class PiglinMaskItem extends WearableRelicItem {
         if (stack.getItem() == newStack.getItem())
             return;
 
-        var entity = slotContext.entity();
-
-        EntityUtils.removeAttribute(entity, stack, Attributes.ATTACK_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        EntityUtils.removeAttribute(slotContext, stack, Attributes.ATTACK_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
     }
 
     @Override
