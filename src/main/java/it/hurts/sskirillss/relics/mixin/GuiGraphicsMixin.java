@@ -5,6 +5,7 @@ import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.utility.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.init.RelicsConfigs;
 import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
@@ -87,7 +88,7 @@ public class GuiGraphicsMixin {
                 renderedUpgradeIcon = true;
             }
 
-            if (!renderedResearchIcon && (abilityData.mayResearch() || abilityData.mayUnlock())) {
+            if (RelicsConfigs.RELICS_CONFIG.isEnabledFloatingMagnifyingGlass() && !renderedResearchIcon && (abilityData.mayResearch() || abilityData.mayUnlock())) {
                 poseStack.pushPose();
 
                 poseStack.translate(x + 9, y + 9, 200);

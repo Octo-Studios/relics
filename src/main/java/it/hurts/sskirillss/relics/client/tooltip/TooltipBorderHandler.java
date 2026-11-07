@@ -5,6 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.utility.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.init.RelicsConfigs;
 import it.hurts.sskirillss.relics.init.RelicsRelicStyles;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
 import net.minecraft.Util;
@@ -40,6 +41,9 @@ public class TooltipBorderHandler {
 
     @SubscribeEvent
     public static void onTooltipDisplay(TooltipDisplayEvent event) {
+        if (!RelicsConfigs.RELICS_CONFIG.isEnabledFancyTooltips())
+            return;
+
         var player = Minecraft.getInstance().player;
 
         if (player == null)
@@ -155,6 +159,9 @@ public class TooltipBorderHandler {
 
     @SubscribeEvent
     public static void onTooltipColorEvent(RenderTooltipEvent.Color event) {
+        if (!RelicsConfigs.RELICS_CONFIG.isEnabledFancyTooltips())
+            return;
+
         var stack = event.getItemStack();
         var player = Minecraft.getInstance().player;
 
