@@ -3,11 +3,8 @@ package it.hurts.sskirillss.relics.api.relics.abilities;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.hurts.sskirillss.relics.api.relics.synergies.SynergyComponent;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Singular;
+import it.hurts.sskirillss.relics.utils.RelicsCodecs;
+import lombok.*;
 
 import java.util.Map;
 
@@ -25,10 +22,10 @@ public class AbilitiesComponent {
 
     public static final Codec<AbilitiesComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.unboundedMap(Codec.STRING, AbilityComponent.CODEC)
+                    RelicsCodecs.unboundedMap(Codec.STRING, AbilityComponent.CODEC)
                             .fieldOf("abilities")
                             .forGetter(AbilitiesComponent::getAbilities),
-                    Codec.unboundedMap(Codec.STRING, SynergyComponent.CODEC)
+                    RelicsCodecs.unboundedMap(Codec.STRING, SynergyComponent.CODEC)
                             .fieldOf("synergies")
                             .forGetter(AbilitiesComponent::getSynergies)
             ).apply(instance, AbilitiesComponent::new)

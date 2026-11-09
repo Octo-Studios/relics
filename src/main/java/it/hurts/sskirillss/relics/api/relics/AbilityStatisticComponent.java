@@ -2,11 +2,8 @@ package it.hurts.sskirillss.relics.api.relics;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Singular;
+import it.hurts.sskirillss.relics.utils.RelicsCodecs;
+import lombok.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +20,7 @@ public class AbilityStatisticComponent {
 
     public static final Codec<AbilityStatisticComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.unboundedMap(Codec.STRING, AbilityMetricComponent.CODEC)
+                    RelicsCodecs.unboundedMap(Codec.STRING, AbilityMetricComponent.CODEC)
                             .optionalFieldOf("metrics", new HashMap<>())
                             .forGetter(AbilityStatisticComponent::getMetrics)
             ).apply(instance, AbilityStatisticComponent::new)

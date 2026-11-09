@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.api.relics;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.hurts.sskirillss.relics.utils.RelicsCodecs;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -23,7 +24,7 @@ public class ResearchComponent {
 
     public static final Codec<ResearchComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.unboundedMap(Codec.STRING, Codec.list(Codec.INT))
+                    RelicsCodecs.unboundedMap(Codec.STRING, Codec.list(Codec.INT))
                             .fieldOf("links")
                             .forGetter(ResearchComponent::getLinks),
                     Codec.BOOL
