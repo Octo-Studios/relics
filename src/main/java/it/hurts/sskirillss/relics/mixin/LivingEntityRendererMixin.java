@@ -1,10 +1,12 @@
 package it.hurts.sskirillss.relics.mixin;
 
+import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import it.hurts.sskirillss.relics.client.post_effects.misc.EntityGlitchMask;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.util.Mth;
@@ -12,6 +14,7 @@ import net.minecraft.world.entity.LivingEntity;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -35,15 +38,16 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
 
     @Inject(
             method = "render(Lnet/minecraft/world/entity/LivingEntity;FFLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/MultiBufferSource;I)V",
-            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V", shift = At.Shift.BEFORE)
+            at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V")
     )
     private void relics$renderGlitchMask(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
         var animation = this.relics$getLayerAnimation(entity, partialTicks);
 
-        EntityGlitchMask.render(entity, this.model, this.layers, ((LivingEntityRenderer<T, M>) (Object) this).getTextureLocation(entity), poseStack, packedLight,
+        EntityGlitchMask.render(entity, this.model, this.layers, ((LivingEntityRenderer<T, M>) (Object) this).getTextureLocation(entity), poseStack, buffer, packedLight,
                 animation.limbSwing(), animation.limbSwingAmount(), partialTicks, animation.ageInTicks(), animation.netHeadYaw(), animation.headPitch());
     }
 
+    @Unique
     private RelicsLayerAnimation relics$getLayerAnimation(T entity, float partialTicks) {
         var shouldSit = entity.isPassenger() && entity.getVehicle() != null && entity.getVehicle().shouldRiderSit();
         var bodyYaw = Mth.rotLerp(partialTicks, entity.yBodyRotO, entity.yBodyRot);
