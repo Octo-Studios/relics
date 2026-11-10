@@ -43,6 +43,7 @@ public abstract class LivingEntityRendererMixin<T extends LivingEntity, M extend
     private void relics$renderGlitchMask(T entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight, CallbackInfo ci) {
         var animation = this.relics$getLayerAnimation(entity, partialTicks);
 
+        if (!(buffer instanceof MultiBufferSource.BufferSource)) return; // Added a guard, against a ClassCastException later in EntityGlitchMask.render()
         EntityGlitchMask.render(entity, this.model, this.layers, ((LivingEntityRenderer<T, M>) (Object) this).getTextureLocation(entity), poseStack, buffer, packedLight,
                 animation.limbSwing(), animation.limbSwingAmount(), partialTicks, animation.ageInTicks(), animation.netHeadYaw(), animation.headPitch());
     }
