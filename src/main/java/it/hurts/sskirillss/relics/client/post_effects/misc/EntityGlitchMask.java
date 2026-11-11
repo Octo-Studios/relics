@@ -37,7 +37,7 @@ public class EntityGlitchMask {
             mask.resize(window.getWidth(), window.getHeight(), Minecraft.ON_OSX);
 
         mask.setClearColor(1.0F, 0.0F, 0.0F, 1.0F);
-        //mask.clear(Minecraft.ON_OSX);
+        mask.clear(Minecraft.ON_OSX);
 
         depthCopied = false;
         renderedThisFrame = false;
