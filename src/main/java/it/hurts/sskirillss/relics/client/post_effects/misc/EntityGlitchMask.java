@@ -3,7 +3,9 @@ package it.hurts.sskirillss.relics.client.post_effects.misc;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.vertex.ByteBufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
+import it.hurts.sskirillss.relics.mixin.BufferSourceAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -60,16 +62,16 @@ public class EntityGlitchMask {
         return !renderingMask && MC.player != null && entity.isAlive() && entity.hasEffect(RelicsMobEffects.GLITCH);
     }
 
-    public static <T extends LivingEntity, M extends EntityModel<T>> void render(T entity, M model, List<RenderLayer<T, M>> layers, ResourceLocation texture, PoseStack poseStack, int packedLight, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
+    public static <T extends LivingEntity, M extends EntityModel<T>> void render(T entity, M model, List<RenderLayer<T, M>> layers, ResourceLocation texture, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch) {
         var mask = getTarget();
 
         if (mask == null || !shouldRender(entity))
             return;
 
         var main = MC.getMainRenderTarget();
-        var maskBuffer = new ByteBufferBuilder(RenderType.SMALL_BUFFER_SIZE);
-        var buffer = MultiBufferSource.immediate(maskBuffer);
 
+        ByteBufferBuilder maskBuffer = new ByteBufferBuilder(RenderType.SMALL_BUFFER_SIZE);
+        MultiBufferSource.BufferSource buffer = MultiBufferSource.immediateWithBuffers(((BufferSourceAccessor) bufferSource).getFixedBuffers(), maskBuffer);
         renderingMask = true;
 
         try {
@@ -80,21 +82,24 @@ public class EntityGlitchMask {
 
             mask.bindWrite(false);
 
-            var vertexConsumer = buffer.getBuffer(model.renderType(texture));
+            VertexConsumer vertexConsumer = buffer.getBuffer(model.renderType(texture));
 
             model.renderToBuffer(poseStack, vertexConsumer, packedLight, OverlayTexture.NO_OVERLAY, -1);
             renderedThisFrame = true;
 
             if (!entity.isSpectator()) {
-                for (var layer : layers)
-                    layer.render(poseStack, buffer, packedLight, entity, limbSwing, limbSwingAmount, partialTicks, ageInTicks, netHeadYaw, headPitch);
+                layers.forEach(layer -> layer.render(
+                        poseStack, bufferSource,
+                        packedLight, entity,
+                        limbSwing, limbSwingAmount,
+                        partialTicks, ageInTicks,
+                        netHeadYaw, headPitch)
+                );
             }
         } finally {
-            buffer.endBatch();
-            maskBuffer.discard();
-
             renderingMask = false;
-
+            buffer.endBatch();
+            maskBuffer.close();
             main.bindWrite(false);
         }
     }

@@ -40,7 +40,7 @@ minecraft {
         server {
             systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
 
-            programArgument '--nogui'
+            argument '--nogui' // verify this is the right change, was programArgument.
         }
     }
 }
@@ -87,6 +87,7 @@ dependencies {
 
     implementation("curse.maven:irisshaders-455508:6661598")
     implementation("curse.maven:octo-lib-916747:6932487")
+    //implementation files("libs/OctoLib-NEOFORGE-0.6.2+1.21.jar");
     implementation("curse.maven:sodium-394468:6382651")
     implementation("curse.maven:sophisticated-backpacks-422301:7916628")
     implementation("curse.maven:sophisticated-core-618298:7916600")
