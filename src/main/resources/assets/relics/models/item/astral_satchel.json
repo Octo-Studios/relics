@@ -1,6 +1,21 @@
 {
-  "parent": "minecraft:item/generated",
+  "parent": "neoforge:item/default",
+  "base": {
+    "parent": "relics:item/astral_satchel_3d"
+  },
   "textures": {
-    "layer0": "relics:item/astral_satchel"
+    "particle": "relics:item/astral_satchel"
+  },
+  "loader": "neoforge:separate_transforms",
+  "perspectives": {
+    "ground": {
+      "parent": "relics:item/astral_satchel_2d"
+    },
+    "gui": {
+      "parent": "relics:item/astral_satchel_2d"
+    },
+    "fixed": {
+      "parent": "relics:item/astral_satchel_2d"
+    }
   }
 }
