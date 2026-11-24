@@ -442,6 +442,19 @@ public class AstralSatchelItem extends RelicItem {
         if (stack.isEmpty() || stack == satchel || !canQuickStore(player, satchel))
             return false;
 
+        var moved = addQuickStoreEntries(player, satchel, stack);
+
+        if (moved == 0)
+            return false;
+
+        stack.shrink(moved);
+
+        reward(player, satchel, (AstralSatchelItem) satchel.getItem(), moved);
+
+        return true;
+    }
+
+    private static int addQuickStoreEntries(Player player, ItemStack satchel, ItemStack stack) {
         var relic = (AstralSatchelItem) satchel.getItem();
         var entries = new ArrayList<>(getEntries(satchel));
         var limit = getStackLimit(player, satchel, stack);
@@ -475,17 +488,90 @@ public class AstralSatchelItem extends RelicItem {
         if (moved <= 0) {
             player.displayClientMessage(Component.translatable("relics.message.astral_satchel.full"), true);
 
-            return false;
+            return 0;
         }
 
         if (!canStoreEntries(player, entries))
-            return false;
-
-        stack.shrink(moved);
+            return 0;
 
         setEntries(satchel, entries);
 
-        reward(player, satchel, relic, moved);
+        return moved;
+    }
+
+    private static void quickStoreFromSlot(Player player, ItemStack satchel, Slot slot, ItemStack stack) {
+        var updated = satchel.copy();
+        var source = stack.copy();
+        var moved = addQuickStoreEntries(player, updated, source);
+
+        if (moved == 0)
+            return;
+
+        var extracted = slot.remove(moved);
+
+        if (extracted.isEmpty())
+            return;
+
+        slot.onTake(player, extracted.copy());
+
+        if (extracted.getCount() != moved || !ItemStack.isSameItemSameComponents(source, extracted)) {
+            quickStore(player, satchel, extracted);
+
+            if (!extracted.isEmpty())
+                player.getInventory().placeItemBackInInventory(extracted);
+
+            return;
+        }
+
+        setEntries(satchel, getEntries(updated));
+        reward(player, satchel, (AstralSatchelItem) satchel.getItem(), moved);
+    }
+
+    private static void quickStoreIntoSlot(Player player, Slot slot, ItemStack updated, ItemStack source) {
+        var moved = addQuickStoreEntries(player, updated, source);
+
+        if (moved == 0)
+            return;
+
+        updateQuickStoreSlot(slot, updated);
+
+        var stored = slot.getItem();
+
+        if (!(stored.getItem() instanceof AstralSatchelItem relic) || !matchesStoredEntries(getEntries(updated), getEntries(stored)))
+            return;
+
+        source.shrink(moved);
+
+        var rewarded = stored.copy();
+
+        reward(player, rewarded, relic, moved);
+
+        if (!ItemStack.matches(stored, rewarded))
+            updateQuickStoreSlot(slot, rewarded);
+    }
+
+    private static void updateQuickStoreSlot(Slot slot, ItemStack stack) {
+        if (!slot.mayPlace(stack))
+            return;
+
+        try {
+            slot.setByPlayer(stack);
+        } catch (RuntimeException exception) {
+            Relics.LOGGER.debug("Could not update astral satchel in slot {}", slot.index, exception);
+        }
+    }
+
+    private static boolean matchesStoredEntries(List<Entry> expected, List<Entry> stored) {
+        if (expected.size() != stored.size())
+            return false;
+
+        for (var i = 0; i < expected.size(); i++) {
+            var entry = expected.get(i);
+            var actual = stored.get(i);
+
+            if (!entry.id().equals(actual.id()) || entry.amount() != actual.amount())
+                return false;
+        }
 
         return true;
     }
@@ -508,11 +594,20 @@ public class AstralSatchelItem extends RelicItem {
             source = carried;
         }
 
-        if (source == satchel || isLocked(player, slot) || !canQuickStore(player, satchel))
+        if (source == satchel || isLocked(player, slot))
+            return false;
+
+        if (satchel == stored)
+            satchel = stored.copy();
+
+        if (!canQuickStore(player, satchel))
             return false;
 
         if (apply) {
-            quickStore(player, satchel, source);
+            if (satchel == carried)
+                quickStoreFromSlot(player, satchel, slot, source);
+            else
+                quickStoreIntoSlot(player, slot, satchel, source);
 
             slot.setChanged();
             menu.broadcastChanges();
