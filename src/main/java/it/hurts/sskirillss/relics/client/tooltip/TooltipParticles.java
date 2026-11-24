@@ -3,21 +3,18 @@ package it.hurts.sskirillss.relics.client.tooltip;
 import com.mojang.blaze3d.platform.NativeImage;
 import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
+import it.hurts.sskirillss.relics.api.events.utility.TooltipDisplayEvent;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.tooltip.TooltipRenderUtil;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import org.lwjgl.opengl.GL11;
 
-import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,7 +36,6 @@ public class TooltipParticles {
 
     private static final ResourceLocation PIXEL = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/particles/pixel.png");
 
-    private static final Map<Item, Integer> ITEM_COLORS = new HashMap<>();
     private static final Map<ResourceLocation, NativeImage> FRAMES = new HashMap<>();
     private static final List<Particle> PARTICLES = new ArrayList<>();
     private static final RandomSource RANDOM = RandomSource.create();
@@ -48,44 +44,43 @@ public class TooltipParticles {
     private static final long RESET_DELAY = 250L;
     private static final long LIFETIME = 2200L;
     private static final long LIFETIME_RANGE = 1400L;
-    private static final int ALPHA_THRESHOLD = 128;
 
     private static final float SPAWN_DENSITY = 1F / 175F;
     private static final float TRIANGLE_HEIGHT = 56F;
     private static final float EDGE_HEIGHT = 0.3F;
-    private static final float TOP_EDGE_OFFSET = 3F;
-    private static final float BOTTOM_EDGE_OFFSET = 2F;
+    private static final int TOP_EDGE_OFFSET = TooltipRenderUtil.PADDING_TOP;
+    private static final int BOTTOM_EDGE_OFFSET = TooltipRenderUtil.PADDING_BOTTOM - 1;
     private static final float DISTANCE_MIN = 0.6F;
     private static final float DRIFT = 1.5F;
     private static final float DRIFT_SPEED = 2F;
     private static final float FADE_IN = 0.15F;
     private static final float FADE_OUT_START = 0.35F;
     private static final float ALPHA = 0.85F;
-    private static final float SATURATION_BOOST = 1.4F;
-    private static final float SATURATION_MIN = 0.15F;
-    private static final float BRIGHTNESS_MIN = 0.85F;
 
     private static Item lastItem = null;
     private static long lastSpawn = 0L;
     private static long lastRender = 0L;
 
-    public static void render(GuiGraphics guiGraphics, ItemStack stack, ResourceLocation frame, int x, int y, int width, int height) {
+    public static void render(TooltipDisplayEvent event, ResourceLocation frame, int frameOffset) {
         var now = Util.getMillis();
+        var item = event.getStack().getItem();
+        var image = FRAMES.computeIfAbsent(frame, TooltipParticles::loadFrame);
+        var width = event.getWidth();
+        var topColor = event.getBorderStart();
+        var bottomColor = event.getBorderEnd();
 
-        var fallback = ITEM_COLORS.computeIfAbsent(stack.getItem(), item -> BigRelicCardWidget.getItemColor(stack));
-
-        if (lastItem != stack.getItem() || now - lastRender > RESET_DELAY) {
+        if (lastItem != item || now - lastRender > RESET_DELAY) {
             PARTICLES.clear();
 
-            lastItem = stack.getItem();
+            lastItem = item;
             lastSpawn = now;
 
             for (var cycle = 0; cycle < (LIFETIME + LIFETIME_RANGE / 2) / SPAWN_INTERVAL; cycle++) {
                 var count = getSpawnCount(width);
 
                 for (var i = 0; i < count; i++) {
-                    prewarm(now, -1F, frame, fallback, x, width);
-                    prewarm(now, 1F, frame, fallback, x, width);
+                    prewarm(now, -1F, image, frameOffset, topColor, width);
+                    prewarm(now, 1F, image, frameOffset, bottomColor, width);
                 }
             }
         }
@@ -98,42 +93,47 @@ public class TooltipParticles {
             var count = getSpawnCount(width);
 
             for (var i = 0; i < count; i++) {
-                PARTICLES.add(create(now, -1F, frame, fallback, x, width));
-                PARTICLES.add(create(now, 1F, frame, fallback, x, width));
+                PARTICLES.add(create(now, -1F, image, frameOffset, topColor, width));
+                PARTICLES.add(create(now, 1F, image, frameOffset, bottomColor, width));
             }
         }
 
         PARTICLES.removeIf(particle -> now - particle.spawnTime >= particle.lifetime);
 
-        var poseStack = guiGraphics.pose();
+        var poseStack = event.getGraphics().pose();
+        var x = event.getX();
+        var y = event.getY();
+        var height = event.getHeight();
 
         RenderSystem.disableDepthTest();
         RenderSystem.enableBlend();
-        RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
+        RenderSystem.defaultBlendFunc();
 
         for (var particle : PARTICLES) {
             var age = now - particle.spawnTime;
             var progress = age / (float) particle.lifetime;
 
             var fadeOut = Mth.clamp((progress - FADE_OUT_START) / (1F - FADE_OUT_START), 0F, 1F);
-            var visibility = Math.min(progress / FADE_IN, 1F) * (1F - fadeOut * fadeOut * (3F - 2F * fadeOut));
+            var fadeIn = Math.min(progress / FADE_IN, 1F);
+            var visibility = fadeIn * (1F - fadeOut * fadeOut * (3F - 2F * fadeOut));
 
-            var posX = x + width * particle.offset + Mth.sin(particle.phase + age / 1000F * DRIFT_SPEED) * DRIFT;
+            var posX = x + (int) (width * particle.offset) + Mth.sin(particle.phase + age / 1000F * DRIFT_SPEED) * DRIFT * fadeIn;
             var posY = (particle.direction < 0F ? y - TOP_EDGE_OFFSET : y + height + BOTTOM_EDGE_OFFSET) + particle.direction * particle.distance * progress;
 
-            RenderSystem.setShaderColor(particle.red, particle.green, particle.blue, ALPHA * visibility);
-
             GUIRenderer.begin(PIXEL, poseStack)
+                    .color(particle.red, particle.green, particle.blue, ALPHA * visibility)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(posX, posY)
                     .end();
         }
 
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
-
-        RenderSystem.defaultBlendFunc();
         RenderSystem.disableBlend();
         RenderSystem.enableDepthTest();
+    }
+
+    static void clearFrameCache() {
+        FRAMES.values().forEach(NativeImage::close);
+        FRAMES.clear();
     }
 
     private static int getSpawnCount(int width) {
@@ -142,15 +142,15 @@ public class TooltipParticles {
         return (int) expected + (RANDOM.nextFloat() < expected - (int) expected ? 1 : 0);
     }
 
-    private static void prewarm(long now, float direction, ResourceLocation frame, int fallback, int x, int width) {
-        var particle = create(now, direction, frame, fallback, x, width);
+    private static void prewarm(long now, float direction, NativeImage image, int frameOffset, int borderColor, int width) {
+        var particle = create(now, direction, image, frameOffset, borderColor, width);
 
         particle.spawnTime = now - (long) (RANDOM.nextFloat() * particle.lifetime);
 
         PARTICLES.add(particle);
     }
 
-    private static Particle create(long now, float direction, ResourceLocation frame, int fallback, int x, int width) {
+    private static Particle create(long now, float direction, NativeImage image, int frameOffset, int borderColor, int width) {
         var particle = new Particle();
 
         var offset = RANDOM.nextFloat();
@@ -163,52 +163,45 @@ public class TooltipParticles {
         particle.spawnTime = now;
         particle.lifetime = LIFETIME + (long) (RANDOM.nextFloat() * LIFETIME_RANGE);
 
-        var sampled = sampleFrame(frame, getFrameColumn(x, width, x + width * offset), direction < 0F);
-        var source = sampled < 0 ? fallback : sampled;
-        var hsb = Color.RGBtoHSB((source >> 16) & 0xFF, (source >> 8) & 0xFF, source & 0xFF, null);
-        var color = Color.HSBtoRGB(hsb[0], Mth.clamp(hsb[1] * SATURATION_BOOST + SATURATION_MIN, 0F, 1F), Math.max(hsb[2], BRIGHTNESS_MIN));
-
-        particle.red = ((color >> 16) & 0xFF) / 255F;
-        particle.green = ((color >> 8) & 0xFF) / 255F;
-        particle.blue = (color & 0xFF) / 255F;
+        var color = sampleFrame(image, frameOffset, width, (int) (width * offset), direction < 0F, borderColor);
+        particle.red = FastColor.ARGB32.red(color) / 255F;
+        particle.green = FastColor.ARGB32.green(color) / 255F;
+        particle.blue = FastColor.ARGB32.blue(color) / 255F;
 
         return particle;
     }
 
-    private static int getFrameColumn(int x, int width, float position) {
-        var middle = x + (width - TooltipBorderHandler.MIDDLE_WIDTH) / 2;
+    private static int sampleFrame(NativeImage image, int frameOffset, int width, int column, boolean top, int color) {
+        if (image == null || image.getWidth() < TooltipBorderHandler.PATTERN_WIDTH || frameOffset + TooltipBorderHandler.PATTERN_HEIGHT > image.getHeight())
+            return color;
 
-        if (position >= middle && position < middle + TooltipBorderHandler.MIDDLE_WIDTH)
-            return TooltipBorderHandler.CORNER_WIDTH + (int) (position - middle);
+        var cornerRow = top
+                ? TooltipBorderHandler.CORNER_HEIGHT / 2 + TooltipBorderHandler.CORNER_MARGIN - TOP_EDGE_OFFSET
+                : TooltipBorderHandler.PATTERN_HEIGHT - TooltipBorderHandler.CORNER_HEIGHT / 2 - TooltipBorderHandler.CORNER_MARGIN + BOTTOM_EDGE_OFFSET;
+        var left = column + TooltipBorderHandler.CORNER_WIDTH / 2 + TooltipBorderHandler.CORNER_MARGIN;
+        var right = column - width + TooltipBorderHandler.CORNER_WIDTH / 2 - TooltipBorderHandler.CORNER_MARGIN;
+        var middle = column - (width - TooltipBorderHandler.MIDDLE_WIDTH) / 2;
 
-        var left = x - TooltipBorderHandler.CORNER_WIDTH / 2 - TooltipBorderHandler.CORNER_MARGIN;
+        if (left < TooltipBorderHandler.CORNER_WIDTH)
+            color = samplePixel(image, left, frameOffset + cornerRow, color);
 
-        if (position >= left && position < left + TooltipBorderHandler.CORNER_WIDTH)
-            return (int) (position - left);
+        if (right >= 0)
+            color = samplePixel(image, TooltipBorderHandler.PATTERN_WIDTH - TooltipBorderHandler.CORNER_WIDTH + right, frameOffset + cornerRow, color);
 
-        var right = x + width - TooltipBorderHandler.CORNER_WIDTH / 2 + TooltipBorderHandler.CORNER_MARGIN;
-
-        if (position >= right && position < right + TooltipBorderHandler.CORNER_WIDTH)
-            return TooltipBorderHandler.PATTERN_WIDTH - TooltipBorderHandler.CORNER_WIDTH + (int) (position - right);
-
-        return -1;
-    }
-
-    private static int sampleFrame(ResourceLocation frame, int column, boolean top) {
-        var image = FRAMES.computeIfAbsent(frame, TooltipParticles::loadFrame);
-
-        if (image == null || column < 0 || column >= image.getWidth())
-            return -1;
-
-        for (var i = 0; i < TooltipBorderHandler.CORNER_HEIGHT; i++) {
-            var row = top ? TooltipBorderHandler.CORNER_HEIGHT - 1 - i : TooltipBorderHandler.PATTERN_HEIGHT - TooltipBorderHandler.CORNER_HEIGHT + i;
-            var pixel = image.getPixelRGBA(column, row);
-
-            if (FastColor.ABGR32.alpha(pixel) >= ALPHA_THRESHOLD)
-                return (FastColor.ABGR32.red(pixel) << 16) | (FastColor.ABGR32.green(pixel) << 8) | FastColor.ABGR32.blue(pixel);
+        if (middle >= 0 && middle < TooltipBorderHandler.MIDDLE_WIDTH) {
+            var middleRow = top ? TooltipBorderHandler.MIDDLE_HEIGHT - 1 - TOP_EDGE_OFFSET : TooltipBorderHandler.MIDDLE_HEIGHT + 1 + BOTTOM_EDGE_OFFSET;
+            color = samplePixel(image, TooltipBorderHandler.CORNER_WIDTH + middle, frameOffset + middleRow, color);
         }
 
-        return -1;
+        return color;
+    }
+
+    private static int samplePixel(NativeImage image, int column, int row, int color) {
+        var pixel = image.getPixelRGBA(column, row);
+        var alpha = FastColor.ABGR32.alpha(pixel);
+        var argb = FastColor.ARGB32.color(alpha, FastColor.ABGR32.red(pixel), FastColor.ABGR32.green(pixel), FastColor.ABGR32.blue(pixel));
+
+        return FastColor.ARGB32.lerp(alpha / 255F, color, argb);
     }
 
     private static NativeImage loadFrame(ResourceLocation frame) {

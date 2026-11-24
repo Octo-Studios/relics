@@ -1,21 +1,10 @@
 {
-  "parent": "neoforge:item/default",
-  "base": {
-    "parent": "relics:item/astral_satchel_3d"
-  },
+  "parent": "item/generated",
   "textures": {
-    "particle": "relics:item/astral_satchel"
+    "layer0": "relics:item/astral_satchel"
   },
-  "loader": "neoforge:separate_transforms",
-  "perspectives": {
-    "ground": {
-      "parent": "relics:item/astral_satchel_2d"
-    },
-    "gui": {
-      "parent": "relics:item/astral_satchel_2d"
-    },
-    "fixed": {
-      "parent": "relics:item/astral_satchel_2d"
-    }
-  }
+  "overrides": [
+    { "predicate": { "relics:flawless": 0 }, "model": "relics:item/astral_satchel_non_flawless" },
+    { "predicate": { "relics:flawless": 1 }, "model": "relics:item/astral_satchel_flawless" }
+  ]
 }

@@ -18,4 +18,7 @@ public class TooltipDisplayEvent extends Event {
 
     private final int x;
     private final int y;
+
+    private final int borderStart;
+    private final int borderEnd;
 }

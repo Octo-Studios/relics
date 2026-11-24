@@ -1,5 +1,8 @@
 package it.hurts.sskirillss.relics.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
+import com.llamalad7.mixinextras.sugar.Share;
+import com.llamalad7.mixinextras.sugar.ref.LocalRef;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.Relics;
@@ -37,10 +40,20 @@ public class GuiGraphicsMixin {
     @Unique
     private static final ResourceLocation RESEARCH_TEXTURE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/item_state/research.png");
 
+    @ModifyExpressionValue(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/ClientHooks;onRenderTooltipColor(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/client/gui/Font;Ljava/util/List;)Lnet/neoforged/neoforge/client/event/RenderTooltipEvent$Color;", remap = false))
+    private RenderTooltipEvent.Color captureTooltipColors(RenderTooltipEvent.Color colors, @Share("tooltipColors") LocalRef<RenderTooltipEvent.Color> tooltipColors) {
+        tooltipColors.set(colors);
+
+        return colors;
+    }
+
     @Inject(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lcom/mojang/blaze3d/vertex/PoseStack;popPose()V", shift = At.Shift.AFTER), locals = LocalCapture.CAPTURE_FAILSOFT)
-    public void onTooltipRender(Font font, List<ClientTooltipComponent> tooltip, int x, int y, ClientTooltipPositioner positioner, CallbackInfo info, RenderTooltipEvent.Pre event, int width, int height, int postWidth, int postHeight, Vector2ic postPos) {
-        if (!tooltip.isEmpty())
-            NeoForge.EVENT_BUS.post(new TooltipDisplayEvent(event.getItemStack(), (GuiGraphics) (Object) this, postWidth, postHeight, postPos.x(), postPos.y()));
+    public void onTooltipRender(Font font, List<ClientTooltipComponent> tooltip, int x, int y, ClientTooltipPositioner positioner, CallbackInfo info, RenderTooltipEvent.Pre event, int width, int height, int postWidth, int postHeight, Vector2ic postPos, @Share("tooltipColors") LocalRef<RenderTooltipEvent.Color> tooltipColors) {
+        if (!tooltip.isEmpty()) {
+            var colors = tooltipColors.get();
+
+            NeoForge.EVENT_BUS.post(new TooltipDisplayEvent(event.getItemStack(), (GuiGraphics) (Object) this, postWidth, postHeight, postPos.x(), postPos.y(), colors.getBorderStart(), colors.getBorderEnd()));
+        }
     }
 
     @Inject(method = "renderItemDecorations(Lnet/minecraft/client/gui/Font;Lnet/minecraft/world/item/ItemStack;IILjava/lang/String;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ItemStack;isEmpty()Z", shift = At.Shift.AFTER))

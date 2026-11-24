@@ -1,0 +1,7 @@
+{
+  "parent": "relics:item/astral_satchel_3d",
+  "textures": {
+    "0": "relics:item/model/astral_satchel_flawless",
+    "particle": "relics:item/model/astral_satchel_flawless"
+  }
+}

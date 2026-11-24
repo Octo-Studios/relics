@@ -11,10 +11,12 @@ import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.SimpleTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RegisterClientReloadListenersEvent;
 import net.neoforged.neoforge.client.event.RenderTooltipEvent;
 import org.lwjgl.opengl.GL11;
 
@@ -37,6 +39,11 @@ public class TooltipBorderHandler {
     private static final float BREATH_SATURATION = 0.4F;
     private static final float BREATH_BRIGHTNESS = 0.12F;
     private static final float BREATH_SPEED = 2F;
+
+    @SubscribeEvent
+    public static void registerReloadListener(RegisterClientReloadListenersEvent event) {
+        event.registerReloadListener((ResourceManagerReloadListener) resources -> TooltipParticles.clearFrameCache());
+    }
 
     @SubscribeEvent
     public static void onTooltipDisplay(TooltipDisplayEvent event) {
@@ -93,19 +100,16 @@ public class TooltipBorderHandler {
         var x = event.getX();
         var y = event.getY();
 
-        TooltipParticles.render(graphics, stack, frameTexture, x, y, width, height);
+        var animation = AnimationData.fromMcmeta(ResourceLocation.fromNamespaceAndPath(Relics.MODID, frameTexture.getPath() + ".mcmeta"));
+        var offset = PATTERN_HEIGHT * animation.getFrameByTime(player.tickCount).getKey();
+
+        TooltipParticles.render(event, frameTexture, offset);
 
         poseStack.pushPose();
 
         RenderSystem.enableBlend();
 
         poseStack.translate(0, 0, 410.0);
-
-        var animation = AnimationData.fromMcmeta(ResourceLocation.fromNamespaceAndPath(Relics.MODID, frameTexture.getPath() + ".mcmeta"));
-
-        int frame = animation.getFrameByTime(player.tickCount).getKey();
-
-        int offset = PATTERN_HEIGHT * frame;
 
         graphics.blit(frameTexture, x - CORNER_WIDTH / 2 - CORNER_MARGIN, y - CORNER_HEIGHT / 2 - CORNER_MARGIN, 0, offset, CORNER_WIDTH, CORNER_HEIGHT, texWidth, texHeight);
         graphics.blit(frameTexture, x + width - CORNER_WIDTH / 2 + CORNER_MARGIN, y - CORNER_HEIGHT / 2 - CORNER_MARGIN, PATTERN_WIDTH - CORNER_WIDTH, offset, CORNER_WIDTH, CORNER_HEIGHT, texWidth, texHeight);
