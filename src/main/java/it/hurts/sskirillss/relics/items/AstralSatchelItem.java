@@ -628,9 +628,10 @@ public class AstralSatchelItem extends RelicItem {
         if (drop.distanceToSqr(player.getEyePosition()) > reach * reach)
             return;
 
-        var stack = drop.getItem();
+        var stack = drop.getItem().copy();
 
-        quickStore(player, satchel, stack);
+        if (!quickStore(player, satchel, stack))
+            return;
 
         if (stack.isEmpty())
             drop.discard();
