@@ -733,8 +733,9 @@ public class AstralSatchelItem extends RelicItem {
 
     public static void push(Player player, UUID id, Vec3 direction) {
         var satchel = find(player);
+        var lengthSqr = direction.lengthSqr();
 
-        if (!isActive(player) || !(satchel.getItem() instanceof AstralSatchelItem relic) || direction.lengthSqr() < 1.0E-6D)
+        if (!isActive(player) || !(satchel.getItem() instanceof AstralSatchelItem relic) || !Double.isFinite(lengthSqr) || lengthSqr < 1.0E-6D)
             return;
 
         var entries = new ArrayList<>(getEntries(satchel));
