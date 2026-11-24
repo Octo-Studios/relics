@@ -2,6 +2,8 @@ package it.hurts.sskirillss.relics.items;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import io.netty.buffer.Unpooled;
+import io.netty.handler.codec.EncoderException;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.utility.ContainerSlotClickEvent;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
@@ -30,7 +32,10 @@ import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.NbtAccounterException;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -248,6 +253,30 @@ public class AstralSatchelItem extends RelicItem {
         stack.set(RelicsDataComponents.ASTRAL_SATCHEL_ENTRIES.get(), List.copyOf(entries));
     }
 
+    private static boolean canStoreEntries(Player player, List<Entry> entries) {
+        var component = RelicsDataComponents.ASTRAL_SATCHEL_ENTRIES.get();
+        var ops = player.registryAccess().createSerializationContext(NbtOps.INSTANCE);
+        var tag = component.codecOrThrow().encodeStart(ops, entries).result();
+
+        if (tag.isPresent()) {
+            var buffer = Unpooled.buffer();
+
+            try {
+                ByteBufCodecs.TAG.encode(buffer, tag.get());
+                ByteBufCodecs.TAG.decode(buffer);
+
+                return true;
+            } catch (NbtAccounterException | EncoderException ignored) {
+            } finally {
+                buffer.release();
+            }
+        }
+
+        player.displayClientMessage(Component.translatable("relics.message.astral_satchel.contents_too_large"), true);
+
+        return false;
+    }
+
     public static Vec3 clamp(Vec3 position, double radius) {
         return position.length() > radius - 1D ? position.normalize().scale(radius - 1D) : position;
     }
@@ -365,14 +394,20 @@ public class AstralSatchelItem extends RelicItem {
         List<Vec3> path = List.of();
 
         if (moved > 0) {
-            if (entries.size() >= MAX_ENTRIES)
+            if (entries.size() >= MAX_ENTRIES) {
+                player.displayClientMessage(Component.translatable("relics.message.astral_satchel.full"), true);
+
                 return false;
+            }
 
             path = getDropPath(player, entries, relic.getRadius(player, satchel));
             thrown = Entry.create(stack, path.getLast(), moved);
 
             entries.add(thrown);
         }
+
+        if (!canStoreEntries(player, entries))
+            return false;
 
         setEntries(satchel, entries);
 
@@ -439,6 +474,9 @@ public class AstralSatchelItem extends RelicItem {
 
             return false;
         }
+
+        if (!canStoreEntries(player, entries))
+            return false;
 
         stack.shrink(moved);
 
@@ -663,8 +701,6 @@ public class AstralSatchelItem extends RelicItem {
             }
 
             player.getInventory().placeItemBackInInventory(stack.copy());
-
-            player.displayClientMessage(Component.translatable("relics.message.astral_satchel.full"), true);
         }
 
         @SubscribeEvent

@@ -575,6 +575,7 @@
   "relics.description.astral_satchel.ability.subspace.statistic.stored_items": "Предметов отправлено в подпространство",
   "relics.description.astral_satchel.ability.subspace.statistic.withdrawn_items": "Предметов забрано из подпространства",
   "relics.message.astral_satchel.full": "Подпространство переполнено",
+  "relics.message.astral_satchel.contents_too_large": "В сумке не хватает места для данных этого предмета",
 
   "item.relics.relic_experience_bottle": "Пузырёк опыта реликвии",
   "item.relics.golden_tooth": "Золотой зуб",
