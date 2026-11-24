@@ -620,12 +620,17 @@ public class AstralSatchelItem extends RelicItem {
     public static void quickStoreDrop(Player player, int id, InteractionHand hand) {
         var satchel = player.getItemInHand(hand);
 
-        if (isActive(player) || !canQuickStore(player, satchel) || !(player.level().getEntity(id) instanceof ItemEntity drop) || !drop.isAlive())
+        if (player.isSpectator() || isActive(player) || !canQuickStore(player, satchel) || !(player.level().getEntity(id) instanceof ItemEntity drop) || !drop.isAlive())
             return;
 
-        var reach = player.entityInteractionRange() + 2D;
+        var target = drop.getTarget();
 
-        if (drop.distanceToSqr(player.getEyePosition()) > reach * reach)
+        if (drop.hasPickUpDelay() || target != null && !target.equals(player.getUUID()))
+            return;
+
+        var reach = player.entityInteractionRange();
+
+        if (drop.getBoundingBox().inflate(DROP_PICK_RADIUS).distanceToSqr(player.getEyePosition()) > reach * reach || !player.hasLineOfSight(drop))
             return;
 
         var stack = drop.getItem().copy();
@@ -954,7 +959,7 @@ public class AstralSatchelItem extends RelicItem {
 
                 var distance = hit.get().distanceToSqr(start);
 
-                if (distance > nearest)
+                if (distance > nearest || !player.hasLineOfSight(drop))
                     continue;
 
                 nearest = distance;
