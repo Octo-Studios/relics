@@ -49,6 +49,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ResultSlot;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
@@ -491,6 +492,10 @@ public class AstralSatchelItem extends RelicItem {
 
     public static boolean quickClick(Player player, AbstractContainerMenu menu, Slot slot, ClickAction action, boolean apply) {
         var carried = menu.getCarried();
+
+        if (slot instanceof ResultSlot || !slot.isActive() || !slot.allowModification(player) || !menu.canTakeItemForPickAll(carried, slot))
+            return false;
+
         var stored = slot.getItem();
         var satchel = ItemStack.EMPTY;
         var source = ItemStack.EMPTY;
