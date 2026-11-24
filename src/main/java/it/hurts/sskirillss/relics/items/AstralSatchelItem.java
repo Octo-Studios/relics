@@ -59,6 +59,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.item.ItemTossEvent;
+import net.neoforged.neoforge.event.entity.living.LivingSwapItemsEvent;
 import net.neoforged.neoforge.event.entity.player.AttackEntityEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
@@ -813,6 +814,15 @@ public class AstralSatchelItem extends RelicItem {
             }
 
             player.getInventory().placeItemBackInInventory(stack.copy());
+        }
+
+        @SubscribeEvent
+        public static void onSwapHands(LivingSwapItemsEvent.Hands event) {
+            if (!(event.getEntity() instanceof ServerPlayer player))
+                return;
+
+            if (isLocked(player, player.getInventory().selected) || isLocked(player, Inventory.SLOT_OFFHAND))
+                event.setCanceled(true);
         }
 
         @SubscribeEvent
