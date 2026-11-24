@@ -32,10 +32,11 @@ import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.core.UUIDUtil;
+import net.minecraft.nbt.NbtAccounter;
 import net.minecraft.nbt.NbtAccounterException;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -82,6 +83,7 @@ public class AstralSatchelItem extends RelicItem {
     public static final double PUSH_RESTITUTION = 0.6D;
     public static final int PUSH_BOUNCES = 3;
     public static final double DROP_PICK_RADIUS = 0.3D;
+    private static final int STORAGE_NBT_DEPTH_OVERHEAD = 13; // should be enough for almost any modded shit
 
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
@@ -262,8 +264,8 @@ public class AstralSatchelItem extends RelicItem {
             var buffer = Unpooled.buffer();
 
             try {
-                ByteBufCodecs.TAG.encode(buffer, tag.get());
-                ByteBufCodecs.TAG.decode(buffer);
+                FriendlyByteBuf.writeNbt(buffer, tag.get());
+                FriendlyByteBuf.readNbt(buffer, new NbtAccounter(2L * 1024 * 1024, 512 - STORAGE_NBT_DEPTH_OVERHEAD));
 
                 return true;
             } catch (NbtAccounterException | EncoderException ignored) {
