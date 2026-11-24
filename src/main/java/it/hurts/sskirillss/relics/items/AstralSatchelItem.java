@@ -650,20 +650,30 @@ public class AstralSatchelItem extends RelicItem {
             return;
 
         var entry = entries.get(index);
+        var inventory = player.getInventory();
         var limit = entry.stack().getMaxStackSize();
         var wanted = amount < 0 ? entry.amount() : Math.min(entry.amount(), amount == 0 ? limit : amount);
         var withdrawn = 0;
 
         while (withdrawn < wanted) {
-            var chunk = entry.stack().copyWithCount(Math.min(wanted - withdrawn, limit));
-            var size = chunk.getCount();
+            var slot = inventory.getSlotWithRemainingSpace(entry.stack());
 
-            player.getInventory().add(chunk);
+            if (slot < 0)
+                slot = inventory.getFreeSlot();
 
-            withdrawn += size - chunk.getCount();
-
-            if (!chunk.isEmpty())
+            if (slot < 0)
                 break;
+
+            var previousCount = inventory.getItem(slot).getCount();
+
+            inventory.add(slot, entry.stack().copyWithCount(Math.min(wanted - withdrawn, limit)));
+
+            var moved = inventory.getItem(slot).getCount() - previousCount;
+
+            if (moved <= 0)
+                break;
+
+            withdrawn += moved;
         }
 
         if (withdrawn <= 0)
