@@ -437,6 +437,12 @@ public class AstralSpace {
         }
 
         @SubscribeEvent
+        public static void onPlayerClone(ClientPlayerNetworkEvent.Clone event) {
+            if (AstralSpace.isEngaged() && !event.getOldPlayer().level().dimension().equals(event.getNewPlayer().level().dimension()))
+                AstralSpace.reset();
+        }
+
+        @SubscribeEvent
         public static void onLoggingOut(ClientPlayerNetworkEvent.LoggingOut event) {
             AstralSpace.reset();
         }
