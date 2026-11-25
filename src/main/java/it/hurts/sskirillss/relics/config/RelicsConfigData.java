@@ -22,6 +22,16 @@ public class RelicsConfigData implements OctoConfig {
     private boolean enabledAutoScale = true;
 
     @Prop(comment = """
+        Enables fancy Relics tooltips.
+        """)
+    private boolean enabledFancyTooltips = true;
+
+    @Prop(comment = """
+        Enables the floating magnifying glass on relics (the "research" icon).
+        """)
+    private boolean enabledFloatingMagnifyingGlass = true;
+
+    @Prop(comment = """
         A list of entity attributes that are ignored by the Ring of The Seven Deadly Sins' gluttony ability.
         """)
     private List<String> ringOfSDSGluttonyAttributesBlacklist = Lists.newArrayList(
