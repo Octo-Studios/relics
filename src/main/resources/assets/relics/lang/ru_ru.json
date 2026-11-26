@@ -113,7 +113,7 @@
   "relics.description.relic.rankup.description": "Повышает ранг реликвии, что увеличивает её максимальный уровень и видоизменяет поведение некоторых способностей.",
 
   "relics.description.relic.dismantle.title": "Раскол реликвии [%1$s/%2$s]",
-  "relics.description.relic.dismantle.description": "После пятого использования этого действия реликвия безвозвратно разрушается, давая одно очко ранга для реликвий того же типа. Все очки, вложенные в повышение её ранга, также возвращаются.",
+  "relics.description.relic.dismantle.description": "После %1$s-го использования этого действия реликвия безвозвратно разрушается, давая одно очко ранга для реликвий того же типа. Все очки, вложенные в повышение её ранга, также возвращаются.",
   "relics.description.relic.dismantle.cost.entry_1": "Экземпляр этой реликвии",
   "relics.description.relic.dismantle.reward.entry_1": "%1$s очков ранга",
 

@@ -38,7 +38,7 @@ import it.hurts.sskirillss.relics.network.packets.leveling.C2SDismantleRelic;
 import it.hurts.sskirillss.relics.network.packets.leveling.C2SRerollAbility;
 import it.hurts.sskirillss.relics.network.packets.leveling.C2SRankupRelic;
 import it.hurts.sskirillss.relics.network.packets.leveling.S2CSyncRankPoints;
-import it.hurts.sskirillss.relics.network.packets.leveling.S2CDismantleStrike;
+import it.hurts.sskirillss.relics.network.packets.leveling.S2CDismantleResult;
 import it.hurts.sskirillss.relics.network.packets.research.PacketManageLink;
 import it.hurts.sskirillss.relics.network.packets.research.PacketResearchHint;
 import it.hurts.sskirillss.relics.network.packets.research.S2CSyncPlayerResearch;
@@ -76,7 +76,7 @@ public class NetworkHandler {
         registrar.playToServer(PacketResearchHint.TYPE, PacketResearchHint.STREAM_CODEC, PacketResearchHint::handle);
         registrar.playToServer(C2SRankupRelic.TYPE, C2SRankupRelic.STREAM_CODEC, C2SRankupRelic::handle);
         registrar.playToServer(C2SDismantleRelic.TYPE, C2SDismantleRelic.STREAM_CODEC, C2SDismantleRelic::handle);
-        registrar.playToClient(S2CDismantleStrike.TYPE, S2CDismantleStrike.STREAM_CODEC, S2CDismantleStrike::handle);
+        registrar.playToClient(S2CDismantleResult.TYPE, S2CDismantleResult.STREAM_CODEC, S2CDismantleResult::handle);
         registrar.playToClient(S2CSyncRankPoints.TYPE, S2CSyncRankPoints.STREAM_CODEC, S2CSyncRankPoints::handle);
         registrar.playToServer(C2SChangeAbilityMode.TYPE, C2SChangeAbilityMode.STREAM_CODEC, C2SChangeAbilityMode::handle);
         registrar.playToServer(C2SChangeSynergyMode.TYPE, C2SChangeSynergyMode.STREAM_CODEC, C2SChangeSynergyMode::handle);

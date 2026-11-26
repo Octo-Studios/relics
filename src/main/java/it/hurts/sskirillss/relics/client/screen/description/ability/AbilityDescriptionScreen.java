@@ -18,6 +18,9 @@ import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtil
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.AbilityDescriptionContainerWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.SelectionSlide;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.StrikeProgress;
+import it.hurts.sskirillss.relics.network.NetworkHandler;
+import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -38,9 +41,14 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class AbilityDescriptionScreen extends DescriptionScreen implements ITabbedDescriptionScreen, IPagedDescriptionScreen {
+    public static final int REQUIRED_LOCK_HITS = 5;
+    private final Map<String, StrikeProgress> lockStrikes = new HashMap<>();
+
     @Getter
     @Setter
     private int page;
@@ -71,6 +79,44 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
             this.setPage(abilities.indexOf(getSelectedAbility()) / 4);
         }
+    }
+
+    @Override
+    public void removed() {
+        lockStrikes.clear();
+
+        super.removed();
+    }
+
+    public int getLockHits(String ability) {
+        var progress = lockStrikes.get(ability);
+        return progress == null ? 0 : StrikeProgress.remainingHits(progress.hits(), minecraft.level.getGameTime() - progress.lastHit());
+    }
+
+    public void strikeLock(AbilityCardWidget card) {
+        var ability = card.getAbility();
+        var hits = getLockHits(ability) + 1;
+
+        if (hits > REQUIRED_LOCK_HITS)
+            return;
+
+        lockStrikes.put(ability, new StrikeProgress(hits, minecraft.level.getGameTime()));
+        card.playLockStrike(hits);
+
+        if (hits == REQUIRED_LOCK_HITS)
+            NetworkHandler.sendToServer(new C2SPacketAbilityUnlock(container, slot, stack.getItem(), ability));
+    }
+
+    public void onResearchSync() {
+        if (!(stack.getItem() instanceof IRelicItem relic))
+            return;
+
+        var abilities = relic.getRelicData(minecraft.player, stack).getAbilitiesData();
+        lockStrikes.keySet().removeIf(id -> {
+            var ability = abilities.getAbilityData(id);
+            return ability == null || ability.getResearchData().isLockOpen();
+        });
+        rebuildWidgets();
     }
 
     @Override
@@ -140,9 +186,8 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
         rerollButton = abilityData.mayReroll() ? addRenderableWidget(new RerollAbilityActionWidget(x + 289, y + 84, this)) : null;
 
         var researchTemplate = abilityData.getTemplate().getResearchTemplate();
-        var researchData = abilityData.getResearchData();
 
-        if (!researchTemplate.getStars().isEmpty() && researchData.isResearched())
+        if (!researchTemplate.getStars().isEmpty() && abilityData.isUnlocked())
             this.addRenderableWidget(new AbilityResearchWidget(x + 68, y + 64, this));
 
         var container = subcategory.getContainerWidget(this);

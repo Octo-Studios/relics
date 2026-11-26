@@ -1,7 +1,6 @@
 package it.hurts.sskirillss.relics.api.relics.data;
 
 import it.hurts.sskirillss.relics.api.events.relic.abilities.ability.AbilityModeSwitchEvent;
-import it.hurts.sskirillss.relics.api.relics.LockComponent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
@@ -64,13 +63,6 @@ public class AbilityData {
                             .build())
                     .build();
 
-        if (template.getRequiredLevel() <= 0 && template.getRequiredRank() <= 0)
-            abilityComponent = abilityComponent.toBuilder()
-                    .lock(LockComponent.builder()
-                            .unlocks(new LockData(this).getMaxUnlocks())
-                            .build())
-                    .build();
-
         this.getAbilitiesData().setComponent(abilitiesComponent.toBuilder()
                 .ability(this.getId(), abilityComponent)
                 .build());
@@ -98,10 +90,6 @@ public class AbilityData {
 
     public AbilityTargetingData getTargetingData() {
         return new AbilityTargetingData(this);
-    }
-
-    public LockData getLockData() {
-        return new LockData(this);
     }
 
     public AbilityRankModifierData getRankModifierData(String rankModifier) {
@@ -285,7 +273,7 @@ public class AbilityData {
     }
 
     public boolean isUnlocked() {
-        return isEnoughLevel() && isEnoughRank() && getLockData().isUnlocked() && getResearchData().isResearched();
+        return isEnoughLevel() && isEnoughRank() && getResearchData().isLockOpen() && getResearchData().isResearched();
     }
 
     public boolean canPlayerUse(LivingEntity entity) {
@@ -438,11 +426,11 @@ public class AbilityData {
     }
 
     public boolean mayUnlock() {
-        return isEnoughLevel() && isEnoughRank() && !getLockData().isUnlocked();
+        return isEnoughLevel() && isEnoughRank() && !getResearchData().isLockOpen();
     }
 
     public boolean mayResearch() {
-        return isEnoughLevel() && isEnoughRank() && getLockData().isUnlocked() && !getResearchData().isResearched();
+        return isEnoughLevel() && isEnoughRank() && getResearchData().isLockOpen() && !getResearchData().isResearched();
     }
 
     public int getRerollPlayerExperienceCost() {

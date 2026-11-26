@@ -7,6 +7,7 @@ import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.arguments.LongArgumentType;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.ResearchComponent;
 import it.hurts.sskirillss.relics.commands.arguments.AbilityArgument;
 import it.hurts.sskirillss.relics.commands.arguments.AbilityStatArgument;
 import it.hurts.sskirillss.relics.commands.arguments.RelicAbilityStatisticMetricArgument;
@@ -18,7 +19,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.neoforged.neoforge.server.command.EnumArgument;
 
-import java.util.HashMap;
+import java.util.Set;
 import java.util.stream.Stream;
 
 public class RelicsCommand {
@@ -48,7 +49,6 @@ public class RelicsCommand {
                                     relicData.getTemplate().getAbilities().getAbilities().forEach((abilityId, abilityTemplate) -> {
                                         var abilityData = abilitiesData.getAbilityData(abilityId);
 
-                                        abilityData.getLockData().setUnlocks(abilityData.getLockData().getMaxUnlocks());
                                         abilityData.getResearchData().complete();
 
                                         abilityTemplate.getStats().keySet().forEach(statId -> abilityData.getStatData(statId).setInitialQuality(abilityData.getStatData(statId).getMaxQuality()));
@@ -70,25 +70,19 @@ public class RelicsCommand {
                                     }
 
                                     var relicData = relic.getRelicData(player, stack);
-
-                                    relicData.getLevelingData().setRank(0);
-                                    relicData.getLevelingData().setLevel(0);
-                                    relicData.getLevelingData().setExperience(0);
-
                                     var abilitiesData = relicData.getAbilitiesData();
 
                                     relicData.getTemplate().getAbilities().getAbilities().forEach((abilityId, abilityTemplate) -> {
                                         var abilityData = abilitiesData.getAbilityData(abilityId);
 
-                                        abilityData.getResearchData().setResearched(false);
-
-                                        abilityData.getResearchData().setLinks(new HashMap<>());
-
-                                        if (!abilityData.isEnoughLevel())
-                                            abilityData.getLockData().setUnlocks(0);
+                                        abilityData.getResearchData().setComponent(ResearchComponent.EMPTY);
 
                                         abilityTemplate.getStats().keySet().forEach(statId -> abilityData.getStatData(statId).setInitialQuality(0));
                                     });
+
+                                    relicData.getLevelingData().setRank(0);
+                                    relicData.getLevelingData().setLevel(0);
+                                    relicData.getLevelingData().setExperience(0);
 
                                     return Command.SINGLE_SUCCESS;
                                 })
@@ -242,6 +236,41 @@ public class RelicsCommand {
                                         )
                                 )
                         )
+                        .then(Commands.literal("lock")
+                                .then(Commands.argument("ability", AbilityArgument.ability())
+                                        .then(Commands.argument("locked", BoolArgumentType.bool())
+                                                .executes(ctx -> {
+                                                    var source = ctx.getSource();
+                                                    var player = source.getPlayerOrException();
+                                                    var stack = player.getMainHandItem();
+
+                                                    if (!(stack.getItem() instanceof IRelicItem relic)) {
+                                                        source.sendFailure(Component.translatable("command.relics.base.not_relic"));
+
+                                                        return 0;
+                                                    }
+
+                                                    var ability = AbilityArgument.getAbility(ctx, "ability");
+                                                    var locked = BoolArgumentType.getBool(ctx, "locked");
+                                                    var abilities = relic.getRelicData(player, stack).getAbilitiesData();
+
+                                                    for (var id : ability.equalsIgnoreCase("all") ? abilities.getAbilityIDs() : Set.of(ability)) {
+                                                        var abilityData = abilities.getAbilityData(id);
+
+                                                        if (abilityData == null)
+                                                            return 0;
+
+                                                        var research = abilityData.getResearchData();
+
+                                                        if (research.hasLock())
+                                                            research.setLockOpen(!locked);
+                                                    }
+
+                                                    return Command.SINGLE_SUCCESS;
+                                                })
+                                        )
+                                )
+                        )
                         .then(Commands.literal("research")
                                 .then(Commands.argument("ability", AbilityArgument.ability())
                                         .then(Commands.argument("researched", BoolArgumentType.bool())
@@ -259,20 +288,19 @@ public class RelicsCommand {
                                                     var researched = BoolArgumentType.getBool(ctx, "researched");
                                                     var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
 
-                                                    Stream.of(ability.equalsIgnoreCase("all") ? abilitiesData.getAbilityIDs().toArray(new String[0]) : new String[]{ability})
-                                                            .forEach(abilityEntry -> {
-                                                                var abilityData = abilitiesData.getAbilityData(abilityEntry);
+                                                    for (var id : ability.equalsIgnoreCase("all") ? abilitiesData.getAbilityIDs() : Set.of(ability)) {
+                                                        var abilityData = abilitiesData.getAbilityData(id);
 
-                                                                if (abilityData == null)
-                                                                    return;
+                                                        if (abilityData == null)
+                                                            return 0;
 
-                                                                if (researched) {
-                                                                    abilityData.getResearchData().complete();
-                                                                } else {
-                                                                    abilityData.getResearchData().setResearched(false);
-                                                                    abilityData.getResearchData().setLinks(new HashMap<>());
-                                                                }
-                                                            });
+                                                        var research = abilityData.getResearchData();
+
+                                                        if (researched)
+                                                            research.complete();
+                                                        else
+                                                            research.resetResearch();
+                                                    }
 
                                                     return Command.SINGLE_SUCCESS;
                                                 })

@@ -123,7 +123,7 @@ public class DescriptionUtils {
     }
 
     @Nullable
-    private static Slot getActionSlot(Player player, int container, int slot) {
+    public static Slot getActionSlot(Player player, int container, int slot) {
         var menu = getContainerMenu(player);
 
         if (menu.containerId != container || player.isSpectator() || !menu.stillValid(player))

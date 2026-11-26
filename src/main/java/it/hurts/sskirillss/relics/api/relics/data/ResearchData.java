@@ -7,10 +7,13 @@ import it.hurts.sskirillss.relics.api.relics.ResearchComponent;
 import it.hurts.sskirillss.relics.handlers.PlayerResearchHandler;
 import it.hurts.sskirillss.relics.init.RelicsAttachments;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -41,12 +44,21 @@ public class ResearchData {
     public void setComponent(ResearchComponent component) {
         var entity = this.getAbilityData().getAbilitiesData().getRelicData().getEntity();
 
-        if (!(entity instanceof net.minecraft.server.level.ServerPlayer player))
+        if (!(entity instanceof ServerPlayer player))
             return;
 
         var playerResearch = player.getData(RelicsAttachments.PLAYER_RESEARCH);
-        var map = new java.util.HashMap<>(playerResearch.getResearch());
-        map.put(this.getResearchKey(), component);
+        var key = getResearchKey();
+
+        if (component.equals(playerResearch.getResearch().getOrDefault(key, ResearchComponent.EMPTY)))
+            return;
+
+        var map = new HashMap<>(playerResearch.getResearch());
+
+        if (component.equals(ResearchComponent.EMPTY))
+            map.remove(key);
+        else
+            map.put(key, component);
 
         PlayerResearchHandler.set(player, playerResearch.toBuilder().research(map).build());
     }
@@ -56,18 +68,22 @@ public class ResearchData {
                 .collect(MultimapBuilder.hashKeys().arrayListValues()::build, (multimap, entry) -> multimap.putAll(Integer.parseInt(entry.getKey()), entry.getValue()), Multimap::putAll);
     }
 
-    public void setLinks(Map<String, java.util.List<Integer>> links) {
+    public void setLinks(Map<String, List<Integer>> links) {
         setComponent(getComponent().toBuilder()
                 .links(links)
                 .build());
     }
 
     public void setLinks(Multimap<Integer, Integer> links) {
-        setLinks(links.asMap().entrySet().stream()
+        setLinks(toLinkMap(links));
+    }
+
+    private static Map<String, List<Integer>> toLinkMap(Multimap<Integer, Integer> links) {
+        return links.asMap().entrySet().stream()
                 .collect(Collectors.toMap(
                         entry -> String.valueOf(entry.getKey()),
                         entry -> new ArrayList<>(entry.getValue())
-                )));
+                ));
     }
 
     public void addLink(int from, int to) {
@@ -83,43 +99,34 @@ public class ResearchData {
 
         links.remove(from, to);
 
-        setComponent(getComponent().toBuilder()
-                .links(links.asMap().entrySet().stream()
-                        .collect(Collectors.toMap(
-                                entry -> String.valueOf(entry.getKey()),
-                                entry -> new ArrayList<>(entry.getValue())
-                        )))
-                .build());
+        setLinks(links);
+    }
+
+    public boolean hasLock() {
+        var template = abilityData.getTemplate();
+
+        return template.getRequiredLevel() > 0 || template.getRequiredRank() > 0;
+    }
+
+    public boolean isLockOpen() {
+        return !hasLock() || getComponent().isLockOpen();
+    }
+
+    public void setLockOpen(boolean open) {
+        var component = getComponent();
+
+        if (component.isLockOpen() != open)
+            setComponent(component.toBuilder().lockOpen(open).build());
     }
 
     public boolean isResearched() {
-        if (this.getAbilityData().getTemplate().getResearchTemplate().getStars().isEmpty())
-            return true;
-
-        var entity = this.getAbilityData().getAbilitiesData().getRelicData().getEntity();
-
-        if (!(entity instanceof Player player))
-            return false;
-
-        return player.getData(RelicsAttachments.PLAYER_RESEARCH)
-                .getResearch()
-                .getOrDefault(this.getResearchKey(), ResearchComponent.EMPTY)
-                .isResearched();
+        return abilityData.getTemplate().getResearchTemplate().getStars().isEmpty() || getComponent().isResearched();
     }
 
     public void setResearched(boolean researched) {
-        var entity = this.getAbilityData().getAbilitiesData().getRelicData().getEntity();
+        var component = getComponent();
 
-        if (entity instanceof net.minecraft.server.level.ServerPlayer player) {
-            var key = this.getResearchKey();
-            var playerResearch = player.getData(RelicsAttachments.PLAYER_RESEARCH);
-            var map = new java.util.HashMap<>(playerResearch.getResearch());
-            var research = map.getOrDefault(key, ResearchComponent.EMPTY);
-
-            map.put(key, research.toBuilder().researched(researched).build());
-
-            PlayerResearchHandler.set(player, playerResearch.toBuilder().research(map).build());
-        }
+        setComponent(component.toBuilder().lockOpen(researched || component.isLockOpen()).researched(researched).build());
     }
 
     public void complete() {
@@ -128,8 +135,18 @@ public class ResearchData {
         if (template == null)
             return;
 
-        this.setLinks(template.getResearchTemplate().getLinks());
-        this.setResearched(true);
+        setComponent(getComponent().toBuilder()
+                .links(toLinkMap(template.getResearchTemplate().getLinks()))
+                .researched(true)
+                .lockOpen(true)
+                .build());
+    }
+
+    public void resetResearch() {
+        setComponent(getComponent().toBuilder()
+                .links(Map.of())
+                .researched(false)
+                .build());
     }
 
     private String getResearchKey() {

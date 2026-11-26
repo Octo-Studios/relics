@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,17 +17,19 @@ import java.util.Map;
 public class ResearchComponent {
     private final Map<String, List<Integer>> links;
     private final boolean researched;
+    private final boolean lockOpen;
 
-    public static final ResearchComponent EMPTY = new ResearchComponent(new HashMap<>(), false);
+    public static final ResearchComponent EMPTY = new ResearchComponent(Map.of(), false, false);
 
     public static final Codec<ResearchComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.unboundedMap(Codec.STRING, Codec.list(Codec.INT))
-                            .fieldOf("links")
+                            .optionalFieldOf("links", Map.of())
                             .forGetter(ResearchComponent::getLinks),
                     Codec.BOOL
-                            .fieldOf("researched")
-                            .forGetter(ResearchComponent::isResearched)
+                            .optionalFieldOf("researched", false)
+                            .forGetter(ResearchComponent::isResearched),
+                    Codec.BOOL.optionalFieldOf("lock_open", false).forGetter(ResearchComponent::isLockOpen)
             ).apply(instance, ResearchComponent::new)
     );
 }

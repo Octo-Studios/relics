@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
-import it.hurts.sskirillss.relics.handlers.DismantleProgress;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.DismantleEffect;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.network.chat.Component;
@@ -48,7 +48,7 @@ public class DismantleRelicActionWidget extends AbstractRelicActionWidget {
         var newLine = Component.literal(" ");
 
         return List.of(
-                Component.translatable("relics.description.relic.dismantle.title", getScreen().getDismantleEffect().hits(), DismantleProgress.REQUIRED_HITS)
+                Component.translatable("relics.description.relic.dismantle.title", getScreen().getDismantleEffect().hits(), DismantleEffect.REQUIRED_HITS)
                         .withStyle(ChatFormatting.BOLD, ChatFormatting.UNDERLINE),
                 newLine,
                 Component.translatable("relics.description.general.cost.title").append(":").withStyle(ChatFormatting.BOLD, ChatFormatting.UNDERLINE),
@@ -59,7 +59,7 @@ public class DismantleRelicActionWidget extends AbstractRelicActionWidget {
                 Component.literal("   ● ").append(Component.translatable("relics.description.relic.dismantle.reward.entry_1", reward)
                         .withColor(DescriptionUtils.POSITIVE_COLOR(true))),
                 newLine,
-                Component.translatable("relics.description.relic.dismantle.description").withColor(DescriptionUtils.NEGATIVE_COLOR(false))
+                Component.translatable("relics.description.relic.dismantle.description", DismantleEffect.REQUIRED_HITS).withColor(DescriptionUtils.NEGATIVE_COLOR(false))
         );
     }
 }

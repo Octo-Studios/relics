@@ -30,9 +30,6 @@ import it.hurts.sskirillss.relics.client.screen.utils.misc.ProgressPath;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.RerollAnimation;
 import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.UIParticles;
-import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.description.ability.C2SPacketAbilityUnlock;
-import it.hurts.sskirillss.relics.utils.ClientScheduler;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.AnimationData;
@@ -66,6 +63,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
     private static final float STAR_CENTER_Y = 1F;
     private static final int STAR_SPARKS = 3;
     private static final float PROGRESS_FLASH = 1.2F;
+    private static final int LOCK_TEXTURE_STAGES = 5;
 
     private final AbilityDescriptionScreen screen;
     @Getter
@@ -96,17 +94,14 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
     public void onPress() {
         var player = minecraft.player;
         var stack = screen.getStack();
-        var random = player.getRandom();
 
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
         var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
         var isEnoughConditions = abilityData.isEnoughLevel() && abilityData.isEnoughRank();
-        var isLockUnlocked = abilityData.getLockData().isUnlocked();
+        var isLockUnlocked = abilityData.getResearchData().isLockOpen();
         var isAbilityResearched = abilityData.getResearchData().isResearched();
-
-        var soundManager = minecraft.getSoundManager();
 
         if (isEnoughConditions) {
             if (isLockUnlocked) {
@@ -125,67 +120,67 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     }
                 } else
                     minecraft.setScreen(new AbilityResearchScreen(minecraft.player, screen.container, screen.slot, screen, ability));
-            } else {
-                var unlocks = abilityData.getLockData().getUnlocks() + 1;
-
-                NetworkHandler.sendToServer(new C2SPacketAbilityUnlock(screen.container, screen.slot, ability, unlocks));
-
-                clickAnimation.play(1F + 0.035F * unlocks, 0.025F * unlocks, 10, 0.2D);
-
-                for (int i = 0; i < unlocks * 75; i++) {
-                    var center = new Vec2(width / 2F, height / 2F);
-                    var margin = new Vec2(center.x + MathUtils.randomFloat(random) * 7F, center.y + MathUtils.randomFloat(random) * 8.5F);
-
-                    var particle = new PixelUIParticle(5F, random.nextInt(20, 40), getX() + margin.x, getY() + margin.y, UIParticle.Layer.SCREEN, 110);
-
-                    var size = (random.nextFloat() * 0.5F) + 0.75F;
-
-                    particle.setColors(new OctoColor(1F, 0.5F + random.nextFloat() * 0.5F, random.nextFloat() * 0.25F, 1F), new OctoColor(1F, 0F, 0F, 1F));
-                    particle.setDirection(MathUtils.randomFloat(random), -random.nextFloat());
-                    particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
-                    particle.getTransform().setSize(new Vector2f(size, size));
-                    particle.setGravity(0.5F + random.nextFloat() * 0.5F);
-                    particle.setSpeed(1.5F + random.nextFloat() * 1.5F);
-                    particle.setGravityDirection(0, 1);
-                    particle.setScreen(this.screen);
-
-                    particle.instantiate();
-                }
-
-                soundManager.play(SimpleSoundInstance.forUI(SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, 1F));
-
-                if (unlocks >= abilityData.getLockData().getMaxUnlocks()) {
-                    ClientScheduler.schedule(1, screen::rebuildWidgets);
-
-                    for (int i = 0; i < 25; i++) {
-                        var center = new Vec2(width / 2F, height / 2F);
-                        var margin = new Vec2(center.x + MathUtils.randomFloat(random) * 7F, center.y + MathUtils.randomFloat(random) * 8.5F);
-
-                        var particle = new ExtendedUIParticle(new UIParticle.Texture2D(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/particle/chain.png"), 0, 0, 6, 6, 6, 6),
-                                5F, random.nextInt(40, 60), getX() + margin.x, getY() + margin.y, UIParticle.Layer.SCREEN, 110);
-
-                        var size = (random.nextFloat() * 0.5F) + 0.75F;
-
-                        particle.setDirection(MathUtils.randomFloat(random) * 0.25F, -random.nextFloat());
-                        particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
-                        particle.getTransform().setSize(new Vector2f(size, size));
-                        particle.setGravityDirection(0, 1);
-                        particle.enableBlend(false);
-                        particle.setScreen(this.screen);
-                        particle.setGravity(1F);
-                        particle.setSpeed(3.5F);
-
-                        particle.instantiate();
-                    }
-
-                    soundManager.play(SimpleSoundInstance.forUI(SoundEvents.WITHER_BREAK_BLOCK, 1F));
-                    soundManager.play(SimpleSoundInstance.forUI(SoundEvents.GENERIC_EXPLODE, 1F));
-                }
-            }
+            } else
+                screen.strikeLock(this);
         } else {
             clickAnimation.play(1.035F, 0.025F, 10, 0.25D);
 
-            soundManager.play(SimpleSoundInstance.forUI(SoundEvents.CHAIN_BREAK, 1F));
+            minecraft.getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.CHAIN_BREAK, 1F));
+        }
+    }
+
+    public void playLockStrike(int unlocks) {
+        var random = minecraft.player.getRandom();
+        var soundManager = minecraft.getSoundManager();
+
+        clickAnimation.play(1F + 0.035F * unlocks, 0.025F * unlocks, 10, 0.2D);
+
+        for (var i = 0; i < unlocks * 75; i++) {
+            var center = new Vec2(width / 2F, height / 2F);
+            var margin = new Vec2(center.x + MathUtils.randomFloat(random) * 7F, center.y + MathUtils.randomFloat(random) * 8.5F);
+
+            var particle = new PixelUIParticle(5F, random.nextInt(20, 40), getX() + margin.x, getY() + margin.y, UIParticle.Layer.SCREEN, 110);
+
+            var size = (random.nextFloat() * 0.5F) + 0.75F;
+
+            particle.setColors(new OctoColor(1F, 0.5F + random.nextFloat() * 0.5F, random.nextFloat() * 0.25F, 1F), new OctoColor(1F, 0F, 0F, 1F));
+            particle.setDirection(MathUtils.randomFloat(random), -random.nextFloat());
+            particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
+            particle.getTransform().setSize(new Vector2f(size, size));
+            particle.setGravity(0.5F + random.nextFloat() * 0.5F);
+            particle.setSpeed(1.5F + random.nextFloat() * 1.5F);
+            particle.setGravityDirection(0, 1);
+            particle.setScreen(this.screen);
+
+            particle.instantiate();
+        }
+
+        soundManager.play(SimpleSoundInstance.forUI(SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, 1F));
+
+        if (unlocks == AbilityDescriptionScreen.REQUIRED_LOCK_HITS) {
+            for (var i = 0; i < 25; i++) {
+                var center = new Vec2(width / 2F, height / 2F);
+                var margin = new Vec2(center.x + MathUtils.randomFloat(random) * 7F, center.y + MathUtils.randomFloat(random) * 8.5F);
+
+                var particle = new ExtendedUIParticle(new UIParticle.Texture2D(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/relic/particle/chain.png"), 0, 0, 6, 6, 6, 6),
+                        5F, random.nextInt(40, 60), getX() + margin.x, getY() + margin.y, UIParticle.Layer.SCREEN, 110);
+
+                var size = (random.nextFloat() * 0.5F) + 0.75F;
+
+                particle.setDirection(MathUtils.randomFloat(random) * 0.25F, -random.nextFloat());
+                particle.setRollVelocity(MathUtils.randomFloat(random) * 15);
+                particle.getTransform().setSize(new Vector2f(size, size));
+                particle.setGravityDirection(0, 1);
+                particle.enableBlend(false);
+                particle.setScreen(this.screen);
+                particle.setGravity(1F);
+                particle.setSpeed(3.5F);
+
+                particle.instantiate();
+            }
+
+            soundManager.play(SimpleSoundInstance.forUI(SoundEvents.WITHER_BREAK_BLOCK, 1F));
+            soundManager.play(SimpleSoundInstance.forUI(SoundEvents.GENERIC_EXPLODE, 1F));
         }
     }
 
@@ -208,10 +203,8 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (abilityTemplate == null)
             return;
 
-        var unlocks = abilityData.getLockData().getUnlocks();
-
         var isEnoughConditions = abilityData.isEnoughLevel() && abilityData.isEnoughRank();
-        var isLockUnlocked = isEnoughConditions && abilityData.getLockData().isUnlocked();
+        var isLockUnlocked = isEnoughConditions && abilityData.getResearchData().isLockOpen();
         var isAbilityResearched = abilityData.getResearchData().isResearched();
 
         var canUse = isEnoughConditions && isLockUnlocked && isAbilityResearched;
@@ -277,14 +270,16 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                         .end();
             }
         } else {
-            GUIRenderer.begin(isEnoughConditions ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/chains_active_" + unlocks + ".png") : DescriptionTextures.ABILITY_CHAINS_INACTIVE, poseStack)
+            var lockStage = Math.min(LOCK_TEXTURE_STAGES - 1, screen.getLockHits(ability) * LOCK_TEXTURE_STAGES / AbilityDescriptionScreen.REQUIRED_LOCK_HITS);
+
+            GUIRenderer.begin(isEnoughConditions ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/chains_active_" + lockStage + ".png") : DescriptionTextures.ABILITY_CHAINS_INACTIVE, poseStack)
                     .pos(0, 0.5F)
                     .end();
 
 
             poseStack.pushPose();
 
-            GUIRenderer.begin(isEnoughConditions ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/icons/lock_active_" + unlocks + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
+            GUIRenderer.begin(isEnoughConditions ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/icons/lock_active_" + lockStage + ".png") : DescriptionTextures.LOCK_INACTIVE, poseStack)
                     .pos(0, -2)
                     .end();
 
@@ -618,10 +613,10 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
             entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.low_level", Component.literal(String.valueOf(abilityTemplate.getRequiredLevel())).withStyle(ChatFormatting.BOLD))));
         } else {
-            if (!abilityData.getLockData().isUnlocked()) {
+            if (!abilityData.getResearchData().isLockOpen()) {
                 entries.add(Component.literal(" "));
 
-                entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.ready_to_unlock", Component.literal(String.valueOf(abilityData.getLockData().getMaxUnlocks() - abilityData.getLockData().getUnlocks())).withStyle(ChatFormatting.BOLD))));
+                entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.ready_to_unlock", Component.literal(String.valueOf(AbilityDescriptionScreen.REQUIRED_LOCK_HITS - screen.getLockHits(ability))).withStyle(ChatFormatting.BOLD))));
             } else {
                 if (!abilityData.getResearchData().isResearched()) {
                     entries.add(Component.literal(" "));

@@ -20,7 +20,7 @@ import net.neoforged.neoforge.client.model.data.ModelData;
 import org.joml.Matrix4f;
 
 class FracturedRelicRenderer {
-    private static final int CRACK_COUNT = 5;
+    static final int CRACK_COUNT = 5;
     private final float[] cracks = new float[CRACK_COUNT * 2];
     private TextureTarget target;
     private boolean frozen;

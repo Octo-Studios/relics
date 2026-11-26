@@ -2,7 +2,6 @@ package it.hurts.sskirillss.relics.api.relics.abilities;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import it.hurts.sskirillss.relics.api.relics.LockComponent;
 import it.hurts.sskirillss.relics.api.relics.RankModifierComponent;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationComponent;
@@ -22,7 +21,6 @@ import java.util.Map;
 public class AbilityComponent {
     @Singular
     private final Map<String, StatComponent> stats;
-    private final LockComponent lock;
     private final AbilityStatisticComponent statistic;
     private final String mode;
     @Singular
@@ -30,12 +28,11 @@ public class AbilityComponent {
     private final AbilityActivationComponent activation;
     private final boolean enabled;
 
-    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), LockComponent.EMPTY, AbilityStatisticComponent.EMPTY, "", Map.of(), AbilityActivationComponent.EMPTY, true);
+    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), AbilityStatisticComponent.EMPTY, "", Map.of(), AbilityActivationComponent.EMPTY, true);
 
     public static final Codec<AbilityComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
                     Codec.unboundedMap(Codec.STRING, StatComponent.CODEC).optionalFieldOf("stats", Map.of()).forGetter(AbilityComponent::getStats),
-                    LockComponent.CODEC.optionalFieldOf("lock", LockComponent.EMPTY).forGetter(AbilityComponent::getLock),
                     AbilityStatisticComponent.CODEC.optionalFieldOf("statistic", AbilityStatisticComponent.EMPTY).forGetter(AbilityComponent::getStatistic),
                     Codec.STRING.optionalFieldOf("mode", "").forGetter(AbilityComponent::getMode),
                     Codec.unboundedMap(Codec.STRING, RankModifierComponent.CODEC).optionalFieldOf("rank_modifiers", Map.of()).forGetter(AbilityComponent::getRankModifiers),

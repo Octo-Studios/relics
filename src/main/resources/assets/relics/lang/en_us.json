@@ -112,7 +112,7 @@
   "relics.description.relic.rankup.description": "Increases the relic's rank, which raises its maximum level and alters the behavior of certain abilities.",
 
   "relics.description.relic.dismantle.title": "Relic Shattering [%1$s/%2$s]",
-  "relics.description.relic.dismantle.description": "On the fifth use, the relic is permanently destroyed, granting one rank point for relics of the same type. All points spent to increase its rank are also returned.",
+  "relics.description.relic.dismantle.description": "When the counter reaches %1$s, the relic is permanently destroyed, granting one rank point for relics of the same type. All points spent to increase its rank are also returned.",
   "relics.description.relic.dismantle.cost.entry_1": "One copy of this relic",
   "relics.description.relic.dismantle.reward.entry_1": "%1$s rank points",
 

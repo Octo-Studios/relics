@@ -19,7 +19,6 @@ import net.minecraft.network.protocol.game.ClientboundSoundPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -71,31 +70,29 @@ public class PacketResearchHint implements CustomPacketPayload {
                 return;
             }
 
-            RandomSource random = player.getRandom();
+            var data = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
 
-            int cost = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().getHintPlayerExperienceCost() * amount;
-
-            if (EntityUtils.getPlayerTotalExperience(player) < cost)
+            if (data == null || !data.mayResearch() || amount <= 0)
                 return;
 
-            player.giveExperiencePoints(-cost);
+            var research = data.getResearchData();
+            var cost = (long) research.getHintPlayerExperienceCost() * amount;
+
+            if (cost > Integer.MAX_VALUE || EntityUtils.getPlayerTotalExperience(player) < cost)
+                return;
+
+            player.giveExperiencePoints(-(int) cost);
 
             research(player, stack, amount);
 
-            if (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().isComplete()) {
-                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().setResearched(true);
+            var random = player.getRandom();
+            
+            if (research.isComplete()) {
+                research.setResearched(true);
 
                 player.connection.send(new ClientboundSoundPacket(Holder.direct(RelicsSounds.FINISH_RESEARCH.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 1F, 1F, random.nextLong()));
             } else
                 player.connection.send(new ClientboundSoundPacket(Holder.direct(RelicsSounds.CONNECT_STARS.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.75F, 0.75F + random.nextFloat() * 0.5F, random.nextLong()));
-
-            try {
-                player.containerMenu.getSlot(slot).set(stack);
-            } catch (Exception e) {
-                e.printStackTrace();
-
-                causeError(player);
-            }
         });
     }
 

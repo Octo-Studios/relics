@@ -4,6 +4,7 @@ import io.netty.buffer.ByteBuf;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.PlayerResearchComponent;
 import it.hurts.sskirillss.relics.api.relics.ResearchComponent;
+import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.init.RelicsAttachments;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,6 +32,7 @@ public class S2CSyncPlayerResearch implements CustomPacketPayload {
     private static final StreamCodec<ByteBuf, ResearchComponent> RESEARCH_COMPONENT_CODEC = StreamCodec.composite(
             ByteBufCodecs.map(HashMap::new, ByteBufCodecs.STRING_UTF8, ByteBufCodecs.collection(java.util.ArrayList::new, ByteBufCodecs.INT)), ResearchComponent::getLinks,
             ByteBufCodecs.BOOL, ResearchComponent::isResearched,
+            ByteBufCodecs.BOOL, ResearchComponent::isLockOpen,
             ResearchComponent::new
     );
 
@@ -63,5 +65,8 @@ public class S2CSyncPlayerResearch implements CustomPacketPayload {
             return;
 
         player.setData(RelicsAttachments.PLAYER_RESEARCH, PlayerResearchComponent.builder().research(research).build());
+
+        if (player == minecraft.player && minecraft.screen instanceof AbilityDescriptionScreen screen)
+            screen.onResearchSync();
     }
 }

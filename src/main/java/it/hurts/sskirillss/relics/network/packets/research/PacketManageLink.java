@@ -19,7 +19,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.ByIdMap;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
@@ -74,28 +73,25 @@ public class PacketManageLink implements CustomPacketPayload {
                 return;
             }
 
-            RandomSource random = player.getRandom();
+            var data = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+            if (data == null || !data.mayResearch())
+                return;
+
+            var research = data.getResearchData();
+            var random = player.getRandom();
 
             switch (operation) {
                 case ADD -> {
-                    relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().addLink(from, to);
+                    research.addLink(from, to);
 
-                    if (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().isComplete()) {
-                        relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().setResearched(true);
+                    if (research.isComplete()) {
+                        research.setResearched(true);
 
                         player.connection.send(new ClientboundSoundPacket(Holder.direct(RelicsSounds.FINISH_RESEARCH.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.75F, 1F, random.nextLong()));
                     } else
                         player.connection.send(new ClientboundSoundPacket(Holder.direct(RelicsSounds.CONNECT_STARS.get()), SoundSource.PLAYERS, player.getX(), player.getY(), player.getZ(), 0.75F, 0.75F + random.nextFloat() * 0.5F, random.nextLong()));
                 }
-                case REMOVE -> relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability).getResearchData().removeLink(from, to);
-            }
-
-            try {
-                player.containerMenu.getSlot(slot).set(stack);
-            } catch (Exception e) {
-                e.printStackTrace();
-
-                causeError(player);
+                case REMOVE -> research.removeLink(from, to);
             }
         });
     }

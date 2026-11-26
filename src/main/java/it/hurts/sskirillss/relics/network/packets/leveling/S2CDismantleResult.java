@@ -10,12 +10,12 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
-public record S2CDismantleStrike(int session, int hits) implements CustomPacketPayload {
-    public static final Type<S2CDismantleStrike> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "dismantle_strike"));
-    public static final StreamCodec<ByteBuf, S2CDismantleStrike> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.VAR_INT, S2CDismantleStrike::session,
-            ByteBufCodecs.VAR_INT, S2CDismantleStrike::hits,
-            S2CDismantleStrike::new
+public record S2CDismantleResult(int requestId, boolean dismantled) implements CustomPacketPayload {
+    public static final Type<S2CDismantleResult> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "dismantle_result"));
+    public static final StreamCodec<ByteBuf, S2CDismantleResult> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.VAR_INT, S2CDismantleResult::requestId,
+            ByteBufCodecs.BOOL, S2CDismantleResult::dismantled,
+            S2CDismantleResult::new
     );
 
     @Override
@@ -26,7 +26,7 @@ public record S2CDismantleStrike(int session, int hits) implements CustomPacketP
     public void handle(IPayloadContext ctx) {
         ctx.enqueueWork(() -> {
             if (Minecraft.getInstance().screen instanceof RelicDescriptionScreen screen)
-                screen.getDismantleEffect().confirm(session, hits);
+                screen.getDismantleEffect().confirm(requestId, dismantled);
         });
     }
 }

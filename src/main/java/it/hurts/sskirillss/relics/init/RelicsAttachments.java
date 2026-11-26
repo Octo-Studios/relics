@@ -4,7 +4,6 @@ import com.mojang.serialization.Codec;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.PlayerAbilityTargetingComponent;
 import it.hurts.sskirillss.relics.api.relics.PlayerResearchComponent;
-import it.hurts.sskirillss.relics.handlers.DismantleProgress;
 import it.hurts.sskirillss.relics.items.AstralSatchelItem;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -38,9 +37,6 @@ public class RelicsAttachments {
 
     public static final DeferredHolder<AttachmentType<?>, AttachmentType<AstralSatchelItem.State>> ASTRAL_SATCHEL_STATE = ATTACHMENTS.register("astral_satchel_state",
             () -> AttachmentType.builder(AstralSatchelItem.State::new).build());
-
-    public static final DeferredHolder<AttachmentType<?>, AttachmentType<DismantleProgress>> DISMANTLE_PROGRESS = ATTACHMENTS.register("dismantle_progress",
-            () -> AttachmentType.builder(() -> DismantleProgress.EMPTY).build());
 
     public static void register(IEventBus bus) {
         ATTACHMENTS.register(bus);

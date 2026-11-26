@@ -11,7 +11,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -44,41 +43,25 @@ public class RankHandler {
         syncRankPoints(player);
     }
 
-    public static int strikeRelic(ServerPlayer player, int container, int index, Item item, int rank, int session) {
+    public static boolean dismantleRelic(ServerPlayer player, int container, int index, Item item, int count, int rank) {
         var slot = DescriptionUtils.getRemovableRelicSlot(player, container, index);
 
         if (slot == null)
-            return 0;
+            return false;
 
         var stack = slot.getItem();
 
-        if (!stack.is(item) || !(item instanceof IRelicItem relic) || relic.getRelicData(player, stack).getLevelingData().getRank() != rank)
-            return 0;
-
-        var now = player.level().getGameTime();
-        var previous = player.getData(RelicsAttachments.DISMANTLE_PROGRESS);
-        var hits = 1;
-
-        if (previous.session() == session && previous.container() == container && previous.slot() == index
-                && previous.rank() == rank && previous.count() == stack.getCount() && ItemStack.matches(previous.stack(), stack))
-            hits += DismantleProgress.remainingHits(previous.hits(), now - previous.lastHit());
-
-        if (hits < DismantleProgress.REQUIRED_HITS) {
-            player.setData(RelicsAttachments.DISMANTLE_PROGRESS, new DismantleProgress(session, container, index, stack, stack.getCount(), rank, hits, now));
-
-            return hits;
-        }
-
-        player.removeData(RelicsAttachments.DISMANTLE_PROGRESS);
+        if (!stack.is(item) || stack.getCount() != count || !(item instanceof IRelicItem relic) || relic.getRelicData(player, stack).getLevelingData().getRank() != rank)
+            return false;
 
         var removed = slot.safeTake(1, 1, player);
 
         if (removed.isEmpty())
-            return 0;
+            return false;
 
         addRankPoints(player, removed.getItem(), relic.getRelicData(player, removed).getLevelingData().getDismantleRankPointReward());
 
-        return hits;
+        return true;
     }
 
     private static void syncRankPoints(ServerPlayer player) {

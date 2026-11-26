@@ -6,7 +6,6 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.Rank
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
 import it.hurts.sskirillss.relics.client.screen.utils.ParticleStorage;
-import it.hurts.sskirillss.relics.handlers.DismantleProgress;
 import it.hurts.sskirillss.relics.handlers.RankHandler;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.leveling.C2SDismantleRelic;
@@ -23,21 +22,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DismantleEffect {
+    public static final int REQUIRED_HITS = 5;
     private static final int BURST_TICKS = 15;
     private static final int POINT_LAUNCH_TICK = 2;
     private static final int POINT_ARRIVAL_TICK = 16;
     private static final int MAX_TRAILS = 20;
-    private static int nextSession;
+    private static int nextRequestId;
 
     private final RelicDescriptionScreen screen;
     private final FracturedRelicRenderer renderer = new FracturedRelicRenderer();
     private final List<FlyingParticleData> pointTrails = new ArrayList<>();
-    private int session = ++nextSession;
+    private int pendingRequestId;
     private ItemStack snapshot = ItemStack.EMPTY;
     private int rank;
     private long pointsBeforeStrike;
     private int hits;
-    private int pending;
     private int age;
     private int finishAge = -1;
     private float stress;
@@ -48,7 +47,7 @@ public class DismantleEffect {
     }
 
     public int hits() {
-        return DismantleProgress.remainingHits(hits, age);
+        return isCommitted() ? hits : StrikeProgress.remainingHits(hits, age);
     }
 
     public boolean isFinishing() {
@@ -60,31 +59,43 @@ public class DismantleEffect {
     }
 
     public boolean isCommitted() {
-        return isFinishing() || hits() + pending >= DismantleProgress.REQUIRED_HITS;
+        return pendingRequestId != 0 || isFinishing();
     }
 
     public void strike(ItemStack stack, int rank) {
         snapshot = stack.copy();
         this.rank = rank;
-        pointsBeforeStrike = RankHandler.getRankPoints(Minecraft.getInstance().player, stack.getItem());
-        pending++;
-        NetworkHandler.sendToServer(new C2SDismantleRelic(screen.getContainer(), screen.getSlot(), stack.getItem(), rank, session));
+
+        var nextHit = hits() + 1;
+
+        if (nextHit == REQUIRED_HITS) {
+            pointsBeforeStrike = RankHandler.getRankPoints(Minecraft.getInstance().player, stack.getItem());
+            pendingRequestId = ++nextRequestId;
+
+            NetworkHandler.sendToServer(new C2SDismantleRelic(screen.getContainer(), screen.getSlot(), stack.getItem(), stack.getCount(), rank, pendingRequestId));
+        } else
+            playStrike(nextHit);
     }
 
     public long displayedPoints(long points) {
         return isCommitted() && finishAge < POINT_ARRIVAL_TICK ? pointsBeforeStrike : points;
     }
 
-    public void confirm(int session, int hits) {
-        if (this.session != session || pending == 0)
+    public void confirm(int requestId, boolean dismantled) {
+        if (pendingRequestId != requestId)
             return;
 
-        pending--;
+        pendingRequestId = 0;
+
+        if (dismantled)
+            playStrike(REQUIRED_HITS);
+        else
+            reset();
+    }
+
+    private void playStrike(int hits) {
         this.hits = hits;
         age = 0;
-
-        if (hits == 0)
-            return;
 
         var minecraft = Minecraft.getInstance();
         var sounds = minecraft.getSoundManager();
@@ -92,9 +103,9 @@ public class DismantleEffect {
         var tint = BigRelicCardWidget.getItemColor(snapshot);
         var x = screen.x + 84F;
         var y = screen.y + 88F;
-        var shattered = hits == DismantleProgress.REQUIRED_HITS;
+        var shattered = hits == REQUIRED_HITS;
 
-        screen.getRankupEffect().start(1.25F * hits / DismantleProgress.REQUIRED_HITS);
+        screen.getRankupEffect().start(1.25F * hits / REQUIRED_HITS);
         LevelUpEffect.crumbleAt(screen, random, x, y, tint, 2 * hits);
         LevelUpEffect.burstAt(screen, random, x, y, tint, shattered ? 4 * hits : hits);
 
@@ -115,29 +126,30 @@ public class DismantleEffect {
 
         age++;
         previousStress = stress;
-        stress = Mth.approach(stress, hits(), 0.32F);
+        stress = Mth.approach(stress, (float) hits() * FracturedRelicRenderer.CRACK_COUNT / REQUIRED_HITS, 0.32F);
 
         if (isFinishing()) {
             finishAge++;
 
             if (finishAge == POINT_ARRIVAL_TICK)
                 Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forUI(SoundEvents.EXPERIENCE_ORB_PICKUP, 1.25F, 0.65F));
-        } else if (pending == 0 && previousStress == 0F && stress == 0F && hits() == 0)
+        } else if (previousStress == 0F && stress == 0F && hits() == 0)
             reset();
     }
 
     public ItemStack displayedStack(ItemStack live) {
-        if (isFinishing() || live.isEmpty() && pending > 0)
+        if (isCommitted())
             return snapshot;
 
-        if (!snapshot.isEmpty() && (!live.is(snapshot.getItem()) || ((IRelicItem) live.getItem()).getRelicData(Minecraft.getInstance().player, live).getLevelingData().getRank() != rank))
+        if (!snapshot.isEmpty() && (!live.is(snapshot.getItem()) || live.getCount() != snapshot.getCount()
+                || ((IRelicItem) live.getItem()).getRelicData(Minecraft.getInstance().player, live).getLevelingData().getRank() != rank))
             reset();
 
         return live;
     }
 
     private float impact(float partialTick) {
-        return Math.max(0F, 1F - (age + partialTick) / 6F) * hits / DismantleProgress.REQUIRED_HITS;
+        return Math.max(0F, 1F - (age + partialTick) / 6F) * hits / REQUIRED_HITS;
     }
 
     public float backgroundFlash(float partialTick) {
@@ -185,9 +197,9 @@ public class DismantleEffect {
             pointTrails.clear();
         }
 
-        session = ++nextSession;
+        pendingRequestId = 0;
         snapshot = ItemStack.EMPTY;
-        hits = pending = 0;
+        hits = 0;
         previousStress = stress = 0F;
         finishAge = -1;
         renderer.close();
