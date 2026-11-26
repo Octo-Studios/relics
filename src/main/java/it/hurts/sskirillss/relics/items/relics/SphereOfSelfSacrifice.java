@@ -26,7 +26,6 @@ import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTempla
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
-import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -41,7 +40,6 @@ import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,7 +54,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
                                 .rankModifier(1, "resistance")
                                 .rankModifier(3, "salvo")
                                 .rankModifier(5, "salvation")
-                                .initialMaxLevel(10)
+                                .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("stacks")
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 9.99985D)

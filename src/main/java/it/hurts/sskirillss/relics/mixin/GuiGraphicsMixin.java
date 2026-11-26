@@ -36,8 +36,6 @@ import java.util.List;
 @Mixin(GuiGraphics.class)
 public class GuiGraphicsMixin {
     @Unique
-    private static final ResourceLocation UPGRADE_TEXTURE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/item_state/upgrade.png");
-    @Unique
     private static final ResourceLocation RESEARCH_TEXTURE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/item_state/research.png");
 
     @ModifyExpressionValue(method = "renderTooltipInternal", at = @At(value = "INVOKE", target = "Lnet/neoforged/neoforge/client/ClientHooks;onRenderTooltipColor(Lnet/minecraft/world/item/ItemStack;Lnet/minecraft/client/gui/GuiGraphics;IILnet/minecraft/client/gui/Font;Ljava/util/List;)Lnet/neoforged/neoforge/client/event/RenderTooltipEvent$Color;", remap = false))
@@ -71,36 +69,12 @@ public class GuiGraphicsMixin {
         var time = (stack.getItem().hashCode() / 1000F) + player.tickCount + partialTicks;
         var color = (float) (1F + Math.sin(time * 0.45F) * 0.1F);
 
-        var renderedUpgradeIcon = false;
-        var renderedResearchIcon = false;
-
         var relicData = relic.getRelicData(player, stack);
 
         for (var ability : relicData.getTemplate().getAbilities().getAbilities().values()) {
             var abilityData = relicData.getAbilitiesData().getAbilityData(ability.getId());
 
-            if (!renderedUpgradeIcon && abilityData.mayUpgrade()) {
-                poseStack.pushPose();
-
-                poseStack.translate(x + 9, y - 2, 200);
-
-                poseStack.translate(4.5F, 4.5F, 0);
-
-                poseStack.mulPose(Axis.ZP.rotation((float) (Math.sin(time * 0.35F) * 0.15F)));
-
-                poseStack.translate(-4.5F, -4.5F, 0);
-
-                GUIRenderer.begin(UPGRADE_TEXTURE, poseStack)
-                        .color(color, color, color, 1F)
-                        .anchor(SpriteAnchor.TOP_LEFT)
-                        .end();
-
-                poseStack.popPose();
-
-                renderedUpgradeIcon = true;
-            }
-
-            if (!renderedResearchIcon && (abilityData.mayResearch() || abilityData.mayUnlock())) {
+            if (abilityData.mayResearch() || abilityData.mayUnlock()) {
                 poseStack.pushPose();
 
                 poseStack.translate(x + 9, y + 9, 200);
@@ -118,7 +92,7 @@ public class GuiGraphicsMixin {
 
                 poseStack.popPose();
 
-                renderedResearchIcon = true;
+                break;
             }
         }
     }

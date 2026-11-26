@@ -47,7 +47,7 @@ public class PiglinMaskItem extends WearableRelicItem {
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("neutrality")
                                 .rankModifier(1, "legion")
-                                .initialMaxLevel(0)
+                                .levelContribution(0)
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("target")
                                                 .rankModifierVisibilityState("legion", VisibilityState.OBFUSCATED)

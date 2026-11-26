@@ -18,12 +18,16 @@ public class RelicsCoreShaders {
     public static ShaderInstance REVEAL_SHADER = null;
     public static ShaderInstance ASTRAL_NEBULA_SHADER = null;
     public static ShaderInstance ASTRAL_VOID_SHADER = null;
-    public static RenderStateShard.ShaderStateShard REVEAL_SHADER_SHARD = new RenderStateShard.ShaderStateShard(()->REVEAL_SHADER);
+    public static ShaderInstance RELIC_FRACTURE_SHADER;
+    public static RenderStateShard.ShaderStateShard REVEAL_SHADER_SHARD = new RenderStateShard.ShaderStateShard(() -> REVEAL_SHADER);
 
     @SubscribeEvent
     public static void register(RegisterShadersEvent event) throws IOException {
-        event.registerShader(new ShaderInstance(event.getResourceProvider(),ResourceLocation.tryBuild(Relics.MODID,"reveal_panel"), DefaultVertexFormat.POSITION_TEX),
-                (inst)->{
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.fromNamespaceAndPath(Relics.MODID, "relic_fracture"), DefaultVertexFormat.POSITION_TEX),
+                shader -> RELIC_FRACTURE_SHADER = shader);
+
+        event.registerShader(new ShaderInstance(event.getResourceProvider(), ResourceLocation.tryBuild(Relics.MODID, "reveal_panel"), DefaultVertexFormat.POSITION_TEX),
+                (inst) -> {
                     REVEAL_SHADER = inst;
                 });
 

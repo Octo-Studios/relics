@@ -16,8 +16,6 @@ public class LevelingTemplate {
     private final double step;
     private final int maxRank;
     private final double rankupCost;
-    private final ScalingModel rankScalingModel;
-    private final double rankStep;
 
     public static LevelingTemplateBuilder builder() {
         return new LevelingTemplateBuilder();
@@ -38,8 +36,6 @@ public class LevelingTemplate {
         private double step = 100D;
         private int maxRank = 5;
         private double rankupCost = 2000D;
-        private ScalingModel rankScalingModel = RelicsScalingModels.EXPONENTIAL.get();
-        private double rankStep = 0.25D;
 
         private LevelingTemplateBuilder(LevelingTemplate base) {
             this.scalingModel = base.getScalingModel();
@@ -47,8 +43,6 @@ public class LevelingTemplate {
             this.step = base.getStep();
             this.maxRank = base.getMaxRank();
             this.rankupCost = base.getRankupCost();
-            this.rankScalingModel = base.getRankScalingModel();
-            this.rankStep = base.getRankStep();
         }
 
         public LevelingTemplateBuilder scalingModel(ScalingModel scalingModel) {
@@ -81,20 +75,8 @@ public class LevelingTemplate {
             return this;
         }
 
-        public LevelingTemplateBuilder rankScalingModel(ScalingModel rankScalingModel) {
-            this.rankScalingModel = rankScalingModel;
-
-            return this;
-        }
-
-        public LevelingTemplateBuilder rankStep(double rankStep) {
-            this.rankStep = rankStep;
-
-            return this;
-        }
-
         public LevelingTemplate build() {
-            return new LevelingTemplate(scalingModel, initialCost, step, maxRank, rankupCost, rankScalingModel, rankStep);
+            return new LevelingTemplate(scalingModel, initialCost, step, maxRank, rankupCost);
         }
     }
 }

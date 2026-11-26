@@ -54,12 +54,12 @@ configurations {
 repositories {
     mavenLocal()
     maven {
-        name = "TerraformersMC"
-        url = "https://maven.terraformersmc.com/"
+        name = "Shatterbyte"
+        url = "https://maven.shatterbyte.com/releases"
     }
     maven {
-        name = "OctoStudios"
-        url = uri("https://maven.octo-studios.com/releases")
+        name = "TerraformersMC"
+        url = "https://maven.terraformersmc.com/"
     }
     maven {
         name = "Illusive Soulworks maven"
@@ -84,9 +84,9 @@ dependencies {
     implementation 'top.theillusivec4.curios:curios-neoforge:9.3.1+1.21.1'
     implementation "dev.architectury:architectury-neoforge:13.0.6"
     implementation "dev.emi:emi-neoforge:1.1.12+1.21"
+    implementation "it.hurts.octostudios.octolib:octolib-neoforge:0.6.3.3+1.21"
 
     implementation("curse.maven:irisshaders-455508:6661598")
-    implementation("curse.maven:octo-lib-916747:6932487")
     implementation("curse.maven:sodium-394468:6382651")
     implementation("curse.maven:sophisticated-backpacks-422301:7916628")
     implementation("curse.maven:sophisticated-core-618298:7916600")

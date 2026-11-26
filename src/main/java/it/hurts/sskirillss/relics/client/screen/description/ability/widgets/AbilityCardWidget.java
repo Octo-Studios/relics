@@ -17,7 +17,6 @@ import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategorie
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
@@ -123,13 +122,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                             screen.setSubcategory(DescriptionSubcategories.getSubcategory("ability_description"));
 
                         screen.rebuildWidgets();
-
-                        for (var entry : screen.renderables) {
-                            if (!(entry instanceof AbilityCardWidget card) || !card.ability.equals(ability))
-                                continue;
-                        }
-                    } else if (abilityData.mayPlayerUpgrade() && screen.getUpgradeButton() != null)
-                        screen.getUpgradeButton().shake();
+                    }
                 } else
                     minecraft.setScreen(new AbilityResearchScreen(minecraft.player, screen.container, screen.slot, screen, ability));
             } else {
@@ -162,7 +155,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                 soundManager.play(SimpleSoundInstance.forUI(SoundEvents.ZOMBIE_ATTACK_IRON_DOOR, 1F));
 
                 if (unlocks >= abilityData.getLockData().getMaxUnlocks()) {
-                    ClientScheduler.schedule(1, this::rebuildActionButtons);
+                    ClientScheduler.schedule(1, screen::rebuildWidgets);
 
                     for (int i = 0; i < 25; i++) {
                         var center = new Vec2(width / 2F, height / 2F);
@@ -196,14 +189,6 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         }
     }
 
-    public void rebuildActionButtons() {
-        this.screen.children().removeIf(entry -> entry instanceof AbstractAbilityActionWidget);
-        this.screen.initActionButtons();
-
-        this.screen.children().removeIf(entry -> entry instanceof AbilityModeWidget);
-        this.screen.initModeButtons();
-    }
-
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         var player = this.minecraft.player;
@@ -214,7 +199,6 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         var stack = this.screen.getStack();
 
-        var manager = this.minecraft.getTextureManager();
         var poseStack = guiGraphics.pose();
 
         var relicData = relic.getRelicData(player, stack);
@@ -232,10 +216,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         var canUse = isEnoughConditions && isLockUnlocked && isAbilityResearched;
 
-        var canUpgrade = abilityData.mayPlayerUpgrade();
-
-        var canBeLeveledUp = abilityData.getTemplate().getInitialMaxLevel() > 0;
-        var hasStats = !abilityData.getTemplate().getStats().isEmpty();
+        var hasStats = abilityData.hasStats();
 
         RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
@@ -250,7 +231,7 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
 
         poseStack.mulPose(Axis.ZP.rotation(clickAnimation.getRotation()));
 
-        var color = (float) ((canUpgrade ? 0.75F : 1.05F) + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
+        var color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F));
 
         if (isLockUnlocked)
             GUIRenderer.begin(abilityData.isEnabled() ? DescriptionTextures.getAbilityCardTexture(stack, ability) : GrayscaleTextures.get(DescriptionTextures.getAbilityCardTexture(stack, ability)), poseStack)
@@ -267,22 +248,19 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         GUIRenderer.begin(canUse ? DescriptionTextures.ABILITY_SMALL_CARD_FRAME_ACTIVE : DescriptionTextures.ABILITY_SMALL_CARD_FRAME_INACTIVE, poseStack)
                 .end();
 
-        if (!canBeLeveledUp)
-            GUIRenderer.begin(canUse ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_level_slug_active.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_level_slug_inactive.png"), poseStack)
+        if (!hasStats) {
+            GUIRenderer.begin(canUse ? DescriptionTextures.ABILITY_SMALL_CARD_LEVEL_SLUG_ACTIVE : DescriptionTextures.ABILITY_SMALL_CARD_LEVEL_SLUG_INACTIVE, poseStack)
                     .end();
-
-        if (!hasStats)
-            GUIRenderer.begin(canUse ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_quality_slug_active.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_quality_slug_inactive.png"), poseStack)
+            GUIRenderer.begin(canUse ? DescriptionTextures.ABILITY_SMALL_CARD_PROGRESS_SLUG_ACTIVE : DescriptionTextures.ABILITY_SMALL_CARD_PROGRESS_SLUG_INACTIVE, poseStack)
                     .end();
-
-        if (!canBeLeveledUp && !hasStats)
-            GUIRenderer.begin(canUse ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_progress_slug_active.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/small_card_frame_progress_slug_inactive.png"), poseStack)
+            GUIRenderer.begin(canUse ? DescriptionTextures.ABILITY_SMALL_CARD_QUALITY_SLUG_ACTIVE : DescriptionTextures.ABILITY_SMALL_CARD_QUALITY_SLUG_INACTIVE, poseStack)
                     .end();
+        } else if (canUse) {
+            var progress = progressBarEffect.progressOr((float) abilityData.getProgress(), partialTick);
+            var brightness = 1F + (progressBarEffect.isRising() ? progressBarEffect.flash(partialTick) * PROGRESS_FLASH : 0F);
 
-        var level = abilityData.getLevel();
-        var maxLevel = abilityTemplate.getInitialMaxLevel();
-
-        drawProgressBar(guiGraphics, (-this.width / 2F) + 2, (-this.height / 2F) + 3F, progressBarEffect.progressOr(maxLevel > 0 ? (float) level / maxLevel : 0F, partialTick), 1F + (progressBarEffect.isRising() ? progressBarEffect.flash(partialTick) * PROGRESS_FLASH : 0F));
+            drawProgressBar(guiGraphics, -width / 2F + 2F, -height / 2F + 3F, progress, brightness);
+        }
 
         if (isHovered())
             GUIRenderer.begin(DescriptionTextures.ABILITY_SMALL_CARD_FRAME_SELECTION, poseStack)
@@ -322,59 +300,39 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
             poseStack.popPose();
         }
 
-        {
-            if (canUse) {
-                if (canUpgrade) {
-                    GUIRenderer.begin(DescriptionTextures.UPGRADE, poseStack)
-                            .pos(0, -1)
-                            .patternSize(20, 20)
-                            .scale(0.9F + ((float) (Math.sin((player.tickCount + partialTicks) * 0.25F) * 0.05F)))
-                            .animation(AnimationData.construct(200, 20, 2))
-                            .end();
-                }
+        if (hasStats && canUse) {
+            var xOff = 0;
+
+            var quality = abilityData.calculateQuality();
+            var isAliquot = quality % 2 == 1;
+
+            for (var i = 0; i < Math.floor(quality / 2D); i++) {
+                var brightness = starBrightness(i, 2, partialTick);
+
+                GUIRenderer.begin(DescriptionTextures.SMALL_STAR_ACTIVE, poseStack)
+                        .pos(-(width / 2F) + xOff + STAR_X, -(height / 2F) + STAR_Y)
+                        .color(brightness, brightness, brightness, 1F)
+                        .end();
+
+                xOff += STAR_STEP;
+            }
+
+            if (isAliquot) {
+                var brightness = starBrightness(quality / 2, 1, partialTick);
+
+                GUIRenderer.begin(DescriptionTextures.SMALL_STAR_ACTIVE, poseStack)
+                        .pos(-(width / 2F) + xOff + STAR_X - 1, -(height / 2F) + STAR_Y)
+                        .patternSize(1, 2)
+                        .color(brightness, brightness, brightness, 1F)
+                        .end();
             }
         }
 
-        {
-            if (hasStats && canUse) {
-                int xOff = 0;
+        if (hasStats) {
+            var label = Component.literal(canUse ? abilityData.getProgressPercent() + "%" : "?").withStyle(ChatFormatting.BOLD);
 
-                int quality = abilityData.calculateQuality();
-                boolean isAliquot = quality % 2 == 1;
-
-                for (int i = 0; i < Math.floor(quality / 2D); i++) {
-                    var brightness = starBrightness(i, 2, partialTick);
-
-                    GUIRenderer.begin(DescriptionTextures.SMALL_STAR_ACTIVE, poseStack)
-                            .pos(-(width / 2F) + xOff + STAR_X, -(height / 2F) + STAR_Y)
-                            .color(brightness, brightness, brightness, 1F)
-                            .end();
-
-                    xOff += STAR_STEP;
-                }
-
-                if (isAliquot) {
-                    var brightness = starBrightness(quality / 2, 1, partialTick);
-
-                    GUIRenderer.begin(DescriptionTextures.SMALL_STAR_ACTIVE, poseStack)
-                            .pos(-(width / 2F) + xOff + STAR_X - 1, -(height / 2F) + STAR_Y)
-                            .patternSize(1, 2)
-                            .color(brightness, brightness, brightness, 1F)
-                            .end();
-                }
-            }
-        }
-
-        {
-            if (canBeLeveledUp) {
-                MutableComponent title = Component.literal(canUse ? String.valueOf(level) : "?").withStyle(ChatFormatting.BOLD);
-
-                float textScale = 0.5F;
-
-                poseStack.scale(textScale, textScale, textScale);
-
-                guiGraphics.drawString(minecraft.font, title, -((width + 1) / 2) - (minecraft.font.width(title) / 2) + 19, (-(height / 2) - 20), canUse ? 0xFFE278 : 0xB7AED9, true);
-            }
+            poseStack.scale(0.5F, 0.5F, 1F);
+            ScreenUtils.drawCenteredString(guiGraphics, minecraft.font, label, 0, -(height / 2) - 20, canUse ? 0xFFE278 : 0xB7AED9, true);
         }
 
         RenderSystem.disableBlend();
@@ -600,20 +558,18 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
         if (abilityData == null || abilityData.getTemplate() == null)
             return;
 
-        var maxLevel = abilityData.getTemplate().getInitialMaxLevel();
+        if (abilityData.hasStats() && abilityData.isUnlocked()) {
+            var scaleX = getHoverXSqueeze() * clickAnimation.getScale();
+            var scaleY = getHoverYSqueeze() * clickAnimation.getScale();
 
-        var random = player.getRandom();
-
-        var scaleX = getHoverXSqueeze() * clickAnimation.getScale();
-        var scaleY = getHoverYSqueeze() * clickAnimation.getScale();
-
-        progressBarEffect.update(maxLevel > 0 ? (float) abilityData.getLevel() / maxLevel : 0F);
-        progressBarEffect.tick(screen, random, getX() + width / 2F + (-width / 2F + 2F) * scaleX, getY() + height / 2F + (-height / 2F + 3F) * scaleY, scaleX, scaleY);
+            progressBarEffect.update((float) abilityData.getProgress());
+            progressBarEffect.tick(screen, player.getRandom(), getX() + width / 2F + (-width / 2F + 2F) * scaleX, getY() + height / 2F + (-height / 2F + 3F) * scaleY, scaleX, scaleY);
+        }
 
         if (rerollAnimation.observe(abilityData, ability)) {
             for (var i = 0; i < BigAbilityCardWidget.STAR_COUNT; i++) {
                 if (BigAbilityCardWidget.getStarState(rerollAnimation.getNewQuality(), i) != BigAbilityCardWidget.getStarState(rerollAnimation.getOldQuality(), i))
-                    LevelUpEffect.burstAt(screen, random, getX() + STAR_X + i * STAR_STEP + STAR_CENTER_X, getY() + STAR_Y + STAR_CENTER_Y, UIParticles.GOLD, STAR_SPARKS);
+                    LevelUpEffect.burstAt(screen, player.getRandom(), getX() + STAR_X + i * STAR_STEP + STAR_CENTER_X, getY() + STAR_Y + STAR_CENTER_Y, UIParticles.GOLD, STAR_SPARKS);
             }
         }
 
@@ -671,10 +627,6 @@ public class AbilityCardWidget extends AbstractDescriptionWidget implements IHov
                     entries.add(Component.literal(" "));
 
                     entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.unresearched")));
-                } else if (abilityData.mayPlayerUpgrade()) {
-                    entries.add(Component.literal(" "));
-
-                    entries.add(Component.literal("").append(Component.translatable("relics.description.researching.relic.card.ready_to_upgrade")));
                 }
             }
         }

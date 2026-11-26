@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class ExponentialSaturationScalingModel extends ScalingModel {
     @Override
-    public double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, int iterations) {
-        return baseValue + modifier * (1 - Math.exp(-iterations * modifier));
+    public double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, double iterations) {
+        return baseValue - modifier * Math.expm1(-iterations * Math.abs(modifier));
     }
 }

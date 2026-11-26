@@ -49,15 +49,15 @@
   "relics.description.researching.research.hint.quick": "Удерживай [Шифт] для полного автоматического исследования способности.",
   "relics.description.researching.research.hint.locked": "Способность уже исследована!",
 
-  "relics.description.researching.general.leveling_point.title": "Очки улучшения:",
-  "relics.description.researching.general.leveling_point.extra_info": "Получаются при повышении уровня реликвии и используются для повышения уровня способностей.",
+  "relics.description.researching.general.rank_point.title": "Очки ранга:",
+  "relics.description.researching.general.rank_point.extra_info": "Получаются при разрушении реликвии того же типа и используются для повышения ранга реликвии.",
 
   "relics.description.researching.general.player_experience.title_1": "Очки опыта:",
   "relics.description.researching.general.player_experience.title_2": "%1$s [%2$s уровней]",
   "relics.description.researching.general.player_experience.extra_info": "Опыт игрока из \"ванильного\" Minecraft. Получается при убийстве мобов, добыче руды, плавке предметов и т.п.",
 
   "relics.description.researching.general.relic_progress.title": "Прогресс развития реликвии:",
-  "relics.description.researching.general.relic_progress.extra_info": "Демонстрирует насколько реликвия близка к своим предельным возможностям. Определяется качеством и уровнем реликвии и способностей.",
+  "relics.description.researching.general.relic_progress.extra_info": "Демонстрирует насколько реликвия близка к своим предельным возможностям. Определяется рангом, уровенем реликвии и качеством её способностей.",
 
   "relics.description.researching.general.relic_rank.title": "Ранг реликвии:",
   "relics.description.researching.general.relic_rank.extra_info": "Получается при ручном повышении ранга реликвии, что увеличивает её максимальный уровень.",
@@ -66,7 +66,6 @@
   "relics.description.researching.relic.card.low_rank": "Для разблокировки способности необходимо повысить ранг реликвии до %1$s!",
   "relics.description.researching.relic.card.unresearched": "Для использования способности необходимо завершить исследование!",
   "relics.description.researching.relic.card.ready_to_unlock": "Способность готова к разблокировке! Кликов осталось: %1$s",
-  "relics.description.researching.relic.card.ready_to_upgrade": "Способность готова к улучшению!",
 
   "relics.description.researching.tab.relic": "Реликвия",
   "relics.description.researching.tab.ability": "Способности",
@@ -86,13 +85,13 @@
   "relics.description.researching.relic.info.extra_info": "Качество реликвии представляет собой среднее арифметическое качества всех разблокированных на данный момент способностей и измеряется в виде очков от 1 до 5 с шагом в 0.5. Является исключительно визуальной метрикой и показывает насколько стартовые случайные характеристики предмета близки к идеально возможным. Для повышения общего качества реликвии необходимо рассматривать каждую способность по отдельности.",
 
   "relics.description.researching.relic.experience.title": "Опыт реликвии:",
-  "relics.description.researching.relic.experience.extra_info": "Получается при использовании способностей реликвии по прямому назначению (подробнее можно узнать в разделе источников получения опыта). При достижении максимального значения опыта уровень реликвии и запас очков улучшения увеличивается на 1, позволяя разблокировать ранее недоступные способности или улучшить уже существующие.",
+  "relics.description.researching.relic.experience.extra_info": "Получается при использовании способностей реликвии по прямому назначению (подробнее можно узнать в разделе источников получения опыта). При достижении максимального значения опыта уровень реликвии увеличивается на 1, делая все её разблокированные способности сильнее.",
 
-  "relics.description.researching.ability.info.level": "Уровень способности:",
+  "relics.description.researching.ability.info.progress": "Прогресс способности:",
   "relics.description.researching.ability.info.quality": "Качество способности:",
   "relics.description.researching.ability.info.extra_info": "Качество способности, по аналогии с качеством реликвии, представляет собой среднее арифметическое качества всех имеющихся у способности характеристик и измеряется в виде очков от 1 до 5 с шагом в 0.5. Является исключительно визуальной метрикой и показывает насколько стартовые случайные характеристики способности близки к идеально возможным. Для повышения качества способности необходимо сбрасывать её случайные характеристики до получения лучшего значения.",
 
-  "relics.general.hold_shift": "Удерживайте [%1$s] для отображения подробного описания!",
+  "relics.general.hold_shift": "Удерживай [%1$s] для отображения подробного описания!",
 
   "relics.description.ability.research.rules": "Правила",
 
@@ -104,30 +103,25 @@
   "relics.description.ability.research.rule_3.description": "Присматривайся к мелочам: на позиции звёзд видно частицы даже сквозь туман, а количество летающих вокруг звезды точек указывает на её необходимое количество соединений.",
 
   "relics.description.general.cost.title": "Стоимость",
+  "relics.description.general.reward.title": "Награда",
 
   "relics.description.relic.rankup.title": "Повышение ранга реликвии",
-  "relics.description.relic.rankup.cost.entry_1": "%1$s уровней реликвии",
-  "relics.description.relic.rankup.cost.entry_2": "%1$s очков опыта (%2$s относительных уровней)",
+  "relics.description.relic.rankup.cost.entry_1": "%1$s очков опыта (%2$s относительных уровней)",
+  "relics.description.relic.rankup.cost.entry_2": "%1$s очков ранга",
+  "relics.description.relic.rankup.auto": "При удержании клавиши [Шифт] во время этого действия ранг реликвии будет повышаться автоматически до тех пор, пока не достигнет максимума или не закончатся очки опыта или очки ранга.",
   "relics.description.relic.rankup.max_rank": "Реликвия уже достигла своего максимального ранга и дальнейшее его повышение теперь невозможно!",
   "relics.description.relic.rankup.description": "Повышает ранг реликвии, что увеличивает её максимальный уровень и видоизменяет поведение некоторых способностей.",
 
-  "relics.description.ability.levelup.title": "Повышение уровня способности",
-  "relics.description.ability.levelup.cost.entry_1": "%1$s очков опыта (%2$s относительных уровней)",
-  "relics.description.ability.levelup.cost.entry_2": "%1$s очков улучшения",
-  "relics.description.ability.levelup.auto": "При удержании клавиши [%1$s] во время этого действия повышение уровня способности будет выполняться автоматически до тех пор, пока не иссякнут опыт или очки улучшения.",
-  "relics.description.ability.levelup.max_level": "Способность уже достигла максимального уровня, дальнейшее его повышение невозможно!",
-  "relics.description.ability.levelup.description": "Увеличивает текущий уровень способности, улучшая её характеристики.",
+  "relics.description.relic.dismantle.title": "Раскол реликвии [%1$s/%2$s]",
+  "relics.description.relic.dismantle.description": "После пятого использования этого действия реликвия безвозвратно разрушается, давая одно очко ранга для реликвий того же типа. Все очки, вложенные в повышение её ранга, также возвращаются.",
+  "relics.description.relic.dismantle.cost.entry_1": "Экземпляр этой реликвии",
+  "relics.description.relic.dismantle.reward.entry_1": "%1$s очков ранга",
 
   "relics.description.ability.reroll.title": "Сброс случайных характеристик способности",
   "relics.description.ability.reroll.cost.entry_1": "%1$s очков опыта (%2$s относительных уровней)",
-  "relics.description.ability.reroll.auto": "При удержании клавиши [%1$s] во время этого действия сброс случайных характеристик будет выполняться автоматически до тех пор, пока не выпадет максимально возможная редкость или не закончатся очки опыта.",
-  "relics.description.ability.reroll.max_quality": "Способность уже достигла максимального качества, и это действие гарантированно ухудшит его значение. Удерживайте клавишу [%1$s] перед использованием, чтобы подвердить что ты осознаёшь возможные последствия!",
+  "relics.description.ability.reroll.auto": "При удержании клавиши [Шифт] во время этого действия сброс случайных характеристик будет выполняться автоматически до тех пор, пока не выпадет максимально возможная редкость или не закончатся очки опыта.",
+  "relics.description.ability.reroll.max_quality": "Способность уже достигла максимального качества, и это действие гарантированно ухудшит его значение. Удерживай клавишу [Шифт] перед использованием, чтобы подвердить что ты осознаёшь возможные последствия!",
   "relics.description.ability.reroll.description": "Случайным образом сбрасывает значения характеристик способности в лучшую или худшую сторону.",
-
-  "relics.description.ability.reset.title": "Сброс уровня способности",
-  "relics.description.ability.reset.cost.entry_1": "%1$s очков опыта (%2$s относительных уровней)",
-  "relics.description.ability.reset.min_level": "Способность уже достигла своего минимального уровня и его сброс сейчас не требуется!",
-  "relics.description.ability.reset.description": "Сбрасывает уровень способности до минимального, возвращая распределённые очки улучшения.",
 
   "relics.description.ability.rank_modifier.condition.rank": "Начиная с %1$s ранга:",
   "relics.description.ability.experience_source.condition.rank": "Начиная с %1$s ранга:",

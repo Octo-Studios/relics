@@ -30,15 +30,11 @@
 
   "relics.description.researching.badge.ability.cast_type.hint": "Aktif yetenekler menüsünü açmak için herhangi bir arayüzün dışında [%1$s] tuşunu kullanın!",
 
-  "relics.description.researching.general.leveling_point.title": "Yükseltme Puanları:",
-  "relics.description.researching.general.leveling_point.extra_info": "Yadigarı seviye atlattığınızda elde edilir ve yetenekleri yükseltmek için kullanılır.",
-
   "relics.description.researching.general.player_experience.title_1": "Deneyim Puanları:",
   "relics.description.researching.general.player_experience.title_2": "%1$s [%2$s seviyeler]",
   "relics.description.researching.general.player_experience.extra_info": "Oyuncunun temel Minecraft'tan elde ettiği deneyim puanı. Yaratıkları öldürerek, maden cevheri çıkararak, eşyaları eriterek vb. yollarla elde edilir.",
 
   "relics.description.researching.general.relic_progress.title": "Kalıntı Geliştirme İlerlemesi:",
-  "relics.description.researching.general.relic_progress.extra_info": "Bu, kutsal emanetin maksimum potansiyeline ne kadar yakın olduğunu gösterir. Kutsal emanetin kalitesi, seviyesi ve yetenekleri tarafından belirlenir.",
 
   "relics.description.researching.general.relic_rank.title": "Kalıntı Sırası:",
   "relics.description.researching.general.relic_rank.extra_info": "Bu işlem, kalıntının rütbesini manuel olarak artırarak gerçekleştirilir; maksimum seviyesini yükseltir.",
@@ -46,7 +42,6 @@
   "relics.description.researching.relic.card.low_level": "Bu yeteneğin kilidini açmak için, kalıntı seviyesini yükseltmeniz gerekir %1$s!",
   "relics.description.researching.relic.card.unresearched": "Bu yeteneği kullanabilmek için araştırmayı tamamlamanız gerekiyor!",
   "relics.description.researching.relic.card.ready_to_unlock": "Yetenek kilidini açmaya hazır! Kalan tıklama sayısı: %1$s",
-  "relics.description.researching.relic.card.ready_to_upgrade": "Yetenek yükseltilmeye hazır!",
 
   "relics.description.researching.tab.relic": "Kalıntı",
   "relics.description.researching.tab.ability": "Yetenekler",
@@ -59,9 +54,7 @@
   "relics.description.researching.relic.info.extra_info": "Yadigâr kalitesi, şu anda kilidi açık olan tüm yeteneklerin kalitesinin aritmetik ortalamasıdır ve 1 ila 5 arasında 0,5'lik adımlarla puan cinsinden ölçülür. Bu tamamen görsel bir ölçüttür ve eşyanın başlangıçtaki rastgele özelliklerinin ideal olası değerlere ne kadar yakın olduğunu gösterir. Genel yadigâr kalitesini artırmak için her yetenek ayrı ayrı değerlendirilmelidir.",
 
   "relics.description.researching.relic.experience.title": "Yadigâr Deneyimi:",
-  "relics.description.researching.relic.experience.extra_info": "Yadigâr yeteneklerini amaçlarına uygun şekilde kullanarak kazanılır (daha fazla ayrıntı deneyim kaynakları bölümünde bulunabilir). Maksimum deneyim seviyesine ulaşıldığında, yadigâr seviyesi ve yükseltme puanları 1 artar, bu da daha önce erişilemeyen yeteneklerin kilidini açmanıza veya mevcut yetenekleri geliştirmenize olanak tanır.",
 
-  "relics.description.researching.ability.info.level": "Yetenek Seviyesi:",
   "relics.description.researching.ability.info.quality": "Yetenek Kalitesi:",
   "relics.description.researching.ability.info.extra_info": "Yetenek kalitesi, kalıntı kalitesine benzer şekilde, yeteneğin tüm özelliklerinin kalitesinin aritmetik ortalamasıdır ve 1 ila 5 arasında 0,5'lik adımlarla puan cinsinden ölçülür. Bu tamamen görsel bir ölçüttür ve yeteneğin başlangıçtaki rastgele özelliklerinin ideal olası değerlere ne kadar yakın olduğunu gösterir. Yetenek kalitesini artırmak için, daha iyi bir değer elde edene kadar rastgele özelliklerini yeniden belirlemeniz gerekir.",
 
@@ -79,28 +72,15 @@
   "relics.description.general.cost.title": "Maliyet",
 
   "relics.description.relic.rankup.title": "Kalıntı Sıralamasını Yükselt",
-  "relics.description.relic.rankup.cost.entry_1": "%1$s kalıntı seviyeleri",
-  "relics.description.relic.rankup.cost.entry_2": "%1$s deneyim puanları (%2$s göreceli seviyeler)",
+  "relics.description.relic.rankup.cost.entry_1": "%1$s deneyim puanları (%2$s göreceli seviyeler)",
   "relics.description.relic.rankup.max_rank": "Bu kalıntı zaten en yüksek seviyeye ulaştı ve daha fazla yükseltilemez!",
   "relics.description.relic.rankup.description": "Kalıntının rütbesini yükselterek maksimum seviyesini artırır ve belirli yeteneklerin davranışını değiştirir.",
-
-  "relics.description.ability.levelup.title": "Yetenek Seviyesi Yükseltme",
-  "relics.description.ability.levelup.cost.entry_1": "%1$s deneyim puanları (%2$s göreceli seviyeler)",
-  "relics.description.ability.levelup.cost.entry_2": "%1$s yükseltme puanları",
-  "relics.description.ability.levelup.auto": "Bu işlem sırasında [%1$s] tuşunu basılı tutmak, deneyim veya yükseltme puanları bitene kadar yeteneği otomatik olarak yükseltecektir.",
-  "relics.description.ability.levelup.max_level": "Bu yetenek zaten maksimum seviyeye ulaştı ve daha fazla artırılamaz!",
-  "relics.description.ability.levelup.description": "Mevcut yetenek seviyesini artırarak özelliklerini geliştirir.",
 
   "relics.description.ability.reroll.title": "Yetenek Niteliklerini Yeniden Oluştur",
   "relics.description.ability.reroll.cost.entry_1": "%1$s deneyim puanları (%2$s göreceli seviyeler)",
   "relics.description.ability.reroll.auto": "Bu işlem sırasında [%1$s] tuşunu basılı tutmak, mümkün olan en yüksek nadirlik seviyesine ulaşılana veya deneyim puanları bitene kadar nitelikleri otomatik olarak yeniden belirleyecektir.",
   "relics.description.ability.reroll.max_quality": "Bu yetenek zaten maksimum kaliteye ulaşmış durumda ve bu işlem kesinlikle kalitesini düşürecektir. Olası sonuçları anladığınızı onaylamak için kullanmadan önce [%1$s] tuşuna basılı tutun!",
   "relics.description.ability.reroll.description": "Yeteneklerin özelliklerini rastgele olarak, daha iyi veya daha kötü değerler elde edecek şekilde yeniden belirler.",
-
-  "relics.description.ability.reset.title": "Yetenek Seviyesini Sıfırla",
-  "relics.description.ability.reset.cost.entry_1": "%1$s deneyim puanı (%2$s göreceli seviye)",
-  "relics.description.ability.reset.min_level": "Yetenek seviyesi zaten minimum seviyeye ulaştı, bu nedenle sıfırlama gerekmiyor!",
-  "relics.description.ability.reset.description": "Yetenek seviyesini minimum seviyeye sıfırlar ve harcanan yükseltme puanlarını geri verir.",
 
   "relics.description.ability.rank_modifier.condition.rank": "Sıralamadan başlayarak %1$s:",
   "relics.description.ability.experience_source.condition.rank": "Sıralamadan başlayarak %1$s:",

@@ -1,6 +1,5 @@
 package it.hurts.sskirillss.relics.client.handlers;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.math.Axis;
 import it.hurts.octostudios.octolib.client.animation.Tween;
@@ -589,20 +588,7 @@ public class ActiveAbilitiesClientHandler {
     }
 
     public static boolean isAbilityListKeyDown() {
-        var key = RelicsHotkeys.ACTIVE_ABILITIES_LIST.getKey();
-
-        if (RelicsHotkeys.ACTIVE_ABILITIES_LIST.isUnbound())
-            return false;
-
-        var window = MC.getWindow().getWindow();
-
-        if (key.getType() == InputConstants.Type.MOUSE)
-            return GLFW.glfwGetMouseButton(window, key.getValue()) == GLFW.GLFW_PRESS;
-
-        if (key.getType() == InputConstants.Type.KEYSYM)
-            return GLFW.glfwGetKey(window, key.getValue()) == GLFW.GLFW_PRESS;
-
-        return RelicsHotkeys.ACTIVE_ABILITIES_LIST.isDown();
+        return RelicsHotkeys.isHeld(RelicsHotkeys.ACTIVE_ABILITIES_LIST);
     }
 
     private static boolean shouldKeepOpenDuringMouseChord() {

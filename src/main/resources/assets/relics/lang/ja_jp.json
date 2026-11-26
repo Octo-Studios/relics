@@ -49,15 +49,11 @@
   "relics.description.researching.research.hint.quick": "［Shift］長押しで自動調査",
   "relics.description.researching.research.hint.locked": "このアビリティはすでに調査済みです！",
 
-  "relics.description.researching.general.leveling_point.title": "アップグレードポイント：",
-  "relics.description.researching.general.leveling_point.extra_info": "レリックのレベルアップ時に獲得し、アビリティの強化に使用します。",
-
   "relics.description.researching.general.player_experience.title_1": "経験値レベル：",
   "relics.description.researching.general.player_experience.title_2": "%1$s［%2$sレベル］",
   "relics.description.researching.general.player_experience.extra_info": "バニラのMinecraftで得られる経験値です。Mobを倒す、鉱石を採掘する、アイテムを製錬するなどで獲得できます。",
 
   "relics.description.researching.general.relic_progress.title": "レリックの成長度：",
-  "relics.description.researching.general.relic_progress.extra_info": "レリックが最大潜在能力にどれほど近づいているかを示します。レリックとアビリティそれぞれの品質およびレベルによって決定されます。",
 
   "relics.description.researching.general.relic_rank.title": "レリックのランク：",
   "relics.description.researching.general.relic_rank.extra_info": "手動でランクアップを行うことで上昇します。レベル上限が引き上げられます。",
@@ -66,7 +62,6 @@
   "relics.description.researching.relic.card.low_rank": "解放するには、レリックのランクを%1$sまで上げる必要があります！",
   "relics.description.researching.relic.card.unresearched": "このアビリティを使用するには、調査を完了させてください！",
   "relics.description.researching.relic.card.ready_to_unlock": "アビリティを解放できます！残りクリック数：%1$s",
-  "relics.description.researching.relic.card.ready_to_upgrade": "アビリティをアップグレードできます！",
 
   "relics.description.researching.tab.relic": "レリック",
   "relics.description.researching.tab.ability": "アビリティ",
@@ -85,9 +80,7 @@
   "relics.description.researching.relic.info.extra_info": "レリックの品質は、現在解放されているすべてのアビリティの品質の算術平均であり、1から5の範囲で0.5刻みの値として算出されます。これは純粋に視覚的な指標であり、アイテムの初期ランダム特性が理想的な最大値にどれだけ近いかを示すものです。レリック全体の品質を向上させるには、各アビリティを個別に精査する必要があります。",
 
   "relics.description.researching.relic.experience.title": "レリック経験値：",
-  "relics.description.researching.relic.experience.extra_info": "レリックのアビリティを本来の用途で使用することで獲得できます（詳細は経験値ソースの項目を参照）。経験値が最大値に達すると、レリックのレベルとアップグレードポイントが1上昇し、未解放のアビリティの解放や既存アビリティの強化が可能になります。",
 
-  "relics.description.researching.ability.info.level": "アビリティのレベル：",
   "relics.description.researching.ability.info.quality": "アビリティの品質：",
   "relics.description.researching.ability.info.extra_info": "アビリティの品質は、レリックの品質と同様にそのアビリティが持つすべての属性の品質の算術平均であり、1から5の範囲で0.5刻みの値として算出されます。これは純粋に視覚的な指標であり、アビリティの初期ランダム特性が理想的な最大値にどれだけ近いかを示すものです。アビリティの品質を向上させるには、より良い値が出るまでランダムな属性をリロールする必要があります。",
 
@@ -105,28 +98,15 @@
   "relics.description.general.cost.title": "コスト",
 
   "relics.description.relic.rankup.title": "レリックをレベルアップ",
-  "relics.description.relic.rankup.cost.entry_1": "%1$sレリックのレベル",
-  "relics.description.relic.rankup.cost.entry_2": "%1$s経験値ポイント（%2$s相対レベル）",
+  "relics.description.relic.rankup.cost.entry_1": "%1$s経験値ポイント（%2$s相対レベル）",
   "relics.description.relic.rankup.max_rank": "このレリックはすでに最大ランクに達しているため、これ以上強化できません！",
   "relics.description.relic.rankup.description": "レリックのランクが上昇し、レベル上限の解放や特定のアビリティの性質変化が起こります。",
-
-  "relics.description.ability.levelup.title": "アビリティをレベルアップ",
-  "relics.description.ability.levelup.cost.entry_1": "%1$s経験値ポイント（%2$s相対レベル）",
-  "relics.description.ability.levelup.cost.entry_2": "%1$s強化ポイント",
-  "relics.description.ability.levelup.auto": "実行中に［%1$s］を長押しすると、経験値またはポイントが尽きるまで自動的にレベルを上げ続けます。",
-  "relics.description.ability.levelup.max_level": "このアビリティは最大レベルに達しているため、これ以上強化できません！",
-  "relics.description.ability.levelup.description": "現在のアビリティのレベルを上昇させ、その性能を強化します。",
 
   "relics.description.ability.reroll.title": "アビリティ属性をリロール",
   "relics.description.ability.reroll.cost.entry_1": "%1$s経験値ポイント（%2$s相対レベル）",
   "relics.description.ability.reroll.auto": "実行中に［%1$s］を長押しすると、最大品質に達するか経験値が尽きるまで自動的にリロールを繰り返します。",
   "relics.description.ability.reroll.max_quality": "このアビリティはすでに最大品質に達しています。この操作を行うと確実に性能が悪化します。起こりうる結果を理解した上で実行する場合は、［%1$s］を長押しして確定してください！",
   "relics.description.ability.reroll.description": "アビリティの属性値をランダムにリロールします。数値が良くなることもあれば、悪くなることもあります。",
-
-  "relics.description.ability.reset.title": "アビリティのレベルをリセット",
-  "relics.description.ability.reset.cost.entry_1": "%1$s経験値ポイント（%2$s相対レベル）",
-  "relics.description.ability.reset.min_level": "このアビリティはすでに最低レベルのため、リセットの必要はありません！",
-  "relics.description.ability.reset.description": "アビリティレベルを最低値まで戻し、消費したアップグレードポイントを返却します。",
 
   "relics.description.ability.rank_modifier.condition.rank": "ランク%1$sで解放：",
   "relics.description.ability.experience_source.condition.rank": "ランク%1$sで解放：",

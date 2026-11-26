@@ -49,7 +49,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.living.LivingFallEvent;
-import top.theillusivec4.curios.api.SlotContext;
 
 import java.awt.*;
 
@@ -62,7 +61,7 @@ public class ChorusStaffItem extends RelicItem {
                                 .rankModifier(1, "flicker")
                                 .rankModifier(3, "safe_fall")
                                 .rankModifier(5, "ascent")
-                                .initialMaxLevel(10)
+                                .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("distance")
                                         .initialValue(10D, 15D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30D)

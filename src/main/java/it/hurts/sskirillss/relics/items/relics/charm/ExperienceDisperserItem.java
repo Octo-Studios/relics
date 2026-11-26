@@ -36,7 +36,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("dispersion")
-                                .initialMaxLevel(10)
+                                .levelContribution(10)
                                 .rankModifier(1, "same_item")
                                 .rankModifier(3, "player_xp")
                                 .rankModifier(5, "max_level")

@@ -76,7 +76,7 @@ public class ShieldOfRetaliationItem extends RelicItem {
                                 .rankModifier(1, "projectile")
                                 .rankModifier(3, "stun")
                                 .rankModifier(5, "guard")
-                                .initialMaxLevel(10)
+                                .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("window")
                                         .initialValue(0.5D, 0.75D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.5D)

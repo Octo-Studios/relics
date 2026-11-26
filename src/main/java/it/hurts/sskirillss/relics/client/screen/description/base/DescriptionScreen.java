@@ -49,7 +49,6 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
     @Override
     public void renderBackground(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-
         renderSpaceBackground(guiGraphics);
 
         renderTopScroll(guiGraphics);
@@ -63,12 +62,9 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
         if (LogoWidget.getRemainingClicks() != 0)
             this.addRenderableWidget(new LogoWidget(this.x + 313, this.y + 53, this));
 
-        if (relic.getRelicData(minecraft.player, stack).getLevelingData().isPointsMismatch())
-            this.addRenderableWidget(new PointsFixWidget(x + 330, y + 33, this));
-
         this.addRenderableWidget(new RelicProgressPlateWidget(this.x + 313, this.y + 77, this));
         this.addRenderableWidget(new RankPlateWidget(this.x + 313, this.y + 102, this));
-        this.addRenderableWidget(new LevelingPointsPlateWidget(this.x + 313, this.y + 127, this));
+        this.addRenderableWidget(new RankPointsPlateWidget(this.x + 313, this.y + 127, this));
         this.addRenderableWidget(new PlayerExperiencePlateWidget(this.x + 313, this.y + 152, this));
 
         if (relic instanceof IDocsEntry entry && entry.getURI(minecraft.player, stack) != null)
@@ -116,13 +112,19 @@ public class DescriptionScreen extends SimpleDescriptionScreen {
 
     protected void renderSpaceBackground(GuiGraphics guiGraphics) {
         var poseStack = guiGraphics.pose();
+        var brightness = getSpaceBackgroundBrightness();
 
         GUIRenderer.begin(DescriptionTextures.SPACE_BACKGROUND, poseStack)
+                .color(brightness, brightness, brightness, 1F)
                 .texSize(418, 4096)
                 .patternSize(backgroundWidth, backgroundHeight)
                 .pos(x + (backgroundWidth / 2F), y + (backgroundHeight / 2F))
                 .animation(AnimationData.construct(4096, backgroundHeight, 2))
                 .end();
+    }
+
+    protected float getSpaceBackgroundBrightness() {
+        return 1F;
     }
 
     protected void renderTopScroll(GuiGraphics guiGraphics) {

@@ -16,7 +16,6 @@ import it.hurts.sskirillss.relics.entities.ReflectiveOrbEntity;
 import it.hurts.sskirillss.relics.init.RelicsEntities;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -40,7 +39,7 @@ public class ReflectiveNecklaceItem extends WearableRelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("reflection")
-                                .initialMaxLevel(10)
+                                .levelContribution(10)
                                 .rankModifier(1, "stun")
                                 .rankModifier(3, "piercing")
                                 .rankModifier(5, "bounce")

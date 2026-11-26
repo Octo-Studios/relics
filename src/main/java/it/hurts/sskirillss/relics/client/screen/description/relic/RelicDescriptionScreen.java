@@ -4,6 +4,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategories;
+import it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategories;
 import it.hurts.sskirillss.relics.api.relics.description.DescriptionSubcategory;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
@@ -14,22 +15,25 @@ import it.hurts.sskirillss.relics.client.screen.description.general.widgets.Reli
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.ScrollbarWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
+import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.DismantleRelicActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RankupRelicActionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.RelicIntroContainerWidget;
+import it.hurts.sskirillss.relics.client.screen.utils.misc.DismantleEffect;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.RankupEffect;
+import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.gui.components.events.GuiEventListener;
+import net.minecraft.client.gui.navigation.CommonInputs;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
@@ -41,6 +45,9 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
 
     @Getter
     private final RankupEffect rankupEffect = new RankupEffect();
+    @Getter
+    private final DismantleEffect dismantleEffect = new DismantleEffect(this);
+    private BigRelicCardWidget relicCard;
 
     public RelicDescriptionScreen(Player player, int container, int slot, Screen screen) {
         super(player, container, slot, screen);
@@ -48,19 +55,37 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
 
     @Override
     public void tick() {
-        super.tick();
+        dismantleEffect.tick();
 
+        if (dismantleEffect.isFinished()) {
+            onClose();
+            return;
+        }
+
+        super.tick();
         rankupEffect.tick();
+    }
+
+    @Override
+    protected ItemStack getDisplayedStack(ItemStack live) {
+        return dismantleEffect.displayedStack(live);
+    }
+
+    @Override
+    public void removed() {
+        dismantleEffect.reset();
+
+        super.removed();
     }
 
     @Override
     protected void init() {
         super.init();
 
-        if (this.stack == null || !(this.stack.getItem() instanceof IRelicItem relic))
+        if (!(stack.getItem() instanceof IRelicItem))
             return;
 
-        this.addRenderableWidget(new BigRelicCardWidget(x + 59, y + 43, this));
+        relicCard = this.addRenderableWidget(new BigRelicCardWidget(x + 59, y + 43, this));
 
         var introContainer = new RelicIntroContainerWidget(this);
 
@@ -72,7 +97,13 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
         this.addRenderableWidget(container);
         this.addRenderableWidget(new ScrollbarWidget(x + 279, y + 74, container));
 
-        this.addRenderableWidget(new RankupRelicActionWidget(x + 289, y + 84, this));
+        this.addRenderableWidget(new RankupRelicActionWidget(x + 289, y + 70, this));
+        this.addRenderableWidget(new DismantleRelicActionWidget(x + 289, y + 98, this));
+    }
+
+    @Override
+    protected float getSpaceBackgroundBrightness() {
+        return 1F + dismantleEffect.backgroundFlash(RenderUtils.getPartialTick(false));
     }
 
     @Override
@@ -105,21 +136,27 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
         var poseStack = guiGraphics.pose();
 
         poseStack.pushPose();
-
         poseStack.translate(rankupEffect.shakeX(pPartialTick), rankupEffect.shakeY(pPartialTick), 0F);
 
         super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
 
-        for (GuiEventListener listener : this.children()) {
-            if (listener instanceof AbstractButton button && button.isHovered()
-                    && button instanceof IHoverableWidget widget) {
-                guiGraphics.pose().translate(0, 0, 100);
-
-                widget.onHovered(guiGraphics, pMouseX, pMouseY);
+        if (dismantleEffect.isFinishing())
+            relicCard.renderItem(guiGraphics, pPartialTick);
+        else {
+            for (var listener : this.children()) {
+                if (listener instanceof AbstractButton button && button.isHovered()
+                        && button instanceof IHoverableWidget widget) {
+                    poseStack.translate(0, 0, 100);
+                    widget.onHovered(guiGraphics, pMouseX, pMouseY);
+                }
             }
         }
-
         poseStack.popPose();
+    }
+
+    @Override
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return dismantleEffect.isCommitted() || super.mouseClicked(mouseX, mouseY, button);
     }
 
     @Override
@@ -130,14 +167,12 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
             return true;
         }
 
-        return super.keyPressed(pKeyCode, pScanCode, pModifiers);
+        return dismantleEffect.isCommitted() && CommonInputs.selected(pKeyCode) || super.keyPressed(pKeyCode, pScanCode, pModifiers);
     }
 
     @Override
     public void onClose() {
-        screen.rebuildWidgets();
-
-        Minecraft.getInstance().setScreen(screen);
+        minecraft.setScreen(dismantleEffect.isCommitted() ? getReturnScreen() : screen);
     }
 
     @Override
@@ -146,7 +181,7 @@ public class RelicDescriptionScreen extends DescriptionScreen implements ITabbed
     }
 
     @Override
-    public it.hurts.sskirillss.relics.api.relics.description.DescriptionCategory getCategory() {
+    public DescriptionCategory getCategory() {
         return DescriptionCategories.getCategory("relic");
     }
 }

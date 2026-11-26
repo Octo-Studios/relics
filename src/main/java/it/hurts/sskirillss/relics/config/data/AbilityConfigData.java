@@ -15,12 +15,12 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AbilityConfigData {
-    @Prop(comment = "Number of leveling points needed to increase the ability level")
-    private int requiredPoints;
+    @Prop(comment = "Weight of this ability in the relic level cap")
+    private int levelWeight;
     @Prop(comment = "Relic level at which the ability becomes unlocked")
     private int requiredLevel;
-    @Prop(comment = "Highest level to which the ability can be upgraded")
-    private int maxLevel;
+    @Prop(comment = "Base level contribution of this ability to the relic level cap")
+    private int levelContribution;
 
     private Map<String, StatConfigData> stats = new LinkedHashMap<>();
 
@@ -28,9 +28,9 @@ public class AbilityConfigData {
         var template = relic.getDefaultAbilityTemplate(ability);
 
         return template.toBuilder()
-                .requiredPoints(requiredPoints)
+                .levelWeight(levelWeight)
                 .requiredLevel(requiredLevel)
-                .initialMaxLevel(maxLevel)
+                .levelContribution(levelContribution)
                 .stats(template.getStats().entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> stats.get(entry.getKey()).toData(relic, ability, entry.getKey()), (o1, o2) -> o1, LinkedHashMap::new)))
                 .build();
     }

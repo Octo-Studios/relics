@@ -28,9 +28,9 @@ public class RelicsScalingModels {
     public static final Supplier<ScalingModel> EXPONENTIAL_DECAY = UPGRADE_OPERATIONS.register("exponential_decay", ExponentialDecayScalingModel::new);
 
     /**
-     * Scales using exponential saturation controlled by the modifier: value + modifier * (1 - e^(-points * modifier)). Grows very quickly at first, then saturates earlier or later depending on the modifier.
+     * Applies exponential saturation using value + modifier * (1 - e^(-iterations * abs(modifier))). Positive modifiers raise the value and negative modifiers lower it, with diminishing changes each step.
      *
-     * @implNote Unlike standard exponential decay, this version uses the modifier in the exponent itself, allowing fine control over how early saturation occurs.
+     * @implNote The curve approaches value + modifier. The absolute modifier in the exponent determines how quickly the curve approaches that limit.
      * @see ExponentialSaturationScalingModel#evaluate
      */
     public static final Supplier<ScalingModel> EXPONENTIAL_SATURATION = UPGRADE_OPERATIONS.register("exponential_saturation", ExponentialSaturationScalingModel::new);

@@ -108,18 +108,29 @@ public class AbilityData {
         return new AbilityRankModifierData(this, rankModifier);
     }
 
-    public int getLevel() {
-        return getComponent().getPoints();
+    private double getProgress(int rank) {
+        var template = getTemplate();
+        var leveling = getAbilitiesData().getRelicData().getLevelingData();
+
+        return leveling.getRank() >= template.getRequiredRank() ? leveling.getLevelProgress(rank, template.getRequiredLevel()) : 0D;
     }
 
-    public void setLevel(int points) {
-        setComponent(getComponent().toBuilder()
-                .points(points)
-                .build());
+    public double getProgress() {
+        return getProgress(getAbilitiesData().getRelicData().getLevelingData().getRank());
     }
 
-    public void addLevel(int points) {
-        setLevel(getLevel() + points);
+    public int getProgressPercent() {
+        var progress = getProgress();
+
+        return progress >= 1D ? 100 : Math.min(99, (int) Math.round(progress * 100));
+    }
+
+    public double getOverallProgress() {
+        return getProgress(getAbilitiesData().getRelicData().getTemplate().getLeveling().getMaxRank());
+    }
+
+    public boolean hasStats() {
+        return !getTemplate().getStats().isEmpty();
     }
 
     public String getMode() {
@@ -274,7 +285,7 @@ public class AbilityData {
     }
 
     public boolean isUnlocked() {
-        return isEnoughLevel() && getLockData().isUnlocked() && getResearchData().isResearched();
+        return isEnoughLevel() && isEnoughRank() && getLockData().isUnlocked() && getResearchData().isResearched();
     }
 
     public boolean canPlayerUse(LivingEntity entity) {
@@ -427,55 +438,11 @@ public class AbilityData {
     }
 
     public boolean mayUnlock() {
-        return isEnoughLevel() && !getLockData().isUnlocked();
+        return isEnoughLevel() && isEnoughRank() && !getLockData().isUnlocked();
     }
 
     public boolean mayResearch() {
-        return isEnoughLevel() && getLockData().isUnlocked() && !getResearchData().isResearched();
-    }
-
-    public int getUpgradePlayerExperienceCost() {
-        return (getLevel() + 1) * 50;
-    }
-
-    public boolean canBeUpgraded() {
-        var template = getTemplate();
-
-        return template.getInitialMaxLevel() > 0 && !template.getStats().isEmpty();
-    }
-
-    public boolean mayUpgrade() {
-        var template = getTemplate();
-
-        return template != null
-                && template.getInitialMaxLevel() > 0 && !template.getStats().isEmpty()
-                && !isMaxLevel()
-                && this.getAbilitiesData().getRelicData().getLevelingData().getPoints() >= template.getRequiredPoints()
-                && isUnlocked();
-    }
-
-    public boolean mayPlayerUpgrade() {
-        var entity = this.getAbilitiesData().getRelicData().getEntity();
-
-        if (!(entity instanceof Player player))
-            return false;
-
-        return mayUpgrade() && EntityUtils.getPlayerTotalExperience(player) >= getUpgradePlayerExperienceCost();
-    }
-
-    public boolean upgrade() {
-        var entity = this.getAbilitiesData().getRelicData().getEntity();
-
-        if (!(entity instanceof Player player) || !this.mayPlayerUpgrade())
-            return false;
-
-        player.giveExperiencePoints(-this.getUpgradePlayerExperienceCost());
-
-        this.setLevel(getLevel() + 1);
-
-        this.getAbilitiesData().getRelicData().getLevelingData().addPoints(-getTemplate().getRequiredPoints());
-
-        return true;
+        return isEnoughLevel() && isEnoughRank() && getLockData().isUnlocked() && !getResearchData().isResearched();
     }
 
     public int getRerollPlayerExperienceCost() {
@@ -483,9 +450,7 @@ public class AbilityData {
     }
 
     public boolean mayReroll() {
-        var template = getTemplate();
-
-        return template != null && !template.getStats().isEmpty() && isUnlocked();
+        return isUnlocked() && hasStats();
     }
 
     public boolean mayPlayerReroll() {
@@ -506,42 +471,6 @@ public class AbilityData {
         player.giveExperiencePoints(-this.getRerollPlayerExperienceCost());
 
         this.randomizeStats();
-
-        return true;
-    }
-
-    public int getResetPlayerExperienceCost() {
-        return this.getLevel() * 250;
-    }
-
-    public boolean mayReset() {
-        return this.getLevel() > 0 && this.isUnlocked();
-    }
-
-    public boolean mayPlayerReset() {
-        var entity = this.getAbilitiesData().getRelicData().getEntity();
-
-        if (!(entity instanceof Player player))
-            return false;
-
-        var template = this.getTemplate();
-
-        return template != null && !template.getStats().isEmpty()
-                && this.mayReset()
-                && EntityUtils.getPlayerTotalExperience(player) >= this.getResetPlayerExperienceCost();
-    }
-
-    public boolean reset() {
-        var entity = this.getAbilitiesData().getRelicData().getEntity();
-
-        if (!(entity instanceof Player player) || !this.mayPlayerReset())
-            return false;
-
-        player.giveExperiencePoints(-getResetPlayerExperienceCost());
-
-        this.getAbilitiesData().getRelicData().getLevelingData().addPoints(this.getLevel() * this.getTemplate().getRequiredPoints());
-
-        this.setLevel(0);
 
         return true;
     }
@@ -578,31 +507,7 @@ public class AbilityData {
         return (int) Mth.clamp(Math.floor(avg), min + 1, max - 1);
     }
 
-    public boolean isMaxLevel() {
-        var template = getTemplate();
-
-        return template != null && getLevel() >= template.getInitialMaxLevel();
-    }
-
     public boolean isMaxQuality() {
         return calculateQuality() >= getMaxQuality();
-    }
-
-    public boolean isUpgradeEnabled() {
-        var template = getTemplate();
-
-        return template != null && isUnlocked() && !template.getStats().isEmpty();
-    }
-
-    public boolean isRerollEnabled() {
-        var template = getTemplate();
-
-        return template != null && isUnlocked() && !template.getStats().isEmpty();
-    }
-
-    public boolean isResetEnabled() {
-        var template = getTemplate();
-
-        return template != null && isUnlocked() && !template.getStats().isEmpty();
     }
 }

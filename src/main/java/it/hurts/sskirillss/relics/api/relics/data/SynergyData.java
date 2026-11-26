@@ -2,18 +2,13 @@ package it.hurts.sskirillss.relics.api.relics.data;
 
 import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.LockComponent;
-import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.synergies.SynergyComponent;
 import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.AbilityConditionTemplate;
 import it.hurts.sskirillss.relics.api.relics.synergies.conditions.RelicConditionTemplate;
-import it.hurts.sskirillss.relics.init.RelicsRegistries;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.List;
-import java.util.Map;
 
 public class SynergyData {
     private final AbilitiesData abilitiesData;
@@ -67,7 +62,7 @@ public class SynergyData {
         if (totalAbilities == 0)
             return 0D;
 
-        double progressSum = 0D;
+        var progressSum = 0D;
 
         for (var condition : conditions) {
             var abilityConditions = condition.getAbilityConditions();
@@ -85,12 +80,15 @@ public class SynergyData {
             if (relicStacks.isEmpty())
                 continue;
 
-            double bestProgress = 0D;
+            var bestProgress = 0D;
 
             for (var stack : relicStacks) {
                 var relicData = relic.getRelicData(entity, stack);
+                if (!meetsConditions(relicData, condition))
+                    continue;
+
                 var conditionAbilitiesData = relicData.getAbilitiesData();
-                double stackProgress = 0D;
+                var stackProgress = 0D;
 
                 for (var abilityCondition : abilityConditions) {
                     var abilityData = conditionAbilitiesData.getAbilityData(abilityCondition.getId());
@@ -194,23 +192,15 @@ public class SynergyData {
 
         var relicStacks = this.findRelicStacks(relic, condition.getRelicContainers());
 
-        if (relicStacks.isEmpty())
-            return false;
-
         for (var stack : relicStacks) {
-            var relicData = relic.getRelicData(entity, stack);
-
-            if (!this.isRelicDataSatisfied(relicData, condition))
-                continue;
-
-            if (this.areAbilityConditionsSatisfied(relicData, condition.getAbilityConditions()))
+            if (meetsConditions(relic.getRelicData(entity, stack), condition))
                 return true;
         }
 
         return false;
     }
 
-    private boolean isRelicDataSatisfied(RelicData relicData, RelicConditionTemplate condition) {
+    private boolean meetsConditions(RelicData relicData, RelicConditionTemplate condition) {
         var levelingData = relicData.getLevelingData();
 
         if (levelingData.getLevel() < condition.getLevel())
@@ -219,10 +209,11 @@ public class SynergyData {
         if (levelingData.getRank() < condition.getRank())
             return false;
 
-        if (relicData.calculateQuality() < condition.getQuality())
+        if (condition.getQuality() > 0 && relicData.calculateQuality() < condition.getQuality())
             return false;
 
-        return relicData.calculateProgress() >= condition.getProgress();
+        return (condition.getProgress() <= 0D || relicData.calculateProgress() >= condition.getProgress())
+                && areAbilityConditionsSatisfied(relicData, condition.getAbilityConditions());
     }
 
     private boolean areAbilityConditionsSatisfied(RelicData relicData, List<AbilityConditionTemplate> conditions) {
@@ -234,10 +225,10 @@ public class SynergyData {
             if (abilityData == null || !abilityData.isUnlocked())
                 return false;
 
-            if (abilityData.getLevel() < abilityCondition.getLevel())
+            if (abilityCondition.getProgress() > 0D && abilityData.getOverallProgress() < abilityCondition.getProgress())
                 return false;
 
-            if (abilityData.calculateQuality() < abilityCondition.getQuality())
+            if (abilityCondition.getQuality() > 0 && abilityData.calculateQuality() < abilityCondition.getQuality())
                 return false;
         }
 
@@ -245,24 +236,13 @@ public class SynergyData {
     }
 
     private double calculateAbilityProgress(AbilityData abilityData, AbilityConditionTemplate condition) {
-        if (abilityData == null)
-            return 0D;
+        var minimum = condition.getProgress();
+        var progress = abilityData.getOverallProgress();
 
-        var template = abilityData.getTemplate();
+        if (minimum >= 1D)
+            return progress >= minimum ? 1D : 0D;
 
-        if (template == null)
-            return 0D;
-
-        var maxLevel = template.getInitialMaxLevel();
-        var minLevel = condition.getLevel();
-
-        if (maxLevel <= minLevel)
-            return abilityData.getLevel() >= minLevel ? 1D : 0D;
-
-        var currentLevel = abilityData.getLevel();
-        var progress = (currentLevel - minLevel) / (double) (maxLevel - minLevel);
-
-        return Math.clamp(progress, 0D, 1D);
+        return Math.clamp((progress - minimum) / (1D - minimum), 0D, 1D);
     }
 
     private List<ItemStack> findRelicStacks(IRelicItem relic, List<RelicContainer> containers) {

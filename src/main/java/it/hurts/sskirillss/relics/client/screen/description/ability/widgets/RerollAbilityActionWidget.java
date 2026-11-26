@@ -1,17 +1,16 @@
 package it.hurts.sskirillss.relics.client.screen.description.ability.widgets;
 
-import com.mojang.blaze3d.platform.InputConstants;
-import com.mojang.blaze3d.systems.RenderSystem;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.ability.widgets.base.AbstractAbilityActionWidget;
+import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.init.RelicsHotkeys;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
-import it.hurts.sskirillss.relics.network.packets.leveling.PacketAbilityTweak;
+import it.hurts.sskirillss.relics.network.packets.leveling.C2SRerollAbility;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -23,64 +22,60 @@ import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FormattedCharSequence;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
+public class RerollAbilityActionWidget extends AbstractDescriptionWidget implements IHoverableWidget {
+    private final AbilityDescriptionScreen screen;
+
     public RerollAbilityActionWidget(int x, int y, AbilityDescriptionScreen screen) {
-        super(x, y, PacketAbilityTweak.Operation.REROLL, screen);
+        super(x, y, 14, 14);
+
+        this.screen = screen;
     }
 
     @Override
     public boolean isLocked() {
-        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
+        if (DescriptionUtils.getEditableRelicSlot(minecraft.player, screen.getContainer(), screen.getSlot()) == null
+                || !(screen.getStack().getItem() instanceof IRelicItem relic))
             return true;
 
-        return !relic.getRelicData(minecraft.player, getScreen().getStack()).getAbilitiesData().getAbilityData(getAbility()).mayPlayerReroll();
+        return !relic.getRelicData(minecraft.player, screen.getStack()).getAbilitiesData().getAbilityData(screen.getSelectedAbility()).mayPlayerReroll();
     }
 
     @Override
     public void playDownSound(SoundManager handler) {
         var player = minecraft.player;
-        var stack = getScreen().getStack();
+        var stack = screen.getStack();
 
         if (isLocked() || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility());
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(screen.getSelectedAbility());
 
-        if (abilityData.calculateQuality() == abilityData.getMaxQuality() && !Screen.hasShiftDown())
+        if (abilityData.isMaxQuality() && !Screen.hasShiftDown())
             return;
 
         handler.play(SimpleSoundInstance.forUI(RelicsSounds.TABLE_REROLL.get(), 1F));
     }
 
-    @Override
     public List<MutableComponent> buildDescription() {
-        var description = super.buildDescription();
+        var description = new ArrayList<MutableComponent>();
 
         var player = this.minecraft.player;
-        var stack = this.getScreen().getStack();
+        var stack = screen.getStack();
         var relic = (IRelicItem) stack.getItem();
-
-        var key = RelicsHotkeys.RESEARCH_RELIC.getKey().getValue();
-
-        var hasShiftDown = key != GLFW.GLFW_KEY_UNKNOWN && InputConstants.isKeyDown(minecraft.getWindow().getWindow(), key);
 
         var newLine = Component.literal(" ");
 
         var currentExperience = EntityUtils.getPlayerTotalExperience(player);
-        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility());
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(screen.getSelectedAbility());
         var requiredExperience = abilityData.getRerollPlayerExperienceCost();
         var hasExperience = requiredExperience <= currentExperience;
 
-        var quality = abilityData.calculateQuality();
-        var maxQuality = abilityData.getMaxQuality();
-
-        var isMaxQuality = quality >= maxQuality;
+        var isMaxQuality = abilityData.isMaxQuality();
+        var quick = !isMaxQuality && Screen.hasShiftDown();
 
         description.add(Component.translatable("relics.description.ability.reroll.title")
                 .withStyle(ChatFormatting.BOLD)
@@ -96,25 +91,25 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
         var relativeLevelCost = hasExperience ? EntityUtils.calculateExperienceLevelLoss(player, requiredExperience) : EntityUtils.getLevelFromTotalExperience(requiredExperience);
 
         description.add(Component.literal("   ● ")
-                .append(Component.translatable("relics.description.ability.reroll.cost.entry_1", !isMaxQuality && hasShiftDown ? (requiredExperience + "+") : requiredExperience, !isMaxQuality && hasShiftDown ? (relativeLevelCost + "+") : relativeLevelCost)
+                .append(Component.translatable("relics.description.ability.reroll.cost.entry_1", quick ? (requiredExperience + "+") : requiredExperience, quick ? (relativeLevelCost + "+") : relativeLevelCost)
                         .withColor(hasExperience ? DescriptionUtils.POSITIVE_COLOR(true) : DescriptionUtils.NEGATIVE_COLOR(true))));
 
         description.add(newLine);
 
         if (isMaxQuality)
-            description.add(Component.translatable("relics.description.ability.reroll.max_quality", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName().getString())
+            description.add(Component.translatable("relics.description.ability.reroll.max_quality", "Shift")
                     .withColor(DescriptionUtils.NEGATIVE_COLOR(true)));
         else
-            description.add(Component.translatable("relics.description.ability.reroll.auto", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName().getString())
+            description.add(Component.translatable("relics.description.ability.reroll.auto", "Shift")
                     .withColor(DescriptionUtils.NEUTRAL_COLOR(true)));
 
         description.add(newLine);
 
-        if (hasShiftDown)
+        if (RelicsHotkeys.isHeld(RelicsHotkeys.RESEARCH_RELIC))
             description.add(Component.translatable("relics.description.ability.reroll.description")
                     .withStyle(ChatFormatting.ITALIC));
         else
-            description.add(Component.translatable("relics.general.hold_shift", RelicsHotkeys.RESEARCH_RELIC.getKey().getDisplayName().getString()));
+            description.add(Component.translatable("relics.general.hold_shift", RelicsHotkeys.RESEARCH_RELIC.getTranslatedKeyMessage()));
 
         return description;
     }
@@ -122,44 +117,43 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
     @Override
     public void onPress() {
         var player = minecraft.player;
-        var stack = getScreen().getStack();
+        var stack = screen.getStack();
 
-        if (isLocked() || !(getScreen().getStack().getItem() instanceof IRelicItem relic))
+        if (isLocked() || !(stack.getItem() instanceof IRelicItem relic))
             return;
 
-        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility());
-        boolean hasWarning = abilityData.calculateQuality() == abilityData.getMaxQuality();
+        var ability = screen.getSelectedAbility();
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
+        var hasWarning = abilityData.isMaxQuality();
 
         if (hasWarning && !Screen.hasShiftDown())
             return;
 
-        NetworkHandler.sendToServer(new PacketAbilityTweak(getScreen().getContainer(), getScreen().getSlot(), getAbility(), PacketAbilityTweak.Operation.REROLL, !hasWarning && Screen.hasShiftDown()));
+        NetworkHandler.sendToServer(new C2SRerollAbility(screen.getContainer(), screen.getSlot(), stack.getItem(), ability, hasWarning, Screen.hasShiftDown()));
     }
 
     @Override
     public void renderWidget(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         var player = minecraft.player;
-        var stack = getScreen().getStack();
+        var stack = screen.getStack();
 
-        if (!(getScreen().getStack().getItem() instanceof IRelicItem relic))
+        if (!(stack.getItem() instanceof IRelicItem relic))
             return;
 
         var poseStack = guiGraphics.pose();
 
-        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(getAbility());
-        var isWarning = abilityData.calculateQuality() == abilityData.getMaxQuality();
-        var isQuick = Screen.hasShiftDown() && abilityData.mayPlayerReroll();
+        var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(screen.getSelectedAbility());
+        var isWarning = abilityData.isMaxQuality();
+        var locked = isLocked();
+        var isQuick = Screen.hasShiftDown() && !locked;
 
-        var color = (isWarning && Screen.hasShiftDown()) || isQuick ? (float) (1.05F + (Math.sin((player.tickCount + (getAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;
+        var color = isQuick ? (float) (1.05F + (Math.sin((player.tickCount + (screen.getSelectedAbility().length() * 10)) * 0.5F) * 0.1F)) : 1F;
 
-        RenderSystem.setShaderColor(color, color, color, 1F);
-
-        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/reroll_button_" + (isLocked() ? "inactive" : "active" + (isWarning ? "_warning" : isQuick ? "_quick" : "")) + ".png"), poseStack)
+        GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/ability/reroll_button_" + (locked ? "inactive" : "active" + (isWarning ? "_warning" : isQuick ? "_quick" : "")) + ".png"), poseStack)
                 .anchor(SpriteAnchor.TOP_LEFT)
+                .color(color, color, color, 1F)
                 .pos(this.getX(), this.getY())
                 .end();
-
-        RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
 
         if (this.isHovered())
             GUIRenderer.begin(DescriptionTextures.ACTION_BUTTON_OUTLINE, poseStack)
@@ -170,39 +164,6 @@ public class RerollAbilityActionWidget extends AbstractAbilityActionWidget {
 
     @Override
     public void onHovered(GuiGraphics guiGraphics, int mouseX, int mouseY) {
-        List<FormattedCharSequence> tooltip = new ArrayList<>();
-
-        var poseStack = guiGraphics.pose();
-
-        int maxWidth = 150;
-        int renderWidth = 0;
-
-        for (var entry : this.buildDescription()) {
-            var entryWidth = (minecraft.font.width(entry) + 4) / 2;
-
-            if (entryWidth > renderWidth)
-                renderWidth = Math.min(entryWidth, maxWidth);
-
-            tooltip.addAll(minecraft.font.split(entry, maxWidth * 2));
-        }
-
-        var height = Math.round(tooltip.size() * 5F);
-
-        var renderX = getX() + width + 1;
-        var renderY = mouseY - (height / 2) - 9;
-
-        DescriptionUtils.drawTooltipBackground(guiGraphics, renderWidth, height, renderX, renderY);
-
-        var yOff = 0;
-
-        poseStack.scale(0.5F, 0.5F, 0.5F);
-
-        for (FormattedCharSequence entry : tooltip) {
-            guiGraphics.drawString(minecraft.font, entry, (renderX + 10) * 2, (renderY + 9 + yOff) * 2, DescriptionUtils.TEXT_COLOR, false);
-
-            yOff += 5;
-        }
-
-        poseStack.scale(1F, 1F, 1F);
+        DescriptionUtils.drawActionTooltip(guiGraphics, minecraft.font, buildDescription(), getX() + width + 1, mouseY);
     }
 }

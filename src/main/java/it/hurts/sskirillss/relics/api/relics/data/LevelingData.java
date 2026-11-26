@@ -2,11 +2,12 @@ package it.hurts.sskirillss.relics.api.relics.data;
 
 import it.hurts.sskirillss.relics.api.events.relic.leveling.RelicExperienceChangeEvent;
 import it.hurts.sskirillss.relics.api.events.relic.leveling.RelicLevelChangeEvent;
-import it.hurts.sskirillss.relics.api.events.relic.leveling.RelicLevelingPointsChangeEvent;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.LevelingComponent;
+import it.hurts.sskirillss.relics.handlers.RankHandler;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.NeoForge;
 
@@ -41,6 +42,16 @@ public class LevelingData {
         return getComponent().getLevel();
     }
 
+    public double getLevelProgress(int rank) {
+        return getLevelProgress(rank, 0);
+    }
+
+    public double getLevelProgress(int rank, int startLevel) {
+        var maxLevel = relicData.calculateMaxLevel(rank);
+
+        return maxLevel > startLevel ? Math.clamp((double) (getLevel() - startLevel) / (maxLevel - startLevel), 0D, 1D) : 0D;
+    }
+
     public void setLevel(int level) {
         setComponent(getComponent().toBuilder()
                 .level(Math.max(0, level))
@@ -63,12 +74,7 @@ public class LevelingData {
         if (NeoForge.EVENT_BUS.post(event).isCanceled() || event.getDelta() == 0)
             return false;
 
-        var delta = event.getDelta();
-        var newLevel = currentLevel + delta;
-
-        setLevel(newLevel);
-
-        addPoints(delta);
+        setLevel(currentLevel + event.getDelta());
 
         return true;
     }
@@ -78,8 +84,10 @@ public class LevelingData {
     }
 
     public void setExperience(double experience) {
+        var level = getLevel();
+
         setComponent(getComponent().toBuilder()
-                .experience(Math.clamp(experience, 0D, getTotalExperienceForLevel(getLevel() + 1)))
+                .experience(Math.clamp(experience, 0D, getTotalExperienceBetweenLevels(level, level + 1)))
                 .build());
     }
 
@@ -94,8 +102,12 @@ public class LevelingData {
         if (!(event.getStack().getItem() instanceof IRelicItem relic))
             return false;
 
-        relic.getRelicData(event.getBearer(), event.getStack()).getLevelingData().addSourceExperience(ability, experienceSource, delta);
-        relic.getRelicData(event.getBearer(), event.getStack()).getLevelingData().addExperience(delta);
+        var leveling = relic.getRelicData(event.getBearer(), event.getStack()).getLevelingData();
+
+        if (!leveling.addExperience(delta))
+            return false;
+
+        leveling.addSourceExperience(ability, experienceSource, delta);
 
         return true;
     }
@@ -172,71 +184,12 @@ public class LevelingData {
         }
 
         if (amount < 0)
-            xp = 0;
+            xp += amount;
 
-        setExperience(xp);
-
-        if (level != oldLevel)
-            addLevel(level - oldLevel);
-
-        return true;
-    }
-
-    public int getPoints() {
-        return getComponent().getPoints();
-    }
-
-    public void setPoints(int amount) {
-        setComponent(getComponent().toBuilder()
-                .points(Math.max(0, amount))
-                .build());
-    }
-
-    public boolean addPoints(int amount) {
-        var event = new RelicLevelingPointsChangeEvent(this.getRelicData().getEntity(), this.getRelicData().getStack(), amount);
-
-        if (NeoForge.EVENT_BUS.post(event).isCanceled())
+        if (level != oldLevel && !addLevel(level - oldLevel))
             return false;
 
-        var delta = event.getDelta();
-        var currentPoints = getPoints();
-        var maxLevel = this.getRelicData().calculateMaxLevel();
-        var newPoints = currentPoints + delta;
-
-        if (newPoints < 0) {
-            var deficit = -newPoints;
-
-            var abilitiesData = this.getRelicData().getAbilitiesData();
-
-            var abilities = abilitiesData.getAbilityIDs().stream()
-                    .filter(ability -> abilitiesData.getAbilityData(ability).getLevel() > 0)
-                    .toList();
-
-            var comparator = java.util.Comparator.comparingInt((String ability) -> abilitiesData.getAbilityData(ability).getTemplate().getRequiredPoints());
-
-            var sortedAbilities = deficit == 1
-                    ? abilities.stream().sorted(comparator).toList()
-                    : abilities.stream().sorted(comparator.reversed()).toList();
-
-            for (var ability : sortedAbilities) {
-                var abilityData = abilitiesData.getAbilityData(ability);
-
-                while (deficit > 0 && abilityData.getLevel() > 0) {
-                    var cost = abilityData.getTemplate().getRequiredPoints();
-
-                    abilityData.addLevel(-1);
-
-                    deficit -= cost;
-                }
-
-                if (deficit <= 0)
-                    break;
-            }
-
-            newPoints = deficit < 0 ? -deficit : 0;
-        }
-
-        setPoints(Math.clamp(newPoints, 0, maxLevel));
+        setExperience(xp);
 
         return true;
     }
@@ -267,21 +220,15 @@ public class LevelingData {
         if (level <= 0)
             return 0;
 
-        var template = this.getRelicData().getTemplate().getLeveling();
+        var template = getTemplate();
         var operation = template.getScalingModel();
 
         var total = 0D;
 
-        for (int i = 0; i < level; i++)
+        for (var i = 0; i < level; i++)
             total += operation.evaluate(this.getRelicData().getEntity(), this.getRelicData().getStack(), template.getInitialCost(), template.getStep(), i);
 
-        return (int) Math.floor(total * getRankExperienceMultiplier());
-    }
-
-    public double getRankExperienceMultiplier() {
-        var template = this.getRelicData().getTemplate().getLeveling();
-
-        return Math.max(0D, template.getRankScalingModel().evaluate(this.getRelicData().getEntity(), this.getRelicData().getStack(), 1D, template.getRankStep(), getRank()));
+        return Math.floor(total);
     }
 
     public int getLevelFromExperience(int experience) {
@@ -297,39 +244,37 @@ public class LevelingData {
         return result - 1;
     }
 
-    public boolean isPointsMismatch() {
-        int current = getPoints();
-
-        var abilitiesData = this.getRelicData().getAbilitiesData();
-
-        for (var data : this.getRelicData().getTemplate().getAbilities().getAbilities().values())
-            current += abilitiesData.getAbilityData(data.getId()).getComponent().getPoints() * data.getRequiredPoints();
-
-        return current != getLevel();
-    }
-
     public int getRankupPlayerExperienceCost() {
         return (int) Math.round(this.getRelicData().getTemplate().getLeveling().getRankupCost() * (getRank() + 1));
     }
 
-    public boolean mayRankup() {
-        var levelingTemplate = this.getRelicData().getTemplate().getLeveling();
+    public int getRankupRankPointCost() {
+        return 1;
+    }
 
-        return getLevel() >= this.getRelicData().calculateMaxLevel() && getRank() < levelingTemplate.getMaxRank();
+    public long getDismantleRankPointReward() {
+        return 1L + getRank();
+    }
+
+    public boolean mayRankup() {
+        return !getRelicData().isMaxRank();
     }
 
     public boolean mayPlayerRankup() {
         if (!(this.getRelicData().getEntity() instanceof Player player))
             return false;
 
-        return mayRankup() && EntityUtils.getPlayerTotalExperience(player) >= getRankupPlayerExperienceCost();
+        return mayRankup() && EntityUtils.getPlayerTotalExperience(player) >= getRankupPlayerExperienceCost()
+                && RankHandler.getRankPoints(player, getRelicData().getStack().getItem()) >= getRankupRankPointCost();
     }
 
     public boolean rankup() {
-        if (!(this.getRelicData().getEntity() instanceof Player player) || !mayPlayerRankup())
+        if (!(this.getRelicData().getEntity() instanceof ServerPlayer player) || !mayPlayerRankup())
             return false;
 
         player.giveExperiencePoints(-getRankupPlayerExperienceCost());
+
+        RankHandler.addRankPoints(player, getRelicData().getStack().getItem(), -getRankupRankPointCost());
 
         addRank(1);
 

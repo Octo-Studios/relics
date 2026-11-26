@@ -49,15 +49,11 @@
   "relics.description.researching.research.hint.quick": "按住 [Shift] 可进行全自动能力研究。",
   "relics.description.researching.research.hint.locked": "该能力已完成研究！",
 
-  "relics.description.researching.general.leveling_point.title": "升级点数：",
-  "relics.description.researching.general.leveling_point.extra_info": "遗物升级时获得，用于升级能力。",
-
   "relics.description.researching.general.player_experience.title_1": "经验值：",
   "relics.description.researching.general.player_experience.title_2": "%1$s [%2$s 级]",
   "relics.description.researching.general.player_experience.extra_info": "原版 Minecraft 的玩家经验。通过击杀生物、挖掘矿石、烧炼物品等方式获得。",
 
   "relics.description.researching.general.relic_progress.title": "遗物发展进度：",
-  "relics.description.researching.general.relic_progress.extra_info": "显示遗物与其最大潜能的接近程度。由遗物和能力的基础品质与等级决定。",
 
   "relics.description.researching.general.relic_rank.title": "遗物品阶：",
   "relics.description.researching.general.relic_rank.extra_info": "通过手动提升遗物品阶获得，此举会提高其最高等级。",
@@ -66,7 +62,6 @@
   "relics.description.researching.relic.card.low_rank": "要解锁此能力，你必须将遗物品阶提升至 %1$s！",
   "relics.description.researching.relic.card.unresearched": "要使用此能力，你必须完成研究！",
   "relics.description.researching.relic.card.ready_to_unlock": "能力已准备就绪，可以解锁！剩余点击次数：%1$s",
-  "relics.description.researching.relic.card.ready_to_upgrade": "能力已准备就绪，可以升级！",
 
   "relics.description.researching.tab.relic": "遗物",
   "relics.description.researching.tab.ability": "能力",
@@ -85,9 +80,7 @@
   "relics.description.researching.relic.info.extra_info": "遗物品质是所有当前已解锁能力品质的算术平均值，以 0.5 为步长，取值范围为 1 到 5 分。它纯粹是一个视觉指标，显示物品初始随机特性与理想可能值的接近程度。要提高遗物整体品质，必须单独考虑每项能力。",
 
   "relics.description.researching.relic.experience.title": "遗物经验：",
-  "relics.description.researching.relic.experience.extra_info": "通过使用遗物能力达到预期目的获得（更多详情可在经验来源部分找到）。当达到最大经验时，遗物等级和升级点数增加 1，使你能够解锁以前无法使用的能力或改进现有能力。",
 
-  "relics.description.researching.ability.info.level": "能力等级：",
   "relics.description.researching.ability.info.quality": "能力品质：",
   "relics.description.researching.ability.info.extra_info": "能力品质与遗物品质类似，是能力所有属性品质的算术平均值，以 0.5 为步长，取值范围为 1 到 5 分。它纯粹是一个视觉指标，显示能力初始随机特性与理想可能值的接近程度。要提高能力品质，你必须重掷其随机属性，直到获得更好的数值。",
 
@@ -105,28 +98,15 @@
   "relics.description.general.cost.title": "消耗",
 
   "relics.description.relic.rankup.title": "遗物晋升",
-  "relics.description.relic.rankup.cost.entry_1": "%1$s 遗物等级",
-  "relics.description.relic.rankup.cost.entry_2": "%1$s 经验值（%2$s 相对等级）",
+  "relics.description.relic.rankup.cost.entry_1": "%1$s 经验值（%2$s 相对等级）",
   "relics.description.relic.rankup.max_rank": "遗物已达到最高品阶，无法继续提升！",
   "relics.description.relic.rankup.description": "提高遗物的品阶，从而提高其最高等级并改变某些能力的行为。",
-
-  "relics.description.ability.levelup.title": "能力升级",
-  "relics.description.ability.levelup.cost.entry_1": "%1$s 经验值（%2$s 相对等级）",
-  "relics.description.ability.levelup.cost.entry_2": "%1$s 升级点数",
-  "relics.description.ability.levelup.auto": "在此操作期间按住 [%1$s] 将自动升级能力，直到经验或升级点数耗尽。",
-  "relics.description.ability.levelup.max_level": "能力已达到最高等级，无法继续提升！",
-  "relics.description.ability.levelup.description": "提高当前能力等级，改进其属性。",
 
   "relics.description.ability.reroll.title": "重掷能力属性",
   "relics.description.ability.reroll.cost.entry_1": "%1$s 经验值（%2$s 相对等级）",
   "relics.description.ability.reroll.auto": "在此操作期间按住 [%1$s] 将自动重掷属性，直到达到最高稀有度或经验值耗尽。",
   "relics.description.ability.reroll.max_quality": "能力已达到最高品质，此操作必定会使其变差。使用前请按住 [%1$s] 以确认你理解可能的后果！",
   "relics.description.ability.reroll.description": "随机重掷该能力的属性数值，结果可能更好，也可能更差。",
-
-  "relics.description.ability.reset.title": "重置能力等级",
-  "relics.description.ability.reset.cost.entry_1": "%1$s 经验值（%2$s 相对等级）",
-  "relics.description.ability.reset.min_level": "能力已达到最低等级，无需重置！",
-  "relics.description.ability.reset.description": "将能力等级重置为最低，返还已使用的升级点数。",
 
   "relics.description.ability.rank_modifier.condition.rank": "从品阶 %1$s 开始：",
   "relics.description.ability.experience_source.condition.rank": "从品阶 %1$s 开始：",

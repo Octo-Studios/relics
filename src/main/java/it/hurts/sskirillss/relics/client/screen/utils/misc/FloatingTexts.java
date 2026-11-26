@@ -23,7 +23,7 @@ public class FloatingTexts {
         private boolean hold = false;
     }
 
-    private static final int DURATION = 22;
+    static final int DURATION = 22;
     private static final int MAX_ENTRIES = 8;
     private static final int HOLD_TIMEOUT = 200;
     private static final int MIN_ALPHA = 5;

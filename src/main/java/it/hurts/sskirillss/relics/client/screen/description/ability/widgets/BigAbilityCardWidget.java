@@ -8,13 +8,11 @@ import it.hurts.sskirillss.relics.api.relics.data.AbilityData;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.base.ITickingWidget;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
-import it.hurts.sskirillss.relics.client.screen.description.ability.misc.PointsRefundEffect;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.base.AbstractDescriptionWidget;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.widgets.BigRelicCardWidget;
-import it.hurts.sskirillss.relics.client.screen.utils.misc.AnimatedValue;
-import it.hurts.sskirillss.relics.client.screen.utils.misc.DeltaCounter;
+import it.hurts.sskirillss.relics.client.screen.utils.ScreenUtils;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.FloatingTexts;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.GrayscaleTextures;
 import it.hurts.sskirillss.relics.client.screen.utils.misc.LevelUpEffect;
@@ -43,12 +41,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
     public static final int STAR_COUNT = 5;
 
     private static final int STAR_TINT = UIParticles.GOLD;
-    private static final int LEVEL_UP_COLOR = 0xFFE278;
-    private static final int LEVEL_DOWN_COLOR = RerollAnimation.TINT_DOWN;
 
-    private static final int MAX_PARTICLES = 200;
-    private static final int LEVEL_UP_PARTICLES = 40;
-    private static final int LEVEL_UP_PARTICLES_PER_LEVEL = 8;
     private static final int REROLL_PARTICLES_MAXED = 220;
     private static final int REROLL_PARTICLES_UP = 60;
     private static final int REROLL_PARTICLES_UP_PER_STAR = 20;
@@ -59,16 +52,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
     private static final int STAR_BURST_PARTICLES = 10;
     private static final int STAR_BURST_PARTICLES_PER_STATE = 4;
     private static final int STAR_CRUMBLE_PARTICLES = 8;
-    private static final int RESET_CRUMBLE_PARTICLES = 14;
 
-    private static final int BASE_ROLLBACK_DURATION = 10;
-    private static final int MIN_ROLLBACK_DURATION = 5;
-    private static final int MAX_ROLLBACK_DURATION = 30;
-    private static final int ROLLBACK_PER_LEVEL = 3;
-
-
-    private static final float COUNTER_OFFSET_Y = 8F;
-    private static final float RESET_CRUMBLE_OFFSET_Y = 10F;
     private static final float REROLL_TEXT_OFFSET_Y = 66F;
     private static final float REROLL_TEXT_SPREAD = 18F;
 
@@ -80,7 +64,6 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
     private static final float PUNCH_DECAY = 0.7F;
     private static final float PUNCH_THRESHOLD = 0.0005F;
-    private static final float RESET_PUNCH = -0.07F;
     private static final float REROLL_PUNCH_UP = 0.04F;
     private static final float REROLL_PUNCH_UP_PER_STAR = 0.01F;
     private static final float REROLL_PUNCH_UP_MAX = 0.09F;
@@ -98,16 +81,9 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
     private AbilityDescriptionScreen screen;
 
-    private final LevelUpEffect levelUpEffect = new LevelUpEffect();
     private final LevelUpEffect rerollEffect = new LevelUpEffect();
     private final RerollAnimation rerollAnimation = new RerollAnimation();
     private final FloatingTexts floatingTexts = new FloatingTexts();
-    private final AnimatedValue shownLevel = new AnimatedValue();
-    private final DeltaCounter levelCounter = new DeltaCounter(floatingTexts);
-    private final PointsRefundEffect pointsRefund = new PointsRefundEffect();
-
-    private String lastAbility = null;
-    private int lastLevel = -1;
 
     private float punch = 0F;
     private float punchO = 0F;
@@ -133,11 +109,8 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         var random = minecraft.player.getRandom();
 
-        updateLevel(random, stack, ability, abilityData);
         updateMode(random, ability, abilityData);
-        pointsRefund.tick(screen, random);
 
-        levelUpEffect.tick();
         rerollEffect.tick();
 
         if (rerollAnimation.observe(abilityData, ability))
@@ -168,30 +141,6 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         return index == full && quality % 2 == 1 ? 1 : 0;
     }
 
-    private void updateLevel(RandomSource random, ItemStack stack, String ability, AbilityData abilityData) {
-        var level = abilityData.getLevel();
-        var known = ability.equals(lastAbility) && lastLevel >= 0;
-
-        if (!known) {
-            shownLevel.snap(level);
-            levelCounter.reset();
-        }
-
-        if (known && level > lastLevel) {
-            levelUpEffect.start(screen, random, getX(), getY(), width, height, BigRelicCardWidget.getTextureColor(DescriptionTextures.getAbilityCardTexture(stack, ability)), Math.min(LEVEL_UP_PARTICLES + level * LEVEL_UP_PARTICLES_PER_LEVEL, MAX_PARTICLES));
-
-            shownLevel.set(level, Mth.clamp(Math.round(Math.abs(level - shownLevel.getValue()) * ROLLBACK_PER_LEVEL), MIN_ROLLBACK_DURATION, MAX_ROLLBACK_DURATION));
-        }
-
-        if (known && level < lastLevel)
-            onReset(random, abilityData.getTemplate().getRequiredPoints(), lastLevel, level);
-
-        lastAbility = ability;
-        lastLevel = level;
-
-        levelCounter.update(shownLevel.getInt(level), shownLevel.isMoving(), LEVEL_UP_COLOR, LEVEL_DOWN_COLOR, getX() + width / 2F, getY() + COUNTER_OFFSET_Y);
-    }
-
     private void updateMode(RandomSource random, String ability, AbilityData abilityData) {
         var template = abilityData.getTemplate();
 
@@ -203,21 +152,6 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         if (index >= 0 && screen.getModeSlide().update(ability, index))
             LevelUpEffect.burstAt(screen, random, getModeDotX(modes.size(), index) + MODE_DOT_WIDTH / 2F, getY() + MODE_DOT_Y + MODE_DOT_WIDTH / 2F, STAR_TINT, MODE_SPARKS);
-    }
-
-    private void onReset(RandomSource random, int requiredPoints, int oldLevel, int newLevel) {
-        var centerX = getX() + width / 2F;
-
-        var speed = PointsRefundEffect.getSpeed((oldLevel - newLevel) * requiredPoints);
-
-        punch = RESET_PUNCH;
-        punchO = punch;
-
-        shownLevel.set(newLevel, Math.round(BASE_ROLLBACK_DURATION * speed));
-
-        LevelUpEffect.crumbleAt(screen, random, centerX, getY() + RESET_CRUMBLE_OFFSET_Y, LEVEL_DOWN_COLOR, RESET_CRUMBLE_PARTICLES);
-
-        pointsRefund.start(screen, random, centerX, getY() + height / 2F, oldLevel - newLevel, requiredPoints);
     }
 
     private void onReroll(RandomSource random) {
@@ -279,14 +213,13 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         var isUnlocked = abilityData.isUnlocked();
 
-        var canBeLeveledUp = abilityData.getTemplate().getInitialMaxLevel() > 0;
-        var hasStats = !abilityData.getTemplate().getStats().isEmpty();
+        var hasStats = abilityData.hasStats();
 
         poseStack.pushPose();
 
         applyPunch(poseStack, pPartialTick);
 
-        var color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F)) + (levelUpEffect.flash(pPartialTick) + rerollEffect.flash(pPartialTick)) * FLASH_STRENGTH;
+        var color = (float) (1.05F + (Math.sin((player.tickCount + (ability.length() * 10)) * 0.2F) * 0.1F)) + rerollEffect.flash(pPartialTick) * FLASH_STRENGTH;
 
         if (isUnlocked)
             GUIRenderer.begin(abilityData.isEnabled() ? DescriptionTextures.getAbilityCardTexture(stack, ability) : GrayscaleTextures.get(DescriptionTextures.getAbilityCardTexture(stack, ability)), poseStack)
@@ -306,8 +239,16 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
                 .pos(this.getX(), this.getY())
                 .end();
 
-        if (!canBeLeveledUp)
-            GUIRenderer.begin(isUnlocked ? ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_level_slug_active.png") : ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_level_slug_inactive.png"), poseStack)
+        if (hasStats) {
+            var label = Component.literal(isUnlocked ? abilityData.getProgressPercent() + "%" : "?").withStyle(ChatFormatting.BOLD);
+
+            poseStack.pushPose();
+            poseStack.translate(getX() + width / 2F, getY() + 4.5F, 0F);
+            poseStack.scale(0.75F, 0.75F, 1F);
+            ScreenUtils.drawCenteredString(guiGraphics, minecraft.font, label, 0, 0, isUnlocked ? 0xFFE278 : 0xB7AED9, false);
+            poseStack.popPose();
+        } else
+            GUIRenderer.begin(isUnlocked ? DescriptionTextures.BIG_CARD_LEVEL_SLUG_ACTIVE : DescriptionTextures.BIG_CARD_LEVEL_SLUG_INACTIVE, poseStack)
                     .anchor(SpriteAnchor.TOP_LEFT)
                     .pos(this.getX(), this.getY())
                     .end();
@@ -371,19 +312,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
 
         floatingTexts.render(guiGraphics, minecraft.font, pPartialTick);
 
-        if (canBeLeveledUp) {
-            poseStack.pushPose();
-
-            var pointsComponent = Component.literal(isUnlocked ? String.valueOf(shownLevel.getInt(abilityData.getLevel())) : "?").withStyle(ChatFormatting.BOLD);
-
-            poseStack.scale(0.75F, 0.75F, 1F);
-
-            guiGraphics.drawString(minecraft.font, pointsComponent, (int) (((getX() + 26.5F) * 1.33F) - (minecraft.font.width(pointsComponent) / 2F)), (int) ((getY() + 4.5F) * 1.33F), isUnlocked ? 0xFFE278 : 0xB7AED9, false);
-
-            poseStack.popPose();
-        }
-
-        if (isUnlocked && canBeLeveledUp && this.isHovered()) {
+        if (isUnlocked && hasStats && this.isHovered()) {
             if (modes.isEmpty())
                 GUIRenderer.begin(ResourceLocation.fromNamespaceAndPath(Relics.MODID, "textures/gui/description/general/big_card_frame_outline.png"), poseStack)
                         .anchor(SpriteAnchor.TOP_LEFT)
@@ -422,9 +351,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
             return;
 
         var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
-        var template = abilityData.getTemplate();
-
-        if (!abilityData.isUnlocked() || !abilityData.canBeUpgraded() || template == null)
+        if (!abilityData.isUnlocked() || !abilityData.hasStats())
             return;
 
         PoseStack poseStack = guiGraphics.pose();
@@ -435,7 +362,7 @@ public class BigAbilityCardWidget extends AbstractDescriptionWidget implements I
         int renderWidth = 0;
 
         List<MutableComponent> entries = Lists.newArrayList(
-                Component.literal("").append(Component.translatable("relics.description.researching.ability.info.level").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + abilityData.getLevel() + "/" + template.getInitialMaxLevel()),
+                Component.empty().append(Component.translatable("relics.description.researching.ability.info.progress").withStyle(ChatFormatting.BOLD, ChatFormatting.UNDERLINE)).append(" " + abilityData.getProgressPercent() + "%"),
                 Component.literal("").append(Component.translatable("relics.description.researching.ability.info.quality").withStyle(ChatFormatting.BOLD).withStyle(ChatFormatting.UNDERLINE)).append(" " + MathUtils.round(abilityData.calculateQuality() / 2F, 1) + "/" + abilityData.getMaxQuality() / 2),
                 Component.literal(" ")
         );

@@ -14,13 +14,11 @@ import com.mojang.blaze3d.vertex.VertexSorting;
 import com.mojang.math.Axis;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.misc.TextJustificator;
-import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.research.misc.BurnPoint;
 import it.hurts.sskirillss.relics.client.screen.description.research.particles.ResearchParticleData;
 import it.hurts.sskirillss.relics.client.screen.description.research.widgets.HintWidget;
@@ -160,10 +158,10 @@ public class AbilityResearchScreen extends DescriptionScreen {
 
     @Override
     public void tick() {
+        super.tick();
+
         if (!(stack.getItem() instanceof IRelicItem relic))
             return;
-
-        super.tick();
 
         var abilityData = relic.getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(ability);
         var template = abilityData.getTemplate();

@@ -57,11 +57,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
     private final SelectionSlide modeSlide = new SelectionSlide();
 
     @Getter
-    private UpgradeAbilityActionWidget upgradeButton;
-    @Getter
     private RerollAbilityActionWidget rerollButton;
-    @Getter
-    private ResetAbilityActionWidget resetButton;
 
     public AbilityDescriptionScreen(Player player, int container, int slot, Screen screen) {
         super(player, container, slot, screen);
@@ -141,7 +137,7 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             }
         }
 
-        this.initActionButtons();
+        rerollButton = abilityData.mayReroll() ? addRenderableWidget(new RerollAbilityActionWidget(x + 289, y + 84, this)) : null;
 
         var researchTemplate = abilityData.getTemplate().getResearchTemplate();
         var researchData = abilityData.getResearchData();
@@ -162,21 +158,6 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
             this.addRenderableWidget(new AbilityToggleWidget(x + AbilityToggleWidget.TOGGLE_X, y + AbilityToggleWidget.TOGGLE_Y, this));
 
         this.initModeButtons();
-    }
-
-    public void initActionButtons() {
-        if (stack == null || !(stack.getItem() instanceof IRelicItem relic))
-            return;
-
-        var ability = this.getSelectedAbility();
-        var player = minecraft.player;
-
-        if (relic.getRelicData(player, this.stack).getAbilitiesData().getAbilityData(ability).isUpgradeEnabled())
-            this.upgradeButton = this.addRenderableWidget(new UpgradeAbilityActionWidget(x + 289, y + 63, this));
-        if (relic.getRelicData(player, this.stack).getAbilitiesData().getAbilityData(ability).isRerollEnabled())
-            this.rerollButton = this.addRenderableWidget(new RerollAbilityActionWidget(x + 289, y + 84, this));
-        if (relic.getRelicData(player, this.stack).getAbilitiesData().getAbilityData(ability).isResetEnabled())
-            this.resetButton = this.addRenderableWidget(new ResetAbilityActionWidget(x + 289, y + 105, this));
     }
 
     public void initModeButtons() {

@@ -25,15 +25,11 @@
   "relics.description.researching.research.hint.quick": "Утримуйте [Shift] для повністю автоматичного дослідження здібностей.",
   "relics.description.researching.research.hint.locked": "Цю здібність уже досліджено!",
 
-  "relics.description.researching.general.leveling_point.title": "Очки покращення:",
-  "relics.description.researching.general.leveling_point.extra_info": "Отримується під час підвищення рівня реліквії та використовується для покращення здібностей.",
-
   "relics.description.researching.general.player_experience.title_1": "Очки досвіду:",
   "relics.description.researching.general.player_experience.title_2": "%1$s [%2$s рівнів]",
   "relics.description.researching.general.player_experience.extra_info": "Досвід гравця зі стандартного Minecraft. Отримується шляхом убивства мобів, добування руди, витопленням предметів тощо.",
 
   "relics.description.researching.general.relic_progress.title": "Прогрес розвитку реліквії:",
-  "relics.description.researching.general.relic_progress.extra_info": "Показує, наскільки реліквія близька до свого максимального потенціалу. Визначається якістю та рівнем реліквії та здібностей.",
 
   "relics.description.researching.general.relic_rank.title": "Ранг реліквії:",
   "relics.description.researching.general.relic_rank.extra_info": "Отримується під час ручного підвищення рангу реліквії, що збільшує її максимальний рівень.",
@@ -41,7 +37,6 @@
   "relics.description.researching.relic.card.low_level": "Щоб розблокувати цю здібність, ви повинні підняти рівень реліквії до %1$s!",
   "relics.description.researching.relic.card.unresearched": "Щоб використовувати цю здібність, ви повинні завершити дослідження!",
   "relics.description.researching.relic.card.ready_to_unlock": "Здібність готова до розблокування! Залишилося натисків: %1$s",
-  "relics.description.researching.relic.card.ready_to_upgrade": "Здібність готова до оновлення!",
 
   "relics.description.researching.tab.relic": "Реліквія",
   "relics.description.researching.tab.ability": "Здібності",
@@ -54,9 +49,7 @@
   "relics.description.researching.relic.info.extra_info": "Якість реліквії — це середнє аритметичне якости всіх наразі розблокованих здібностей і вимірюється в очках від 1 до 5 із кроком 0,5. Це суто візуальний показник, який показує, наскільки початкові випадкові характеристики предмета близькі до ідеальних можливих значень. Щоб підвищити загальну якість реліквії, кожну здібність слід розглядати окремо.",
 
   "relics.description.researching.relic.experience.title": "Досвід реліквії:",
-  "relics.description.researching.relic.experience.extra_info": "Отримано шляхом використання здібностей реліквії за призначенням (додаткову інформацію можна знайти в розділі джерел досвіду). Коли досягнуто максимального досвіду, рівень реліквії та бали покращення збільшуються на 1, дозволяючи розблокувати раніше недоступні здібності або покращити наявні.",
 
-  "relics.description.researching.ability.info.level": "Рівень здібностей:",
   "relics.description.researching.ability.info.quality": "Якість здібностей:",
   "relics.description.researching.ability.info.extra_info": "Якість здібностей, подібна до якости реліктів, є середнім аритметичним якости всіх атрибутів здібностей і вимірюється в очках від 1 до 5 із кроком 0,5. Це суто візуальна метрика, яка показує, наскільки початкові випадкові характеристики здібности близькі до ідеальних можливих значень. Щоб підвищити якість здібностей, ви повинні перекрутити її випадкові атрибути, поки не отримаєте краще значення.",
 
@@ -74,28 +67,15 @@
   "relics.description.general.cost.title": "Вартість",
 
   "relics.description.relic.rankup.title": "Підвищення рангу реліквії",
-  "relics.description.relic.rankup.cost.entry_1": "%1$s рівнів реліквій",
-  "relics.description.relic.rankup.cost.entry_2": "%1$s очок досвіду (%2$s відносних рівнів)",
+  "relics.description.relic.rankup.cost.entry_1": "%1$s очок досвіду (%2$s відносних рівнів)",
   "relics.description.relic.rankup.max_rank": "Реліквія вже досягла свого максимального рангу і більше не може бути збільшена!",
   "relics.description.relic.rankup.description": "Підвищує ранг реліквії, що підвищує її максимальний рівень і змінює поведінку певних здібностей.",
-
-  "relics.description.ability.levelup.title": "Підвищення рівня здібности",
-  "relics.description.ability.levelup.cost.entry_1": "%1$s очок досвіду (%2$s відносних рівнів)",
-  "relics.description.ability.levelup.cost.entry_2": "%1$s очок покращення",
-  "relics.description.ability.levelup.auto": "Утримання [%1$s] під час цієї дії призведе до автоматичного підвищення рівня здібности, доки не закінчаться очки досвіду або покращення.",
-  "relics.description.ability.levelup.max_level": "Здібність уже досягла максимального рівня і не може бути збільшена далі!",
-  "relics.description.ability.levelup.description": "Підвищує поточний рівень здібности, покращуючи її атрибути.",
 
   "relics.description.ability.reroll.title": "Перекрутка атрибутів здібностей",
   "relics.description.ability.reroll.cost.entry_1": "%1$s очок досвіду (%2$s відносних рівнів)",
   "relics.description.ability.reroll.auto": "Якщо утримувати [%1$s] під час цієї дії, атрибути автоматично перекидатимуться, доки не буде досягнуто максимально можливої ​​рідкости або не закінчаться очки досвіду.",
   "relics.description.ability.reroll.max_quality": "Здібність уже досягла максимальної якости, і ця дія безумовно погіршить її. Утримуйте [%1$s] перед використанням, щоб підтвердити, що ви розумієте можливі наслідки!",
   "relics.description.ability.reroll.description": "Випадково перекидає атрибути здібностей для кращих або гірших значень.",
-
-  "relics.description.ability.reset.title": "Скидання рівня здібностей",
-  "relics.description.ability.reset.cost.entry_1": "%1$s очок досвіду (%2$s відносних рівнів)",
-  "relics.description.ability.reset.min_level": "Здібність уже досягла мінімального рівня, тому скидання не потрібне!",
-  "relics.description.ability.reset.description": "Скидає рівень здібности до мінімального, повертаючи витрачені очки покращення.",
 
   "relics.description.ability.rank_modifier.condition.rank": "Починаючи з позиції %1$s:",
   "relics.description.ability.experience_source.condition.rank": "Починаючи з рангу %1$s:",

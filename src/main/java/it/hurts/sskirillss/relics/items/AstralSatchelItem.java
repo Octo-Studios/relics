@@ -92,7 +92,7 @@ public class AstralSatchelItem extends RelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("subspace")
-                                .initialMaxLevel(10)
+                                .levelContribution(10)
                                 .rankModifier(1, "quick_storage")
                                 .rankModifier(3, "immortality")
                                 .rankModifier(5, "infinite_stacks")

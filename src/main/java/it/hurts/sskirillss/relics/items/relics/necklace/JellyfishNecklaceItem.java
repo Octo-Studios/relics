@@ -24,7 +24,6 @@ import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -52,7 +51,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("regeneration")
-                                .initialMaxLevel(10)
+                                .levelContribution(10)
                                 .rankModifier(3, "retention")
                                 .stat(AbilityStatTemplate.builder("max_health")
                                         .initialValue(0.1D, 0.2D)
@@ -79,7 +78,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                                         .build())
                                 .build())
                         .ability(AbilityTemplate.builder("shock")
-                                .initialMaxLevel(10)
+                                .levelContribution(10)
                                 .rankModifier(1, "conductor")
                                 .rankModifier(5, "charge")
                                 .modes("enabled", "disabled")

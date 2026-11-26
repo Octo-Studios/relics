@@ -28,20 +28,18 @@ public class AbilityComponent {
     @Singular
     private final Map<String, RankModifierComponent> rankModifiers;
     private final AbilityActivationComponent activation;
-    private final int points;
     private final boolean enabled;
 
-    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), LockComponent.EMPTY, AbilityStatisticComponent.EMPTY, "", Map.of(), AbilityActivationComponent.EMPTY, 0, true);
+    public static final AbilityComponent EMPTY = new AbilityComponent(Map.of(), LockComponent.EMPTY, AbilityStatisticComponent.EMPTY, "", Map.of(), AbilityActivationComponent.EMPTY, true);
 
     public static final Codec<AbilityComponent> CODEC = RecordCodecBuilder.create(instance ->
             instance.group(
-                    Codec.unboundedMap(Codec.STRING, StatComponent.CODEC).fieldOf("stats").forGetter(AbilityComponent::getStats),
-                    LockComponent.CODEC.fieldOf("lock").forGetter(AbilityComponent::getLock),
+                    Codec.unboundedMap(Codec.STRING, StatComponent.CODEC).optionalFieldOf("stats", Map.of()).forGetter(AbilityComponent::getStats),
+                    LockComponent.CODEC.optionalFieldOf("lock", LockComponent.EMPTY).forGetter(AbilityComponent::getLock),
                     AbilityStatisticComponent.CODEC.optionalFieldOf("statistic", AbilityStatisticComponent.EMPTY).forGetter(AbilityComponent::getStatistic),
                     Codec.STRING.optionalFieldOf("mode", "").forGetter(AbilityComponent::getMode),
                     Codec.unboundedMap(Codec.STRING, RankModifierComponent.CODEC).optionalFieldOf("rank_modifiers", Map.of()).forGetter(AbilityComponent::getRankModifiers),
                     AbilityActivationComponent.CODEC.optionalFieldOf("activation", AbilityActivationComponent.EMPTY).forGetter(AbilityComponent::getActivation),
-                    Codec.INT.fieldOf("points").forGetter(AbilityComponent::getPoints),
                     Codec.BOOL.optionalFieldOf("enabled", true).forGetter(AbilityComponent::isEnabled)
             ).apply(instance, AbilityComponent::new)
     );

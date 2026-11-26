@@ -9,7 +9,7 @@ import lombok.Data;
 public class AbilityConditionTemplate {
     private final String id;
 
-    private final int level;
+    private final double progress;
     private final int quality;
 
     public static AbilityConditionTemplateBuilder builder(String id) {
@@ -23,7 +23,7 @@ public class AbilityConditionTemplate {
     public static class AbilityConditionTemplateBuilder {
         private final String id;
 
-        private int level = 0;
+        private double progress = 0;
         private int quality = 0;
 
         public AbilityConditionTemplateBuilder(String id) {
@@ -33,12 +33,12 @@ public class AbilityConditionTemplate {
         private AbilityConditionTemplateBuilder(AbilityConditionTemplate base) {
             this.id = base.getId();
 
-            this.level = base.getLevel();
+            this.progress = base.getProgress();
             this.quality = base.getQuality();
         }
 
-        public AbilityConditionTemplateBuilder level(int level) {
-            this.level = level;
+        public AbilityConditionTemplateBuilder progress(double progress) {
+            this.progress = progress;
 
             return this;
         }
@@ -50,7 +50,7 @@ public class AbilityConditionTemplate {
         }
 
         public AbilityConditionTemplate build() {
-            return new AbilityConditionTemplate(id, level, quality);
+            return new AbilityConditionTemplate(id, progress, quality);
         }
     }
 }

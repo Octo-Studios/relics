@@ -5,11 +5,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.LongArgumentType;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.commands.arguments.AbilityArgument;
 import it.hurts.sskirillss.relics.commands.arguments.AbilityStatArgument;
 import it.hurts.sskirillss.relics.commands.arguments.RelicAbilityStatisticMetricArgument;
 import it.hurts.sskirillss.relics.commands.arguments.RelicStatisticMetricArgument;
+import it.hurts.sskirillss.relics.handlers.RankHandler;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -17,7 +19,6 @@ import net.minecraft.world.InteractionHand;
 import net.neoforged.neoforge.server.command.EnumArgument;
 
 import java.util.HashMap;
-import java.util.Set;
 import java.util.stream.Stream;
 
 public class RelicsCommand {
@@ -47,7 +48,6 @@ public class RelicsCommand {
                                     relicData.getTemplate().getAbilities().getAbilities().forEach((abilityId, abilityTemplate) -> {
                                         var abilityData = abilitiesData.getAbilityData(abilityId);
 
-                                        abilityData.setLevel(abilityTemplate.getInitialMaxLevel());
                                         abilityData.getLockData().setUnlocks(abilityData.getLockData().getMaxUnlocks());
                                         abilityData.getResearchData().complete();
 
@@ -81,7 +81,7 @@ public class RelicsCommand {
                                         var abilityData = abilitiesData.getAbilityData(abilityId);
 
                                         abilityData.getResearchData().setResearched(false);
-                                        abilityData.setLevel(0);
+
                                         abilityData.getResearchData().setLinks(new HashMap<>());
 
                                         if (!abilityData.isEnoughLevel())
@@ -144,35 +144,6 @@ public class RelicsCommand {
                                                         case SET -> experience;
                                                         case ADD -> levelingData.getExperience() + experience;
                                                         case TAKE -> levelingData.getExperience() - experience;
-                                                    });
-
-                                                    return Command.SINGLE_SUCCESS;
-                                                })
-                                        )
-                                )
-                        )
-                        .then(Commands.literal("points")
-                                .then(Commands.argument("action", EnumArgument.enumArgument(CommandAction.class))
-                                        .then(Commands.argument("points", IntegerArgumentType.integer())
-                                                .executes(ctx -> {
-                                                    var player = ctx.getSource().getPlayerOrException();
-                                                    var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-
-                                                    if (!(stack.getItem() instanceof IRelicItem relic)) {
-                                                        ctx.getSource().sendFailure(Component.translatable("command.relics.base.not_relic"));
-
-                                                        return 0;
-                                                    }
-
-                                                    var points = IntegerArgumentType.getInteger(ctx, "points");
-                                                    var action = ctx.getArgument("action", CommandAction.class);
-
-                                                    var levelingData = relic.getRelicData(player, stack).getLevelingData();
-
-                                                    levelingData.setPoints(switch (action) {
-                                                        case SET -> points;
-                                                        case ADD -> levelingData.getPoints() + points;
-                                                        case TAKE -> levelingData.getPoints() - points;
                                                     });
 
                                                     return Command.SINGLE_SUCCESS;
@@ -244,6 +215,33 @@ public class RelicsCommand {
                         )
                 )
                 .then(Commands.literal("player")
+                        .then(Commands.literal("rank_points")
+                                .then(Commands.argument("action", EnumArgument.enumArgument(CommandAction.class))
+                                        .then(Commands.argument("points", LongArgumentType.longArg(0))
+                                                .executes(ctx -> {
+                                                    var player = ctx.getSource().getPlayerOrException();
+                                                    var item = player.getMainHandItem().getItem();
+
+                                                    if (!(item instanceof IRelicItem)) {
+                                                        ctx.getSource().sendFailure(Component.translatable("command.relics.base.not_relic"));
+
+                                                        return 0;
+                                                    }
+
+                                                    var points = LongArgumentType.getLong(ctx, "points");
+                                                    var action = ctx.getArgument("action", CommandAction.class);
+
+                                                    switch (action) {
+                                                        case SET -> RankHandler.setRankPoints(player, item, points);
+                                                        case ADD -> RankHandler.addRankPoints(player, item, points);
+                                                        case TAKE -> RankHandler.addRankPoints(player, item, -points);
+                                                    }
+
+                                                    return Command.SINGLE_SUCCESS;
+                                                })
+                                        )
+                                )
+                        )
                         .then(Commands.literal("research")
                                 .then(Commands.argument("ability", AbilityArgument.ability())
                                         .then(Commands.argument("researched", BoolArgumentType.bool())
@@ -283,42 +281,6 @@ public class RelicsCommand {
                         )
                 )
                 .then(Commands.literal("ability")
-                        .then(Commands.literal("level")
-                                .then(Commands.argument("action", EnumArgument.enumArgument(CommandAction.class))
-                                        .then(Commands.argument("ability", AbilityArgument.ability())
-                                                .then(Commands.argument("level", IntegerArgumentType.integer())
-                                                        .executes(ctx -> {
-                                                            var player = ctx.getSource().getPlayerOrException();
-                                                            var stack = player.getItemInHand(InteractionHand.MAIN_HAND);
-
-                                                            if (!(stack.getItem() instanceof IRelicItem relic)) {
-                                                                ctx.getSource().sendFailure(Component.translatable("command.relics.base.not_relic"));
-
-                                                                return 0;
-                                                            }
-
-                                                            var action = ctx.getArgument("action", CommandAction.class);
-                                                            var ability = AbilityArgument.getAbility(ctx, "ability");
-                                                            var level = IntegerArgumentType.getInteger(ctx, "level");
-
-                                                            var abilitiesData = relic.getRelicData(player, stack).getAbilitiesData();
-
-                                                            (ability.equals("all") ? abilitiesData.getAbilityIDs() : Set.of(ability)).forEach(entry -> {
-                                                                var abilityData = abilitiesData.getAbilityData(entry);
-
-                                                                abilityData.setLevel(switch (action) {
-                                                                    case SET -> level;
-                                                                    case ADD -> abilityData.getLevel() + level;
-                                                                    case TAKE -> abilityData.getLevel() - level;
-                                                                });
-                                                            });
-
-                                                            return Command.SINGLE_SUCCESS;
-                                                        })
-                                                )
-                                        )
-                                )
-                        )
                         .then(Commands.literal("statistic")
                                 .then(Commands.argument("action", EnumArgument.enumArgument(CommandAction.class))
                                         .then(Commands.argument("ability", AbilityArgument.ability())

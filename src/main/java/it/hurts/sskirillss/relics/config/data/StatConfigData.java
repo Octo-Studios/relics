@@ -18,14 +18,14 @@ public class StatConfigData {
     @Prop(comment = "Maximum base value of the stat. A random value within this range is assigned when the relic is first created")
     private double maxInitialValue;
 
-    @Prop(comment = "Minimum threshold value for the stat, representing hard limits that cannot be surpassed through ability level upgrades or other methods")
+    @Prop(comment = "Lower limit of the stat after scaling")
     private double minThresholdValue;
-    @Prop(comment = "Maximum threshold value for the stat, representing hard limits that cannot be surpassed through ability level upgrades or other methods")
+    @Prop(comment = "Upper limit of the stat after scaling")
     private double maxThresholdValue;
 
-    @Prop(comment = "Type of mathematical operation used to calculate the stat's value based on the ability level.")
+    @Prop(comment = "Scaling model for the stat as the relic gains levels.")
     private String scalingModel;
-    @Prop(comment = "Value the stat reaches when both the stat quality and ability level are at their maximum.")
+    @Prop(comment = "Target value at maximum stat quality and the last level of the final rank.")
     private double targetValue;
 
     public AbilityStatTemplate toData(IRelicItem relic, String ability, String stat) {

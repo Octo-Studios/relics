@@ -1,6 +1,5 @@
 package it.hurts.sskirillss.relics.client.handlers;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionUtils;
 import it.hurts.sskirillss.relics.client.screen.description.relic.RelicDescriptionScreen;
@@ -23,7 +22,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import org.lwjgl.glfw.GLFW;
 
 @EventBusSubscriber(value = Dist.CLIENT)
 public class DescriptionHandler {
@@ -44,12 +42,7 @@ public class DescriptionHandler {
         ticksCountOld = ticksCount;
 
         var MC = Minecraft.getInstance();
-        var key = RelicsHotkeys.RESEARCH_RELIC.getKey().getValue();
-
-        if (key == GLFW.GLFW_KEY_UNKNOWN)
-            return;
-
-        var isResearching = InputConstants.isKeyDown(MC.getWindow().getWindow(), key);
+        var isResearching = RelicsHotkeys.isHeld(RelicsHotkeys.RESEARCH_RELIC);
 
         if (ticksCount > 0 && !isResearching)
             ticksCount--;

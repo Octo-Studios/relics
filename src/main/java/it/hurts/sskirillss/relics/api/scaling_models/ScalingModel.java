@@ -1,61 +1,62 @@
 package it.hurts.sskirillss.relics.api.scaling_models;
 
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 
 public abstract class ScalingModel {
     /**
-     * Evaluates the result of a progression or transformation operation based on an initial value, a modifier, and a number of iterations.
+     * Evaluates the scaled value at a given point in the progression.
      * <p>
-     * This method defines how a value evolves through repeated application of a modifier (e.g. for stat scaling, experience growth, cost increases, etc.), according to a specific mathematical model such as additive, exponential, logarithmic, etc.
+     * Fractional iterations represent progress between whole steps on the model's curve.
      *
-     * @param entity     The bearer of the relic. Used to provide context for the evaluation.
-     * @param stack      The stack instance associated with the {@link IRelicItem}. Used to provide context for the evaluation.
-     * @param baseValue  The initial value before any operations are applied.
-     * @param modifier   The change applied per iteration, representing the strength or weight of each step.
-     * @param iterations The number of times the operation should be applied.
-     * @return The resulting value after applying the operation the specified number of times.
+     * @param entity     The bearer of the relic.
+     * @param stack      The relic stack being evaluated.
+     * @param baseValue  The initial value at zero iterations.
+     * @param modifier   The parameter that controls how the value changes along the curve.
+     * @param iterations The number of progression steps reached, including any fractional step.
+     * @return The scaled value at the given number of iterations.
      */
-    public abstract double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, int iterations);
+    public abstract double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, double iterations);
 
+    /**
+     * Calculates the modifier needed to reach the target value from the base value after the given number of iterations.
+     *
+     * @param entity      The bearer of the relic.
+     * @param stack       The relic stack being evaluated.
+     * @param baseValue   The initial value at zero iterations.
+     * @param targetValue The desired value at the end of the progression.
+     * @param iterations  The total number of whole progression steps.
+     * @return The calculated modifier, or zero if the iteration count is nonpositive or the target equals the base value.
+     * @implNote The default implementation uses binary search and assumes that the result of {@link #evaluate} increases
+     * with the modifier over the search interval. Models with a known inverse can calculate the modifier directly.
+     */
     public double calculateModifier(LivingEntity entity, ItemStack stack, double baseValue, double targetValue, int iterations) {
         if (iterations <= 0 || baseValue == targetValue)
             return 0D;
 
         var direction = targetValue > baseValue ? 1D : -1D;
-        var low = direction > 0 ? 0D : -1D;
-        var high = direction > 0 ? 1D : 0D;
+        var low = 0D;
+        var high = 1D;
 
-        for (int i = 0; i < 64; i++) {
-            var value = evaluate(entity, stack, baseValue, high, iterations);
+        for (var i = 0; i < 64; i++) {
+            var value = evaluate(entity, stack, baseValue, direction * high, iterations);
 
-            if ((direction > 0 && value >= targetValue) || (direction < 0 && value <= targetValue))
+            if (direction * (value - targetValue) >= 0D)
                 break;
 
-            if (direction > 0)
-                high *= 2D;
-            else
-                low = low * 2D - 1D;
+            high *= 2D;
         }
 
-        for (int i = 0; i < 96; i++) {
+        for (var i = 0; i < 96; i++) {
             var mid = (low + high) / 2D;
-            var value = evaluate(entity, stack, baseValue, mid, iterations);
+            var value = evaluate(entity, stack, baseValue, direction * mid, iterations);
 
-            if (direction > 0) {
-                if (value < targetValue)
-                    low = mid;
-                else
-                    high = mid;
-            } else {
-                if (value > targetValue)
-                    high = mid;
-                else
-                    low = mid;
-            }
+            if (direction * (value - targetValue) < 0D)
+                low = mid;
+            else
+                high = mid;
         }
 
-        return (low + high) / 2D;
+        return direction * ((low + high) / 2D);
     }
 }

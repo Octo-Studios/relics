@@ -93,8 +93,12 @@ public class RelicData {
     }
 
     public int calculateMaxLevel() {
+        return calculateMaxLevel(getLevelingData().getRank());
+    }
+
+    public int calculateMaxLevel(int rank) {
         return this.getTemplate().getAbilities().getAbilities().values().stream()
-                .mapToInt(template -> template.getInitialMaxLevel() * template.getRequiredPoints())
+                .mapToInt(template -> template.getLevelContribution(rank) * template.getLevelWeight())
                 .sum();
     }
 
@@ -113,7 +117,7 @@ public class RelicData {
         var filtered = abilities.keySet().stream()
                 .filter(ability -> {
                     var abilityData = abilitiesData.getAbilityData(ability);
-                    return abilityData != null && abilityData.canBeUpgraded() && abilityData.isUnlocked();
+                    return abilityData != null && abilityData.hasStats() && abilityData.isUnlocked();
                 })
                 .mapToInt(ability -> abilitiesData.getAbilityData(ability).calculateQuality())
                 .toArray();
@@ -137,18 +141,13 @@ public class RelicData {
 
     public double calculateProgress() {
         var levelingData = this.getLevelingData();
-        var unspentPoints = levelingData.getPoints();
         var template = this.getTemplate().getLeveling();
         var rank = levelingData.getRank();
         var maxRank = template.getMaxRank();
-        var level = levelingData.getLevel();
-        var maxLevel = this.calculateMaxLevel();
         var quality = this.calculateQuality();
         var maxQuality = this.getMaxQuality();
 
-        var adjustedUnits = Math.max(0.0, Math.min(level - (unspentPoints * 0.5), maxLevel));
-
-        var levelFraction = (maxLevel > 0) ? (adjustedUnits / maxLevel) : 0.0;
+        var levelFraction = levelingData.getLevelProgress(rank);
         var totalSegments = Math.max(1, maxRank + 1);
         var completedSegments = Math.max(0, Math.min(rank, maxRank));
 

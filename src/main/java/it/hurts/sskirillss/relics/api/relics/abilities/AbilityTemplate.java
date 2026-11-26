@@ -4,7 +4,6 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
-import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationPredicateContext;
@@ -14,7 +13,6 @@ import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivat
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.config.data.AbilityConfigData;
-import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -33,11 +31,11 @@ public class AbilityTemplate {
 
     private final Function3<Player, ItemStack, String, String> icon;
     private final Map<String, AbilityStatTemplate> stats;
-    private final int initialMaxLevel;
-    private final double maxLevelRankModifier;
+    private final int levelContribution;
+    private final double levelContributionRankModifier;
     private final int requiredLevel;
     private final int requiredRank;
-    private final int requiredPoints;
+    private final int levelWeight;
     private final ResearchTemplate researchTemplate;
     private final AbilityStatisticTemplate statistic;
     private final List<String> modes;
@@ -54,8 +52,32 @@ public class AbilityTemplate {
         return new AbilityTemplateBuilder(this);
     }
 
+    @Deprecated(forRemoval = true)
+    public int getInitialMaxLevel() {
+        return getLevelContribution();
+    }
+
+    @Deprecated(forRemoval = true)
+    public double getMaxLevelRankModifier() {
+        return getLevelContributionRankModifier();
+    }
+
+    @Deprecated(forRemoval = true)
+    public int getRequiredPoints() {
+        return getLevelWeight();
+    }
+
+    public int getLevelContribution(int rank) {
+        var levels = levelContribution;
+
+        for (var i = 0; i < rank; i++)
+            levels += (int) Math.ceil(levels * levelContributionRankModifier);
+
+        return levels;
+    }
+
     public AbilityConfigData toConfigData() {
-        return new AbilityConfigData(requiredPoints, requiredLevel, initialMaxLevel, stats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toConfigData(), (o1, o2) -> o1, LinkedHashMap::new)));
+        return new AbilityConfigData(levelWeight, requiredLevel, levelContribution, stats.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().toConfigData(), (o1, o2) -> o1, LinkedHashMap::new)));
     }
 
     public static class AbilityTemplateBuilder {
@@ -73,11 +95,11 @@ public class AbilityTemplate {
             return ability + (modes.isEmpty() ? "" : "_" + abilityData.getMode());
         };
         private Map<String, AbilityStatTemplate> stats = new LinkedHashMap<>();
-        private int initialMaxLevel = 10;
-        private double maxLevelRankModifier = 0.25D;
+        private int levelContribution = 10;
+        private double levelContributionRankModifier = 0.25D;
         private int requiredLevel = 0;
         private int requiredRank = 0;
-        private int requiredPoints = 1;
+        private int levelWeight = 1;
         private ResearchTemplate researchTemplate = ResearchTemplate.builder().build();
         private AbilityStatisticTemplate statistic = AbilityStatisticTemplate.builder().build();
         private List<String> modes = new ArrayList<>();
@@ -95,11 +117,11 @@ public class AbilityTemplate {
 
             this.icon = base.getIcon();
             this.stats = new LinkedHashMap<>(base.getStats());
-            this.initialMaxLevel = base.getInitialMaxLevel();
-            this.maxLevelRankModifier = base.getMaxLevelRankModifier();
+            this.levelContribution = base.getLevelContribution();
+            this.levelContributionRankModifier = base.getLevelContributionRankModifier();
             this.requiredLevel = base.getRequiredLevel();
             this.requiredRank = base.getRequiredRank();
-            this.requiredPoints = base.getRequiredPoints();
+            this.levelWeight = base.getLevelWeight();
             this.researchTemplate = base.getResearchTemplate();
             this.statistic = base.getStatistic();
             this.experienceSources = base.getExperienceSources();
@@ -127,16 +149,26 @@ public class AbilityTemplate {
             return this;
         }
 
-        public AbilityTemplateBuilder initialMaxLevel(int maxLevel) {
-            this.initialMaxLevel = maxLevel;
+        public AbilityTemplateBuilder levelContribution(int levelContribution) {
+            this.levelContribution = levelContribution;
 
             return this;
         }
 
-        public AbilityTemplateBuilder maxLevelRankModifier(double maxLevelRankModifier) {
-            this.maxLevelRankModifier = maxLevelRankModifier;
+        @Deprecated(forRemoval = true)
+        public AbilityTemplateBuilder initialMaxLevel(int maxLevel) {
+            return levelContribution(maxLevel);
+        }
+
+        public AbilityTemplateBuilder levelContributionRankModifier(double levelContributionRankModifier) {
+            this.levelContributionRankModifier = levelContributionRankModifier;
 
             return this;
+        }
+
+        @Deprecated(forRemoval = true)
+        public AbilityTemplateBuilder maxLevelRankModifier(double maxLevelRankModifier) {
+            return levelContributionRankModifier(maxLevelRankModifier);
         }
 
         public AbilityTemplateBuilder requiredLevel(int requiredLevel) {
@@ -151,10 +183,15 @@ public class AbilityTemplate {
             return this;
         }
 
-        public AbilityTemplateBuilder requiredPoints(int requiredPoints) {
-            this.requiredPoints = requiredPoints;
+        public AbilityTemplateBuilder levelWeight(int levelWeight) {
+            this.levelWeight = levelWeight;
 
             return this;
+        }
+
+        @Deprecated(forRemoval = true)
+        public AbilityTemplateBuilder requiredPoints(int requiredPoints) {
+            return levelWeight(requiredPoints);
         }
 
         public AbilityTemplateBuilder research(ResearchTemplate researchTemplate) {
@@ -230,7 +267,7 @@ public class AbilityTemplate {
                         .predicates(new LinkedHashMap<>(activation.getPredicates()))
                         .build();
 
-            return new AbilityTemplate(this.id, this.icon, this.stats, this.initialMaxLevel, this.maxLevelRankModifier, this.requiredLevel, this.requiredRank, this.requiredPoints, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers, activation, this.targeting);
+            return new AbilityTemplate(this.id, this.icon, this.stats, this.levelContribution, this.levelContributionRankModifier, this.requiredLevel, this.requiredRank, this.levelWeight, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers, activation, this.targeting);
         }
     }
 }

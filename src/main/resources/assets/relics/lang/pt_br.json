@@ -49,15 +49,11 @@
   "relics.description.researching.research.hint.quick": "Segure [Shift] para pesquisa de habilidade totalmente automática.",
   "relics.description.researching.research.hint.locked": "A habilidade já foi pesquisada!",
 
-  "relics.description.researching.general.leveling_point.title": "Pontos de Melhoria:",
-  "relics.description.researching.general.leveling_point.extra_info": "Obtidos ao subir o nível da relíquia e usados para melhorar habilidades.",
-
   "relics.description.researching.general.player_experience.title_1": "Pontos de Experiência:",
   "relics.description.researching.general.player_experience.title_2": "%1$s [%2$s níveis]",
   "relics.description.researching.general.player_experience.extra_info": "Experiência de jogador do Minecraft padrão. Obtida matando criaturas, minerando minérios, fundindo itens na fornalha, etc.",
 
   "relics.description.researching.general.relic_progress.title": "Progresso de Desenvolvimento da Relíquia:",
-  "relics.description.researching.general.relic_progress.extra_info": "Mostra o quão perto a relíquia está do seu potencial máximo. Determinado pela qualidade e nível da relíquia e habilidades.",
 
   "relics.description.researching.general.relic_rank.title": "Grau da Relíquia:",
   "relics.description.researching.general.relic_rank.extra_info": "Obtido aumentando manualmente o grau da relíquia, o que aumenta seu nível máximo.",
@@ -66,7 +62,6 @@
   "relics.description.researching.relic.card.unresearched": "Para usar esta habilidade, você deve concluir a pesquisa!",
   "relics.description.researching.relic.card.low_rank": "Para desbloquear, você precisa elevar o grau da relíquia para %1$s!",
   "relics.description.researching.relic.card.ready_to_unlock": "A habilidade está pronta para ser desbloqueada! Cliques restantes: %1$s",
-  "relics.description.researching.relic.card.ready_to_upgrade": "A habilidade está pronta para ser melhorada!",
 
   "relics.description.researching.tab.relic": "Relíquia",
   "relics.description.researching.tab.ability": "Habilidades",
@@ -85,9 +80,7 @@
   "relics.description.researching.relic.info.extra_info": "A qualidade da relíquia é a média aritmética da qualidade de todas as habilidades atualmente desbloqueadas e é medida em pontos de 1 a 5 em passos de 0,5. Esta é uma métrica puramente visual e mostra o quão perto as características aleatórias iniciais do item estão dos valores ideais possíveis. Para aumentar a qualidade geral da relíquia, cada habilidade deve ser considerada individualmente.",
 
   "relics.description.researching.relic.experience.title": "Experiência da Relíquia:",
-  "relics.description.researching.relic.experience.extra_info": "Obtida usando as habilidades da relíquia para seu propósito pretendido (mais detalhes podem ser encontrados na seção de fontes de experiência). Quando a experiência máxima é atingida, o nível da relíquia e os pontos de melhoria aumentam em 1, permitindo que você desbloqueie habilidades anteriormente inacessíveis ou melhore as existentes.",
 
-  "relics.description.researching.ability.info.level": "Nível da Habilidade:",
   "relics.description.researching.ability.info.quality": "Qualidade da Habilidade:",
   "relics.description.researching.ability.info.extra_info": "A qualidade da habilidade, semelhante à qualidade da relíquia, é a média aritmética da qualidade de todos os atributos da habilidade e é medida em pontos de 1 a 5 em passos de 0,5. Esta é uma métrica puramente visual e mostra o quão perto as características aleatórias iniciais da habilidade estão dos valores ideais possíveis. Para aumentar a qualidade da habilidade, você deve rolar novamente seus atributos aleatórios até obter um valor melhor.",
 
@@ -105,28 +98,15 @@
   "relics.description.general.cost.title": "Custo",
 
   "relics.description.relic.rankup.title": "Aumento de Grau da Relíquia",
-  "relics.description.relic.rankup.cost.entry_1": "%1$s níveis de relíquia",
-  "relics.description.relic.rankup.cost.entry_2": "%1$s pontos de experiência (%2$s níveis relativos)",
+  "relics.description.relic.rankup.cost.entry_1": "%1$s pontos de experiência (%2$s níveis relativos)",
   "relics.description.relic.rankup.max_rank": "A relíquia já atingiu seu grau máximo e não pode mais ser melhorada!",
   "relics.description.relic.rankup.description": "Melhora o grau da relíquia, o que eleva seu nível máximo e altera o comportamento de certas habilidades.",
-
-  "relics.description.ability.levelup.title": "Aumento de Nível de Habilidade",
-  "relics.description.ability.levelup.cost.entry_1": "%1$s pontos de experiência (%2$s níveis relativos)",
-  "relics.description.ability.levelup.cost.entry_2": "%1$s pontos de melhoria",
-  "relics.description.ability.levelup.auto": "Segurar [%1$s] durante esta ação aumentará automaticamente o nível da habilidade até que a experiência ou os pontos de melhoria acabem.",
-  "relics.description.ability.levelup.max_level": "A habilidade já atingiu seu nível máximo e não pode mais ser melhorada!",
-  "relics.description.ability.levelup.description": "Aumenta o nível atual da habilidade, melhorando seus atributos.",
 
   "relics.description.ability.reroll.title": "Rolar Novamente Atributos de Habilidade",
   "relics.description.ability.reroll.cost.entry_1": "%1$s pontos de experiência (%2$s níveis relativos)",
   "relics.description.ability.reroll.auto": "Segurar [%1$s] durante esta ação rolará automaticamente os atributos novamente até que a raridade máxima possível seja alcançada ou os pontos de experiência acabem.",
   "relics.description.ability.reroll.max_quality": "A habilidade já atingiu sua qualidade máxima e esta ação definitivamente a piorará. Segure [%1$s] antes de usar para confirmar que você entende as possíveis consequências!",
   "relics.description.ability.reroll.description": "Rola aleatoriamente os atributos da habilidade para valores melhores ou piores.",
-
-  "relics.description.ability.reset.title": "Redefinir Nível de Habilidade",
-  "relics.description.ability.reset.cost.entry_1": "%1$s pontos de experiência (%2$s níveis relativos)",
-  "relics.description.ability.reset.min_level": "A habilidade já atingiu seu nível mínimo, portanto, redefinir não é necessário!",
-  "relics.description.ability.reset.description": "Redefine o nível da habilidade para o mínimo, devolvendo os pontos de melhoria gastos.",
 
   "relics.description.ability.rank_modifier.condition.rank": "A partir do grau %1$s:",
   "relics.description.ability.experience_source.condition.rank": "A partir do grau %1$s:",

@@ -6,7 +6,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class RadicalScalingModel extends ScalingModel {
     @Override
-    public double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, int iterations) {
+    public double evaluate(LivingEntity entity, ItemStack stack, double baseValue, double modifier, double iterations) {
         return baseValue + Math.sqrt(iterations) * modifier;
     }
 

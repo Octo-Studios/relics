@@ -58,7 +58,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.InputEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDamageEvent;
-import top.theillusivec4.curios.api.SlotContext;
 
 import java.util.*;
 
@@ -68,8 +67,8 @@ public class RiderFluteItem extends RelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("stable")
-                                .initialMaxLevel(5)
-                                .maxLevelRankModifier(0.1)
+                                .levelContribution(5)
+                                .levelContributionRankModifier(0.1)
                                 .rankModifier(1, "regeneration")
                                 .rankModifier(3, "recall")
                                 .rankModifier(5, "resistance")

@@ -10,8 +10,14 @@ public class RankupEffect {
     private static final float SHAKE_FREQUENCY_Y = 6.7F;
 
     private int age = SHAKE_DURATION;
+    private float strength;
 
     public void start() {
+        start(1F);
+    }
+
+    public void start(float strength) {
+        this.strength = strength;
         age = 0;
     }
 
@@ -31,6 +37,6 @@ public class RankupEffect {
     private float amplitude(float partialTick) {
         var remaining = Mth.clamp(1F - (age + partialTick) / SHAKE_DURATION, 0F, 1F);
 
-        return SHAKE_AMPLITUDE * remaining * remaining;
+        return SHAKE_AMPLITUDE * strength * remaining * remaining;
     }
 }

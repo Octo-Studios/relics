@@ -90,14 +90,10 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         if (template == null)
             return new DescriptionData(List.of(), List.of());
 
-        var level = abilityData.getLevel();
-
-        var wantsUpgrade = screen.getUpgradeButton() != null && screen.getUpgradeButton().isHovered() && abilityData.mayUpgrade();
         var wantsReroll = screen.getRerollButton() != null && screen.getRerollButton().isHovered() && abilityData.mayReroll();
-        var wantsReset = screen.getResetButton() != null && screen.getResetButton().isHovered() && abilityData.mayReset();
 
         var dynamicComponents = template.getStats().values().stream().map(stat -> {
-            var rawValue = abilityData.getStatData(stat.getId()).getValueForLevel(wantsUpgrade ? level + 1 : wantsReset ? 0 : level);
+            var rawValue = abilityData.getStatData(stat.getId()).getValue();
             var txt = stat.getFormatValue().apply(rawValue).toString();
 
             if (txt.endsWith(".0"))
@@ -105,7 +101,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
 
             var result = Component.literal(txt)
                     .withStyle(ChatFormatting.BOLD)
-                    .withColor(wantsUpgrade ? DescriptionUtils.POSITIVE_COLOR(true) : wantsReroll ? DescriptionUtils.NEUTRAL_COLOR(true) : wantsReset ? DescriptionUtils.NEGATIVE_COLOR(true) : DescriptionUtils.TEXT_COLOR);
+                    .withColor(wantsReroll ? DescriptionUtils.NEUTRAL_COLOR(true) : DescriptionUtils.TEXT_COLOR);
 
             if (wantsReroll)
                 result = result.withStyle(ChatFormatting.OBFUSCATED);

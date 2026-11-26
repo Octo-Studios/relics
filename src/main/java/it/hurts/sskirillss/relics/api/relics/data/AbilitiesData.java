@@ -3,7 +3,6 @@ package it.hurts.sskirillss.relics.api.relics.data;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 
-import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -76,11 +75,11 @@ public class AbilitiesData {
                 ));
     }
 
-    public boolean hasUnlockedUpgradeableAbility() {
+    public boolean hasUnlockedAbilityWithStats() {
         return this.getAbilityIDs().stream().anyMatch(ability -> {
             var abilityData = this.getAbilityData(ability);
 
-            return abilityData != null && abilityData.canBeUpgraded() && abilityData.isUnlocked();
+            return abilityData != null && abilityData.hasStats() && abilityData.isUnlocked();
         });
     }
 
