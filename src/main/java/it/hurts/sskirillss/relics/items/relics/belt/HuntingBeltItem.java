@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.items.relics.belt;
 
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStacking;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
@@ -9,7 +10,9 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.init.RelicsConfigs;
@@ -17,16 +20,13 @@ import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.PetBoneItem;
-import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
-import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.LivingEntity;
@@ -42,7 +42,7 @@ import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 
 import java.util.ArrayList;
 
-public class HuntingBeltItem extends WearableRelicItem {
+public class HuntingBeltItem extends SlotBeltItem {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -52,9 +52,10 @@ public class HuntingBeltItem extends WearableRelicItem {
                                 .levelContribution(5)
                                 .levelContributionRankModifier(0.1)
                                 .stat(AbilityStatTemplate.builder("amount")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 12D)
-                                        .formatValue(value -> (int) (MathUtils.round(value, 0)))
+                                        .rounding(Math::round)
                                         .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 6, 12).star(1, 8, 17).star(2, 6, 23).star(3, 15, 23).star(4, 13, 17).star(5, 15, 12)
@@ -69,21 +70,29 @@ public class HuntingBeltItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage_modifier")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 3.00075D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("pet_radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(3D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 14.9925D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("resistance_per_pet")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> ability.getRankModifierData("leader").isEnabled())
+                                                .build())
                                         .initialValue(0.01D, 0.05D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.10005D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("revival_cost")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.BEST)
+                                                .condition(ability -> ability.getRankModifierData("revival").isEnabled())
+                                                .build())
                                         .initialValue(10D, 7.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.00312D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
@@ -130,13 +139,6 @@ public class HuntingBeltItem extends WearableRelicItem {
                 .build();
     }
 
-    @Override
-    public RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
-        return RelicSlotModifier.builder()
-                .modifier("charm", (int) Math.round(getRelicData(entity, stack).getAbilitiesData().getAbilityData("slots").getStatData("amount").getValue()))
-                .build();
-    }
-
     @EventBusSubscriber
     public static class CommonEvents {
         private static final String BONE_DROP_TAG = Relics.MODID + ":hunting_belt_bone_drop";
@@ -149,10 +151,10 @@ public class HuntingBeltItem extends WearableRelicItem {
             if (!(ownable.getOwner() instanceof LivingEntity owner))
                 return;
 
-            var stacks = RelicStackingUtils.stacks(owner, RelicsItems.HUNTING_BELT.get(), "pack")
+            var stacks = RelicStacks.of(owner, RelicsItems.HUNTING_BELT.get(), "pack")
                     .filter(entry -> TargetingUtils.canHarm(owner, event.getEntity(), entry.stack(), "pack"));
 
-            var totalModifier = stacks.sum("damage_modifier");
+            var totalModifier = stacks.sum(entry -> entry.stackedStat("damage_modifier"));
 
             if (stacks.any("relentless"))
                 event.getEntity().invulnerableTime = 0;
@@ -175,7 +177,7 @@ public class HuntingBeltItem extends WearableRelicItem {
             if (original <= 0F)
                 return;
 
-            var leaderBelts = RelicStackingUtils.stacks(player, RelicsItems.HUNTING_BELT.get(), "pack").withRank("leader");
+            var leaderBelts = RelicStacks.of(player, RelicsItems.HUNTING_BELT.get(), "pack").withRank("leader");
 
             if (leaderBelts.isEmpty())
                 return;
@@ -194,7 +196,7 @@ public class HuntingBeltItem extends WearableRelicItem {
 
             for (var entry : leaderBelts) {
                 var radius = entry.stat("pet_radius");
-                var resistancePerPet = entry.stat("resistance_per_pet");
+                var resistancePerPet = entry.stackedStat("resistance_per_pet");
                 var petsInRange = nearbyPets.stream().filter(pet -> pet.distanceToSqr(player) <= radius * radius).count();
 
                 var reduction = Math.min(petsInRange, 5L) * resistancePerPet;
@@ -240,7 +242,7 @@ public class HuntingBeltItem extends WearableRelicItem {
             if (damage <= 0F)
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(owner, RelicsItems.HUNTING_BELT.get(), "pack")) {
+            for (var entry : RelicStacks.of(owner, RelicsItems.HUNTING_BELT.get(), "pack")) {
                 if (!TargetingUtils.canHarm(owner, event.getEntity(), entry.stack(), "pack"))
                     continue;
 
@@ -259,13 +261,12 @@ public class HuntingBeltItem extends WearableRelicItem {
 
             if (entity instanceof OwnableEntity ownable && ownable.getOwner() instanceof LivingEntity owner
                     && !RelicsConfigs.RELICS_CONFIG.getHuntingBeltRevivalEntitiesBlacklist().contains(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType()).toString())) {
-                var revivalBelts = RelicStackingUtils.stacks(owner, RelicsItems.HUNTING_BELT.get(), "pack").withRank("revival");
-
+                var revivalBelts = RelicStacks.forStat(owner, RelicsItems.HUNTING_BELT.get(), "pack", "revival_cost");
                 if (!revivalBelts.isEmpty()) {
-                    var requiredHealth = Double.MAX_VALUE;
-
-                    for (var entry : revivalBelts)
-                        requiredHealth = Math.min(requiredHealth, CommonEvents.getReviveHealthRequirement(entry, entity));
+                    var attribute = entity.getAttribute(Attributes.MAX_HEALTH);
+                    var baseHealth = attribute != null ? attribute.getBaseValue() : entity.getMaxHealth();
+                    var cost = StatStacking.fromParticipants(revivalBelts, "revival_cost").total();
+                    var requiredHealth = Math.max(1D, baseHealth * cost.orElseGet(() -> revivalBelts.min("revival_cost")));
 
                     var boneStack = new ItemStack(RelicsItems.PET_BONE.get());
 
@@ -312,12 +313,5 @@ public class HuntingBeltItem extends WearableRelicItem {
             }
         }
 
-        private static double getReviveHealthRequirement(RelicStacks.Entry entry, LivingEntity pet) {
-            var attribute = pet.getAttribute(Attributes.MAX_HEALTH);
-            var baseHealth = attribute != null ? attribute.getBaseValue() : pet.getMaxHealth();
-            var modifier = entry.stat("revival_cost");
-
-            return Math.max(1D, baseHealth * modifier);
-        }
     }
 }

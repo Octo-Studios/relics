@@ -7,17 +7,15 @@ import it.hurts.octostudios.octolib.client.animation.easing.EaseType;
 import it.hurts.octostudios.octolib.client.animation.easing.TransitionType;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.relic_containers.AbilityReference;
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationStage;
 import it.hurts.sskirillss.relics.client.screen.description.misc.DescriptionTextures;
 import it.hurts.sskirillss.relics.init.RelicsHotkeys;
-import it.hurts.sskirillss.relics.init.RelicsRegistries;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.abilities.C2SActivateAbility;
 import it.hurts.sskirillss.relics.network.packets.abilities.C2SSwitchSynergyMode;
-import it.hurts.sskirillss.relics.relic_containers.CuriosRelicStackReference;
-import it.hurts.sskirillss.relics.relic_containers.InventoryRelicStackReference;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -31,7 +29,6 @@ import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.InputEvent;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -460,12 +457,7 @@ public class ActiveAbilitiesClientHandler {
         if (player == null)
             return List.of();
 
-        List<AbilityReference> references = new ArrayList<>();
-
-        for (var container : RelicsRegistries.RELIC_CONTAINER_REGISTRY)
-            references.addAll(container.gatherAbilityReferences().apply(player));
-
-        return references.stream()
+        return RelicContainer.findAbilities(player).stream()
                 .filter(ActiveAbilitiesClientHandler::isUnlockedReference)
                 .toList();
     }
@@ -493,6 +485,11 @@ public class ActiveAbilitiesClientHandler {
     }
 
     public static void sendActivation(AbilityReference reference, AbilityActivationStage stage) {
+        var stackReference = reference.stackReference();
+
+        if (stackReference.getContainer() == null)
+            return;
+
         if (reference.isSynergy()) {
             if (stage == AbilityActivationStage.START)
                 sendSynergyModeSwitch(reference);
@@ -500,16 +497,7 @@ public class ActiveAbilitiesClientHandler {
             return;
         }
 
-        var stackReference = reference.stackReference();
-
-        if (stackReference instanceof InventoryRelicStackReference inventoryReference) {
-            NetworkHandler.sendToServer(new C2SActivateAbility("inventory", inventoryReference.slot(), "", reference.ability(), stage));
-
-            return;
-        }
-
-        if (stackReference instanceof CuriosRelicStackReference curiosReference)
-            NetworkHandler.sendToServer(new C2SActivateAbility("curios", curiosReference.index(), curiosReference.identifier(), reference.ability(), stage));
+        NetworkHandler.sendToServer(new C2SActivateAbility(stackReference, reference.ability(), stage));
     }
 
     private static void sendSynergyModeSwitch(AbilityReference reference) {
@@ -536,14 +524,7 @@ public class ActiveAbilitiesClientHandler {
 
         var nextMode = modes.get(Math.floorMod(modes.indexOf(synergyData.getMode()) + 1, modes.size()));
 
-        if (stackReference instanceof InventoryRelicStackReference(int slot)) {
-            NetworkHandler.sendToServer(new C2SSwitchSynergyMode("inventory", slot, "", reference.ability(), nextMode));
-
-            return;
-        }
-
-        if (stackReference instanceof CuriosRelicStackReference(String identifier, int index))
-            NetworkHandler.sendToServer(new C2SSwitchSynergyMode("curios", index, identifier, reference.ability(), nextMode));
+        NetworkHandler.sendToServer(new C2SSwitchSynergyMode(stackReference, reference.ability(), nextMode));
     }
 
     private static List<AbilityReference> getVisibleReferences(List<AbilityReference> references) {

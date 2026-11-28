@@ -278,14 +278,25 @@ public class AbilityDescriptionScreen extends DescriptionScreen implements ITabb
 
     @Override
     public void render(GuiGraphics guiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        var live = getLiveStack(minecraft.player);
+
+        if (live.isEmpty())
+            return;
+
+        this.stack = live;
+
         super.render(guiGraphics, pMouseX, pMouseY, pPartialTick);
 
         for (GuiEventListener listener : this.children()) {
             if (listener instanceof AbstractButton button && button.isHovered()
                     && button instanceof IHoverableWidget widget) {
+                guiGraphics.pose().pushPose();
+
                 guiGraphics.pose().translate(0, 0, 100);
 
                 widget.onHovered(guiGraphics, pMouseX, pMouseY);
+
+                guiGraphics.pose().popPose();
             }
         }
     }

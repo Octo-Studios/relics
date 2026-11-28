@@ -9,6 +9,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
@@ -22,9 +23,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
@@ -59,6 +59,7 @@ public class GlitchyMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("miss_chance")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.5D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
@@ -85,26 +86,31 @@ public class GlitchyMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("interval")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(15D, 10D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(2.5D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun_radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("echo_radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
@@ -157,16 +163,19 @@ public class GlitchyMantleItem extends WearableRelicItem {
                                 .modes("enabled", "disabled")
                                 .requiredLevel(10)
                                 .stat(AbilityStatTemplate.builder("stability_time")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("fall_damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(2.5D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("phase_time")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(2.5D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -322,6 +331,20 @@ public class GlitchyMantleItem extends WearableRelicItem {
         return knownMovement > 1.0E-4D;
     }
 
+    public static boolean canWalkOnAir(LivingEntity entity) {
+        return RelicStacks.lookup(entity, RelicsItems.GLITCHY_MANTLE.get(), "glitch").located().getEntries().stream()
+                .anyMatch(entry -> ((GlitchyMantleItem) entry.relic()).canCollideWithAirLike(entity, entry.stack()));
+    }
+
+    public static boolean canPhase(LivingEntity entity) {
+        return RelicStacks.lookup(entity, RelicsItems.GLITCHY_MANTLE.get(), "glitch").located().getEntries().stream()
+                .anyMatch(entry -> ((GlitchyMantleItem) entry.relic()).canPhaseThroughBlocks(entity, entry.stack()));
+    }
+
+    private static RelicStacks activeGlitchMantles(LivingEntity entity) {
+        return RelicStacks.of(entity, RelicsItems.GLITCHY_MANTLE.get(), "glitch", ability -> ability.getMode().equals("enabled"));
+    }
+
     public boolean canCollideWithAirLike(LivingEntity entity, ItemStack stack) {
         return this.isGlitchEnabled(entity, stack) && !entity.isShiftKeyDown() && !this.isForcedFall(stack);
     }
@@ -335,7 +358,7 @@ public class GlitchyMantleItem extends WearableRelicItem {
     public boolean isGlitchEnabled(LivingEntity entity, ItemStack stack) {
         var ability = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glitch");
 
-        return ability.canPlayerUse(entity) && ability.getMode().equals("enabled");
+        return ability.isAvailable() && ability.getMode().equals("enabled");
     }
 
     @Override
@@ -397,7 +420,7 @@ public class GlitchyMantleItem extends WearableRelicItem {
 
         var illusion = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("illusion");
 
-        if (illusion.canPlayerUse(entity) && illusion.getMode().equals("enabled")) {
+        if (illusion.isAvailable() && illusion.getMode().equals("enabled")) {
             if (this.getIllusionCooldown(stack) > 0) {
                 this.addIllusionCooldown(stack, -1);
             } else {
@@ -487,25 +510,21 @@ public class GlitchyMantleItem extends WearableRelicItem {
                 }
 
                 if (attacker != null && attacker != player) {
-                    for (var entry : RelicStackingUtils.stacks(player, RelicsItems.GLITCHY_MANTLE.get(), "distortion")) {
-                        var stack = entry.stack();
-                        var relic = (GlitchyMantleItem) entry.relic();
-                        var ability = entry.ability();
-
-                        if (!TargetingUtils.canHarm(player, attacker, stack, "distortion"))
+                    for (var entry : RelicStacks.forStat(player, RelicsItems.GLITCHY_MANTLE.get(), "distortion", "miss_chance")) {
+                        if (!TargetingUtils.canHarm(player, attacker, entry.stack(), "distortion"))
                             continue;
 
-                        if (player.getRandom().nextDouble() >= ability.getStatData("miss_chance").getValue())
+                        if (player.getRandom().nextDouble() >= entry.stat("miss_chance"))
                             continue;
 
                         event.setCanceled(true);
 
                         player.addEffect(new MobEffectInstance(RelicsMobEffects.GLITCH, 10, 0, false, false));
 
-                        ability.getStatisticData().getMetricData("misses").addValue(1);
-                        relic.getRelicData(player, stack).getLevelingData().addExperience("distortion", "miss", 1);
+                        entry.addMetric("misses", 1);
+                        entry.addExperience("miss", 1);
 
-                        if (ability.getRankModifierData("disorientation").isEnabled()) {
+                        if (entry.rank("disorientation")) {
                             var rotation = attacker.getRandom().nextFloat() * 360F;
 
                             if (attacker instanceof ServerPlayer serverAttacker)
@@ -540,16 +559,8 @@ public class GlitchyMantleItem extends WearableRelicItem {
 
             var entity = event.getEntity();
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.GLITCHY_MANTLE.get())) {
-                var relic = (GlitchyMantleItem) stack.getItem();
-                var ability = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glitch");
-
-                if (relic.isGlitchEnabled(entity, stack) && ability.getRankModifierData("phase").isEnabled()) {
-                    event.setCanceled(true);
-
-                    return;
-                }
-            }
+            if (activeGlitchMantles(entity).any("phase"))
+                event.setCanceled(true);
         }
 
         @SubscribeEvent
@@ -558,11 +569,9 @@ public class GlitchyMantleItem extends WearableRelicItem {
 
             var hasSafeFallMantle = false;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.GLITCHY_MANTLE.get())) {
-                var relic = (GlitchyMantleItem) stack.getItem();
-
-                if (!relic.isGlitchEnabled(entity, stack))
-                    continue;
+            for (var entry : activeGlitchMantles(entity)) {
+                var stack = entry.stack();
+                var relic = (GlitchyMantleItem) entry.relic();
 
                 if (!relic.isForcedFall(stack)) {
                     hasSafeFallMantle = true;
@@ -570,8 +579,7 @@ public class GlitchyMantleItem extends WearableRelicItem {
                     continue;
                 }
 
-                var ability = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glitch");
-                var extraMultiplier = 1D + ability.getStatData("fall_damage").getValue();
+                var extraMultiplier = 1D + entry.stat("fall_damage");
 
                 event.setDamageMultiplier((float) (event.getDamageMultiplier() * extraMultiplier));
 
@@ -595,7 +603,7 @@ public class GlitchyMantleItem extends WearableRelicItem {
 
             var target = event.getEntity();
 
-            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.GLITCHY_MANTLE.get(), "illusion", data -> data.getMode().equals("enabled")).withRank("echo")) {
+            for (var entry : RelicStacks.of(source, RelicsItems.GLITCHY_MANTLE.get(), "illusion", data -> data.getMode().equals("enabled")).withRank("echo")) {
                 var stack = entry.stack();
                 var relic = (GlitchyMantleItem) entry.relic();
                 var ability = entry.ability();
@@ -641,17 +649,8 @@ public class GlitchyMantleItem extends WearableRelicItem {
             if (event.getOverlayType() != RenderBlockScreenEffectEvent.OverlayType.BLOCK)
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(event.getPlayer(), RelicsItems.GLITCHY_MANTLE.get())) {
-                if (!(stack.getItem() instanceof GlitchyMantleItem relic))
-                    continue;
-
-                if (relic.isGlitchEnabled(event.getPlayer(), stack)
-                        && relic.getRelicData(event.getPlayer(), stack).getAbilitiesData().getAbilityData("glitch").getRankModifierData("phase").isEnabled()) {
-                    event.setCanceled(true);
-
-                    return;
-                }
-            }
+            if (activeGlitchMantles(event.getPlayer()).any("phase"))
+                event.setCanceled(true);
         }
     }
 }

@@ -1,13 +1,17 @@
 package it.hurts.sskirillss.relics.api.relics.data;
 
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatComponent;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStacking;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import net.minecraft.util.Mth;
 
-import javax.annotation.Nullable;
+import java.util.List;
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.Random;
+import javax.annotation.Nullable;
 
 public class AbilityStatData {
     private final AbilityData abilityData;
@@ -31,6 +35,12 @@ public class AbilityStatData {
         var abilityTemplate = this.getAbilityData().getTemplate();
 
         return abilityTemplate == null ? null : abilityTemplate.getStats().get(this.getId());
+    }
+
+    public List<RelicContainer> getActiveContainers() {
+        var template = getTemplate();
+
+        return template == null || template.getActiveContainers().isEmpty() ? abilityData.getActiveContainers() : template.getActiveContainers();
     }
 
     public StatComponent getComponent() {
@@ -104,34 +114,30 @@ public class AbilityStatData {
         if (statComponent == null)
             return 0;
 
-        var optional = statComponent.getOverrideValue();
-        var value = optional.orElseGet(() -> getValueFromQuality(statComponent.getInitialQuality()));
-
         var statData = getTemplate();
 
         if (statData == null)
             return 0;
 
         var initialValue = statData.getInitialValue();
-        var format = statData.getFormatValue();
-
-        var override = format.apply(value).doubleValue();
-
-        var min = format.apply(initialValue.getMinValue()).doubleValue();
-        var max = format.apply(initialValue.getMaxValue()).doubleValue();
-
+        var min = initialValue.getMinValue();
+        var max = initialValue.getMaxValue();
         var maxQuality = getMaxQuality();
 
         if (min == max)
             return maxQuality;
 
-        var quality = (int) Math.round((override - min) * maxQuality / (max - min));
+        var override = statComponent.getOverrideValue();
 
+        if (override.isEmpty())
+            return statComponent.getInitialQuality();
+
+        var quality = (int) Math.round((override.get() - min) * maxQuality / (max - min));
         return Mth.clamp(quality, 0, maxQuality);
     }
 
     public double getUnscaledValue() {
-        return getOverrideValue().orElse(getValueFromQuality(getQuality()));
+        return getOverrideValue().orElseGet(() -> getValueFromQuality(getInitialQuality()));
     }
 
     public double getValueFromQuality(int quality) {
@@ -153,12 +159,7 @@ public class AbilityStatData {
         return MathUtils.round(value, 5);
     }
 
-    public double getValueForOverallProgress(double progress) {
-        var template = getTemplate();
-
-        if (template == null)
-            return 0D;
-
+    private double calculateValue(double progress, AbilityStatTemplate template) {
         var relicData = abilityData.getAbilitiesData().getRelicData();
         var entity = relicData.getEntity();
         var stack = relicData.getStack();
@@ -172,7 +173,56 @@ public class AbilityStatData {
         return MathUtils.round(Mth.clamp(value, threshold.getMinValue(), threshold.getMaxValue()), 5);
     }
 
+    public double getValueForOverallProgress(double progress) {
+        var template = getTemplate();
+
+        return template == null ? 0D : template.resolveValue(calculateValue(progress, template));
+    }
+
+    public double getRawValue() {
+        var template = getTemplate();
+
+        return template == null ? 0D : calculateValue(abilityData.getOverallProgress(), template);
+    }
+
     public double getValue() {
         return getValueForOverallProgress(abilityData.getOverallProgress());
+    }
+
+    public boolean isInActiveContainer() {
+        var relic = abilityData.getAbilitiesData().getRelicData();
+
+        return RelicContainer.contains(relic.getEntity(), relic.getStack(), getActiveContainers());
+    }
+
+    public boolean isAvailable() {
+        var template = getTemplate();
+
+        return template != null && isInActiveContainer() && template.getStacking().isAvailable(abilityData);
+    }
+
+    public StatStacking getStacking() {
+        return StatStacking.of(this);
+    }
+
+    public OptionalDouble getActiveStackingEfficiency() {
+        return getStacking().efficiency(abilityData.getAbilitiesData().getRelicData().getStack());
+    }
+
+    public double getStackingEfficiency() {
+        return getActiveStackingEfficiency().orElse(0D);
+    }
+
+    public double getStackedValue() {
+        var template = getTemplate();
+
+        if (template == null)
+            return 0D;
+
+        var stacking = template.getStacking();
+        if (!stacking.getType().ranksCopiesByStat())
+            return isAvailable() ? getValue() : stacking.getNeutralValue();
+
+        return getStacking().contribution(abilityData.getAbilitiesData().getRelicData().getStack()).orElse(stacking.getNeutralValue());
     }
 }

@@ -1,11 +1,12 @@
 package it.hurts.sskirillss.relics.api.relics.data;
 
 import it.hurts.sskirillss.relics.api.events.relic.abilities.ability.AbilityModeSwitchEvent;
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityComponent;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
-import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationContext;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationComponent;
+import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationContext;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationPredicateContext;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationPredicateType;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationStage;
@@ -19,6 +20,7 @@ import net.minecraft.world.entity.player.Player;
 import net.neoforged.neoforge.common.NeoForge;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AbilityData {
@@ -40,6 +42,22 @@ public class AbilityData {
 
     public AbilityTemplate getTemplate() {
         return this.getAbilitiesData().getTemplate().getAbilities().get(this.getId());
+    }
+
+    public List<RelicContainer> getActiveContainers() {
+        var template = getTemplate();
+
+        return template == null || template.getActiveContainers().isEmpty() ? abilitiesData.getRelicData().getActiveContainers() : template.getActiveContainers();
+    }
+
+    public boolean isInActiveContainer() {
+        var relic = abilitiesData.getRelicData();
+
+        return RelicContainer.contains(relic.getEntity(), relic.getStack(), getActiveContainers());
+    }
+
+    public boolean isAvailable() {
+        return canPlayerUse(abilitiesData.getRelicData().getEntity()) && isInActiveContainer();
     }
 
     public AbilityComponent getComponent() {
@@ -375,9 +393,15 @@ public class AbilityData {
         return true;
     }
 
+    public List<RelicContainer> getActivationContainers() {
+        var containers = getTemplate().getActivation().getContainers();
+        return containers.isEmpty() ? getActiveContainers() : containers;
+    }
+
     public boolean canPlayerActivate(Player player) {
         return isActive()
                 && canPlayerUse(player)
+                && RelicContainer.contains(player, abilitiesData.getRelicData().getStack(), getActivationContainers())
                 && !isActivationOnCooldown()
                 && testActivationPredicates(player, AbilityActivationPredicateType.CAST);
     }

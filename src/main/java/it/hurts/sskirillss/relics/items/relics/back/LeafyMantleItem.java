@@ -9,22 +9,22 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.LeavesBlockEntity;
 import it.hurts.sskirillss.relics.init.*;
-import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
-import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -34,7 +34,6 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -61,16 +60,21 @@ public class LeafyMantleItem extends WearableRelicItem {
                                 .rankModifier(3, "absorption")
                                 .rankModifier(5, "disappearance")
                                 .stat(AbilityStatTemplate.builder("heal")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 2.50009D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("absorption")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> ability.getRankModifierData("absorption").isEnabled())
+                                                .build())
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 19.9995D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("cooldown")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .thresholdValue(0D, Double.MAX_VALUE)
                                         .initialValue(15D, 10D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 4.9985D)
@@ -102,21 +106,25 @@ public class LeafyMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(5D, 10D)
                                         .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 24.97833D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("heal")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 1D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 4.99992D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 1D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 4.99992D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("paralysis")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 1D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 4.99992D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -235,7 +243,7 @@ public class LeafyMantleItem extends WearableRelicItem {
 
             if (entity.tickCount % 20 == 0) {
                 if (entity.getHealth() < entity.getMaxHealth()) {
-                    var heal = (float) Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatData("heal").getValue(), entity.getMaxHealth() - entity.getHealth());
+                    var heal = (float) Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("camouflage").getStatData("heal").getStackedValue(), entity.getMaxHealth() - entity.getHealth());
 
                     entity.heal(heal);
 
@@ -284,14 +292,14 @@ public class LeafyMantleItem extends WearableRelicItem {
 
             var total = 0F;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").withRank("absorption")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").withRank("absorption")) {
                 var stack = entry.stack();
                 var relic = (LeafyMantleItem) entry.relic();
 
                 if (!relic.isHiding(stack) || relic.getCurrentProgress(stack) < relic.getMaxProgress())
                     continue;
 
-                total += (float) entry.stat("absorption");
+                total += (float) entry.stackedStat("absorption");
             }
 
             var current = entity.getAbsorptionAmount();
@@ -316,7 +324,7 @@ public class LeafyMantleItem extends WearableRelicItem {
             if (!level.getBlockState(entity.getBlockPosBelowThatAffectsMyMovement()).is(BlockTags.LEAVES))
                 return;
 
-            if (!RelicStackingUtils.stacks(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").isEmpty())
+            if (!RelicStacks.of(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").isEmpty())
                 event.setCanceled(true);
         }
 
@@ -340,11 +348,9 @@ public class LeafyMantleItem extends WearableRelicItem {
             if (diff > 0)
                 return;
 
-            for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
-                var relic = (LeafyMantleItem) stack.getItem();
-
-                if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").canPlayerUse(entity))
-                    continue;
+            for (var entry : RelicStacks.of(entity, RelicsItems.LEAFY_MANTLE.get(), "revival")) {
+                var stack = entry.stack();
+                var relic = (LeafyMantleItem) entry.relic();
 
                 if (diff > 0)
                     break;
@@ -352,7 +358,7 @@ public class LeafyMantleItem extends WearableRelicItem {
                 if (!level.isClientSide())
                     relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatisticData().getMetricData("damage_negated").addValue(Math.abs(diff));
 
-                var radius = (int) Math.ceil(relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatData("radius").getValue());
+                var radius = (int) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatData("radius").getValue();
                 var heal = (float) relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("revival").getStatData("heal").getValue();
 
                 var center = entity.blockPosition();
@@ -430,7 +436,7 @@ public class LeafyMantleItem extends WearableRelicItem {
             if (entity.getCommandSenderWorld().isClientSide())
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").withRank("disappearance")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").withRank("disappearance")) {
                 var stack = entry.stack();
                 var relic = (LeafyMantleItem) entry.relic();
 
@@ -443,7 +449,7 @@ public class LeafyMantleItem extends WearableRelicItem {
             if (event.getAmount() > 0) {
                 var entity = event.getEntity();
 
-                for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.LEAFY_MANTLE.get())) {
+                for (var stack : RelicStacks.lookup(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").located().getStacks()) {
                     var relic = (LeafyMantleItem) stack.getItem();
 
                     relic.setHiding(stack, false);

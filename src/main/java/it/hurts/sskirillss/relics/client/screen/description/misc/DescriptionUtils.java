@@ -94,7 +94,10 @@ public class DescriptionUtils {
         }
 
         var height = lines.size() * 5;
-        var y = mouseY - height / 2 - 9;
+        var y = Math.clamp(mouseY - height / 2 - 9, 0, Math.max(0, graphics.guiHeight() - height - 16));
+
+        if (x + width + 18 > graphics.guiWidth())
+            x = Math.max(0, x - width - 22);
 
         drawTooltipBackground(graphics, width, height, x, y);
 

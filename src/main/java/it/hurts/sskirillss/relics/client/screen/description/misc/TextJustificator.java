@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 
 public class TextJustificator {
     private static final Pattern SPACE_RE = Pattern.compile("\\s+");
-    private static final Pattern PLACEHOLDER_RE = Pattern.compile("([()%]*%(\\d+)\\$s[()%]*)");
+    private static final Pattern PLACEHOLDER_RE = Pattern.compile("([()%]*)%(\\d+)\\$s([()%]*)");
 
     private static final class Token {
         final String raw;
@@ -36,13 +36,25 @@ public class TextJustificator {
         }
     }
 
+    public record StatBox(int index, String prefix, String suffix) {
+        public String format(String value) {
+            return prefix + value + suffix;
+        }
+    }
+
     public static final class Word {
         public final MutableComponent component;
         public final boolean isDynamic;
+        private final StatBox statBox;
 
         public Word(MutableComponent component, boolean isDynamic) {
+            this(component, isDynamic, null);
+        }
+
+        private Word(MutableComponent component, boolean isDynamic, StatBox statBox) {
             this.component = component;
             this.isDynamic = isDynamic;
+            this.statBox = statBox;
         }
 
         public boolean isSpace() {
@@ -268,12 +280,11 @@ public class TextJustificator {
                     tokenizeLiteral(before, baseStyle, words);
                 }
 
-                var segment = matcher.group(1);
                 var index = Integer.parseInt(matcher.group(2)) - 1;
                 var dyn = dynamicComponents.get(index).copy();
                 var style = dyn.getStyle();
-                var pre = segment.substring(0, segment.indexOf('%'));
-                var suf = segment.substring(segment.lastIndexOf('s') + 1);
+                var pre = matcher.group(1);
+                var suf = matcher.group(3);
 
                 if (!pre.isEmpty())
                     dyn = Component.literal(pre).withStyle(style).append(dyn);
@@ -281,7 +292,7 @@ public class TextJustificator {
                 if (!suf.isEmpty())
                     dyn = dyn.append(Component.literal(suf).withStyle(style));
 
-                words.add(new Word(dyn, true));
+                words.add(new Word(dyn, true, new StatBox(index, pre, suf)));
 
                 lastEnd = matcher.end();
             }
@@ -368,6 +379,12 @@ public class TextJustificator {
     }
 
     public static void renderJustifiedDescriptionWithStatBoxes(GuiGraphics graphics, int startX, int startY, int maximumLineWidth, Font font, List<LayoutLine> layoutLines) {
+        renderJustifiedDescriptionWithStatBoxes(graphics, startX, startY, maximumLineWidth, font, layoutLines, -1, -1);
+    }
+
+    public static StatBox renderJustifiedDescriptionWithStatBoxes(GuiGraphics graphics, int startX, int startY, int maximumLineWidth, Font font, List<LayoutLine> layoutLines, double mouseX, double mouseY) {
+        StatBox hovered = null;
+
         var splitter = font.getSplitter();
         var spaceWidth = (int) Math.ceil(splitter.stringWidth(FormattedText.of(" ", Style.EMPTY)));
 
@@ -400,78 +417,44 @@ public class TextJustificator {
             }
 
             var x = startX;
+            var extraSpaces = justify && spaceSlots > 0 ? Math.max(0, maximumLineWidth - totalW) / spaceWidth : 0;
+            var seen = 0;
 
-            if (!justify || spaceSlots == 0 || totalW >= maximumLineWidth) {
-                for (var w : words) {
-                    if (w.isSpace()) {
-                        x += (int) Math.ceil(splitter.stringWidth(w.component));
+            for (var w : words) {
+                var textWidth = (int) Math.ceil(splitter.stringWidth(w.component));
 
-                        continue;
-                    }
+                if (w.isSpace()) {
+                    x += textWidth + (extraSpaces / spaceSlots + (seen++ < extraSpaces % spaceSlots ? 1 : 0)) * spaceWidth;
 
-                    var textWidth = (int) Math.ceil(splitter.stringWidth(w.component));
-                    var style = w.component.getStyle();
-                    var color = style.getColor() != null ? style.getColor().getValue() : DescriptionUtils.TEXT_COLOR;
-
-                    if (w.isDynamic) {
-                        graphics.fill(x - 1, y - 1, x + textWidth + 4, y, 0xFF000000 | color);
-                        graphics.fill(x - 1, y + lineHeight, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
-                        graphics.fill(x - 1, y - 1, x, y + lineHeight + 1, 0xFF000000 | color);
-                        graphics.fill(x + textWidth + 3, y - 1, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
-
-                        graphics.drawString(font, Language.getInstance().getVisualOrder(w.component), x + 2, y + 1, color, false);
-
-                        x += textWidth + 5;
-                    } else {
-                        graphics.drawString(font, Language.getInstance().getVisualOrder(w.component), x, y, color, false);
-
-                        x += textWidth;
-                    }
+                    continue;
                 }
-            } else {
-                var missing = maximumLineWidth - totalW;
-                var extraSpacesTotal = Math.max(0, missing / spaceWidth);
-                var base = extraSpacesTotal / spaceSlots;
-                var rem = extraSpacesTotal % spaceSlots;
 
-                var seen = 0;
+                var style = w.component.getStyle();
+                var color = style.getColor() != null ? style.getColor().getValue() : DescriptionUtils.TEXT_COLOR;
 
-                for (var i = 0; i < words.size(); i++) {
-                    var w = words.get(i);
+                if (w.isDynamic) {
+                    graphics.fill(x - 1, y - 1, x + textWidth + 4, y, 0xFF000000 | color);
+                    graphics.fill(x - 1, y + lineHeight, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
+                    graphics.fill(x - 1, y - 1, x, y + lineHeight + 1, 0xFF000000 | color);
+                    graphics.fill(x + textWidth + 3, y - 1, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
 
-                    if (w.isSpace()) {
-                        var add = base + (seen < rem ? 1 : 0);
+                    if (mouseX >= x - 1 && mouseX < x + textWidth + 4 && mouseY >= y - 1 && mouseY < y + lineHeight + 1)
+                        hovered = w.statBox;
 
-                        seen++;
+                    graphics.drawString(font, Language.getInstance().getVisualOrder(w.component), x + 2, y + 1, color, false);
 
-                        x += (int) Math.ceil(splitter.stringWidth(w.component)) + add * spaceWidth;
+                    x += textWidth + 5;
+                } else {
+                    graphics.drawString(font, Language.getInstance().getVisualOrder(w.component), x, y, color, false);
 
-                        continue;
-                    }
-
-                    var textWidth = (int) Math.ceil(splitter.stringWidth(w.component));
-                    var style = w.component.getStyle();
-                    var color = style.getColor() != null ? style.getColor().getValue() : DescriptionUtils.TEXT_COLOR;
-
-                    if (w.isDynamic) {
-                        graphics.fill(x - 1, y - 1, x + textWidth + 4, y, 0xFF000000 | color);
-                        graphics.fill(x - 1, y + lineHeight, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
-                        graphics.fill(x - 1, y - 1, x, y + lineHeight + 1, 0xFF000000 | color);
-                        graphics.fill(x + textWidth + 3, y - 1, x + textWidth + 4, y + lineHeight + 1, 0xFF000000 | color);
-
-                        graphics.drawString(font, Language.getInstance().getVisualOrder(w.component), x + 2, y + 1, color, false);
-
-                        x += textWidth + 5;
-                    } else {
-                        graphics.drawString(font, Language.getInstance().getVisualOrder(w.component), x, y, color, false);
-
-                        x += textWidth;
-                    }
+                    x += textWidth;
                 }
             }
 
             y += lineHeight + 1;
         }
+
+        return hovered;
     }
 
     private static void tokenizeLiteral(String s, Style style, List<Word> out) {

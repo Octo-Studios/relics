@@ -3,10 +3,10 @@ package it.hurts.sskirillss.relics.level;
 import com.google.common.base.Suppliers;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStacking;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsLootCodecs;
-import it.hurts.sskirillss.relics.items.relics.ring.RingOfTheSevenDeadlySinsItem;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -18,8 +18,8 @@ import net.neoforged.neoforge.common.loot.IGlobalLootModifier;
 import net.neoforged.neoforge.common.loot.LootModifier;
 import org.jetbrains.annotations.NotNull;
 
-import javax.annotation.Nonnull;
 import java.util.function.Supplier;
+import javax.annotation.Nonnull;
 
 public class GreedLootModifier extends LootModifier {
     public static final Supplier<MapCodec<GreedLootModifier>> CODEC = Suppliers.memoize(() -> RecordCodecBuilder.mapCodec(inst -> codecStart(inst).apply(inst, GreedLootModifier::new)));
@@ -66,15 +66,13 @@ public class GreedLootModifier extends LootModifier {
         }
 
         if (player != null) {
-            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
-                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
+            var rings = RelicStacks.forStat(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "greed", "chance");
+            var chance = StatStacking.fromParticipants(rings, "chance");
 
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("greed").canPlayerUse(player))
-                    continue;
-
-                if (random.nextDouble() < relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("greed").getStatData("chance").getValue()) {
-                    relic.getRelicData(player, stack).getLevelingData().addExperience("greed", "nullification", 1);
-                    relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("greed").getStatisticData().getMetricData("nullified_tables").addValue(1);
+            for (var entry : rings) {
+                if (random.nextDouble() < chance.contribution(entry.stack()).orElse(0D)) {
+                    entry.addExperience("nullification", 1);
+                    entry.addMetric("nullified_tables", 1);
 
                     return new ObjectArrayList<>();
                 }

@@ -9,7 +9,9 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.relic.midnight_mantle.ConstellationStarEntity;
@@ -20,9 +22,9 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -50,6 +52,13 @@ import top.theillusivec4.curios.api.SlotContext;
 public class MidnightMantleItem extends WearableRelicItem {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
+        var fullMoonStacking = AbilityStatStackingTemplate.builder(StatStackingType.MULTIPLICATIVE)
+                .condition(ability -> ability.getMode().equals("full_moon"))
+                .build();
+        var newMoonStacking = AbilityStatStackingTemplate.builder(StatStackingType.MULTIPLICATIVE)
+                .condition(ability -> ability.getMode().equals("new_moon"))
+                .build();
+
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("phase")
@@ -59,31 +68,37 @@ public class MidnightMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("attack_damage")
+                                        .stacking(fullMoonStacking)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.50008D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("attack_speed")
+                                        .stacking(fullMoonStacking)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.50008D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("max_health")
+                                        .stacking(newMoonStacking)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.4999D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("health_regeneration")
+                                        .stacking(newMoonStacking)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.4999D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(5D, 10D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 120D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("modifier")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.50001D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
@@ -126,18 +141,23 @@ public class MidnightMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("brightness")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.74995D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("cooldown")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .thresholdValue(0D, Double.MAX_VALUE)
                                         .initialValue(15D, 10D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.002D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.MULTIPLICATIVE)
+                                                .condition(ability -> ability.getRankModifierData("strike").isEnabled())
+                                                .build())
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.50008D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
@@ -169,38 +189,45 @@ public class MidnightMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("star_chance")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.1D, 0.2D)
                                         .thresholdValue(0D, 1D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 0.90001D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("constellation_radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .thresholdValue(0D, Double.MAX_VALUE)
                                         .initialValue(5D, 7D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 25.018D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("tremor_duration")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.25D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 9.998D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("explosion_radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 7.501D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("explosion_damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 49.99D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("star_lifetime")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(10D, 15D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 120.0225D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun_duration")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2.5D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 10.00004D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -237,27 +264,32 @@ public class MidnightMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("chance")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .thresholdValue(0D, 1D)
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.7505D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 9.997D)
-                                        .formatValue(value -> MathUtils.round(value, 1))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 4.999D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10.00125D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("bounce_chance")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.05D, 0.15D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.4998D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
@@ -344,10 +376,12 @@ public class MidnightMantleItem extends WearableRelicItem {
     }
 
     public double getModeEffectiveness(LivingEntity entity, ItemStack stack) {
-        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity))
+        var phase = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase");
+
+        if (!phase.isAvailable())
             return 0D;
 
-        var mode = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode();
+        var mode = phase.getMode();
         var level = entity.getCommandSenderWorld();
 
         if (mode.isEmpty() || level.isDay())
@@ -363,10 +397,14 @@ public class MidnightMantleItem extends WearableRelicItem {
 
         var effectiveness = 1 - (minDistance / 4D);
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled() && this.getPhaseDuration(stack) > 0)
-            effectiveness *= 1F + this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("modifier").getValue();
+        if (phase.getRankModifierData("switch").isEnabled() && this.getPhaseDuration(stack) > 0)
+            effectiveness *= 1F + phase.getStatData("modifier").getValue();
 
         return effectiveness;
+    }
+
+    private double getPhaseBonus(LivingEntity entity, ItemStack stack, double contribution) {
+        return contribution * getModeEffectiveness(entity, stack);
     }
 
     public boolean canHideInTheDarkness(LivingEntity entity, ItemStack stack) {
@@ -395,33 +433,33 @@ public class MidnightMantleItem extends WearableRelicItem {
         if (this.getStarfallCooldown(stack) > 0)
             this.addStarfallCooldown(stack, -1);
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").canPlayerUse(entity)) {
-            var mode = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getMode();
+        var phase = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase");
+
+        if (phase.isAvailable()) {
+            var mode = phase.getMode();
 
             if (!mode.isEmpty()) {
                 if (entity.tickCount % 20 == 0)
-                    this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatisticData().getMetricData("duration_" + mode).addValue(1);
+                    phase.getStatisticData().getMetricData("duration_" + mode).addValue(1);
 
-                var totalEffectiveness = this.getModeEffectiveness(entity, stack);
-
-                var attackEffectiveness = mode.equals("full_moon") ? totalEffectiveness : 0D;
-                var healEffectiveness = mode.equals("new_moon") ? totalEffectiveness : 0D;
+                var attackSpeed = mode.equals("full_moon") ? getPhaseBonus(entity, stack, phase.getStatData("attack_speed").getStackedValue()) : 0D;
+                var maxHealth = mode.equals("new_moon") ? getPhaseBonus(entity, stack, phase.getStatData("max_health").getStackedValue()) : 0D;
 
                 EntityUtils.resetAttribute(entity, Attributes.ATTACK_SPEED,
-                        (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("attack_speed").getValue() * attackEffectiveness),
+                        (float) attackSpeed,
                         AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
                         EntityUtils.getAttributeId(slotContext, stack, Attributes.ATTACK_SPEED.value(), "phase"));
                 EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH,
-                        (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getStatData("max_health").getValue() * healEffectiveness),
+                        (float) maxHealth,
                         AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL,
                         EntityUtils.getAttributeId(slotContext, stack, Attributes.MAX_HEALTH.value(), "phase"));
             }
 
-            if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("phase").getRankModifierData("switch").isEnabled() && this.getPhaseDuration(stack) > 0)
+            if (phase.getRankModifierData("switch").isEnabled() && this.getPhaseDuration(stack) > 0)
                 this.addPhaseDuration(stack, -1);
         }
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").canPlayerUse(entity)) {
+        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("invisibility").isAvailable()) {
             var cooldown = this.getInvisibilityCooldown(stack);
 
             if (cooldown > 0) {
@@ -460,7 +498,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             if (entity.getCommandSenderWorld().isClientSide())
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "invisibility")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "invisibility")) {
                 var stack = entry.stack();
                 var relic = (MidnightMantleItem) entry.relic();
 
@@ -476,10 +514,10 @@ public class MidnightMantleItem extends WearableRelicItem {
             if (!level.isClientSide() && level.getServer() != null && !level.getServer().isSameThread())
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "phase", data -> data.getMode().equals("new_moon"))) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "phase", data -> data.getMode().equals("new_moon"))) {
                 var relic = (MidnightMantleItem) entry.relic();
 
-                var heal = event.getAmount() * entry.stat("health_regeneration") * relic.getModeEffectiveness(entity, entry.stack());
+                var heal = event.getAmount() * relic.getPhaseBonus(entity, entry.stack(), entry.stackedStat("health_regeneration"));
 
                 event.setAmount((float) (event.getAmount() + heal));
 
@@ -495,13 +533,13 @@ public class MidnightMantleItem extends WearableRelicItem {
             if (!(event.getSource().getEntity() instanceof LivingEntity entity))
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "phase", data -> data.getMode().equals("full_moon"))) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "phase", data -> data.getMode().equals("full_moon"))) {
                 var relic = (MidnightMantleItem) entry.relic();
 
                 if (!TargetingUtils.canHarm(entity, event.getEntity(), entry.stack(), "phase"))
                     continue;
 
-                var damage = event.getAmount() * entry.stat("attack_damage") * relic.getModeEffectiveness(entity, entry.stack());
+                var damage = event.getAmount() * relic.getPhaseBonus(entity, entry.stack(), entry.stackedStat("attack_damage"));
 
                 event.setAmount((float) (event.getAmount() + damage));
 
@@ -523,7 +561,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             if (!(event.getSource().getEntity() instanceof LivingEntity entity))
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "invisibility").withRank("strike")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "invisibility").withRank("strike")) {
                 var stack = entry.stack();
                 var relic = (MidnightMantleItem) entry.relic();
 
@@ -533,7 +571,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                 if (!TargetingUtils.canHarm(entity, event.getEntity(), stack, "invisibility"))
                     continue;
 
-                var damage = event.getAmount() * entry.stat("damage");
+                var damage = event.getAmount() * entry.stackedStat("damage");
 
                 event.setAmount((float) (event.getAmount() + damage));
 
@@ -585,7 +623,7 @@ public class MidnightMantleItem extends WearableRelicItem {
         public static void onAbilityModeSwitch(AbilityModeSwitchEvent event) {
             var entity = event.getBearer();
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "phase").withRank("switch"))
+            for (var entry : RelicStacks.of(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "phase").withRank("switch"))
                 ((MidnightMantleItem) entry.relic()).setPhaseDuration(entry.stack(), (int) entry.stat("duration") * 20);
         }
 
@@ -602,7 +640,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             var level = entity.level();
             var random = level.getRandom();
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "constellation")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "constellation")) {
                 var stack = entry.stack();
                 var relic = (MidnightMantleItem) entry.relic();
 
@@ -647,7 +685,7 @@ public class MidnightMantleItem extends WearableRelicItem {
             var level = entity.level();
             var random = level.getRandom();
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "starfall")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.MIDNIGHT_MANTLE.get(), "starfall")) {
                 var stack = entry.stack();
                 var relic = (MidnightMantleItem) entry.relic();
 
@@ -664,7 +702,7 @@ public class MidnightMantleItem extends WearableRelicItem {
                 var star = new FallingStarEntity(RelicsEntities.FALLING_STAR.get(), level);
 
                 star.setDamage((float) (event.getAmount() * entry.stat("damage")));
-                star.setRadius((int) Math.round(entry.stat("radius")));
+                star.setRadius((int) entry.stat("radius"));
                 star.setStun((int) (entry.stat("stun") * 20));
                 star.setFlawless(relic.getRelicData(entity, stack).isVisuallyFlawless());
                 star.setDeltaMovement(motion);

@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.init.*;
@@ -21,9 +22,9 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.ring_of_the_seven_deadly_sins.C2SHurtPlayer;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.network.chat.Component;
@@ -70,6 +71,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("multiplier")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(0.025D, 0.05D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 1))
@@ -97,11 +99,13 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("outgoing_damage_multiplier")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(0.005D, 0.015D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.025D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("incoming_damage_multiplier")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(0.75D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
@@ -129,16 +133,19 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("window")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("early_multiplier")
+                                        .stacking(StatStackingType.MULTIPLICATIVE)
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1D)
                                         .formatValue(value -> MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("late_multiplier")
+                                        .stacking(StatStackingType.SEQUENTIAL)
                                         .initialValue(1D, 0.75D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value * 100, 0))
@@ -166,11 +173,13 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                         .ability(AbilityTemplate.builder("sloth")
                                 .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("time")
+                                        .stacking(StatStackingType.BEST)
                                         .initialValue(10D, 7.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.9975D)
                                         .formatValue(value -> MathUtils.round(value, 2))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("speed")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(1D, 0.75D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.24975D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
@@ -195,16 +204,19 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                         .ability(AbilityTemplate.builder("greed")
                                 .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("luck")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 10D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("looting")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 10D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("chance")
+                                        .stacking(StatStackingType.SEQUENTIAL)
                                         .initialValue(0.1D, 0.075D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.00998D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
@@ -230,11 +242,13 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                         .ability(AbilityTemplate.builder("gluttony")
                                 .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("early_multiplier")
+                                        .stacking(StatStackingType.MULTIPLICATIVE)
                                         .initialValue(0.0025, 0.005D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> MathUtils.round(value * 100, 2))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("late_multiplier")
+                                        .stacking(StatStackingType.SEQUENTIAL)
                                         .initialValue(0.1D, 0.05)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.01D)
                                         .formatValue(value -> MathUtils.round(value * 100, 2))
@@ -259,11 +273,13 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                         .ability(AbilityTemplate.builder("lust")
                                 .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("amount")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 13D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("time")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(360D, 420D)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 720D)
                                         .formatValue(value -> MathUtils.round(value, 0))
@@ -332,17 +348,10 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
         var entity = slotContext.entity();
 
         if (entity instanceof Player player && !player.level().isClientSide()) {
-            if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("gluttony").canPlayerUse(player)) {
-                var foodLevel = player.getFoodData().getFoodLevel();
-                var center = 10;
-
-                var above = Math.max(0, foodLevel - center);
-                var below = Math.max(0, center - foodLevel);
-
-                var positive = above * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gluttony").getStatData("early_multiplier").getValue();
-                var negative = below * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gluttony").getStatData("late_multiplier").getValue();
-
-                var modifier = Math.clamp(positive - negative, -0.9D, 1.0D);
+            if (this.getRelicData(player, stack).getAbilitiesData().getAbilityData("gluttony").isAvailable()) {
+                var hungerDifference = player.getFoodData().getFoodLevel() - 10;
+                var stat = hungerDifference >= 0 ? "early_multiplier" : "late_multiplier";
+                var modifier = Math.clamp(hungerDifference * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gluttony").getStatData(stat).getStackedValue(), -0.9D, 1D);
 
                 if (modifier > 0.0001D)
                     this.getRelicData(player, stack).getAbilitiesData().getAbilityData("gluttony").getStatisticData().getMetricData("positive_duration").addValue(1D / 20D);
@@ -362,7 +371,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             }
         }
 
-        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sloth").canPlayerUse(entity)) {
+        if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sloth").isAvailable()) {
             var slothData = stack.getOrDefault(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_SLOTH.get(), SlothData.create(entity.position(), entity.getYRot(), entity.getXRot(), 0));
 
             var positionDelta = entity.position().distanceToSqr(new Vec3(slothData.x(), slothData.y(), slothData.z()));
@@ -411,20 +420,20 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
     public int getFortuneLevel(SlotContext slotContext, LootContext lootContext, ItemStack stack) {
         var entity = slotContext.entity();
 
-        if (entity == null || !this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").canPlayerUse(entity))
+        if (entity == null || !this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").isAvailable())
             return super.getFortuneLevel(slotContext, lootContext, stack);
 
-        return (int) Math.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").getStatData("luck").getValue());
+        return (int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").getStatData("luck").getStackedValue();
     }
 
     @Override
     public int getLootingLevel(SlotContext slotContext, LootContext lootContext, ItemStack stack) {
         var entity = slotContext.entity();
 
-        if (entity == null || !this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").canPlayerUse(entity))
+        if (entity == null || !this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").isAvailable())
             return super.getLootingLevel(slotContext, lootContext, stack);
 
-        return (int) Math.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").getStatData("looting").getValue());
+        return (int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("greed").getStatData("looting").getStackedValue();
     }
 
     @Override
@@ -489,7 +498,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             if (verticalDelta <= 0)
                 return;
 
-            var attackerRings = RelicStackingUtils.stacks(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "pride");
+            var attackerRings = RelicStacks.of(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "pride");
 
             if (!attackerRings.isEmpty()) {
                 var totalBonus = 0D;
@@ -501,7 +510,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                         continue;
                     }
 
-                    var perBlock = entry.stat("multiplier");
+                    var perBlock = entry.stackedStat("multiplier");
                     var bonus = verticalDelta * perBlock;
 
                     ringBonuses.add(bonus);
@@ -524,7 +533,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             }
 
             if (target instanceof LivingEntity victim) {
-                var victimRings = RelicStackingUtils.stacks(victim, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "pride");
+                var victimRings = RelicStacks.of(victim, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "pride");
 
                 if (victimRings.isEmpty())
                     return;
@@ -533,7 +542,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                 var ringPenalties = new ArrayList<Double>(victimRings.size());
 
                 for (var entry : victimRings) {
-                    var perBlock = entry.stat("multiplier");
+                    var perBlock = entry.stackedStat("multiplier");
                     var penalty = verticalDelta * perBlock;
 
                     ringPenalties.add(penalty);
@@ -563,33 +572,18 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             if (speed <= 0)
                 return;
 
-            var rings = RelicStackingUtils.stacks(target, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "sloth");
+            var rings = RelicStacks.lookup(target, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "sloth").stacking("speed");
+            var penalty = speed * rings.total().orElse(0D);
 
-            if (rings.isEmpty())
+            if (penalty <= 0D)
                 return;
 
             var baseDamage = event.getNewDamage();
-            var totalPenalty = 0D;
-            var ringPenalties = new ArrayList<Double>(rings.size());
 
-            for (var entry : rings) {
-                var speedMultiplier = entry.stat("speed");
-                var penalty = speed * speedMultiplier;
+            event.setNewDamage((float) (baseDamage * (1D + penalty)));
 
-                ringPenalties.add(penalty);
-                totalPenalty += penalty;
-            }
-
-            if (totalPenalty <= 0)
-                return;
-
-            event.setNewDamage((float) (baseDamage * (1 + totalPenalty)));
-
-            for (var i = 0; i < rings.size(); i++) {
-                var extraDamage = baseDamage * ringPenalties.get(i);
-
-                rings.getEntries().get(i).addMetric("damage_from_moving", extraDamage);
-            }
+            for (var entry : rings.entries())
+                entry.source().addMetric("damage_from_moving", baseDamage * speed * entry.contribution());
         }
 
         @SubscribeEvent
@@ -597,7 +591,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             if (!(event.getSource().getEntity() instanceof LivingEntity attacker))
                 return;
 
-            var rings = RelicStackingUtils.stacks(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "wrath");
+            var rings = RelicStacks.of(attacker, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "wrath");
 
             if (rings.isEmpty())
                 return;
@@ -623,8 +617,8 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
 
                 if (delta < windowTicks) {
                     var mid = windowTicks / 2D;
-                    var earlyMultiplier = entry.stat("early_multiplier");
-                    var lateMultiplier = entry.stat("late_multiplier");
+                    var earlyMultiplier = entry.stackedStat("early_multiplier");
+                    var lateMultiplier = entry.stackedStat("late_multiplier");
 
                     if (delta <= mid) {
                         var t = delta / mid;
@@ -677,7 +671,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
         }
 
         private static boolean applyEnvy(LivingDamageEvent.Pre event, LivingEntity wearer, LivingEntity other, boolean wearerIsAttacker) {
-            var rings = RelicStackingUtils.stacks(wearer, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "envy");
+            var rings = RelicStacks.of(wearer, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "envy");
 
             if (rings.isEmpty())
                 return false;
@@ -695,7 +689,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                     continue;
                 }
 
-                var perPoint = Math.abs(entry.stat(stat));
+                var perPoint = Math.abs(entry.stackedStat(stat));
                 var modifier = (wearerIsAttacker ? diff : -diff) * perPoint;
 
                 modifiers.add(modifier);
@@ -740,12 +734,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
 
             long totalDeadlineExtension = 0L;
 
-            for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get())) {
-                var relic = (RingOfTheSevenDeadlySinsItem) stack.getItem();
-
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").canPlayerUse(player))
-                    continue;
-
+            for (var entry : RelicStacks.of(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "lust")) {
                 var parentA = event.getParentA();
                 var parentB = event.getParentB();
                 var child = event.getChild();
@@ -754,7 +743,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                 var random = level.getRandom();
 
                 if (child != null) {
-                    var maxOffspring = Math.max(1, (int) Math.round(relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatData("amount").getValue()));
+                    var maxOffspring = Math.max(1, (int) entry.stat("amount"));
                     var count = random.nextInt(maxOffspring + 1);
 
                     for (int i = 0; i < count; i++) {
@@ -768,13 +757,13 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
                         level.addFreshEntity(extra);
                     }
 
-                    relic.getRelicData(player, stack).getLevelingData().addExperience("lust", "offspring", count);
-                    relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatisticData().getMetricData("extra_offspring").addValue(count);
+                    entry.addExperience("offspring", count);
+                    entry.addMetric("extra_offspring", count);
                 }
 
-                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatisticData().getMetricData("breeding_attempts").addValue(1);
+                entry.addMetric("breeding_attempts", 1);
 
-                totalDeadlineExtension += (long) (relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("lust").getStatData("time").getValue() * 20);
+                totalDeadlineExtension += (long) (entry.stackedStat("time") * 20);
             }
 
             if (totalDeadlineExtension > 0L) {
@@ -809,7 +798,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             if (!state.is(Tags.Blocks.ORES))
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "greed"))
+            for (var entry : RelicStacks.of(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "greed"))
                 entry.addExperience("ore", 1);
         }
 
@@ -818,7 +807,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             if (!(event.getSource().getEntity() instanceof Player player))
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "greed"))
+            for (var entry : RelicStacks.of(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "greed"))
                 entry.addExperience("mob", 1);
         }
 
@@ -840,7 +829,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             if (nutrition <= 0)
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "gluttony"))
+            for (var entry : RelicStacks.of(player, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "gluttony"))
                 entry.addExperience("food", nutrition);
         }
 
@@ -897,7 +886,7 @@ public class RingOfTheSevenDeadlySinsItem extends WearableRelicItem implements I
             if (entity.getCommandSenderWorld().isClientSide())
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "sloth")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.RING_OF_THE_SEVEN_DEADLY_SINS.get(), "sloth")) {
                 var stack = entry.stack();
 
                 ServerScheduler.schedule(1, () -> stack.set(RelicsDataComponents.RING_OF_THE_SEVEN_DEADLY_SINS_SLOTH.get(), SlothData.create(entity.position(), entity.getYRot(), entity.getXRot(), 0)));

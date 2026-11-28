@@ -10,7 +10,7 @@ import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.back.MidnightMantleItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.StarData;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.DimensionSpecialEffects;
@@ -89,16 +89,16 @@ public class MidnightMantleSkyRenderer {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_SKY || MC.player == null || MC.level == null)
             return;
 
-        var stacks = EntityUtils.findEquippedCurios(MC.player, RelicsItems.MIDNIGHT_MANTLE.get());
+        var stacks = RelicStacks.lookup(MC.player, RelicsItems.MIDNIGHT_MANTLE.get(), "phase").located();
 
-        INSTANCE.render(event, stacks);
+        INSTANCE.render(event, stacks.getStacks());
     }
 
     public static boolean shouldSuppressVanillaStars() {
         if (MC.player == null || MC.level == null || !hasNormalSky())
             return false;
 
-        return !EntityUtils.findEquippedCurios(MC.player, RelicsItems.MIDNIGHT_MANTLE.get()).isEmpty()
+        return !RelicStacks.lookup(MC.player, RelicsItems.MIDNIGHT_MANTLE.get(), "phase").located().isEmpty()
                 || INSTANCE.currentStarAlpha > 0.003F;
     }
 

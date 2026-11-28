@@ -10,7 +10,10 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStacking;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.ElectricSparkEntity;
@@ -22,7 +25,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -48,17 +51,23 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
 
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
+        var shockStacking = AbilityStatStackingTemplate.builder(StatStackingType.BEST)
+                .condition(ability -> !ability.getMode().equals("disabled"))
+                .build();
+
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("regeneration")
                                 .levelContribution(10)
                                 .rankModifier(3, "retention")
                                 .stat(AbilityStatTemplate.builder("max_health")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(0.1D, 0.2D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 1.5001D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("regeneration")
+                                        .stacking(StatStackingType.MULTIPLICATIVE)
                                         .initialValue(0.15D, 0.35D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 1.99985D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
@@ -83,53 +92,69 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                                 .rankModifier(5, "charge")
                                 .modes("enabled", "disabled")
                                 .stat(AbilityStatTemplate.builder("cooldown")
+                                        .stacking(shockStacking)
                                         .initialValue(120D, 60D)
                                         .thresholdValue(0, Double.MAX_VALUE)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 9.99988D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("rings")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> !ability.getMode().equals("disabled"))
+                                                .build())
                                         .initialValue(1D, 2D)
                                         .thresholdValue(0, Double.MAX_VALUE)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 10.001D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("radius")
+                                        .stacking(shockStacking)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.RADICAL.get(), 4.99977D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("knockback")
+                                        .stacking(shockStacking)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 2.50355D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("paralysis")
+                                        .stacking(shockStacking)
                                         .initialValue(1D, 2.5D)
                                         .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 9.9989D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("distance")
+                                        .stacking(shockStacking)
                                         .initialValue(2.5D, 5D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 19.99989D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("bounces")
+                                        .stacking(shockStacking)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 24.9975D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(shockStacking)
                                         .initialValue(2.5D, 5D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 19.99989D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage_modifier")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.BEST)
+                                                .condition(ability -> !ability.getMode().equals("disabled") && ability.getRankModifierData("conductor").isEnabled())
+                                                .build())
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 4.99993D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.BEST)
+                                                .condition(ability -> !ability.getMode().equals("disabled") && ability.getRankModifierData("charge").isEnabled())
+                                                .build())
                                         .initialValue(2.5D, 5D)
                                         .targetValue(RelicsScalingModels.RADICAL.get(), 30.00017D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -276,21 +301,23 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
         this.setAffectedEntities(stack, list);
     }
 
+    private static boolean isInWaterOrRain(LivingEntity entity) {
+        return entity.isInLiquid() || entity.isInRain();
+    }
+
     @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         var entity = slotContext.entity();
         var level = entity.level();
 
-        var activeRegenerationStacks = RelicStackingUtils.findActiveStacks(entity, RelicsItems.JELLYFISH_NECKLACE.get(),
-                equippedStack -> equippedStack.getItem() == this
-                        && this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").canPlayerUse(entity));
+        var regeneration = RelicStacks.lookup(entity, this, "regeneration");
+        var activeRegenerationStacks = regeneration.active(ability -> true);
 
-        if (RelicStackingUtils.isControllerStack(stack, activeRegenerationStacks)) {
-            var multiplier = (float) RelicStackingUtils.sumValue(entity, stack, "regeneration", "max_health");
-            var retentionUnlocked = activeRegenerationStacks.stream().anyMatch(
-                    equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").getRankModifierData("retention").isEnabled());
+        if (activeRegenerationStacks.isController(stack)) {
+            var multiplier = (float) regeneration.stacking("max_health").clampedTotal(0D);
+            var retentionUnlocked = activeRegenerationStacks.any("retention");
 
-            if (entity.isInLiquid() || entity.isInRain()) {
+            if (isInWaterOrRain(entity)) {
                 var boostedMaxHealth = entity.getMaxHealth() * multiplier;
 
                 EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH, multiplier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, REGEN_MAX_HEALTH_ATTRIBUTE);
@@ -314,30 +341,29 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             }
         }
 
-        var activeShockStacks = RelicStackingUtils.findActiveStacks(entity, RelicsItems.JELLYFISH_NECKLACE.get(),
-                equippedStack -> equippedStack.getItem() == this && this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").canPlayerUse(entity)
-                        && !this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getMode().equals("disabled"));
+        var shock = RelicStacks.lookup(entity, this, "shock");
+        var activeShockStacks = shock.active(RelicStacks.modeIsNot("disabled"));
 
-        if (RelicStackingUtils.isControllerStack(stack, activeShockStacks)) {
+        if (activeShockStacks.isController(stack)) {
             var cooldown = this.getCooldown(stack);
-            var maxRings = (int) Math.ceil(RelicStackingUtils.sumValue(entity, stack, "shock", "rings",
-                    abilityData -> !abilityData.getMode().equals("disabled")));
+            var maxRings = (int) shock.stacking("rings").clampedTotal(0D);
             var rings = Math.min(this.getRings(stack), maxRings);
+
             if (rings != this.getRings(stack))
                 this.setRings(stack, rings);
 
-            var cooldownTicks = (int) Math.round(RelicStackingUtils.bestValue(entity, stack, "shock", "cooldown", abilityData -> !abilityData.getMode().equals("disabled")) * 20D);
-            var radius = RelicStackingUtils.bestValue(entity, stack, "shock", "radius", abilityData -> !abilityData.getMode().equals("disabled"));
-            var knockback = RelicStackingUtils.bestValue(entity, stack, "shock", "knockback", abilityData -> !abilityData.getMode().equals("disabled"));
-            var paralysis = RelicStackingUtils.bestValue(entity, stack, "shock", "paralysis", abilityData -> !abilityData.getMode().equals("disabled"));
-            var distance = RelicStackingUtils.bestValue(entity, stack, "shock", "distance", abilityData -> !abilityData.getMode().equals("disabled"));
-            var bounces = (int) Math.round(RelicStackingUtils.bestValue(entity, stack, "shock", "bounces", abilityData -> !abilityData.getMode().equals("disabled")));
-            var damage = RelicStackingUtils.bestValue(entity, stack, "shock", "damage", abilityData -> !abilityData.getMode().equals("disabled"));
-            var conductorUnlocked = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getRankModifierData("conductor").isEnabled());
-            var chargeUnlocked = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getRankModifierData("charge").isEnabled());
-            var damageModifier = conductorUnlocked ? RelicStackingUtils.maxValue(entity, stack, "shock", "damage_modifier", abilityData -> !abilityData.getMode().equals("disabled")) : 0D;
-            var chargeDurationTicks = (int) Math.round(RelicStackingUtils.bestValue(entity, stack, "shock", "duration", abilityData -> !abilityData.getMode().equals("disabled")) * 20D);
-            var flawless = activeShockStacks.stream().anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).isVisuallyFlawless());
+            var cooldownTicks = (int) Math.round(shock.stacking("cooldown").clampedTotal(0D) * 20D);
+            var radius = shock.stacking("radius").clampedTotal(0D);
+            var knockback = shock.stacking("knockback").clampedTotal(0D);
+            var paralysis = shock.stacking("paralysis").clampedTotal(0D);
+            var distance = shock.stacking("distance").clampedTotal(0D);
+            var bounces = (int) shock.stacking("bounces").clampedTotal(0D);
+            var damage = shock.stacking("damage").clampedTotal(0D);
+            var conductorUnlocked = activeShockStacks.any("conductor");
+            var chargeUnlocked = activeShockStacks.any("charge");
+            var damageModifier = conductorUnlocked ? shock.stacking("damage_modifier").clampedTotal(0D) : 0D;
+            var chargeDurationTicks = (int) Math.round(shock.stacking("duration").clampedTotal(0D) * 20D);
+            var flawless = activeShockStacks.getEntries().stream().anyMatch(entry -> entry.relicData().isVisuallyFlawless());
 
             if (rings < maxRings) {
                 if (cooldown > 0)
@@ -424,7 +450,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             var controllerDamagedEntities = this.getDamagedEntities(stack);
             var controllerAffectedEntities = this.getAffectedEntities(stack);
 
-            for (var equippedStack : activeShockStacks) {
+            for (var equippedStack : activeShockStacks.getStacks()) {
                 if (equippedStack == stack)
                     continue;
 
@@ -445,12 +471,9 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             return;
 
         var entity = slotContext.entity();
-        var activeRegenerationStacks = EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get()).stream()
-                .filter(equippedStack -> equippedStack != stack)
-                .filter(equippedStack -> equippedStack.getItem() == this
-                        && this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").canPlayerUse(entity))
-                .toList();
-        var inWaterOrRain = entity.isInLiquid() || entity.isInRain();
+        var regeneration = RelicStacks.lookup(entity, this, "regeneration");
+        var activeRegenerationStacks = regeneration.active(ability -> ability.getAbilitiesData().getRelicData().getStack() != stack);
+        var inWaterOrRain = isInWaterOrRain(entity);
 
         if (activeRegenerationStacks.isEmpty()) {
             EntityUtils.removeAttribute(entity, Attributes.MAX_ABSORPTION, AttributeModifier.Operation.ADD_VALUE, REGEN_RETENTION_ATTRIBUTE);
@@ -460,11 +483,9 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             return;
         }
 
-        var remainingMultiplier = (float) activeRegenerationStacks.stream()
-                .mapToDouble(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").getStatData("max_health").getValue())
-                .sum();
-        var retentionUnlocked = activeRegenerationStacks.stream()
-                .anyMatch(equippedStack -> this.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("regeneration").getRankModifierData("retention").isEnabled());
+        var remaining = regeneration.forStat("max_health").filter(entry -> entry.stack() != stack);
+        var remainingMultiplier = (float) StatStacking.fromParticipants(remaining, "max_health").clampedTotal(0D);
+        var retentionUnlocked = activeRegenerationStacks.any("retention");
 
         if (inWaterOrRain) {
             EntityUtils.resetAttribute(entity, Attributes.MAX_HEALTH, remainingMultiplier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, REGEN_MAX_HEALTH_ATTRIBUTE);
@@ -507,23 +528,19 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             if (!level.isClientSide() && level.getServer() != null && !level.getServer().isSameThread())
                 return;
 
-            if (entity.isInLiquid() || entity.isInRain()) {
-                for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get())) {
-                    var relic = (JellyfishNecklaceItem) stack.getItem();
+            if (isInWaterOrRain(entity)) {
+                var copies = RelicStacks.forStat(entity, RelicsItems.JELLYFISH_NECKLACE.get(), "regeneration", "regeneration");
+                var stacking = StatStacking.fromParticipants(copies, "regeneration");
 
-                    var abilityData = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration");
-
-                    if (!abilityData.canPlayerUse(entity))
-                        continue;
-
-                    var health = Math.min(entity.getMaxHealth(), event.getAmount() * abilityData.getStatData("regeneration").getValue());
+                for (var entry : copies) {
+                    var health = Math.min(entity.getMaxHealth(), event.getAmount() * stacking.contribution(entry.stack()).orElse(0D));
 
                     event.setAmount((float) (event.getAmount() + health));
 
                     if (!level.isClientSide()) {
-                        relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("regeneration").getStatisticData().getMetricData("health_regenerated").addValue(health);
+                        entry.addMetric("health_regenerated", health);
 
-                        relic.getRelicData(entity, stack).getLevelingData().addExperience("regeneration", "health_regeneration", health);
+                        entry.addExperience("health_regeneration", health);
                     }
                 }
             }
@@ -535,23 +552,13 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
                 return;
 
             var level = entity.level();
-            var stacks = EntityUtils.findEquippedCurios(entity, RelicsItems.JELLYFISH_NECKLACE.get()).stream()
-                    .filter(stack -> stack.getItem() instanceof JellyfishNecklaceItem relic
-                            && relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").canPlayerUse(entity)
-                            && !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("shock").getMode().equals("disabled"))
-                    .toList();
-
-            if (stacks.isEmpty())
+            var shock = RelicStacks.lookup(entity, RelicsItems.JELLYFISH_NECKLACE.get(), "shock");
+            var stacks = shock.active(RelicStacks.modeIsNot("disabled"));
+            if (!stacks.any("charge"))
                 return;
 
-            var stack = stacks.getFirst();
+            var stack = stacks.getControllerStack();
             var relic = (JellyfishNecklaceItem) stack.getItem();
-            var chargeUnlocked = stacks.stream().anyMatch(
-                    equippedStack -> relic.getRelicData(entity, equippedStack).getAbilitiesData().getAbilityData("shock").getRankModifierData("charge").isEnabled());
-
-            if (!chargeUnlocked)
-                return;
-
             if (relic.getDuration(stack) <= 0)
                 return;
 
@@ -560,8 +567,7 @@ public class JellyfishNecklaceItem extends WearableRelicItem {
             var uuid = target.getStringUUID();
 
             if (!targets.contains(uuid)) {
-                var paralysis = RelicStackingUtils.bestValue(entity, stack, "shock", "paralysis",
-                        abilityData -> !abilityData.getMode().equals("disabled"));
+                var paralysis = shock.stacking("paralysis").clampedTotal(0D);
 
                 target.addEffect(new MobEffectInstance(RelicsMobEffects.PARALYSIS, (int) (paralysis * 20), 0, false, false));
 

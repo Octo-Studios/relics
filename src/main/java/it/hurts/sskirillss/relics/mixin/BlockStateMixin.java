@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.mixin;
 import it.hurts.sskirillss.relics.api.events.utility.FluidCollisionEvent;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.back.GlitchyMantleItem;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.LivingEntity;
@@ -57,9 +57,7 @@ public class BlockStateMixin {
         if (!state.is(BlockTags.LEAVES))
             return;
 
-        var stack = EntityUtils.findEquippedCurio(entity, RelicsItems.LEAFY_MANTLE.get());
-
-        if (stack.isEmpty())
+        if (RelicStacks.lookup(entity, RelicsItems.LEAFY_MANTLE.get(), "camouflage").located().isEmpty())
             return;
 
         if (entity.isShiftKeyDown()) {
@@ -82,17 +80,7 @@ public class BlockStateMixin {
         if (!state.isAir())
             return;
 
-        var stack = EntityUtils.findEquippedCurio(entity, RelicsItems.GLITCHY_MANTLE.get());
-
-        if (stack.isEmpty())
-            return;
-
-        var relic = (GlitchyMantleItem) stack.getItem();
-
-        if (relic.isForcedFall(stack))
-            return;
-
-        if (relic.canCollideWithAirLike(entity, stack))
+        if (GlitchyMantleItem.canWalkOnAir(entity))
             cir.setReturnValue(entityContext.isAbove(Shapes.block(), pos, true) ? Shapes.block() : Shapes.empty());
     }
 
@@ -110,17 +98,7 @@ public class BlockStateMixin {
         if (state.getDestroySpeed(level, pos) < 0F)
             return;
 
-        var stack = EntityUtils.findEquippedCurio(entity, RelicsItems.GLITCHY_MANTLE.get());
-
-        if (stack.isEmpty())
-            return;
-
-        var relic = (GlitchyMantleItem) stack.getItem();
-
-        if (relic.isForcedFall(stack))
-            return;
-
-        if (relic.canPhaseThroughBlocks(entity, stack))
+        if (GlitchyMantleItem.canPhase(entity))
             cir.setReturnValue(entity.isShiftKeyDown() ? Shapes.empty() : entityContext.isAbove(Shapes.block(), pos, true) ? Shapes.block() : Shapes.empty());
     }
 }

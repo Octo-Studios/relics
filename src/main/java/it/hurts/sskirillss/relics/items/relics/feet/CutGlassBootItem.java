@@ -12,8 +12,11 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStacking;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -22,9 +25,9 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.cut_glass_boot.C2SCycleFluid;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
 import lombok.AllArgsConstructor;
@@ -69,26 +72,34 @@ import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
 import top.theillusivec4.curios.api.SlotContext;
 
-import javax.annotation.Nullable;
 import java.util.*;
+import javax.annotation.Nullable;
 
 public class CutGlassBootItem extends WearableRelicItem {
+    private static final ResourceLocation SPEED_ATTRIBUTE = ResourceLocation.fromNamespaceAndPath(Relics.MODID, "cut_glass_boot_speed");
+
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("glass")
                                 .stat(AbilityStatTemplate.builder("capacity")
+                                        .activeContainers(RelicsRelicContainers.HANDS.get())
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 50D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0) * 1000)
+                                        .rounding(Math::round)
+                                        .formatValue(value -> value.intValue() * 1000)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("max_fluids")
+                                        .activeContainers(RelicsRelicContainers.HANDS.get())
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("speed")
+                                        .stacking(StatStackingType.MULTIPLICATIVE)
                                         .initialValue(0.01D, 0.05D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
@@ -124,85 +135,118 @@ public class CutGlassBootItem extends WearableRelicItem {
         super.curioTick(slotContext, stack);
 
         var entity = slotContext.entity();
-        var level = entity.level();
-        var movementSpeedAttributeId = EntityUtils.getAttributeId(slotContext, stack, Attributes.MOVEMENT_SPEED.value(), "glass");
 
-        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(entity)) {
-            this.setSpeedBlend(stack, 0F);
-
-            EntityUtils.removeAttribute(entity, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, movementSpeedAttributeId);
-
-            return;
-        }
-
-        if (level.isClientSide())
+        if (entity.level().isClientSide())
             return;
 
+        var boots = EntityUtils.findEquippedCurios(entity, this);
+
+        if (boots.isEmpty() || boots.getFirst() != stack)
+            return;
+
+        var copies = RelicStacks.lookup(entity, this, "glass");
+        var active = copies.active(ability -> true);
+        var speedCopies = copies.forStat("speed");
         var position = entity.position();
+        var level = entity.level();
         var state = level.getFluidState(level.clip(new ClipContext(position, position.add(0, -2, 0), ClipContext.Block.OUTLINE, ClipContext.Fluid.ANY, entity)).getBlockPos());
+        var fluid = state.getFluidType().toString();
+        var bonuses = new IdentityHashMap<ItemStack, Double>();
+        var walking = false;
+        var previousFluidBlend = 0F;
 
-        var attribute = Attributes.MOVEMENT_SPEED;
-        var operation = AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL;
+        for (var entry : active) {
+            var boot = entry.stack();
 
-        var targetProgress = 0F;
-        var fluidAmount = 0;
-        var progressBeforeUpdate = this.getSpeedBlend(stack);
+            if (!boots.contains(boot))
+                continue;
 
-        if (state.getType() != Fluids.EMPTY) {
-            var entry = this.getFluidEntries(entity, stack).get(state.getFluidType().toString());
+            var stored = state.isEmpty() ? null : boot.getOrDefault(RelicsDataComponents.CUT_GLASS_BOOT_FLUIDS, Map.<String, FluidEntry>of()).get(fluid);
 
-            if (entry != null) {
-                targetProgress = 20F;
-                fluidAmount = entry.getAmount();
+            if (stored != null && entity.tickCount % 20 == 0) {
+                if (entity.getKnownMovement().multiply(1, 0, 1).length() > 0)
+                    entry.addExperience("standing", 1);
+
+                entry.addMetric("duration", 1);
             }
+
+            if (!speedCopies.contains(boot))
+                continue;
+
+            var speed = entry.ability().getStatData("speed");
+            var sharedPenalty = sharesWalkingPenalty(speed.getTemplate().getStacking().getType());
+
+            if (stored != null) {
+                bonuses.put(boot, stored.getAmount() / 1000D * speed.getValue());
+
+                walking |= sharedPenalty;
+            } else if (sharedPenalty)
+                previousFluidBlend = Math.max(previousFluidBlend, this.getSpeedBlend(boot));
         }
 
-        if (targetProgress > 0F && entity.tickCount % 20 == 0) {
-            if (entity.getKnownMovement().multiply(1, 0, 1).length() > 0)
-                this.getRelicData(entity, stack).getLevelingData().addExperience("glass", "standing", 1);
+        var rankedCopies = speedCopies.filter(entry -> entry.ability().getStatData("speed").getTemplate().getStacking().getType().ranksCopiesByStat());
+        var ranking = StatStacking.fromParticipants(rankedCopies, "speed");
+        var multiplier = 1D;
+        var perSlotMultiplier = 1D;
+        var longestBlend = 0F;
 
-            this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatisticData().getMetricData("duration").addValue(1);
-        }
+        for (var boot : boots) {
+            var bonus = bonuses.get(boot);
+            var speed = this.getRelicData(entity, boot).getAbilitiesData().getAbilityData("glass").getStatData("speed");
+            var template = speed.getTemplate();
+            var type = template == null ? null : template.getStacking().getType();
+            var sharedPenalty = sharesWalkingPenalty(type);
+            var progress = this.getSpeedBlend(boot);
 
-        var progress = progressBeforeUpdate;
+            if (!active.contains(boot) || !speedCopies.contains(boot) || bonus == null && sharedPenalty && walking)
+                progress = 0F;
+            else if (bonus == null)
+                progress = Math.max(0F, progress - 1F);
+            else
+                progress = Math.min(20F, (sharedPenalty ? Math.max(progress, previousFluidBlend) : progress) + 1F);
 
-        if (progress < targetProgress)
-            progress = Math.min(targetProgress, progress + 1F);
-        else if (progress > targetProgress)
-            progress = Math.max(targetProgress, progress - 1F);
+            this.setSpeedBlend(boot, progress);
 
-        this.setSpeedBlend(stack, progress);
-
-        var maxModifier = (float) (-0.5F + fluidAmount / 1000F * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("speed").getValue());
-
-        if (targetProgress <= 0F && progressBeforeUpdate > 1.0E-4F) {
-            var attributeInstance = entity.getAttribute(attribute);
-
-            if (attributeInstance != null) {
-                var existing = attributeInstance.getModifier(movementSpeedAttributeId);
-
-                if (existing != null) {
-                    var ratioBeforeUpdate = progressBeforeUpdate / 20F;
-
-                    if (ratioBeforeUpdate > 1.0E-4F)
-                        maxModifier = (float) (existing.amount() / ratioBeforeUpdate);
-                }
+            if (progress == 0F) {
+                boot.remove(RelicsDataComponents.CUT_GLASS_BOOT_SPEED_BONUS);
+                continue;
             }
+
+            var efficiency = type == StatStackingType.PARALLEL ? 1D : ranking.efficiency(boot).orElseGet(speed::getStackingEfficiency);
+            var blend = progress / 20F;
+
+            if (bonus == null)
+                bonus = boot.getOrDefault(RelicsDataComponents.CUT_GLASS_BOOT_SPEED_BONUS, 0D);
+            else
+                boot.set(RelicsDataComponents.CUT_GLASS_BOOT_SPEED_BONUS, bonus);
+
+            if (sharedPenalty) {
+                multiplier *= 1D + bonus * efficiency * blend;
+                longestBlend = Math.max(longestBlend, progress);
+            } else
+                perSlotMultiplier *= 1D + (-0.5D + bonus) * efficiency * blend;
         }
 
-        var modifier = maxModifier * (progress / 20F);
+        var modifier = (float) ((multiplier - 0.5D * longestBlend / 20D) * perSlotMultiplier - 1D);
 
-        EntityUtils.resetAttribute(entity, attribute, modifier, operation, movementSpeedAttributeId);
+        if (modifier == 0F)
+            EntityUtils.removeAttribute(entity, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, SPEED_ATTRIBUTE);
+        else
+            EntityUtils.resetAttribute(entity, Attributes.MOVEMENT_SPEED, modifier, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, SPEED_ATTRIBUTE);
+    }
+
+    private static boolean sharesWalkingPenalty(StatStackingType type) {
+        return type == StatStackingType.MULTIPLICATIVE || type == StatStackingType.PARALLEL;
     }
 
     @Override
     public void onUnequip(SlotContext slotContext, ItemStack newStack, ItemStack stack) {
         super.onUnequip(slotContext, newStack, stack);
 
-        if (stack.getItem() == newStack.getItem())
-            return;
+        var entity = slotContext.entity();
 
-        EntityUtils.removeAttribute(slotContext.entity(), Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, EntityUtils.getAttributeId(slotContext, stack, Attributes.MOVEMENT_SPEED.value(), "glass"));
+        if (stack.getItem() != newStack.getItem() && EntityUtils.findEquippedCurios(entity, this).isEmpty())
+            EntityUtils.removeAttribute(entity, Attributes.MOVEMENT_SPEED, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, SPEED_ATTRIBUTE);
     }
 
     @Override
@@ -219,13 +263,13 @@ public class CutGlassBootItem extends WearableRelicItem {
         for (var fluid : this.getFluidEntries(entity, stack).values())
             amount += fluid.getAmount();
 
-        var capacity = (int) MathUtils.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("capacity").getValue(), 0) * 1000;
+        var capacity = (int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("capacity").getValue() * 1000;
 
         return Math.max(amount, capacity);
     }
 
     public int getMaxFluidEntries(LivingEntity entity, ItemStack stack) {
-        var maxFluids = (int) MathUtils.round(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("max_fluids").getValue(), 0);
+        var maxFluids = (int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("glass").getStatData("max_fluids").getValue();
 
         return Math.max(this.getFluidEntries(entity, stack).size(), maxFluids);
     }
@@ -335,7 +379,9 @@ public class CutGlassBootItem extends WearableRelicItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
 
-        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("glass").canPlayerUse(player))
+        var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("glass");
+
+        if (!ability.getStatData("capacity").isAvailable())
             return InteractionResultHolder.pass(stack);
 
         var hitResult = Item.getPlayerPOVHitResult(level, player, ClipContext.Fluid.SOURCE_ONLY);
@@ -667,7 +713,7 @@ public class CutGlassBootItem extends WearableRelicItem {
             if (entity.isShiftKeyDown())
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.CUT_GLASS_BOOT.get(), "glass")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.CUT_GLASS_BOOT.get(), "glass")) {
                 var fluids = ((CutGlassBootItem) entry.relic()).getFluidEntries(entity, entry.stack());
 
                 if (!fluids.containsKey(event.getFluid().getFluidType().toString()))

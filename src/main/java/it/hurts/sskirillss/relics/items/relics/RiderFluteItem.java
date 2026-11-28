@@ -11,8 +11,11 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
@@ -21,8 +24,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.rider_flute.C2SCycleRiderFluteSlot;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
@@ -73,16 +76,23 @@ public class RiderFluteItem extends RelicItem {
                                 .rankModifier(3, "recall")
                                 .rankModifier(5, "resistance")
                                 .stat(AbilityStatTemplate.builder("max_slots")
+                                        .activeContainers(RelicsRelicContainers.HANDS.get())
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 4.286D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("heal")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.05D, 0.1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("resistance")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.PARALLEL)
+                                                .condition(ability -> ability.getRankModifierData("resistance").isEnabled())
+                                                .build())
+                                        .activeContainers(RelicsRelicContainers.INVENTORY.get(), RelicsRelicContainers.CURIOS.get())
                                         .initialValue(0.05D, 0.1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.5D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
@@ -181,11 +191,11 @@ public class RiderFluteItem extends RelicItem {
 
     public int getMaxHorseSlots(LivingEntity entity, ItemStack stack) {
         var currentSlots = this.getHorseSlots(stack).size();
-        var configuredSlots = (int) Math.ceil(this.getRelicData(entity, stack)
+        var configuredSlots = (int) this.getRelicData(entity, stack)
                 .getAbilitiesData()
                 .getAbilityData("stable")
                 .getStatData("max_slots")
-                .getValue());
+                .getValue();
 
         return Math.max(currentSlots, Math.max(1, configuredSlots));
     }
@@ -198,7 +208,7 @@ public class RiderFluteItem extends RelicItem {
 
         var ability = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("stable");
 
-        if (!ability.canPlayerUse(entity) || !ability.getRankModifierData("regeneration").isEnabled())
+        if (!ability.getStatData("heal").isAvailable() || !ability.getRankModifierData("regeneration").isEnabled())
             return;
 
         var amount = (float) ability.getStatData("heal").getValue();
@@ -539,7 +549,7 @@ public class RiderFluteItem extends RelicItem {
 
     @Override
     public InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity entity, InteractionHand hand) {
-        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable").canPlayerUse(player))
+        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable").getStatData("max_slots").isAvailable())
             return InteractionResult.PASS;
 
         if (!this.isSupportedMount(entity))
@@ -568,7 +578,7 @@ public class RiderFluteItem extends RelicItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
 
-        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable").canPlayerUse(player))
+        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable").getStatData("max_slots").isAvailable())
             return InteractionResultHolder.pass(stack);
 
         if (level.isClientSide())
@@ -788,27 +798,6 @@ public class RiderFluteItem extends RelicItem {
 
     @EventBusSubscriber
     public static class CommonEvents {
-        private static double getMountedResistance(Player player, LivingEntity horse) {
-            var total = 0D;
-
-            for (var stack : EntityUtils.getEquippedRelics(player)) {
-                if (!(stack.getItem() instanceof RiderFluteItem relic))
-                    continue;
-
-                if (relic.getHorseSlotByEntityUUID(stack, horse.getUUID()) < 0)
-                    continue;
-
-                var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
-
-                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("resistance").isEnabled())
-                    continue;
-
-                total += ability.getStatData("resistance").getValue();
-            }
-
-            return Math.clamp(total, 0D, 1D);
-        }
-
         @SubscribeEvent
         public static void onLivingDamage(LivingDamageEvent.Pre event) {
             var original = event.getNewDamage();
@@ -831,7 +820,15 @@ public class RiderFluteItem extends RelicItem {
             if (!(horse instanceof AbstractHorse || horse instanceof Saddleable))
                 return;
 
-            var resistance = getMountedResistance(player, horse);
+            var boundFlute = RelicStacks.lookup(player, stack -> stack.getItem() instanceof RiderFluteItem, "stable")
+                    .forStat("resistance")
+                    .filter(entry -> ((RiderFluteItem) entry.relic()).getHorseSlotByEntityUUID(entry.stack(), horse.getUUID()) >= 0)
+                    .getController();
+
+            if (boundFlute == null)
+                return;
+
+            var resistance = Math.clamp(boundFlute.stat("resistance"), 0D, 1D);
 
             if (resistance <= 0D)
                 return;
@@ -843,23 +840,8 @@ public class RiderFluteItem extends RelicItem {
             if (blocked <= 0F)
                 return;
 
-            for (var stack : EntityUtils.getEquippedRelics(player)) {
-                if (!(stack.getItem() instanceof RiderFluteItem relic))
-                    continue;
-
-                if (relic.getHorseSlotByEntityUUID(stack, horse.getUUID()) < 0)
-                    continue;
-
-                var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("stable");
-
-                if (!ability.canPlayerUse(player) || !ability.getRankModifierData("resistance").isEnabled())
-                    continue;
-
-                relic.getRelicData(player, stack).getLevelingData().addExperience("stable", "resistance", blocked);
-                ability.getStatisticData().getMetricData("damage_resisted").addValue(blocked);
-
-                break;
-            }
+            boundFlute.addExperience("resistance", blocked);
+            boundFlute.addMetric("damage_resisted", blocked);
         }
     }
 

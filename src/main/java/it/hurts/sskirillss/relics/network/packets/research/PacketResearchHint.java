@@ -86,7 +86,7 @@ public class PacketResearchHint implements CustomPacketPayload {
             research(player, stack, amount);
 
             var random = player.getRandom();
-            
+
             if (research.isComplete()) {
                 research.setResearched(true);
 

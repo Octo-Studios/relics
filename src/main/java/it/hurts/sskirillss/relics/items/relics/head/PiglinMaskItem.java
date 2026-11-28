@@ -8,7 +8,9 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.GoldenToothEntity;
@@ -23,7 +25,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -67,14 +69,18 @@ public class PiglinMaskItem extends WearableRelicItem {
                         .ability(AbilityTemplate.builder("barter")
                                 .rankModifier(3, "pocket")
                                 .stat(AbilityStatTemplate.builder("trades")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 11.75D)
-                                        .formatValue(Double::intValue)
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("items_count")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> ability.getRankModifierData("pocket").isEnabled())
+                                                .build())
                                         .initialValue(1D, 4D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 64.004D)
-                                        .formatValue(Double::intValue)
+                                        .rounding(Math::round)
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("trade")
@@ -103,26 +109,35 @@ public class PiglinMaskItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("chance")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.1D, 0.15D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.75008D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("health")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(10D, 7.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5125D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(5D, 10D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 29.99998D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("attack_damage")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> ability.getRankModifierData("frenzy").isEnabled())
+                                                .build())
                                         .initialValue(0.005D, 0.01D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.02999D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("attack_speed")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.MULTIPLICATIVE)
+                                                .condition(ability -> ability.getRankModifierData("frenzy").isEnabled())
+                                                .build())
                                         .initialValue(0.005D, 0.01D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.06999D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
@@ -186,6 +201,10 @@ public class PiglinMaskItem extends WearableRelicItem {
         return 32;
     }
 
+    private static double getFrenzyBonus(int stacks, double contribution) {
+        return stacks * contribution * (stacks >= getMaxStacks() ? 3 : 1);
+    }
+
     public int getDuration(ItemStack stack) {
         return stack.getOrDefault(RelicsDataComponents.PIGLIN_MASK_DURATION, 0);
     }
@@ -228,9 +247,7 @@ public class PiglinMaskItem extends WearableRelicItem {
                     this.addStacks(stack, -1);
             }
 
-            var modifier = stacks >= PiglinMaskItem.getMaxStacks() ? 3 : 1;
-
-            EntityUtils.resetAttribute(slotContext, stack, Attributes.ATTACK_SPEED, (float) (stacks * this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("looting").getStatData("attack_speed").getValue() * modifier), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+            EntityUtils.resetAttribute(slotContext, stack, Attributes.ATTACK_SPEED, (float) getFrenzyBonus(stacks, this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("looting").getStatData("attack_speed").getStackedValue()), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
         }
     }
 
@@ -244,7 +261,7 @@ public class PiglinMaskItem extends WearableRelicItem {
 
     @Override
     public boolean makesPiglinsNeutral(SlotContext slotContext, ItemStack stack) {
-        return this.getRelicData(slotContext.entity(), stack).getAbilitiesData().getAbilityData("neutrality").canPlayerUse(slotContext.entity());
+        return this.getRelicData(slotContext.entity(), stack).getAbilitiesData().getAbilityData("neutrality").isAvailable();
     }
 
     @EventBusSubscriber
@@ -258,7 +275,7 @@ public class PiglinMaskItem extends WearableRelicItem {
 
             var level = source.level();
 
-            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.PIGLIN_MASK.get(), "neutrality").withRank("legion")) {
+            for (var entry : RelicStacks.of(source, RelicsItems.PIGLIN_MASK.get(), "neutrality").withRank("legion")) {
                 for (var piglin : level.getEntitiesOfClass(Mob.class, source.getBoundingBox().inflate(32), mob -> mob instanceof Piglin || mob instanceof ZombifiedPiglin)) {
                     if (piglin.getTarget() != null || !piglin.hasLineOfSight(target) || piglin.isBaby())
                         continue;
@@ -283,7 +300,7 @@ public class PiglinMaskItem extends WearableRelicItem {
 
             var level = source.level();
 
-            for (var entry : RelicStackingUtils.stacks(target, RelicsItems.PIGLIN_MASK.get(), "neutrality").withRank("legion")) {
+            for (var entry : RelicStacks.of(target, RelicsItems.PIGLIN_MASK.get(), "neutrality").withRank("legion")) {
                 for (var piglin : level.getEntitiesOfClass(Mob.class, target.getBoundingBox().inflate(32), mob -> mob instanceof Piglin || mob instanceof ZombifiedPiglin)) {
                     if (piglin.getTarget() != null || !piglin.hasLineOfSight(source) || piglin.isBaby())
                         continue;
@@ -311,7 +328,7 @@ public class PiglinMaskItem extends WearableRelicItem {
 
             var totalModifier = 0D;
 
-            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.PIGLIN_MASK.get(), "looting").withRank("frenzy")) {
+            for (var entry : RelicStacks.of(source, RelicsItems.PIGLIN_MASK.get(), "looting").withRank("frenzy")) {
                 var stack = entry.stack();
                 var relic = (PiglinMaskItem) entry.relic();
 
@@ -319,8 +336,7 @@ public class PiglinMaskItem extends WearableRelicItem {
                     continue;
 
                 var stacks = relic.getStacks(stack);
-                var multiplier = stacks >= PiglinMaskItem.getMaxStacks() ? 3 : 1;
-                var modifier = originalDamage * entry.stat("attack_damage") * stacks * multiplier;
+                var modifier = originalDamage * getFrenzyBonus(stacks, entry.stackedStat("attack_damage"));
 
                 entry.addMetric("additional_damage", modifier);
 
@@ -345,7 +361,7 @@ public class PiglinMaskItem extends WearableRelicItem {
             var random = level.getRandom();
             var totalAmount = 0;
 
-            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.PIGLIN_MASK.get(), "looting")) {
+            for (var entry : RelicStacks.of(source, RelicsItems.PIGLIN_MASK.get(), "looting")) {
                 var amount = MathUtils.multicast(random, entry.stat("chance"), (int) Math.ceil(entity.getMaxHealth() / entry.stat("health")));
 
                 entry.addMetric("teeth_dropped", amount);

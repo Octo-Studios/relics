@@ -3,9 +3,9 @@ package it.hurts.sskirillss.relics.mixin;
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
 import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
 import com.llamalad7.mixinextras.sugar.Local;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStacking;
 import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.items.relics.head.PiglinMaskItem;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -19,6 +19,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+import java.util.IdentityHashMap;
 import java.util.List;
 
 @Mixin(PiglinAi.class)
@@ -37,26 +38,10 @@ public abstract class PiglinAiMixin {
 
         var player = optional.get();
 
-        var eligibleStacks = new ArrayList<ItemStack>();
-        var totalValue = 0;
-
-        for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.PIGLIN_MASK.get())) {
-            var relic = (PiglinMaskItem) stack.getItem();
-            var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter");
-
-            if (!ability.canPlayerUse(player) || !ability.getRankModifierData("pocket").isEnabled())
-                continue;
-
-            var value = (int) ability.getStatData("items_count").getValue();
-
-            if (value <= 0)
-                continue;
-
-            eligibleStacks.add(stack);
-            totalValue += value;
-        }
-
-        if (totalValue <= 0)
+        var masks = RelicStacks.forStat(player, RelicsItems.PIGLIN_MASK.get(), "barter", "items_count");
+        var stacking = StatStacking.fromParticipants(masks, "items_count");
+        var limit = (int) stacking.total().orElse(0D);
+        if (limit <= 0)
             return operation.call(itemEntity);
 
         var stack = itemEntity.getItem();
@@ -64,7 +49,7 @@ public abstract class PiglinAiMixin {
         if (!stack.is(ItemTags.PIGLIN_LOVED))
             return operation.call(itemEntity);
 
-        var toSplit = Math.min(stack.getCount(), totalValue);
+        var toSplit = Math.min(stack.getCount(), limit);
 
         if (toSplit < 1)
             return operation.call(itemEntity);
@@ -75,26 +60,29 @@ public abstract class PiglinAiMixin {
             itemEntity.discard();
         else itemEntity.setItem(stack);
 
-        if (taken.getCount() > 1 && !eligibleStacks.isEmpty()) {
-            var remaining = taken.getCount();
+        var ingotsByMask = new IdentityHashMap<ItemStack, Integer>();
+        var unassigned = limit;
 
-            for (var maskStack : eligibleStacks) {
-                if (remaining <= 0)
-                    break;
+        for (var entry : stacking.entries()) {
+            var share = entry == stacking.entries().getLast() ? unassigned : Math.clamp((int) entry.contribution(), 0, unassigned);
+            ingotsByMask.put(entry.stack(), share);
+            unassigned -= share;
+        }
 
-                var relic = (PiglinMaskItem) maskStack.getItem();
-                var ability = relic.getRelicData(player, maskStack).getAbilitiesData().getAbilityData("barter");
-                var contribution = Math.min((int) ability.getStatData("items_count").getValue(), remaining);
+        var remaining = taken.getCount();
+        for (var entry : masks) {
+            if (remaining == 0)
+                break;
 
-                if (contribution <= 0)
-                    continue;
+            var contribution = Math.min(ingotsByMask.getOrDefault(entry.stack(), 0), remaining);
+            if (contribution <= 0)
+                continue;
 
-                if (contribution > 1)
-                    relic.getRelicData(player, maskStack).getLevelingData().addExperience("barter", "pickup", contribution - 1);
+            if (contribution > 1)
+                entry.addExperience("pickup", contribution - 1);
 
-                ability.getStatisticData().getMetricData("currency").addValue(contribution);
-                remaining -= contribution;
-            }
+            entry.addMetric("currency", contribution);
+            remaining -= contribution;
         }
 
         return taken;
@@ -114,15 +102,10 @@ public abstract class PiglinAiMixin {
 
         var shouldCancel = false;
 
-        for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.PIGLIN_MASK.get())) {
-            var relic = (PiglinMaskItem) stack.getItem();
-
-            if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").canPlayerUse(player))
-                continue;
-
+        for (var entry : RelicStacks.forStat(player, RelicsItems.PIGLIN_MASK.get(), "barter", "trades")) {
             shouldCancel = true;
 
-            var base = random.nextInt((int) relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").getStatData("trades").getValue()) + 1;
+            var base = random.nextInt((int) entry.stat("trades")) + 1;
             var total = Math.max(1, base) * count;
 
             for (int i = 0; i < total; i++) {
@@ -135,8 +118,8 @@ public abstract class PiglinAiMixin {
                 for (var tradeEntry : items)
                     amount += tradeEntry.getCount();
 
-                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("barter").getStatisticData().getMetricData("items").addValue(amount);
-                relic.getRelicData(player, stack).getLevelingData().addExperience("barter", "trade", 1);
+                entry.addMetric("items", amount);
+                entry.addExperience("trade", 1);
             }
         }
 

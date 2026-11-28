@@ -12,6 +12,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberration;
@@ -20,6 +21,7 @@ import it.hurts.sskirillss.relics.dev.shake.Shake;
 import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.init.RelicsSounds;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -32,6 +34,7 @@ import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.network.packets.item.shield_of_retaliation.C2SShieldOfRetaliationRelease;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.client.Minecraft;
@@ -73,48 +76,58 @@ public class ShieldOfRetaliationItem extends RelicItem {
         return RelicTemplate.builder()
                 .abilities(AbilitiesTemplate.builder()
                         .ability(AbilityTemplate.builder("retaliation")
+                                .activeContainers(RelicsRelicContainers.HANDS.get())
                                 .rankModifier(1, "projectile")
                                 .rankModifier(3, "stun")
                                 .rankModifier(5, "guard")
                                 .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("window")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 0.75D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("miss_damage")
+                                        .activeContainers(RelicsRelicContainers.INVENTORY.get())
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 0.75D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("miss_duration")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(5D, 3.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("cooldown")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1.5D, 1D)
                                         .thresholdValue(0.05D, Double.MAX_VALUE)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.25D)
                                         .formatValue(value -> MathUtils.round(value, 2))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("projectile_damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("extension")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 0.75D)
                                         .thresholdValue(0.05D, Double.MAX_VALUE)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun_radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -771,17 +784,14 @@ public class ShieldOfRetaliationItem extends RelicItem {
             if (!(event.getEntity() instanceof Player player))
                 return;
 
-            var inventory = player.getInventory();
+            var shields = RelicStacks.lookup(player, stack -> stack.getItem() instanceof ShieldOfRetaliationItem, "retaliation");
 
-            for (int i = 0; i < inventory.getContainerSize(); i++) {
-                var stack = inventory.getItem(i);
+            for (var entry : shields.active(ability -> true)) {
+                var stack = entry.stack();
+                var ability = entry.ability();
+                var relic = (ShieldOfRetaliationItem) entry.relic();
 
-                if (!(stack.getItem() instanceof ShieldOfRetaliationItem relic))
-                    continue;
-
-                var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("retaliation");
-
-                if (!ability.canPlayerUse(player) || getActiveTicks(stack) <= 0)
+                if (getActiveTicks(stack) <= 0)
                     continue;
 
                 if (!isParryStack(player, stack))
@@ -842,21 +852,16 @@ public class ShieldOfRetaliationItem extends RelicItem {
                 return;
             }
 
-            for (int i = 0; i < inventory.getContainerSize(); i++) {
-                var stack = inventory.getItem(i);
+            for (var entry : shields.forStat("miss_damage")) {
+                var stack = entry.stack();
 
-                if (!(stack.getItem() instanceof ShieldOfRetaliationItem relic) || !hasMissed(stack))
-                    continue;
-
-                var ability = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("retaliation");
-
-                if (!ability.canPlayerUse(player))
+                if (!hasMissed(stack))
                     continue;
 
                 setMissed(stack, false);
 
                 var amount = event.getAmount();
-                var multiplier = 1D + ability.getStatData("miss_damage").getValue();
+                var multiplier = 1D + entry.stat("miss_damage");
                 var modified = amount * multiplier;
 
                 if (Float.isFinite(amount) && Double.isFinite(modified) && modified <= Float.MAX_VALUE)

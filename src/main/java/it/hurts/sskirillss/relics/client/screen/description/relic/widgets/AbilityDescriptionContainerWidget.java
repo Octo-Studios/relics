@@ -1,6 +1,9 @@
 package it.hurts.sskirillss.relics.client.screen.description.relic.widgets;
 
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
+import it.hurts.sskirillss.relics.client.screen.base.IHoverableWidget;
 import it.hurts.sskirillss.relics.client.screen.description.ability.AbilityDescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.base.DescriptionScreen;
 import it.hurts.sskirillss.relics.client.screen.description.general.widgets.RankModifierToggleWidget;
@@ -11,19 +14,24 @@ import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIScissors;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.IntStream;
 
-public class AbilityDescriptionContainerWidget extends DescriptionContainerWidget {
+public class AbilityDescriptionContainerWidget extends DescriptionContainerWidget implements IHoverableWidget {
     private static final int VERTICAL_PADDING = 1;
     private static final String RANK_MODIFIER_CONDITION_INDENT = "    ";
     private static final Style DISABLED_STYLE = Style.EMPTY.withStrikethrough(true);
+
+    private TextJustificator.StatBox hoveredStat;
 
     public AbilityDescriptionContainerWidget(DescriptionScreen screen) {
         super(screen);
@@ -34,6 +42,8 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
         var player = this.minecraft.player;
         var screen = ((AbilityDescriptionScreen) this.getScreen());
         var stack = screen.getStack();
+
+        hoveredStat = null;
 
         if (stack == null || !(stack.getItem() instanceof IRelicItem) || player == null)
             return;
@@ -65,11 +75,74 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
             poseStack.translate(0, -shiftY, 0);
         }
 
-        TextJustificator.renderJustifiedDescriptionWithStatBoxes(guiGraphics, (this.getX() + 7) * 2, (this.getY() * 2), 320, this.minecraft.font, layout);
+        hoveredStat = TextJustificator.renderJustifiedDescriptionWithStatBoxes(guiGraphics, (getX() + 7) * 2, getY() * 2, 320, minecraft.font, layout, mouseX * 2, mouseY * 2 + shiftY);
 
         poseStack.popPose();
 
         GUIScissors.end();
+    }
+
+    @Override
+    public void onHovered(GuiGraphics graphics, int mouseX, int mouseY) {
+        if (hoveredStat == null)
+            return;
+
+        var screen = (AbilityDescriptionScreen) getScreen();
+        var stack = screen.getStack();
+        var ability = ((IRelicItem) stack.getItem()).getRelicData(minecraft.player, stack).getAbilitiesData().getAbilityData(screen.getSelectedAbility());
+        var stat = ability.getStatData(ability.getTemplate().getStats().keySet().stream().toList().get(hoveredStat.index()));
+        var template = stat.getTemplate();
+        var type = template.getStacking().getType();
+        var key = "relics.description.ability.stat.stacking." + type.name().toLowerCase(Locale.ROOT);
+        var stacking = Component.translatable(key);
+        var shiftDown = Screen.hasShiftDown();
+
+        if (shiftDown)
+            stacking = Component.translatable("relics.description.ability.stat.stacking.detail", stacking, Component.translatable(key + ".description"));
+
+        var lines = new ArrayList<MutableComponent>();
+
+        lines.add(tooltipLabel("relics.description.ability.stat.stacking").append(stacking));
+
+        if (type.ranksCopiesByStat()) {
+            var result = stat.getStacking();
+            var efficiency = result.efficiency(stack);
+
+            if (type == StatStackingType.BEST) {
+                if (efficiency.isPresent())
+                    lines.add(Component.translatable(key + (result.entries().getFirst().stack() == stack ? ".selected" : ".other")));
+            } else {
+                efficiency.ifPresent(value -> lines.add(tooltipLabel("relics.description.ability.stat.efficiency")
+                        .append(BigDecimal.valueOf(value * 100D).stripTrailingZeros().toPlainString() + "%")));
+            }
+
+            if (result.entries().size() > 1)
+                result.total().ifPresent(value -> {
+                    var total = formatValue(template, value);
+
+                    if (!total.equals(formatValue(template, stat.getValue())))
+                        lines.add(tooltipLabel("relics.description.ability.stat.total").append(hoveredStat.format(total)));
+                });
+        }
+
+        if (!shiftDown || (type.ranksCopiesByStat() && type != StatStackingType.BEST)) {
+            lines.add(Component.literal(" "));
+            lines.add(shiftDown
+                    ? Component.translatable("relics.description.ability.stat.efficiency.description").withStyle(ChatFormatting.ITALIC)
+                    : Component.translatable("relics.description.researching.general.extra_info"));
+        }
+
+        DescriptionUtils.drawActionTooltip(graphics, minecraft.font, lines, mouseX + 2, mouseY);
+    }
+
+    private static MutableComponent tooltipLabel(String key) {
+        return Component.empty().append(Component.translatable(key).withStyle(ChatFormatting.BOLD, ChatFormatting.UNDERLINE)).append(" ");
+    }
+
+    private static String formatValue(AbilityStatTemplate stat, double value) {
+        var text = stat.getFormatValue().apply(value).toString();
+
+        return text.endsWith(".0") ? text.substring(0, text.length() - 2) : text;
     }
 
     public record DescriptionData(List<TextJustificator.LineEntry> rawLines, List<MutableComponent> dynamicComponents) {
@@ -94,12 +167,7 @@ public class AbilityDescriptionContainerWidget extends DescriptionContainerWidge
 
         var dynamicComponents = template.getStats().values().stream().map(stat -> {
             var rawValue = abilityData.getStatData(stat.getId()).getValue();
-            var txt = stat.getFormatValue().apply(rawValue).toString();
-
-            if (txt.endsWith(".0"))
-                txt = txt.substring(0, txt.length() - 2);
-
-            var result = Component.literal(txt)
+            var result = Component.literal(formatValue(stat, rawValue))
                     .withStyle(ChatFormatting.BOLD)
                     .withColor(wantsReroll ? DescriptionUtils.NEUTRAL_COLOR(true) : DescriptionUtils.TEXT_COLOR);
 

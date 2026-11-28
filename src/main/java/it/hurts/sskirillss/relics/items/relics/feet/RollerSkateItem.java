@@ -11,7 +11,9 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
@@ -24,9 +26,9 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.item.roller_skate.C2SCreateSpark;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
@@ -52,26 +54,35 @@ public class RollerSkateItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("speed")
+                                        .stacking(StatStackingType.MULTIPLICATIVE)
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 2.50009D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("step_height")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> ability.getRankModifierData("step_height").isEnabled())
+                                                .build())
                                         .initialValue(0.6D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.9985D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("resistance")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> ability.getRankModifierData("resistance").isEnabled())
+                                                .build())
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.99988D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 9.99875D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("ignite")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10.001D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -138,6 +149,10 @@ public class RollerSkateItem extends WearableRelicItem {
         this.setDuration(stack, this.getDuration(stack) + progress);
     }
 
+    private double getSkatingBonus(int duration, double contribution) {
+        return contribution * duration / getMaxDuration();
+    }
+
     public int getMaxDuration() {
         return 5 * 20;
     }
@@ -169,10 +184,10 @@ public class RollerSkateItem extends WearableRelicItem {
             this.addDuration(stack, -1);
 
         if (duration > 0) {
-            EntityUtils.resetAttribute(entity, Attributes.MOVEMENT_SPEED, (float) (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("speed").getValue() / this.getMaxDuration() * this.getDuration(stack)), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, movementSpeedAttributeId);
+            EntityUtils.resetAttribute(entity, Attributes.MOVEMENT_SPEED, (float) getSkatingBonus(getDuration(stack), this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("speed").getStackedValue()), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, movementSpeedAttributeId);
 
             if (this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getRankModifierData("step_height").isEnabled())
-                EntityUtils.resetAttribute(entity, Attributes.STEP_HEIGHT, (float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("step_height").getValue(), AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
+                EntityUtils.resetAttribute(entity, Attributes.STEP_HEIGHT, (float) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("skating").getStatData("step_height").getStackedValue(), AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
             else
                 EntityUtils.removeAttribute(entity, Attributes.STEP_HEIGHT, AttributeModifier.Operation.ADD_VALUE, stepHeightAttributeId);
         } else {
@@ -246,7 +261,8 @@ public class RollerSkateItem extends WearableRelicItem {
             if (entity.isInLiquid() || entity.isFallFlying() || !entity.onGround())
                 return;
 
-            var stacks = EntityUtils.findEquippedCurios(entity, RelicsItems.ROLLER_SKATE.get());
+            var stacks = RelicStacks.lookup(entity, RelicsItems.ROLLER_SKATE.get(), "skating").located().getStacks();
+
             if (stacks.isEmpty())
                 return;
 
@@ -268,7 +284,7 @@ public class RollerSkateItem extends WearableRelicItem {
             if (!(event.getEntity() instanceof LivingEntity entity) || entity.isInLiquid() || entity.isFallFlying() || !entity.onGround())
                 return;
 
-            if (EntityUtils.findEquippedCurios(entity, RelicsItems.ROLLER_SKATE.get()).isEmpty())
+            if (RelicStacks.lookup(entity, RelicsItems.ROLLER_SKATE.get(), "skating").located().isEmpty())
                 return;
 
             event.setSpeedFactor(1F);
@@ -280,7 +296,7 @@ public class RollerSkateItem extends WearableRelicItem {
             var original = event.getOriginalDamage();
             double resistedTotal = 0D;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.ROLLER_SKATE.get(), "skating").withRank("resistance")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.ROLLER_SKATE.get(), "skating").withRank("resistance")) {
                 var relic = (RollerSkateItem) entry.relic();
 
                 var duration = relic.getDuration(entry.stack());
@@ -288,7 +304,7 @@ public class RollerSkateItem extends WearableRelicItem {
                 if (duration <= 0)
                     continue;
 
-                var modifier = (float) (original * (entry.stat("resistance") * ((float) duration / relic.getMaxDuration())));
+                var modifier = (float) (original * relic.getSkatingBonus(duration, entry.stackedStat("resistance")));
 
                 entry.addMetric("damage_resisted", modifier);
                 entry.addExperience("resisting_damage", modifier);

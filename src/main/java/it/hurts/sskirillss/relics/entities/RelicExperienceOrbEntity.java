@@ -17,9 +17,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.fluids.FluidType;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public class RelicExperienceOrbEntity extends Entity {
     private static final EntityDataAccessor<Integer> EXPERIENCE = SynchedEntityData.defineId(RelicExperienceOrbEntity.class, EntityDataSerializers.INT);
@@ -47,12 +45,7 @@ public class RelicExperienceOrbEntity extends Entity {
     }
 
     private List<ItemStack> getUpgradeableRelics(Player player) {
-        List<ItemStack> relics = new ArrayList<>();
-
-        for (RelicContainer source : RelicsRegistries.RELIC_CONTAINER_REGISTRY.entrySet().stream().map(Map.Entry::getValue).toList())
-            relics.addAll(source.gatherRelics().apply(player).stream().filter(entry -> !((IRelicItem) entry.getItem()).getRelicData(player, entry).isMaxLevel()).toList());
-
-        return relics;
+        return RelicContainer.find(player, RelicsRegistries.RELIC_CONTAINER_REGISTRY, stack -> stack.getItem() instanceof IRelicItem relic && !relic.getRelicData(player, stack).isMaxLevel());
     }
 
     @Override
@@ -97,11 +90,11 @@ public class RelicExperienceOrbEntity extends Entity {
                 this.setDeltaMovement(this.getDeltaMovement().add(player.position().add(0F, player.getBbHeight() / 2F, 0F).subtract(this.position()).normalize().scale((maxDistance - this.position().distanceTo(player.position())) / (maxDistance * 10))));
 
                 if (this.position().distanceTo(player.position()) <= player.getBbWidth() * 1.25F) {
-                    List<ItemStack> upgradeable = getUpgradeableRelics(player);
+                    var upgradeable = getUpgradeableRelics(player);
 
                     if (!upgradeable.isEmpty()) {
-                        ItemStack stack = upgradeable.get(random.nextInt(upgradeable.size()));
-                        IRelicItem relic = (IRelicItem) stack.getItem();
+                        var stack = upgradeable.get(random.nextInt(upgradeable.size()));
+                        var relic = (IRelicItem) stack.getItem();
 
                         var isMaxLevel = relic.getRelicData(player, stack).isMaxLevel();
 
@@ -111,13 +104,7 @@ public class RelicExperienceOrbEntity extends Entity {
                             relic.getRelicData(player, stack).getLevelingData().addExperience(this.getExperience());
 
                         if (toSpread > 0) {
-                            var relics = RelicsRegistries.RELIC_CONTAINER_REGISTRY.entrySet().stream()
-                                    .map(Map.Entry::getValue)
-                                    .flatMap(source -> source.gatherRelics().apply(player).stream())
-                                    .filter(entry -> entry.getItem() instanceof IRelicItem relicItem
-                                            && !relicItem.getRelicData(player, entry).isMaxLevel()
-                                            && !stack.equals(entry))
-                                    .toList();
+                            var relics = getUpgradeableRelics(player).stream().filter(other -> other != stack).toList();
 
                             if (!relics.isEmpty()) {
                                 var relicStack = relics.get(player.level().getRandom().nextInt(relics.size()));

@@ -10,6 +10,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.ReflectiveOrbEntity;
@@ -22,7 +23,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.world.entity.LivingEntity;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -47,35 +48,41 @@ public class ReflectiveNecklaceItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("chance")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.1D, 0.25D)
                                         .thresholdValue(0D, 1D)
                                         .targetValue(RelicsScalingModels.RADICAL.get(), 1.00016D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 2.49996D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("lifetime")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(5D, 10D)
                                         .targetValue(RelicsScalingModels.EXPONENTIAL.get(), 60.04761D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("piercings")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 19.9995D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.50025D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("bounces")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 49.999D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .experienceSources(ExperienceSourcesTemplate.builder()
                                         .source(ExperienceSourceTemplate.builder("construct")
@@ -127,7 +134,7 @@ public class ReflectiveNecklaceItem extends WearableRelicItem {
             var random = level.getRandom();
 
             if (damage >= 1) {
-                for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.REFLECTIVE_NECKLACE.get(), "reflection")) {
+                for (var entry : RelicStacks.of(entity, RelicsItems.REFLECTIVE_NECKLACE.get(), "reflection")) {
                     var stack = entry.stack();
 
                     if (level.getRandom().nextDouble() > entry.stat("chance"))
@@ -163,7 +170,7 @@ public class ReflectiveNecklaceItem extends WearableRelicItem {
             if (!(event.getSource().getEntity() instanceof LivingEntity livingSource))
                 return;
 
-            if (!RelicStackingUtils.stacks(livingSource, RelicsItems.REFLECTIVE_NECKLACE.get(), "reflection").isEmpty()) {
+            if (!RelicStacks.of(livingSource, RelicsItems.REFLECTIVE_NECKLACE.get(), "reflection").isEmpty()) {
                 var step = 0;
 
                 for (var orb : level.getEntitiesOfClass(ReflectiveOrbEntity.class, livingSource.getBoundingBox().inflate(ORB_SEARCH_RADIUS)).stream()

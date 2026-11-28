@@ -8,7 +8,9 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
@@ -22,7 +24,7 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
 import it.hurts.sskirillss.relics.utils.MathUtils;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import it.hurts.sskirillss.relics.utils.WorldUtils;
 import net.minecraft.server.level.ServerLevel;
@@ -52,26 +54,33 @@ public class SpringyBootItem extends WearableRelicItem {
                                 .rankModifier(3, "strike")
                                 .rankModifier(5, "shockwave")
                                 .stat(AbilityStatTemplate.builder("power")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(0.5D, 0.75D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 1.99993D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage_modifier")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> ability.getRankModifierData("strike").isEnabled())
+                                                .build())
                                         .initialValue(0.05D, 0.15D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.50017D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 10.00005D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(2.5D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30.0075D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("stun")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.25D, 0.5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 4.99925D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -250,14 +259,14 @@ public class SpringyBootItem extends WearableRelicItem {
 
             var power = 0D;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.SPRINGY_BOOT.get(), "bounce")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.SPRINGY_BOOT.get(), "bounce")) {
                 var stack = entry.stack();
                 var relic = (SpringyBootItem) entry.relic();
 
                 if (relic.isLeaped(stack) || relic.getBounceCooldown(stack) > 0 || !entity.isShiftKeyDown())
                     continue;
 
-                power += entry.stat("power");
+                power += entry.stackedStat("power");
 
                 entry.addMetric("primary_bounces", 1);
 
@@ -289,7 +298,7 @@ public class SpringyBootItem extends WearableRelicItem {
             var totalModifier = 0D;
             var totalLeaps = 0;
 
-            for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.SPRINGY_BOOT.get(), "bounce").withRank("strike")) {
+            for (var entry : RelicStacks.of(entity, RelicsItems.SPRINGY_BOOT.get(), "bounce").withRank("strike")) {
                 var stack = entry.stack();
                 var relic = (SpringyBootItem) entry.relic();
 
@@ -304,7 +313,7 @@ public class SpringyBootItem extends WearableRelicItem {
                 if (totalLeaps < leaps)
                     totalLeaps = leaps;
 
-                var modifier = entry.stat("damage_modifier");
+                var modifier = entry.stackedStat("damage_modifier");
 
                 totalModifier += modifier;
 

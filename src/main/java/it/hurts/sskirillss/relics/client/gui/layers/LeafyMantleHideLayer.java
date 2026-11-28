@@ -6,7 +6,7 @@ import it.hurts.octostudios.octolib.client.animation.easing.TransitionType;
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.back.LeafyMantleItem;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import it.hurts.sskirillss.relics.utils.data.GUIRenderer;
 import it.hurts.sskirillss.relics.utils.data.SpriteAnchor;
@@ -32,11 +32,13 @@ public class LeafyMantleHideLayer implements LayeredDraw.Layer {
         if (player == null)
             return;
 
-        var stack = EntityUtils.findEquippedCurio(player, RelicsItems.LEAFY_MANTLE.get());
+        var mantle = RelicStacks.lookup(player, RelicsItems.LEAFY_MANTLE.get(), "camouflage").located().withRank("disappearance").getController();
 
-        if (!(stack.getItem() instanceof LeafyMantleItem relic) || !relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("camouflage").getRankModifierData("disappearance").isEnabled())
+        if (mantle == null)
             return;
 
+        var stack = mantle.stack();
+        var relic = (LeafyMantleItem) mantle.relic();
         var progress = relic.getCurrentProgress(stack);
 
         if (progress <= 0)

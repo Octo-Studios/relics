@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.mojang.datafixers.util.Function3;
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.abilities.activation.AbilityActivationPredicateContext;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 public class AbilityTemplate {
     private final String id;
 
+    private final List<RelicContainer> activeContainers;
     private final Function3<Player, ItemStack, String, String> icon;
     private final Map<String, AbilityStatTemplate> stats;
     private final int levelContribution;
@@ -83,6 +85,7 @@ public class AbilityTemplate {
     public static class AbilityTemplateBuilder {
         private final String id;
 
+        private List<RelicContainer> activeContainers = List.of();
         private Function3<Player, ItemStack, String, String> icon = (player, stack, ability) -> {
             var relic = (IRelicItem) stack.getItem();
             var abilityData = relic.getRelicData(player, stack).getAbilitiesData().getAbilityData(ability);
@@ -115,6 +118,7 @@ public class AbilityTemplate {
         private AbilityTemplateBuilder(AbilityTemplate base) {
             this.id = base.getId();
 
+            this.activeContainers = base.getActiveContainers();
             this.icon = base.getIcon();
             this.stats = new LinkedHashMap<>(base.getStats());
             this.levelContribution = base.getLevelContribution();
@@ -258,6 +262,12 @@ public class AbilityTemplate {
             return this;
         }
 
+        public AbilityTemplateBuilder activeContainers(RelicContainer... containers) {
+            this.activeContainers = List.of(containers);
+
+            return this;
+        }
+
         public AbilityTemplate build() {
             var activation = this.activation;
 
@@ -267,7 +277,7 @@ public class AbilityTemplate {
                         .predicates(new LinkedHashMap<>(activation.getPredicates()))
                         .build();
 
-            return new AbilityTemplate(this.id, this.icon, this.stats, this.levelContribution, this.levelContributionRankModifier, this.requiredLevel, this.requiredRank, this.levelWeight, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers, activation, this.targeting);
+            return new AbilityTemplate(this.id, activeContainers,  this.icon, this.stats, this.levelContribution, this.levelContributionRankModifier, this.requiredLevel, this.requiredRank, this.levelWeight, this.researchTemplate, this.statistic, this.modes, this.experienceSources, this.rankModifiers, activation, this.targeting);
         }
     }
 }

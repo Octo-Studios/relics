@@ -10,7 +10,10 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStacking;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.SelfSacrificeProjectileEntity;
@@ -25,6 +28,7 @@ import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
@@ -56,11 +60,15 @@ public class SphereOfSelfSacrifice extends RelicItem {
                                 .rankModifier(5, "salvation")
                                 .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("stacks")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.LOGARITHMIC.get(), 9.99985D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("resistance")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.SEQUENTIAL)
+                                                .condition(ability -> ability.getRankModifierData("resistance").isEnabled())
+                                                .build())
                                         .initialValue(0.01D, 0.025D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.05003D)
                                         .formatValue(value -> MathUtils.round(value * 100, 1))
@@ -129,7 +137,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
 
     public void addHealingStack(LivingEntity entity, ItemStack stack, HealingStack healingStack) {
         var stacks = this.getHealingStacks(stack);
-        var maxStacks = Math.max(1, (int) Math.ceil(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sacrifice").getStatData("stacks").getValue()));
+        var maxStacks = Math.max(1, (int) this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("sacrifice").getStatData("stacks").getValue());
 
         while (stacks.size() >= maxStacks)
             stacks.removeFirst();
@@ -156,7 +164,7 @@ public class SphereOfSelfSacrifice extends RelicItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
 
-        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").canPlayerUse(player))
+        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").isAvailable())
             return InteractionResultHolder.pass(stack);
 
         if (player.isShiftKeyDown() && this.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("salvo").isEnabled()) {
@@ -347,17 +355,11 @@ public class SphereOfSelfSacrifice extends RelicItem {
             if (!(entity instanceof Player player))
                 return;
 
-            for (var stack : EntityUtils.findItemsInInventory(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get())) {
-                var relic = (SphereOfSelfSacrifice) stack.getItem();
-
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").canPlayerUse(player))
-                    continue;
-
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("salvation").isEnabled())
-                    continue;
-
+            for (var entry : RelicStacks.forStat(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get(), "sacrifice", "stacks").withRank("salvation")) {
+                var stack = entry.stack();
+                var relic = (SphereOfSelfSacrifice) entry.relic();
                 var stacks = relic.getHealingStacks(stack);
-                var maxStacks = Math.max(1, (int) Math.ceil(relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getStatData("stacks").getValue()));
+                var maxStacks = Math.max(1, (int) entry.stat("stacks"));
                 var abilityDamage = relic.getHealthCost(player);
 
                 if (stacks.size() >= maxStacks)
@@ -374,10 +376,10 @@ public class SphereOfSelfSacrifice extends RelicItem {
 
                 var prevented = Math.max(0F, incomingDamage - abilityDamage);
 
-                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getStatisticData().getMetricData("salvation_triggers").addValue(1);
-                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getStatisticData().getMetricData("salvation_damage_blocked").addValue(prevented);
+                entry.addMetric("salvation_triggers", 1);
+                entry.addMetric("salvation_damage_blocked", prevented);
 
-                relic.getRelicData(player, stack).getLevelingData().addExperience("sacrifice", "salvation", prevented > 0 ? prevented : 1);
+                entry.addExperience("salvation", prevented > 0 ? prevented : 1);
             }
         }
 
@@ -388,27 +390,21 @@ public class SphereOfSelfSacrifice extends RelicItem {
             if (!(entity instanceof Player player))
                 return;
 
-            for (var stack : EntityUtils.findItemsInInventory(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get())) {
-                var relic = (SphereOfSelfSacrifice) stack.getItem();
+            var spheres = RelicStacks.forStat(player, RelicsItems.SPHERE_OF_SELF_SACRIFICE.get(), "sacrifice", "resistance");
+            var resistance = StatStacking.fromParticipants(spheres, "resistance");
 
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").canPlayerUse(player))
-                    continue;
-
-                if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getRankModifierData("resistance").isEnabled())
-                    continue;
-
-                var stacks = relic.getHealingStacks(stack);
-
+            for (var entry : spheres) {
+                var stacks = ((SphereOfSelfSacrifice) entry.relic()).getHealingStacks(entry.stack());
                 if (stacks.isEmpty())
                     continue;
 
-                var modifier = event.getNewDamage() * stacks.size() * relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getStatData("resistance").getValue();
+                var modifier = event.getNewDamage() * stacks.size() * resistance.contribution(entry.stack()).orElse(0D);
 
                 event.setNewDamage((float) Math.max(0, event.getNewDamage() - modifier));
 
-                relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("sacrifice").getStatisticData().getMetricData("damage_resisted").addValue(modifier);
+                entry.addMetric("damage_resisted", modifier);
 
-                relic.getRelicData(player, stack).getLevelingData().addExperience("sacrifice", "resisting_damage", modifier);
+                entry.addExperience("resisting_damage", modifier);
             }
         }
     }

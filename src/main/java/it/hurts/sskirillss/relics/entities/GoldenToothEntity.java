@@ -3,7 +3,7 @@ package it.hurts.sskirillss.relics.entities;
 import it.hurts.octostudios.octolib.module.particle.trail.EntityTrailProvider;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.items.relics.head.PiglinMaskItem;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -41,7 +41,7 @@ public class GoldenToothEntity extends Entity {
     }
 
     private List<ItemStack> getSuitableRelics(LivingEntity entity) {
-        return EntityUtils.findEquippedCurios(entity, RelicsItems.PIGLIN_MASK.get());
+        return RelicStacks.lookup(entity, RelicsItems.PIGLIN_MASK.get(), "looting").located().getStacks();
     }
 
     @Override

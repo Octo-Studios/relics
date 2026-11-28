@@ -1,14 +1,12 @@
 package it.hurts.sskirillss.relics.entities;
 
-import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.init.RelicsItems;
-import it.hurts.sskirillss.relics.items.relics.back.GlitchyMantleItem;
-import it.hurts.sskirillss.relics.items.relics.necklace.JellyfishNecklaceItem;
+import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -23,8 +21,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
@@ -276,29 +274,17 @@ public class GlitchyIllusionEntity extends Entity {
 
     @Nullable
     private static ElectricSynergy resolveElectricSynergy(LivingEntity owner) {
-        var hasShock = EntityUtils.findEquippedCurios(owner, RelicsItems.JELLYFISH_NECKLACE.get()).stream()
-                .filter(stack -> stack.getItem() instanceof JellyfishNecklaceItem relic
-                        && relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("shock").canPlayerUse(owner))
-                .anyMatch(stack -> {
-                    var relic = (JellyfishNecklaceItem) stack.getItem();
-                    return relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("shock").getMode().equals("enabled");
-                });
-
-        if (!hasShock)
+        if (RelicStacks.of(owner, RelicsItems.JELLYFISH_NECKLACE.get(), "shock", ability -> ability.getMode().equals("enabled")).isEmpty())
             return null;
 
         var damage = 0D;
         var flawless = false;
 
-        for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.GLITCHY_MANTLE.get())) {
-            if (!(stack.getItem() instanceof GlitchyMantleItem relic))
-                continue;
-
-            var relicData = relic.getRelicData(owner, stack);
-            var illusion = relicData.getAbilitiesData().getAbilityData("illusion");
+        for (var entry : RelicStacks.of(owner, RelicsItems.GLITCHY_MANTLE.get(), "illusion", ability -> ability.getMode().equals("enabled"))) {
+            var relicData = entry.relicData();
             var synergy = relicData.getAbilitiesData().getSynergyData("electricity");
 
-            if (!illusion.canPlayerUse(owner) || !illusion.getMode().equals("enabled") || !synergy.isUnlocked() || !synergy.getMode().equals("enabled"))
+            if (!synergy.isUnlocked() || !synergy.getMode().equals("enabled"))
                 continue;
 
             damage = Math.max(damage, synergy.getStatData("damage").getValue());
@@ -362,21 +348,12 @@ public class GlitchyIllusionEntity extends Entity {
         if (owner == null)
             return;
 
-        for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.GLITCHY_MANTLE.get())) {
-            if (!(stack.getItem() instanceof GlitchyMantleItem relic))
-                continue;
+        var mantle = RelicStacks.of(owner, RelicsItems.GLITCHY_MANTLE.get(), "illusion", ability -> ability.getMode().equals("enabled")).getController();
 
-            var relicData = relic.getRelicData(owner, stack);
-            var ability = relicData.getAbilitiesData().getAbilityData("illusion");
-
-            if (!ability.canPlayerUse(owner) || !ability.getMode().equals("enabled"))
-                continue;
-
-            relicData.getLevelingData().addExperience("illusion", "detonation", 1);
-            ability.getStatisticData().getMetricData(byOwner ? "owner_detonations" : "target_detonations").addValue(1);
-            ability.getStatisticData().getMetricData("stun_duration").addValue(stunnedTargets * (this.getStunDuration() / 20D));
-
-            return;
+        if (mantle != null) {
+            mantle.addExperience("detonation", 1);
+            mantle.addMetric(byOwner ? "owner_detonations" : "target_detonations", 1);
+            mantle.addMetric("stun_duration", stunnedTargets * (this.getStunDuration() / 20D));
         }
     }
 

@@ -8,7 +8,9 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
@@ -16,9 +18,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
-import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.entity.LivingEntity;
@@ -40,12 +41,16 @@ public class ChefHatItem extends WearableRelicItem {
                                 .rankModifier(3, "meatball_healing")
                                 .rankModifier(5, "cooked_meatball")
                                 .stat(AbilityStatTemplate.builder("chance")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.1D, 0.15D)
                                         .thresholdValue(0D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.75008D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("healing")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.BEST)
+                                                .condition(ability -> ability.getRankModifierData("meatball_healing").isEnabled())
+                                                .build())
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10.001D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -94,7 +99,7 @@ public class ChefHatItem extends WearableRelicItem {
         if (entity == null)
             return 1D;
 
-        var count = RelicStackingUtils.stacks(entity, RelicsItems.CHEF_HAT.get(), "satiety").count("quick_meal");
+        var count = RelicStacks.of(entity, RelicsItems.CHEF_HAT.get(), "satiety").count("quick_meal");
 
         return count <= 0 ? 1D : 3D * count;
     }
@@ -103,30 +108,18 @@ public class ChefHatItem extends WearableRelicItem {
         if (entity == null)
             return;
 
-        double maxHealing = 0D;
-        RelicStacks.Entry healingEntry = null;
+        var hats = RelicStacks.lookup(entity, RelicsItems.CHEF_HAT.get(), "satiety");
         var consumedMetric = cooked ? "cooked_meatballs_eaten" : "raw_meatballs_eaten";
 
-        for (var entry : RelicStackingUtils.stacks(entity, RelicsItems.CHEF_HAT.get(), "satiety")) {
+        for (var entry : hats.active(ability -> true)) {
             entry.addExperience("consume", 1);
             entry.addMetric(consumedMetric, 1);
-
-            if (!entry.rank("meatball_healing"))
-                continue;
-
-            var healing = entry.stat("healing");
-
-            if (cooked)
-                healing *= 2D;
-
-            if (healing <= maxHealing)
-                continue;
-
-            maxHealing = healing;
-            healingEntry = entry;
         }
 
-        if (maxHealing <= 0D || healingEntry == null)
+        var healing = hats.stacking("healing");
+        var maxHealing = healing.total().orElse(0D) * (cooked ? 2D : 1D);
+
+        if (maxHealing <= 0D)
             return;
 
         var before = entity.getHealth();
@@ -137,6 +130,8 @@ public class ChefHatItem extends WearableRelicItem {
 
         if (restored <= 0F)
             return;
+
+        var healingEntry = healing.entries().getFirst().source();
 
         healingEntry.addExperience("healing", restored);
         healingEntry.addMetric("health_restored", restored);
@@ -164,7 +159,7 @@ public class ChefHatItem extends WearableRelicItem {
                     || event.getSource().is(DamageTypeTags.IS_FIRE)
                     || cookedByFireAspect;
 
-            for (var entry : RelicStackingUtils.stacks(source, RelicsItems.CHEF_HAT.get(), "satiety")) {
+            for (var entry : RelicStacks.forStat(source, RelicsItems.CHEF_HAT.get(), "satiety", "chance")) {
                 var chance = entry.stat("chance");
 
                 if (chance <= 0D)

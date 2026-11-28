@@ -2,18 +2,22 @@ package it.hurts.sskirillss.relics.api.relics.data;
 
 import it.hurts.sskirillss.relics.api.events.relic.GatherRelicTemplateCacheKeyEvent;
 import it.hurts.sskirillss.relics.api.events.relic.ModifyRelicTemplateEvent;
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
 import it.hurts.sskirillss.relics.api.relics.RelicComponent;
 import it.hurts.sskirillss.relics.api.relics.RelicTemplate;
 import it.hurts.sskirillss.relics.handlers.CacheHandler;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.common.NeoForge;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
-import javax.annotation.Nullable;
 import java.util.Arrays;
+import java.util.List;
+import javax.annotation.Nullable;
 
 public class RelicData {
     private final IRelicItem relic;
@@ -66,6 +70,15 @@ public class RelicData {
         NeoForge.EVENT_BUS.post(event);
 
         return event;
+    }
+
+    public List<RelicContainer> getActiveContainers() {
+        var configured = getTemplate().getActiveContainers();
+
+        if (!configured.isEmpty())
+            return configured;
+
+        return List.of(getRelic() instanceof ICurioItem ? RelicsRelicContainers.CURIOS.get() : RelicsRelicContainers.INVENTORY.get());
     }
 
     public RelicComponent getComponent() {

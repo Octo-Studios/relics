@@ -4,8 +4,8 @@ import it.hurts.sskirillss.relics.client.particles.GhostlyFogParticle;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.items.relics.back.GhostlyMantleItem;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,14 +18,13 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-import javax.annotation.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
+import javax.annotation.Nullable;
 
 public class GhostlyFogEntity extends Entity {
     public static final int PARTICLE_MIN_LIFETIME = 55;
@@ -191,17 +190,11 @@ public class GhostlyFogEntity extends Entity {
 
             LAST_EXPOSURE_TICK.put(key, gameTime);
 
-            for (var stack : EntityUtils.findEquippedCurios(owner, RelicsItems.GHOSTLY_MANTLE.get())) {
-                var relic = (GhostlyMantleItem) stack.getItem();
-                var ability = relic.getRelicData(owner, stack).getAbilitiesData().getAbilityData("fog");
+            var mantle = RelicStacks.of(owner, RelicsItems.GHOSTLY_MANTLE.get(), "fog").getController();
 
-                if (!ability.canPlayerUse(owner))
-                    continue;
-
-                ability.getStatisticData().getMetricData("fog_exposure").addValue(1D / 20D);
-                relic.getRelicData(owner, stack).getLevelingData().addExperience("fog", "fog_exposure", 1D / 20D);
-
-                break;
+            if (mantle != null) {
+                mantle.addMetric("fog_exposure", 1D / 20D);
+                mantle.addExperience("fog_exposure", 1D / 20D);
             }
         }
     }

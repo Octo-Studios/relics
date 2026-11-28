@@ -1,5 +1,6 @@
 package it.hurts.sskirillss.relics.api.relics;
 
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
@@ -10,9 +11,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import net.minecraft.network.chat.Component;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RelicTemplate {
+    private final List<RelicContainer> activeContainers;
     private final AbilitiesTemplate abilities;
     private final RelicStatisticTemplate statistic;
     private final LevelingTemplate leveling;
@@ -28,6 +32,7 @@ public class RelicTemplate {
 
     @NoArgsConstructor
     public static class RelicTemplateBuilder {
+        private List<RelicContainer> activeContainers = List.of();
         private AbilitiesTemplate abilities = AbilitiesTemplate.builder().build();
         @Deprecated // TODO: Replace with relic data construction event
         private RelicStatisticTemplate statistic = RelicStatisticTemplate.builder()
@@ -40,6 +45,7 @@ public class RelicTemplate {
         private LootTemplate loot = LootTemplate.builder().build();
 
         private RelicTemplateBuilder(RelicTemplate base) {
+            this.activeContainers = base.getActiveContainers();
             this.abilities = base.getAbilities();
             this.statistic = base.getStatistic();
             this.leveling = base.getLeveling();
@@ -70,8 +76,14 @@ public class RelicTemplate {
             return this;
         }
 
+        public RelicTemplateBuilder activeContainers(RelicContainer... containers) {
+            this.activeContainers = List.of(containers);
+
+            return this;
+        }
+
         public RelicTemplate build() {
-            return new RelicTemplate(abilities, statistic, leveling, loot);
+            return new RelicTemplate(activeContainers, abilities, statistic, leveling, loot);
         }
     }
 }

@@ -39,9 +39,8 @@ public class SimpleDescriptionScreen extends Screen implements IAutoScaledScreen
         var player = Minecraft.getInstance().player;
 
         if (player != null) {
-            var live = DescriptionUtils.gatherRelicStack(player, this.slot);
-            if (!live.is(this.stack.getItem()))
-                live = ItemStack.EMPTY;
+            var live = getLiveStack(player);
+
             this.stack = getDisplayedStack(live);
 
             if (this.screen instanceof DescriptionScreen subScreen)
@@ -50,6 +49,15 @@ public class SimpleDescriptionScreen extends Screen implements IAutoScaledScreen
             if (this.stack.isEmpty())
                 Minecraft.getInstance().setScreen(getReturnScreen());
         }
+    }
+
+    protected ItemStack getLiveStack(Player player) {
+        if (player == null || DescriptionUtils.getContainerMenu(player).containerId != container)
+            return ItemStack.EMPTY;
+
+        var live = DescriptionUtils.gatherRelicStack(player, slot);
+
+        return live.is(stack.getItem()) ? live : ItemStack.EMPTY;
     }
 
     protected Screen getReturnScreen() {

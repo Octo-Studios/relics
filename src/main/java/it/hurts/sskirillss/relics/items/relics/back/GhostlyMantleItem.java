@@ -11,6 +11,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.entities.GhostlyFogEntity;
@@ -20,9 +21,8 @@ import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTempla
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import lombok.Builder;
 import net.minecraft.core.BlockPos;
@@ -61,26 +61,32 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(3D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 15D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("air_loss")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
-                                        .formatValue(value -> (int) MathUtils.round(value * 20, 0))
+                                        .rounding(Math::round)
+                                        .formatValue(value -> value.intValue() * 20)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("suffocation_damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("tremor")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -115,21 +121,25 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("range")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(5D, 10D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("charges")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("weakness")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.005D, 0.01D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.075D)
                                         .formatValue(value -> MathUtils.round(value * 100D, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.01D, 0.025D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.15D)
                                         .formatValue(value -> MathUtils.round(value * 100D, 1))
@@ -162,16 +172,19 @@ public class GhostlyMantleItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("cooldown")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(125D, 100D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 25D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("duration")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(1D, 3D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> MathUtils.round(value, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.5D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 10D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100D, 0))
@@ -268,7 +281,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
 
         var spectralEscape = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("spectral_escape");
 
-        if (spectralEscape.canPlayerUse(entity)
+        if (spectralEscape.isAvailable()
                 && entity.hasEffect(RelicsMobEffects.FLIGHT)
                 && entity.hasEffect(RelicsMobEffects.IMMORTALITY)) {
             spectralEscape.getStatisticData().getMetricData("spectral_form_duration").addValue(1D / 20D);
@@ -279,7 +292,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
     private void tickFogTrail(LivingEntity entity, ItemStack stack) {
         var ability = this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("fog");
 
-        if (!ability.canPlayerUse(entity) || ability.getMode().equals("disabled")) {
+        if (!ability.isAvailable() || ability.getMode().equals("disabled")) {
             this.setLastFogPos(stack, entity.position());
 
             return;
@@ -349,7 +362,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
             fog.setOwner(entity);
             fog.setLifetime((int) Math.max(1D, ability.getStatData("duration").getValue() * 20D));
             fog.setRadius((float) fogRadius);
-            fog.setAirDrain((int) Math.max(0D, MathUtils.round(ability.getStatData("air_loss").getValue(), 0)));
+            fog.setAirDrain((int) Math.max(0D, ability.getStatData("air_loss").getValue()));
             fog.setSuffocationDamage((float) ability.getStatData("suffocation_damage").getValue());
             fog.setTremorTicks(ability.getRankModifierData("frostbite").isEnabled() ? (int) Math.max(1D, ability.getStatData("tremor").getValue() * 20D) : 0);
             fog.setStack(stack);
@@ -370,7 +383,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
         var charges = this.getGazeCharges(stack);
         var changed = false;
 
-        if (!ability.canPlayerUse(owner)) {
+        if (!ability.isAvailable()) {
             if (!charges.isEmpty()) {
                 charges.clear();
                 this.setGazeCharges(stack, charges);
@@ -381,7 +394,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
 
         var seenThisTick = new java.util.HashSet<String>();
         var range = ability.getStatData("range").getValue();
-        var maxCharges = Math.max(1, (int) MathUtils.round(ability.getStatData("charges").getValue(), 0));
+        var maxCharges = Math.max(1, (int) ability.getStatData("charges").getValue());
 
         for (var target : owner.level().getEntitiesOfClass(LivingEntity.class, owner.getBoundingBox().inflate(range),
                 entity -> entity != owner && entity.isAlive() && TargetingUtils.canHarm(owner, entity, stack, "gaze"))) {
@@ -483,7 +496,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
                 var targetId = target.getStringUUID();
 
                 for (var player : target.level().players()) {
-                    for (var stack : EntityUtils.findEquippedCurios(player, RelicsItems.GHOSTLY_MANTLE.get())) {
+                    for (var stack : RelicStacks.lookup(player, RelicsItems.GHOSTLY_MANTLE.get(), "spectral_escape").located().getStacks()) {
                         var relic = (GhostlyMantleItem) stack.getItem();
                         var marks = relic.getReprisalMarks(stack);
                         var modifier = marks.remove(targetId);
@@ -517,7 +530,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
             if (!(target instanceof Player player) || !(source instanceof LivingEntity attacker) || source == target)
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.GHOSTLY_MANTLE.get(), "gaze")) {
+            for (var entry : RelicStacks.of(player, RelicsItems.GHOSTLY_MANTLE.get(), "gaze")) {
                 var relic = (GhostlyMantleItem) entry.relic();
                 var ability = entry.ability();
 
@@ -541,7 +554,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
             if (!(event.getSource().getEntity() instanceof Player player))
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.GHOSTLY_MANTLE.get(), "gaze").withRank("dread")) {
+            for (var entry : RelicStacks.of(player, RelicsItems.GHOSTLY_MANTLE.get(), "gaze").withRank("dread")) {
                 var stack = entry.stack();
                 var relic = (GhostlyMantleItem) entry.relic();
                 var ability = entry.ability();
@@ -573,7 +586,7 @@ public class GhostlyMantleItem extends WearableRelicItem {
             if (!(target instanceof Player player))
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.GHOSTLY_MANTLE.get(), "spectral_escape")) {
+            for (var entry : RelicStacks.of(player, RelicsItems.GHOSTLY_MANTLE.get(), "spectral_escape")) {
                 var stack = entry.stack();
                 var relic = (GhostlyMantleItem) entry.relic();
                 var ability = entry.ability();

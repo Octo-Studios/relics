@@ -7,7 +7,7 @@ import it.hurts.sskirillss.relics.init.RelicsMobEffects;
 import it.hurts.sskirillss.relics.items.relics.belt.KineticBeltItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.PacketSyncEntityEffects;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
@@ -25,18 +25,12 @@ public class LivingEntityMixin {
     @Inject(method = "jumpFromGround", at = @At("HEAD"))
     private void onJumpFromGround(CallbackInfo ci) {
         var entity = (LivingEntity) (Object) this;
-        var motion = entity.getDeltaMovement();
+        var scale = RelicStacks.forStat(entity, RelicsItems.KINETIC_BELT.get(), "gliding", "efficiency")
+                .filter(entry -> ((KineticBeltItem) entry.relic()).isActive(entry.stack()))
+                .max("efficiency");
 
-        for (var stack : EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get())) {
-            var relic = (KineticBeltItem) stack.getItem();
-
-            if (!relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled") || !relic.isActive(stack))
-                continue;
-
-            var scale = relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue();
-
-            entity.setDeltaMovement(motion.add(motion.scale(scale)));
-        }
+        if (scale > 0D)
+            entity.setDeltaMovement(entity.getDeltaMovement().scale(1D + scale));
     }
 
     @ModifyConstant(method = "travel", constant = @Constant(floatValue = 0.91F, ordinal = 1))
@@ -49,15 +43,12 @@ public class LivingEntityMixin {
         var maxValue = 0.985F;
         var diff = maxValue - original;
 
-        var scale = (float) EntityUtils.findEquippedCurios(entity, RelicsItems.KINETIC_BELT.get()).stream()
-                .filter(stack -> {
-                    var relic = ((KineticBeltItem) stack.getItem());
+        var scale = (float) RelicStacks.forStat(entity, RelicsItems.KINETIC_BELT.get(), "gliding", "efficiency")
+                .filter(entry -> {
+                    var relic = (KineticBeltItem) entry.relic();
 
-                    return relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) && !relic.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled") && (!relic.isLanded(stack) || relic.isActive(stack));
-                })
-                .mapToDouble(stack -> ((KineticBeltItem) stack.getItem()).getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue())
-                .max()
-                .orElse(0D);
+                    return !relic.isLanded(entry.stack()) || relic.isActive(entry.stack());
+                }).max("efficiency");
 
         return original + (diff * scale);
     }

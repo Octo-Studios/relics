@@ -13,6 +13,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.data.AbilityData;
 import it.hurts.sskirillss.relics.client.astral.AstralSpace;
 import it.hurts.sskirillss.relics.init.RelicsAttachments;
@@ -29,6 +30,7 @@ import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SQuickSt
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.C2SQuickStoreAstralSatchelSlot;
 import it.hurts.sskirillss.relics.network.packets.item.astral_satchel.S2CAstralSatchelMotion;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
 import net.minecraft.core.UUIDUtil;
@@ -40,9 +42,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -97,6 +99,7 @@ public class AstralSatchelItem extends RelicItem {
                                 .rankModifier(3, "immortality")
                                 .rankModifier(5, "infinite_stacks")
                                 .stat(AbilityStatTemplate.builder("radius")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(8D, 12D)
                                         .thresholdValue(4D, 48D)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 32D)
@@ -153,18 +156,11 @@ public class AstralSatchelItem extends RelicItem {
             return stack.getItem() instanceof AstralSatchelItem ? stack : ItemStack.EMPTY;
         }
 
-        for (var i = 0; i < inventory.getContainerSize(); i++) {
-            var stack = inventory.getItem(i);
-
-            if (stack.getItem() instanceof AstralSatchelItem)
-                return stack;
-        }
-
-        return ItemStack.EMPTY;
+        return RelicStacks.lookup(player, candidate -> candidate.getItem() instanceof AstralSatchelItem, "subspace").located().getControllerStack();
     }
 
     public static boolean canUse(Player player, ItemStack stack) {
-        return stack.getItem() instanceof AstralSatchelItem relic && relic.getAbility(player, stack).canPlayerUse(player);
+        return stack.getItem() instanceof AstralSatchelItem relic && relic.getAbility(player, stack).isAvailable();
     }
 
     public static int getSlot(Player player, InteractionHand hand) {

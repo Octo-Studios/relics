@@ -246,9 +246,6 @@ public class SynergyData {
     }
 
     private List<ItemStack> findRelicStacks(IRelicItem relic, List<RelicContainer> containers) {
-        return containers.stream()
-                .flatMap(container -> container.gatherRelics().apply(this.getAbilitiesData().getRelicData().getEntity()).stream())
-                .filter(stack -> stack.getItem() == relic)
-                .toList();
+        return RelicContainer.find(abilitiesData.getRelicData().getEntity(), containers, stack -> stack.getItem() == relic);
     }
 }

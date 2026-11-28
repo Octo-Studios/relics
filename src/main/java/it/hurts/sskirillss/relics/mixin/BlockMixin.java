@@ -9,7 +9,7 @@ import it.hurts.sskirillss.relics.items.relics.feet.SpringyBootItem;
 import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.network.packets.item.springy_boot.S2CBounceFromSurface;
-import it.hurts.sskirillss.relics.utils.EntityUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import it.hurts.sskirillss.relics.utils.WorldUtils;
 import net.minecraft.core.BlockPos;
@@ -18,8 +18,8 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -31,6 +31,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.ArrayList;
+
 @Mixin(Block.class)
 public class BlockMixin {
     @Inject(method = "fallOn", at = @At("HEAD"), cancellable = true)
@@ -40,7 +41,7 @@ public class BlockMixin {
 
         var mayContinue = false;
 
-        for (var stack : EntityUtils.findEquippedCurios(livingEntity, RelicsItems.SPRINGY_BOOT.get())) {
+        for (var stack : RelicStacks.lookup(livingEntity, RelicsItems.SPRINGY_BOOT.get(), "bounce").located().getStacks()) {
             if (!(stack.getItem() instanceof SpringyBootItem relic))
                 continue;
 
@@ -77,7 +78,7 @@ public class BlockMixin {
 
         var waveIndex = 0;
 
-        for (var stack : EntityUtils.findEquippedCurios(livingEntity, RelicsItems.SPRINGY_BOOT.get())) {
+        for (var stack : RelicStacks.lookup(livingEntity, RelicsItems.SPRINGY_BOOT.get(), "bounce").located().getStacks()) {
             if (!(stack.getItem() instanceof SpringyBootItem relic))
                 continue;
 

@@ -1,61 +1,24 @@
 package it.hurts.sskirillss.relics.relic_containers;
 
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
-import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
-import it.hurts.sskirillss.relics.api.relic_containers.RelicStackReference;
+import it.hurts.sskirillss.relics.api.relic_containers.SlottedRelicContainer;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiConsumer;
 
-public class CuriosRelicContainer extends RelicContainer {
-    @Override
-    public Function<LivingEntity, List<ItemStack>> gatherRelics() {
-        return entity -> {
-            List<ItemStack> relics = new ArrayList<>();
-
-            CuriosApi.getCuriosInventory(entity).ifPresent(itemHandler -> {
-                for (Map.Entry<String, ICurioStacksHandler> entry : itemHandler.getCurios().entrySet()) {
-                    ICurioStacksHandler stacksHandler = entry.getValue();
-
-                    for (int slot = 0; slot < stacksHandler.getSlots(); slot++) {
-                        ItemStack stack = stacksHandler.getStacks().getStackInSlot(slot);
-
-                        if (stack.getItem() instanceof IRelicItem)
-                            relics.add(stack);
-                    }
-                }
-            });
-
-            return relics;
-        };
+public class CuriosRelicContainer extends SlottedRelicContainer<CuriosRelicStackReference> {
+    public CuriosRelicContainer() {
+        super(CuriosRelicStackReference.STREAM_CODEC);
     }
 
     @Override
-    public Function<Player, List<RelicStackReference>> gatherRelicReferences() {
-        return player -> {
-            List<RelicStackReference> references = new ArrayList<>();
+    protected void visitSlots(LivingEntity entity, BiConsumer<CuriosRelicStackReference, ItemStack> consumer) {
+        CuriosApi.getCuriosInventory(entity).ifPresent(inventory -> inventory.getCurios().forEach((identifier, handler) -> {
+            var stacks = handler.getStacks();
 
-            CuriosApi.getCuriosInventory(player).ifPresent(itemHandler -> {
-                for (Map.Entry<String, ICurioStacksHandler> entry : itemHandler.getCurios().entrySet()) {
-                    ICurioStacksHandler stacksHandler = entry.getValue();
-
-                    for (int slot = 0; slot < stacksHandler.getSlots(); slot++) {
-                        ItemStack stack = stacksHandler.getStacks().getStackInSlot(slot);
-
-                        if (stack.getItem() instanceof IRelicItem)
-                            references.add(new CuriosRelicStackReference(entry.getKey(), slot));
-                    }
-                }
-            });
-
-            return references;
-        };
+            for (var slot = 0; slot < stacks.getSlots(); slot++)
+                consumer.accept(new CuriosRelicStackReference(identifier, slot), stacks.getStackInSlot(slot));
+        }));
     }
 }

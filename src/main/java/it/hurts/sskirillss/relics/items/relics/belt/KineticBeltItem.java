@@ -8,7 +8,9 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.AbilityTargetingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.targeting.SelectorType;
 import it.hurts.sskirillss.relics.api.relics.synergies.SynergyTemplate;
@@ -20,8 +22,6 @@ import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsItems;
 import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
-import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
-import it.hurts.sskirillss.relics.items.relics.base.data.RelicSlotModifier;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
@@ -32,7 +32,6 @@ import it.hurts.sskirillss.relics.network.packets.item.kinetic_belt.C2SSetActive
 import it.hurts.sskirillss.relics.utils.EntityUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.TargetingUtils;
 import net.minecraft.client.player.LocalPlayer;
@@ -50,7 +49,7 @@ import top.theillusivec4.curios.api.SlotContext;
 
 import java.awt.*;
 
-public class KineticBeltItem extends WearableRelicItem {
+public class KineticBeltItem extends SlotBeltItem {
     @Override
     public RelicTemplate constructDefaultRelicTemplate() {
         return RelicTemplate.builder()
@@ -60,9 +59,10 @@ public class KineticBeltItem extends WearableRelicItem {
                                 .levelContribution(5)
                                 .levelContributionRankModifier(0.1)
                                 .stat(AbilityStatTemplate.builder("amount")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(1D, 2D)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 12D)
-                                        .formatValue(value -> (int) (MathUtils.round(value, 0)))
+                                        .rounding(Math::round)
                                         .build())
                                 .research(ResearchTemplate.builder()
                                         .star(0, 11, 2).star(1, 5, 6).star(2, 17, 6).star(3, 2, 10).star(4, 20, 10).star(5, 11, 11).star(6, 2, 17).star(7, 7, 17).star(8, 15, 17).star(9, 20, 17).star(10, 2, 24).star(11, 20, 24).star(12, 11, 25)
@@ -78,17 +78,26 @@ public class KineticBeltItem extends WearableRelicItem {
                                         .selector(SelectorType.HARMFUL)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("efficiency")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.MIXED)
+                                                .condition(ability -> !ability.getMode().equals("disabled"))
+                                                .build())
                                         .initialValue(0.25D, 0.35D)
                                         .thresholdValue(0D, 1D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 1.00048D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("damage")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> ability.getRankModifierData("strike").isEnabled() && !ability.getMode().equals("disabled"))
+                                                .build())
                                         .initialValue(0.1D, 0.25D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 2.49963D)
                                         .formatValue(value -> (int) MathUtils.round(value * 100, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("resistance")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.ADDITIVE)
+                                                .condition(ability -> ability.getRankModifierData("resistance").isEnabled() && !ability.getMode().equals("disabled"))
+                                                .build())
                                         .initialValue(0.05D, 0.15D)
                                         .thresholdValue(0D, 0.75D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.75008D)
@@ -201,13 +210,6 @@ public class KineticBeltItem extends WearableRelicItem {
     }
 
     @Override
-    public RelicSlotModifier getSlotModifiers(LivingEntity entity, ItemStack stack) {
-        return RelicSlotModifier.builder()
-                .modifier("charm", (int) Math.round(getRelicData(entity, stack).getAbilitiesData().getAbilityData("slots").getStatData("amount").getValue()))
-                .build();
-    }
-
-    @Override
     public void curioTick(SlotContext slotContext, ItemStack stack) {
         super.curioTick(slotContext, stack);
 
@@ -215,7 +217,7 @@ public class KineticBeltItem extends WearableRelicItem {
         var level = entity.level();
         var gravityAttributeId = EntityUtils.getAttributeId(slotContext, stack, Attributes.GRAVITY.value(), "gliding");
 
-        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").canPlayerUse(entity) || this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")) {
+        if (!this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").isAvailable() || this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getMode().equals("disabled")) {
             EntityUtils.removeAttribute(entity, Attributes.GRAVITY, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);
 
             if (!level.isClientSide())
@@ -273,8 +275,7 @@ public class KineticBeltItem extends WearableRelicItem {
                 this.getRelicData(entity, stack).getLevelingData().addExperience("gliding", "gliding", 1);
             }
 
-            if (!hasAttribute)
-                EntityUtils.applyAttribute(entity, Attributes.GRAVITY, (float) -Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getValue(), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);
+            EntityUtils.resetAttribute(entity, Attributes.GRAVITY, (float) -Math.min(this.getRelicData(entity, stack).getAbilitiesData().getAbilityData("gliding").getStatData("efficiency").getStackedValue(), 0.9F), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL, gravityAttributeId);
 
             var prevPosition = new Vec3(entity.xOld, entity.yOld, entity.zOld);
             var position = entity.position();
@@ -339,7 +340,7 @@ public class KineticBeltItem extends WearableRelicItem {
     @EventBusSubscriber
     public static class CommonEvents {
         private static RelicStacks getGlidingStacks(LivingEntity entity) {
-            return RelicStackingUtils.stacks(entity, RelicsItems.KINETIC_BELT.get(), "gliding", RelicStacks.modeIsNot("disabled"));
+            return RelicStacks.of(entity, RelicsItems.KINETIC_BELT.get(), "gliding", RelicStacks.modeIsNot("disabled"));
         }
 
         @SubscribeEvent
@@ -368,7 +369,7 @@ public class KineticBeltItem extends WearableRelicItem {
                     if (!TargetingUtils.canHarm(source, event.getEntity(), entry.stack(), "gliding"))
                         continue;
 
-                    var additional = original * entry.stat("damage");
+                    var additional = original * entry.stackedStat("damage");
 
                     entry.addExperience("strike", additional);
                     entry.addMetric("damage", additional);
@@ -385,7 +386,7 @@ public class KineticBeltItem extends WearableRelicItem {
                 if (!((KineticBeltItem) entry.relic()).isActive(entry.stack()))
                     continue;
 
-                var additional = original * entry.stat("resistance");
+                var additional = original * entry.stackedStat("resistance");
 
                 entry.addExperience("resistance", additional);
                 entry.addMetric("resistance", additional);

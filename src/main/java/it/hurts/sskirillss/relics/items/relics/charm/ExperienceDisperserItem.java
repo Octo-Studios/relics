@@ -2,6 +2,7 @@ package it.hurts.sskirillss.relics.items.relics.charm;
 
 import it.hurts.sskirillss.relics.Relics;
 import it.hurts.sskirillss.relics.api.events.relic.leveling.RelicExperienceChangeEvent;
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
 import it.hurts.sskirillss.relics.api.relics.AbilityMetricTemplate;
 import it.hurts.sskirillss.relics.api.relics.AbilityStatisticTemplate;
 import it.hurts.sskirillss.relics.api.relics.IRelicItem;
@@ -10,22 +11,24 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilitiesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatStackingTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.init.RelicsItems;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.WearableRelicItem;
 import it.hurts.sskirillss.relics.items.relics.base.data.leveling.LevelingTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.LootTemplate;
 import it.hurts.sskirillss.relics.items.relics.base.data.loot.misc.LootEntries;
 import it.hurts.sskirillss.relics.items.relics.base.data.research.ResearchTemplate;
-import it.hurts.sskirillss.relics.utils.RelicStackingUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.player.PlayerXpEvent;
-import top.theillusivec4.curios.api.CuriosApi;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,16 +44,21 @@ public class ExperienceDisperserItem extends WearableRelicItem {
                                 .rankModifier(3, "player_xp")
                                 .rankModifier(5, "max_level")
                                 .stat(AbilityStatTemplate.builder("distribution_ratio")
+                                        .stacking(StatStackingType.ADDITIVE)
                                         .initialValue(0.05D, 0.15D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.99997D)
                                         .formatValue(value -> MathUtils.round(value * 100D, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("same_item_bonus")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(0.15D, 0.25D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.99988D)
                                         .formatValue(value -> MathUtils.round(value * 100D, 1))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("player_xp_ratio")
+                                        .stacking(AbilityStatStackingTemplate.builder(StatStackingType.SEQUENTIAL)
+                                                .condition(ability -> ability.getRankModifierData("player_xp").isEnabled())
+                                                .build())
                                         .initialValue(0.025D, 0.05D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 0.49993D)
                                         .formatValue(value -> MathUtils.round(value * 100D, 1))
@@ -113,13 +121,13 @@ public class ExperienceDisperserItem extends WearableRelicItem {
 
             var sourceAtMaxLevel = sourceRelicData != null && sourceRelicData.isMaxLevel();
 
-            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.EXPERIENCE_DISPERSER.get(), "dispersion")) {
+            for (var entry : RelicStacks.of(player, RelicsItems.EXPERIENCE_DISPERSER.get(), "dispersion")) {
                 var ability = entry.ability();
 
                 if (sourceAtMaxLevel && !entry.rank("max_level"))
                     continue;
 
-                var ratio = entry.stat("distribution_ratio");
+                var ratio = entry.stackedStat("distribution_ratio");
                 var sameItemBonus = entry.stat("same_item_bonus");
 
                 if (ratio <= 0D)
@@ -196,9 +204,9 @@ public class ExperienceDisperserItem extends WearableRelicItem {
             if (relics.isEmpty())
                 return;
 
-            for (var entry : RelicStackingUtils.stacks(player, RelicsItems.EXPERIENCE_DISPERSER.get(), "dispersion").withRank("player_xp")) {
+            for (var entry : RelicStacks.of(player, RelicsItems.EXPERIENCE_DISPERSER.get(), "dispersion").withRank("player_xp")) {
                 var ability = entry.ability();
-                var ratio = entry.stat("player_xp_ratio");
+                var ratio = entry.stackedStat("player_xp_ratio");
                 var targets = new ArrayList<ItemStack>();
 
                 for (var relicStack : relics) {
@@ -267,23 +275,7 @@ public class ExperienceDisperserItem extends WearableRelicItem {
         }
 
         private static List<ItemStack> getEquippedRelics(Player player) {
-            var relics = new ArrayList<ItemStack>();
-
-            for (var handStack : player.getHandSlots()) {
-                if (handStack.getItem() instanceof IRelicItem)
-                    relics.add(handStack);
-            }
-
-            CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
-                for (int i = 0; i < handler.getEquippedCurios().getSlots(); i++) {
-                    var stack = handler.getEquippedCurios().getStackInSlot(i);
-
-                    if (stack.getItem() instanceof IRelicItem)
-                        relics.add(stack);
-                }
-            });
-
-            return relics;
+            return RelicContainer.find(player, List.of(RelicsRelicContainers.HANDS.get(), RelicsRelicContainers.CURIOS.get()), stack -> true);
         }
     }
 }

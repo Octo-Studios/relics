@@ -2,7 +2,8 @@ package it.hurts.sskirillss.relics.utils;
 
 import com.google.common.collect.Lists;
 import it.hurts.sskirillss.relics.Relics;
-import it.hurts.sskirillss.relics.api.relics.IRelicItem;
+import it.hurts.sskirillss.relics.api.relic_containers.RelicContainer;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -24,13 +25,13 @@ import net.minecraft.world.phys.Vec3;
 import top.theillusivec4.curios.api.CuriosApi;
 import top.theillusivec4.curios.api.SlotContext;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
+import javax.annotation.Nullable;
 
 public class EntityUtils {
     public static void moveTowardsPosition(Entity entity, Vec3 targetPos, double speed) {
@@ -350,32 +351,10 @@ public class EntityUtils {
     }
 
     public static List<ItemStack> getEquippedRelics(LivingEntity entity) {
-        List<ItemStack> items = new ArrayList<>();
+        if (!(entity instanceof Player))
+            return new ArrayList<>();
 
-        if (!(entity instanceof Player player))
-            return items;
-
-        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-            ItemStack stack = player.getInventory().getItem(i);
-
-            if (!(stack.getItem() instanceof IRelicItem))
-                continue;
-
-            items.add(stack);
-        }
-
-        CuriosApi.getCuriosInventory(player).ifPresent(handler -> {
-            for (int i = 0; i < handler.getEquippedCurios().getSlots(); i++) {
-                ItemStack stack = handler.getEquippedCurios().getStackInSlot(i);
-
-                if (!(stack.getItem() instanceof IRelicItem))
-                    continue;
-
-                items.add(stack);
-            }
-        });
-
-        return items;
+        return new ArrayList<>(RelicContainer.find(entity, List.of(RelicsRelicContainers.INVENTORY.get(), RelicsRelicContainers.CURIOS.get()), stack -> true));
     }
 
     public static <T extends LivingEntity> Stream<T> gatherPotentialTargets(Entity seeker, Class<T> type, double radius) {

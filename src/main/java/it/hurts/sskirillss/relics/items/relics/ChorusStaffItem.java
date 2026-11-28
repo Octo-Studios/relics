@@ -9,12 +9,14 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberration;
 import it.hurts.sskirillss.relics.dev.chromatic_aberration.ChromaticAberrationManager;
 import it.hurts.sskirillss.relics.dev.shake.Shake;
 import it.hurts.sskirillss.relics.dev.shake.ShakeManager;
 import it.hurts.sskirillss.relics.init.RelicsCreativeTabs;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
+import it.hurts.sskirillss.relics.init.RelicsRelicContainers;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.misc.CreativeContentConstructor;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -27,6 +29,7 @@ import it.hurts.sskirillss.relics.network.packets.S2CSetEntityMotion;
 import it.hurts.sskirillss.relics.utils.FlawlessUtils;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.ServerScheduler;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -63,16 +66,20 @@ public class ChorusStaffItem extends RelicItem {
                                 .rankModifier(5, "ascent")
                                 .levelContribution(10)
                                 .stat(AbilityStatTemplate.builder("distance")
+                                        .activeContainers(RelicsRelicContainers.HANDS.get())
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(10D, 15D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30D)
                                         .formatValue(value -> (int) MathUtils.round(value, 0))
                                         .build())
                                 .stat(AbilityStatTemplate.builder("max_charge")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(3D, 5D)
                                         .targetValue(RelicsScalingModels.ADDITIVE.get(), 40D)
-                                        .formatValue(value -> (int) MathUtils.round(value, 0))
+                                        .rounding(Math::round)
                                         .build())
                                 .stat(AbilityStatTemplate.builder("cooldown")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(30D, 15D)
                                         .thresholdValue(1D, Double.MAX_VALUE)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 5D)
@@ -147,7 +154,9 @@ public class ChorusStaffItem extends RelicItem {
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
         var stack = player.getItemInHand(hand);
 
-        if (!this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").canPlayerUse(player))
+        var ability = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink");
+
+        if (!ability.getStatData("distance").isAvailable())
             return InteractionResultHolder.pass(stack);
 
         var radius = this.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatData("distance").getValue();
@@ -315,7 +324,12 @@ public class ChorusStaffItem extends RelicItem {
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slotId, boolean isSelected) {
         super.inventoryTick(stack, level, entity, slotId, isSelected);
 
-        if (level.isClientSide() || !(entity instanceof LivingEntity livingEntity) || livingEntity.tickCount % ((int) this.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("blink").getStatData("cooldown").getValue() * 20) != 0
+        if (level.isClientSide() || !(entity instanceof LivingEntity livingEntity))
+            return;
+
+        var cooldown = this.getRelicData(livingEntity, stack).getAbilitiesData().getAbilityData("blink").getStatData("cooldown");
+
+        if (!cooldown.isInActiveContainer() || livingEntity.tickCount % ((int) cooldown.getValue() * 20) != 0
                 || this.getCharge(livingEntity, stack) >= this.getMaxCharge(livingEntity, stack))
             return;
 
@@ -358,23 +372,19 @@ public class ChorusStaffItem extends RelicItem {
             if (!(event.getEntity() instanceof Player player))
                 return;
 
-            var inventory = player.getInventory();
+            for (var entry : RelicStacks.lookup(player, candidate -> candidate.getItem() instanceof ChorusStaffItem, "blink").located().withRank("safe_fall")) {
+                var stack = entry.stack();
+                var relic = (ChorusStaffItem) entry.relic();
 
-            for (int i = 0; i < inventory.getContainerSize(); i++) {
-                var stack = inventory.getItem(i);
+                if (!relic.shouldSafeFall(stack))
+                    continue;
 
-                if (stack.getItem() instanceof ChorusStaffItem relic) {
-                    if (!relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getRankModifierData("safe_fall").isEnabled() || !relic.shouldSafeFall(stack))
-                        continue;
+                relic.setSafeFall(stack, false);
 
-                    relic.setSafeFall(stack, false);
+                entry.addExperience("blink", 1);
+                entry.addMetric("safe_falls", 1);
 
-                    relic.getRelicData(player, stack).getLevelingData().addExperience("blink", "blink", 1);
-
-                    relic.getRelicData(player, stack).getAbilitiesData().getAbilityData("blink").getStatisticData().getMetricData("safe_falls").addValue(1);
-
-                    event.setDamageMultiplier(0F);
-                }
+                event.setDamageMultiplier(0F);
             }
         }
     }

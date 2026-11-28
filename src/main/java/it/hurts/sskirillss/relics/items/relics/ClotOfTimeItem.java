@@ -12,6 +12,7 @@ import it.hurts.sskirillss.relics.api.relics.abilities.AbilityTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourceTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.ExperienceSourcesTemplate;
 import it.hurts.sskirillss.relics.api.relics.abilities.stats.AbilityStatTemplate;
+import it.hurts.sskirillss.relics.api.relics.abilities.stats.StatStackingType;
 import it.hurts.sskirillss.relics.init.RelicsDataComponents;
 import it.hurts.sskirillss.relics.init.RelicsScalingModels;
 import it.hurts.sskirillss.relics.items.relics.base.RelicItem;
@@ -23,6 +24,7 @@ import it.hurts.sskirillss.relics.network.NetworkHandler;
 import it.hurts.sskirillss.relics.network.packets.S2CSpawnParticle;
 import it.hurts.sskirillss.relics.utils.MathUtils;
 import it.hurts.sskirillss.relics.utils.ParticleUtils;
+import it.hurts.sskirillss.relics.utils.RelicStacks;
 import it.hurts.sskirillss.relics.utils.RenderUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -36,7 +38,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.UseAnim;
@@ -49,7 +50,6 @@ import net.neoforged.neoforge.client.event.RenderFrameEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.tick.EntityTickEvent;
 import org.joml.Vector3f;
-import top.theillusivec4.curios.api.SlotContext;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -65,6 +65,7 @@ public class ClotOfTimeItem extends RelicItem {
                                 .rankModifier(3, "oblivion")
                                 .rankModifier(5, "health_rewind")
                                 .stat(AbilityStatTemplate.builder("time")
+                                        .stacking(StatStackingType.PARALLEL)
                                         .initialValue(3D, 5D)
                                         .targetValue(RelicsScalingModels.MULTIPLICATIVE_BASE.get(), 30.0075D)
                                         .formatValue(value -> MathUtils.round(value, 1))
@@ -472,20 +473,12 @@ public class ClotOfTimeItem extends RelicItem {
             if (!(event.getEntity() instanceof ServerPlayer player) || player.level().isClientSide())
                 return;
 
-            var usingSlot = -1;
             var currentDimension = player.level().dimension().location().toString();
-
-            if (player.isUsingItem() && player.getUseItem().getItem() instanceof ClotOfTimeItem)
-                usingSlot = player.getUsedItemHand() == InteractionHand.MAIN_HAND ? player.getInventory().selected : Inventory.SLOT_OFFHAND;
-
             PathPointData pointToAppend = null;
 
-            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-                var stack = player.getInventory().getItem(i);
-
-                if (!(stack.getItem() instanceof ClotOfTimeItem relic))
-                    continue;
-
+            for (var entry : RelicStacks.lookup(player, candidate -> candidate.getItem() instanceof ClotOfTimeItem, "rewind").located()) {
+                var stack = entry.stack();
+                var relic = (ClotOfTimeItem) entry.relic();
                 var rememberedTicks = relic.getRememberedTicks(player, stack);
 
                 if (rememberedTicks <= 0) {
@@ -498,7 +491,7 @@ public class ClotOfTimeItem extends RelicItem {
 
                 var cursor = stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_REWIND_CURSOR, -1D);
                 var storedPath = stack.getOrDefault(RelicsDataComponents.CLOT_OF_TIME_PATH, List.<PathPointData>of());
-                var usingThisStack = i == usingSlot;
+                var usingThisStack = player.isUsingItem() && player.getUseItem() == stack;
                 var justStoppedRewind = false;
 
                 if (usingThisStack) {
